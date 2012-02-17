@@ -1,0 +1,85 @@
+From any given shout:  (long press on a shout to get options)
+  1) Send it to twitter (Twout?)
+  2) Reshout <-- Need a new name for this
+  3) Save / favorite
+  4) Add hashtag of shouts to hashtag browser
+  5) Previous usernames
+  6) Previous avatars?????
+  
+  
+For things that we sent to twitter
+  1) have a list of things we sent to twitter in the past ?????????????
+  
+In general applications
+  1) Browse nearby shouts
+  2) Browse favorited shouts
+  3) Filter nearby shouts on hashtags -> for saved filters save the shouts
+  4) Browse through saved hashtags (show most recent, either cached or immediate, overwrite cached with immediate)
+  
+When composing shouts:
+  1) Text Editor
+  2) Option to tweet (save last choice)
+  3) Autocomplete for hash tags
+  4) Click popular hash tag list (stored hash tags)
+  
+  
+  
+STORING SHOUTS
+
+5 Tables in a DB
+
+--My Tweets--
+My_Tweet_Key (PK), Content, Date, Incoming Tweet Key (FK or null)
+
+--Shout--
+Shout_Key (PK), User_Key (FK), Content, Date
+
+--Tag--
+Tag_Key (PK), Name
+
+--Tag_Assignment--
+Tag_Assignment_Key (PK), Shout_Key (FK), Tag_Key (FK)
+
+--User--
+User_Key (PK), Public_Key, Username, Avatar??????
+
+
+USER INTERFACE STRUCTURE
+
+--Activites---
+Launcher (main)
+Timeline (main screen / where all usage of app takes place)
+Settings
+HashTag Management
+Message Composition
+
+--Views--
+Launcher: Splash Screen
+Timeline: Timeline, Saved Filters (each one is a new view), Popular (collapse things with multiple RT into 1, show number), Favorited
+Settings: Setting settings 
+Hashtag Management: Filter management
+Message Composition: Text Editor
+
+Searching -> Widget??? Brought up on top of current view, searches current view
+    Searchable Views: Everything in Timeline Activity
+
+--Settings--
+Screenname
+Generate new key (lose old one)
+Twitter account linking
+Set list of hashtag filter screens (displayed, not displayed, delete entirely)
+Length to keep old things not explicity stored (e.g. favorited)
+Font????
+Shouts per page?????
+Set Avatar
+Auto Rotate
+Refresh Timeline Rate (Notification management)
+Show Version Info (About)
+
+
+
+PROGRAM COMPLETION SCHEDULE
+Database
+Timeline
+Past Shouts
+Popular 
