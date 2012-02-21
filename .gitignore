@@ -2,3 +2,6 @@
 .project
 .classpath
 *~
+bin
+gen
+target
