@@ -1,0 +1,33 @@
+CONTENT PROVIDER DESIGN INFORMATION
+
+This is a in-progress document that will be updated as the ContentProvider evoles.
+
+INTERACTION
+
+URI STRUCTURE
+
+org.whispercomm.shout.provider/<tablename>/<id> can access an individual row in
+tablee <tablename> with primary key <id>
+
+
+DATABASE DESIGN
+
+5 tables in the database
+In every table, the primary key column has the name "_ID" in order to maintain
+compatibility with automatically populating ListViews.
+
+--User_Shouts--
+_ID (PK), Content, Date, Incoming_Shout_ID (FK or null)
+
+--Shout--
+_ID (PK), User_ID (FK), Content, Date
+
+--Tag--
+_ID (PK), Name
+
+--Tag_Assignment--
+_ID (PK), Shout_ID (FK), Tag_ID (FK)
+
+--User--
+_ID (PK), Public_Key, Username
+
