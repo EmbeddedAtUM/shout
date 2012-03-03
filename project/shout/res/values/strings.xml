@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">Hello shout!</string>
-    <string name="app_name">shout</string>
+    <string name="app_name">Shout</string>
+    <string name="no_shouts">You haven\'t received any Shouts.</string>
 </resources>

@@ -2,12 +2,22 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="?android:attr/listPreferredItemHeight"
-    android:padding="6dip">
+    android:orientation="vertical">
     
 	<TextView
 	    android:id="@+id/message"
 	    android:layout_width="fill_parent"
-	    android:layout_height="20dip"
+	    android:layout_height="25dip"
+	    android:textColor="@android:color/black"
+	/>
+	
+	<TextView
+	    android:id="@+id/age"
+	    android:layout_width="fill_parent"
+	    android:layout_height="16dip"
+	    android:layout_marginTop="10dip"
+	    android:layout_marginLeft="70dip"
+	    android:textColor="@android:color/black"
 	/>
 
 </LinearLayout>
