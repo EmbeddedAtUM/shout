@@ -1,7 +1,9 @@
 package org.whispercomm.shout;
 
-public class Shout {
+import org.joda.time.DateTime;
 
+public class Shout {
+	DateTime date;
 	String content;
 
 	public Shout(String content) {
