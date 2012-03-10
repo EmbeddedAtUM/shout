@@ -2,8 +2,39 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical">
+    
+    
+    
+    <!-- Title Bar -->
+   	<LinearLayout
+    style="@style/TitleBar"
+    android:background="@drawable/navgradient" >
+
+    <TextView style="@style/TitleBarLogo" />
+
+    <TextView style="@style/TitleBarText" />
+    
+    <ImageView style="@style/TitleBarSeparator"
+        android:contentDescription="@string/separatorDesc" />
+    
+    <ImageButton
+        style="@style/TitleBarButton"
+        android:src="@drawable/chat"
+        android:onClick="onClickShout"
+        android:contentDescription="@string/shoutDesc"/>
+    
+    <ImageView style="@style/TitleBarSeparator"
+        android:contentDescription="@string/separatorDesc" />
+
+    <ImageButton
+        style="@style/TitleBarButton"
+        android:src="@drawable/gear"
+        android:onClick="onClickSettings"
+        android:contentDescription="@string/settingsDesc" />
+	</LinearLayout>
         
+    <!-- ListView displaying the shouts -->
 	<ListView
 	    android:id="@android:id/list"
 	    android:layout_width="fill_parent"
@@ -12,6 +43,7 @@
 	    android:divider="@android:color/black"
 	    android:dividerHeight="1dip"/>
 	
+	<!-- TextView displayed if the ListView is empty -->
 	<TextView 
 	    android:id="@android:id/empty"
 	    android:layout_width="fill_parent"

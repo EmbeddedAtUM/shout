@@ -6,9 +6,13 @@ import org.joda.time.DateTime;
 
 import android.app.ListActivity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -111,5 +115,43 @@ public class ShoutActivity extends ListActivity {
 			return rowView;
 		}
 
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.menu, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		Intent intent;
+
+		switch (item.getItemId()) {
+		case R.id.settings:
+			intent = new Intent(this, SettingsActivity.class);
+			break;
+		case R.id.compose:
+			intent = new Intent(this, MessageActivity.class);
+			break;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+
+		startActivity(intent);
+		return true;
+	}
+
+	public void onClickShout(View v) {
+		Log.v(TAG, "Shout button clicked");
+
+		startActivity(new Intent(this, MessageActivity.class));
+	}
+
+	public void onClickSettings(View v) {
+		Log.v(TAG, "Settings button clicked");
+
+		startActivity(new Intent(this, SettingsActivity.class));
 	}
 }
