@@ -2,11 +2,34 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:background="@drawable/messageviewgradient" >
     
-    <TextView
-        android:layout_height="wrap_content"
+    <EditText 
+        android:inputType="textMultiLine"
+        android:layout_height="150dip"
         android:layout_width="fill_parent"
-        android:text="Message activity stub."/>   
+ 		android:gravity="top" />
+    
+    <RelativeLayout
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content" >
+        
+	    <CheckBox
+	        android:id="@+id/tweet"
+	        android:layout_height="wrap_content"
+	        android:layout_width="wrap_content"
+	        android:text="@string/postToTwitter" />
+	    
+		<Button 
+		    android:id="@+id/send"
+		    android:layout_height="wrap_content"
+	        android:layout_width="wrap_content"
+	        android:layout_alignParentRight="true"
+	        android:layout_marginRight="10dip"
+	        android:text="@string/shout"
+	        android:onClick="onClickSend" />
+		
+	</RelativeLayout>
 
 </LinearLayout>

@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class ShoutActivity extends ListActivity {
@@ -30,7 +31,8 @@ public class ShoutActivity extends ListActivity {
 
 		ArrayList<Shout> shouts = new ArrayList<Shout>();
 		for (int i = 0; i < 15; i++) {
-			shouts.add(new Shout("Item " + i, DateTime.now()));
+			shouts.add(new Shout("gsingh2011", "gsingh2011", "Item " + i,
+					DateTime.now()));
 		}
 
 		TimelineAdapter adapter = new TimelineAdapter(
@@ -41,6 +43,9 @@ public class ShoutActivity extends ListActivity {
     }
     
 	static class ViewHolder {
+		ImageView avatar;
+		TextView origSender;
+		TextView sender;
 		TextView message;
 		TextView age;
 	}
@@ -69,6 +74,12 @@ public class ShoutActivity extends ListActivity {
 				rowView = inflater.inflate(R.layout.row, parent, false);
 
 				ViewHolder viewHolder = new ViewHolder();
+				viewHolder.avatar = (ImageView) rowView
+						.findViewById(R.id.avatar);
+				viewHolder.origSender = (TextView) rowView
+						.findViewById(R.id.origsender);
+				viewHolder.sender = (TextView) rowView
+						.findViewById(R.id.sender);
 				viewHolder.message = (TextView) rowView
 						.findViewById(R.id.message);
 				viewHolder.age = (TextView) rowView.findViewById(R.id.age);
@@ -81,40 +92,23 @@ public class ShoutActivity extends ListActivity {
 			// Gets the view information
 			ViewHolder holder = (ViewHolder) rowView.getTag();
 
-			// Creates the message string
-			long timePassed;
-			String unit;
-			DateTime time = shout.getTimePassed();
-			if (time.isAfter(60 * 1000)) {
-				timePassed = shout.getTimePassed().getMinuteOfHour();
-				unit = "minute";
-			} else if (time.isAfter(60 * 60 * 1000)) {
-				timePassed = shout.getTimePassed().getHourOfDay();
-				unit = "hour";
-			} else if (time.isAfter(60 * 60 * 24 * 1000)) {
-				timePassed = shout.getTimePassed().getDayOfWeek();
-				unit = "day";
-			} else {
-				timePassed = shout.getTimePassed().getSecondOfMinute();
-				unit = "second";
-			}
-				
-			String ageText = String.format("Message received %d %s%s ago.",
-					timePassed, unit, timePassed == 1 ? "" : "s");
+			String ageText = shout.getAgeMessage();
 
 			Log.v(TAG, ageText);
+			holder.avatar.setImageResource(R.drawable.defaultavatar);
+			holder.origSender.setText(shout.getOrigSender());
+			holder.sender.setText(shout.getSender());
 			holder.age.setText(ageText);
 			holder.message.setText(shout.getContent());
 			Log.v(TAG, "Textview text set");
 
 			if (shout.id % 2 == 0)
-				rowView.setBackgroundColor(0xFFA8FFFF);
+				rowView.setBackgroundColor(0xFFE2F7FF);
 			else
 				rowView.setBackgroundColor(0xFFFFFFFF);
 
 			return rowView;
 		}
-
 	}
 	
 	@Override

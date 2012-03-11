@@ -15,17 +15,11 @@
 
     <TextView style="@style/TitleBarText" />
     
-    <ImageView style="@style/TitleBarSeparator"
-        android:contentDescription="@string/separatorDesc" />
-    
     <ImageButton
         style="@style/TitleBarButton"
         android:src="@drawable/chat"
         android:onClick="onClickShout"
         android:contentDescription="@string/shoutDesc"/>
-    
-    <ImageView style="@style/TitleBarSeparator"
-        android:contentDescription="@string/separatorDesc" />
 
     <ImageButton
         style="@style/TitleBarButton"
@@ -33,6 +27,18 @@
         android:onClick="onClickSettings"
         android:contentDescription="@string/settingsDesc" />
 	</LinearLayout>
+	
+   	<!-- Title of page -->
+   	<TextView 
+   	    android:id="@+id/pagetitle"
+   	    android:layout_height="40dip"
+   	    android:layout_width="fill_parent"
+   	    android:gravity="top|left"
+   	    android:paddingLeft="10dip"
+   	    android:paddingTop="10dip"
+   	    android:background="@drawable/titlegradient"
+   	    android:text="All Shouts"
+   	    android:textColor="@android:color/black" />
         
     <!-- ListView displaying the shouts -->
 	<ListView
@@ -40,8 +46,7 @@
 	    android:layout_width="fill_parent"
 	    android:layout_height="fill_parent"
 	    android:background="@android:color/white"
-	    android:divider="@android:color/black"
-	    android:dividerHeight="1dip"/>
+	    android:divider="#000000" />
 	
 	<!-- TextView displayed if the ListView is empty -->
 	<TextView 
