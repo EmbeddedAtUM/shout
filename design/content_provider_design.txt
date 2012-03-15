@@ -1,23 +1,19 @@
-CONTENT PROVIDER DESIGN INFORMATION
+====CONTENT PROVIDER DESIGN INFORMATION====
 
-This is a in-progress document that will be updated as the ContentProvider evoles.
+This is a in-progress document that will be updated as the ContentProvider evolves.
 
-INTERACTION
+====INTERACTION====
 
-URI STRUCTURE
+====URI STRUCTURE====
 
-org.whispercomm.shout.provider/<tablename>/<id> can access an individual row in
-tablee <tablename> with primary key <id>
-
-
-DATABASE DESIGN
+====DATABASE DESIGN====
 
 5 tables in the database
 In every table, the primary key column has the name "_ID" in order to maintain
 compatibility with automatically populating ListViews.
 
 --User_Shouts--
-_ID (PK), Content, Date, Incoming_Shout_ID (FK or null)
+_ID (PK), Shout_ID (FK), Reshout_ID (FK or null)
 
 --Shout--
 _ID (PK), User_ID (FK), Content, Date
@@ -26,8 +22,46 @@ _ID (PK), User_ID (FK), Content, Date
 _ID (PK), Name
 
 --Tag_Assignment--
-_ID (PK), Shout_ID (FK), Tag_ID (FK)
+_ID (PK), Tag_ID (FK), Shout_ID (FK)
 
 --User--
 _ID (PK), Public_Key, Username
 
+====CURRENT CREATE TABLE COMMANDS====
+
+CREATE TABLE User
+(
+    _ID INT NOT NULL PRIMARY KEY ASC AUTOINCREMENT,
+    Public_Key VARCHAR(16) UNIQUE,
+    Username VARCHAR(16)
+);
+CREATE TABLE Shout
+(
+    _ID INT PRIMARY KEY NOT NULL ASC AUTOINCREMENT,
+    User_ID INT,
+    FOREIGN KEY(User_ID) REFERENCES `User(_ID)`,
+    Content VARCHAR(140),
+    Date VARCHAR(19)
+);
+CREATE TABLE Tag
+(
+    _ID INT NOT NULL PRIMARY KEY ASC AUTOINCREMENT,
+    Name VARCHAR(139)
+);
+CREATE TABLE Tag_Assignment
+(
+    _ID INT NOT NULL PRIMARY KEY ASC AUTOINCREMENT,
+    Tag_ID INT NOT NULL,
+    FOREIGN KEY(Tag_ID) REFERENCES Tag(_ID),
+    Shout_ID INT NOT NULL,
+    FOREIGN KEY(Shout_ID) REFERENCES Shout(_ID)
+);
+CREATE TABLE User_Shouts
+(
+    _ID INT NOT NULL PRIMARY KEY ASC AUTOINCREMENT,
+    Shout_ID INT NOT NULL UNIQUE,
+    FOREIGN KEY(Shout_ID) REFERENCES Shout(_ID),
+    Reshout_ID INT,
+    FOREIGN KEY(Reshout_ID) REFERENCES Shout(_ID)
+);
+   
