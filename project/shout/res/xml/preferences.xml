@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- defaultValue should be changed to default username, i.e. user123 -->
+    <org.whispercomm.shout.customwidgets.MyPreferenceCategory
+        android:title="General Preferences" >
+            <org.whispercomm.shout.customwidgets.MyEditTextPreference
+                android:name="Username"
+                android:summary="This is the username which will be displayed by your Shouts"
+                android:defaultValue="Nothing"
+                android:title="Username"
+                android:key="usernamePref" />
+            <org.whispercomm.shout.customwidgets.MyEditTextPreference
+                android:name="Username"
+                android:summary="This is the username which will be displayed by your Shouts"
+                android:defaultValue="Nothing"
+                android:title="Username"
+                android:key="usernamePref" />
+            <org.whispercomm.shout.customwidgets.MyEditTextPreference
+                android:name="Username"
+                android:summary="This is the username which will be displayed by your Shouts"
+                android:defaultValue="Nothing"
+                android:title="Username"
+                android:key="usernamePref" />
+            <org.whispercomm.shout.customwidgets.MyEditTextPreference
+                android:name="Username"
+                android:summary="This is the username which will be displayed by your Shouts"
+                android:defaultValue="Nothing"
+                android:title="Username"
+                android:key="usernamePref" />
+                <org.whispercomm.shout.customwidgets.MyCheckBoxPreference
+                        android:title="Auto Rotate"
+                        android:defaultValue="false"
+                        android:summary="If checked, the screen will automatically rotate when tilted"
+                        android:key="rotatePref" />
+        	</org.whispercomm.shout.customwidgets.MyPreferenceCategory>
+        <PreferenceCategory
+                android:title="Twitter Account">
+        <org.whispercomm.shout.customwidgets.MyPreference
+                android:title="Login to Twitter"
+                android:summary="Login to Twitter to tweet your Shouts"
+                android:key="twitterLoginPref" />
+        </PreferenceCategory>
+</PreferenceScreen>
