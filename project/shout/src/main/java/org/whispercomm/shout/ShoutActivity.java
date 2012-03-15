@@ -102,6 +102,9 @@ public class ShoutActivity extends ListActivity {
 			holder.message.setText(shout.getContent());
 			Log.v(TAG, "Textview text set");
 
+			// TODO: Color will always alternate, but white should never be the
+			// first color (bug was seen when starting this Activity from
+			// another)
 			if (shout.id % 2 == 0)
 				rowView.setBackgroundColor(0xFFE2F7FF);
 			else

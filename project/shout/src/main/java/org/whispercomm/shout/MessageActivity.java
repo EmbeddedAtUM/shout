@@ -28,7 +28,9 @@ public class MessageActivity extends Activity {
 	public void onClickSend(View v) {
 		Log.v(TAG, "Send button clicked");
 
-		startActivity(new Intent(this, ShoutActivity.class));
+		Intent intent = new Intent();
+		setResult(RESULT_OK, intent);
+		finish();
 
 		successToast.show();
 	}
