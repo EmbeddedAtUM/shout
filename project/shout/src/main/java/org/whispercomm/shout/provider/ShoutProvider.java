@@ -8,6 +8,7 @@ import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.util.Log;
 
@@ -15,6 +16,8 @@ public class ShoutProvider extends ContentProvider {
 
 	private static final String TAG = ShoutProvider.class.getName();
 	private static final String AUTHORITY = TAG;
+
+	private static final String URI_ERROR = "Error: Invalid URI ";
 
 	private static final UriMatcher sURIMatcher = new UriMatcher(
 			UriMatcher.NO_MATCH);
@@ -27,7 +30,34 @@ public class ShoutProvider extends ContentProvider {
 	private static final int TAGS_ID = 5;
 	private static final int USERS = 6;
 	private static final int USERS_ID = 7;
-	
+
+	// These are the basic query strings. Note that none of them are semicolon
+	// delimited within the string.
+	private static final String SQL_QUERY_SHOUTS = "SELECT S._ID, S.User_ID, S.Content, S.Date, U.Username, U.Public_Key "
+			+ "FROM Shout AS S "
+			+ "JOIN `User` AS U "
+			+ "ON S.User_ID = U.User_ID;";
+	private static final String SQL_QUERY_SHOUTS_ID = "SELECT S._ID, S.User_ID, S.Content, S.Date, U.Username, U.Public_Key "
+			+ "FROM Shout AS S "
+			+ "JOIN `User` AS U "
+			+ "ON S.User_ID = U.User_ID " + "WHERE S.Shout_ID = ?;";
+	private static final String SQL_QUERY_SHOUTS_USER_ID = "SELECT S._ID, S.User_ID, S.Content, S.Date, U.Username, U.Public_Key "
+			+ "FROM Shout AS S "
+			+ "JOIN `User` AS U "
+			+ "ON S.User_ID = U.User_ID " + "WHERE S.User_ID = ?;";
+	private static final String SQL_QUERY_SHOUTS_TAG_ID = "SELECT S._ID, S.User_ID, S.Content, S.Date, U.Username, U.Public_Key "
+			+ "FROM Tag_Assignment AS TA "
+			+ "JOIN Shout AS S "
+			+ "ON S._ID = TA.Shout_ID "
+			+ "JOIN `User` as U "
+			+ "ON S.User_ID = U._ID " + "WHERE TA.Tag_ID = ?";
+	private static final String SQL_QUERY_TAGS = "SELECT T._ID, T.Name FROM Tag AS T;";
+	private static final String SQL_QUERY_TAGS_ID = "SELECT T._ID, T.Name FROM Tag AS T "
+			+ " WHERE T._ID = ?;";
+	private static final String SQL_QUERY_USERS = "SELECT U._ID, U.Username, U.Public_Key FROM User AS U;";
+	private static final String SQL_QUERY_USERS_ID = "SELECT U._ID, U.Username, U.Public_Key FROM User AS U "
+			+ " WHERE U._ID = ?;";
+
 	/**
 	 * Initializer block to set URIs in the UriMatcher
 	 */
@@ -47,7 +77,7 @@ public class ShoutProvider extends ContentProvider {
 
 	@Override
 	public boolean onCreate() {
-		Log.d(TAG, "onCreate() called");
+		Log.v(TAG, "onCreate() called");
 		mDBHelper = new ShoutProviderDatabaseHelper(super.getContext());
 		return true;
 	}
@@ -57,12 +87,63 @@ public class ShoutProvider extends ContentProvider {
 			String[] selectionArgs, String sortOrder) {
 		// TODO Auto-generated method stub
 		mDB = mDBHelper.getReadableDatabase();
-		return null;
+		int match = sURIMatcher.match(uri);
+		String query = null;
+		String[] condition = { uri.getLastPathSegment() };
+		switch (match) {
+		case SHOUTS:
+			query = SQL_QUERY_SHOUTS;
+			break;
+		case SHOUTS_ID:
+			query = SQL_QUERY_SHOUTS_ID;
+			break;
+		case SHOUTS_USER_ID:
+			query = SQL_QUERY_SHOUTS_USER_ID;
+			break;
+		case SHOUTS_TAG_ID:
+			query = SQL_QUERY_SHOUTS_TAG_ID;
+			break;
+		case TAGS:
+			query = SQL_QUERY_TAGS;
+			break;
+		case TAGS_ID:
+			query = SQL_QUERY_TAGS_ID;
+			break;
+		case USERS:
+			query = SQL_QUERY_USERS;
+			break;
+		case USERS_ID:
+			query = SQL_QUERY_USERS_ID;
+			break;
+		default:
+			throw new IllegalArgumentException(URI_ERROR + uri);
+		}
+		return mDB.rawQuery(query, condition);
 	}
 
 	@Override
 	public String getType(Uri uri) {
-		// TODO Auto-generated method stub
+		int match = sURIMatcher.match(uri);
+		switch (match) {
+		case SHOUTS:
+			break;
+		case SHOUTS_ID:
+			break;
+		case SHOUTS_USER_ID:
+			break;
+		case SHOUTS_TAG_ID:
+			break;
+		case TAGS:
+			break;
+		case TAGS_ID:
+			break;
+		case USERS:
+			break;
+		case USERS_ID:
+			break;
+		default:
+			throw new IllegalArgumentException(URI_ERROR + uri);
+		}
 		return null;
 	}
 

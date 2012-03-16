@@ -3,9 +3,11 @@ package org.whispercomm.shout.provider;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 public final class ShoutProviderDatabaseHelper extends SQLiteOpenHelper {
 
+	private static final String TAG = ShoutProviderDatabaseHelper.class.getName();
 	private static final String DB_NAME = "shout_base";
 	private static final int DB_VERSION = 1;
 	
@@ -49,6 +51,7 @@ public final class ShoutProviderDatabaseHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
+		Log.v(TAG, "onCreate() called");
 		db.execSQL(ShoutProviderDatabaseHelper.SQL_CREATETABLE_USER);
 		db.execSQL(ShoutProviderDatabaseHelper.SQL_CREATETABLE_SHOUT);
 		db.execSQL(ShoutProviderDatabaseHelper.SQL_CREATETABLE_USER_SHOUTS);
@@ -58,8 +61,7 @@ public final class ShoutProviderDatabaseHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		// TODO Auto-generated method stub
-
+		// Move along, nothing to see here
 	}
 
 }
