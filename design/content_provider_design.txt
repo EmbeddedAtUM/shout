@@ -4,7 +4,21 @@ This is a in-progress document that will be updated as the ContentProvider evolv
 
 ====INTERACTION====
 
+Recent / all shouts (timeline)
+My Shouts (e.g. shouts by user)
+Shouts by user
+User by ID
+
 ====URI STRUCTURE====
+
+AUTHORITY/shouts
+AUTHORITY/shouts/#
+AUTHORITY/shouts/user/#
+AUTHORITY/shouts/tag/#
+AUTHORITY/tags
+AUTHORITY/tags/#
+AUTHORITY/users
+AUTHORITY/users/#
 
 ====DATABASE DESIGN====
 
