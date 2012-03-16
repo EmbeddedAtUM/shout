@@ -4,41 +4,30 @@
     android:layout_height="fill_parent"
     android:orientation="vertical">
     
-    
-    
     <!-- Title Bar -->
-   	<LinearLayout
-    style="@style/TitleBar"
-    android:background="@drawable/navgradient" >
+   	<RelativeLayout style="@style/TitleBar" >
 
     <TextView style="@style/TitleBarLogo" />
-
-    <TextView style="@style/TitleBarText" />
     
-    <ImageButton
-        style="@style/TitleBarButton"
-        android:src="@drawable/chat"
-        android:onClick="onClickShout"
-        android:contentDescription="@string/shoutDesc"/>
-
-    <ImageButton
-        style="@style/TitleBarButton"
+    <ImageButton style="@style/TitleBarButton"
+        android:id="@+id/settingsButton"
+        android:layout_alignParentRight="true"
         android:src="@drawable/gear"
         android:onClick="onClickSettings"
         android:contentDescription="@string/settingsDesc" />
-	</LinearLayout>
+    
+    <ImageButton style="@style/TitleBarButton"
+        android:id="@+id/composeButton"
+        android:layout_toLeftOf="@id/settingsButton"
+        android:src="@drawable/chat"
+        android:onClick="onClickShout"
+        android:contentDescription="@string/shoutDesc"/>
+    
+	</RelativeLayout>
 	
    	<!-- Title of page -->
-   	<TextView 
-   	    android:id="@+id/pagetitle"
-   	    android:layout_height="40dip"
-   	    android:layout_width="fill_parent"
-   	    android:gravity="top|left"
-   	    android:paddingLeft="10dip"
-   	    android:paddingTop="10dip"
-   	    android:background="@drawable/titlegradient"
-   	    android:text="All Shouts"
-   	    android:textColor="@android:color/black" />
+   	<TextView style="@style/PageTitle"
+   	    android:text="All Shouts" />
         
     <!-- ListView displaying the shouts -->
 	<ListView

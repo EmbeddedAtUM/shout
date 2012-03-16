@@ -2,15 +2,14 @@
 <resources>
 	<style name="TitleBar">
 	    <item name="android:layout_width">fill_parent</item>
-	    <item name="android:layout_height">wrap_content</item>  
-	    <!-- <item name="android:background">#ff355689</item> -->
-	    <item name="android:orientation">horizontal</item>
+	    <item name="android:layout_height">45dip</item>  
+	    <item name="android:background">@drawable/navgradient</item>
 	</style>
 	<style name="TitleBarLogo">
 	    <item name="android:layout_width">wrap_content</item>
 	    <item name="android:layout_height">fill_parent</item>
-	    <item name="android:padding">8dip</item>
-	    <item name="android:layout_weight">.40</item>
+	    <item name="android:paddingLeft">30dip</item>
+	    <item name="android:layout_alignParentLeft">true</item>
 	    <item name="android:gravity">center</item>
 	    <item name="android:text">Logo</item>
 	    <item name="android:textSize">23dip</item>
@@ -20,20 +19,16 @@
 	    <item name="android:layout_width">45dip</item>
 	    <item name="android:layout_height">fill_parent</item>
 		<item name="android:background">@drawable/title_button</item>
-		<item name="android:contentDescription">Get Location</item>
 	</style>
-	<style name="TitleBarText">
-	    <item name="android:id">@+id/title_text</item>
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">fill_parent</item>
-        <item name="android:layout_weight">1</item>
-        <item name="android:gravity">center_vertical</item>
-	   	<item name="android:textSize">18sp</item>
-    	<item name="android:paddingLeft">12dip</item>
-        <item name="android:paddingRight">12dip</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">#fff</item>
-        <item name="android:singleLine">true</item>
-        <item name="android:ellipsize">end</item>
+	
+	<style name="PageTitle">
+	    <item name="android:id">@+id/pagetitle</item>
+   	    <item name="android:layout_height">40dip</item>
+   	    <item name="android:layout_width">fill_parent</item>
+   	    <item name="android:gravity">top|left</item>
+   	    <item name="android:paddingLeft">10dip</item>
+   	    <item name="android:paddingTop">10dip</item>
+   	    <item name="android:background">@drawable/titlegradient</item>
+   	    <item name="android:textColor">@android:color/black</item>
 	</style>
 </resources> 
