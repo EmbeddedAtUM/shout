@@ -16,6 +16,7 @@ AUTHORITY/shouts/#
 AUTHORITY/shouts/user/#
 AUTHORITY/shouts/tag/#
 AUTHORITY/tags
+AUTHORITY/tags/shout/#
 AUTHORITY/tags/#
 AUTHORITY/users
 AUTHORITY/users/#
