@@ -6,14 +6,11 @@
 	    <item name="android:background">@drawable/navgradient</item>
 	</style>
 	<style name="TitleBarLogo">
+	    <item name="android:id">@+id/logo</item>
 	    <item name="android:layout_width">wrap_content</item>
 	    <item name="android:layout_height">fill_parent</item>
-	    <item name="android:paddingLeft">30dip</item>
-	    <item name="android:layout_alignParentLeft">true</item>
-	    <item name="android:gravity">center</item>
-	    <item name="android:text">Logo</item>
-	    <item name="android:textSize">23dip</item>
-	    <item name="android:textColor">#fff</item>
+	    <item name="android:paddingLeft">20dip</item>
+	    <item name="android:src">@drawable/shoutlogo</item>	   
 	</style>
 	<style name="TitleBarButton">
 	    <item name="android:layout_width">45dip</item>
