@@ -7,13 +7,14 @@
     
     <EditText 
         android:inputType="textMultiLine"
-        android:layout_height="150dip"
+        android:layout_height="0dip"
         android:layout_width="fill_parent"
+        android:layout_weight="1"
  		android:gravity="top" />
     
     <RelativeLayout
         android:layout_height="wrap_content"
-        android:layout_width="wrap_content" >
+        android:layout_width="wrap_content">
         
 	    <CheckBox
 	        android:id="@+id/tweet"
