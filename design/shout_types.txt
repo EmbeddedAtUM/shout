@@ -1,0 +1,118 @@
+----------------------------------------------------------------------
+Description of a Shout
+
+A shout consists of the following parameters.
+
+parent:    a reference to a shout that is being reshouted or commented
+           upon, if any.
+author:    identity information (public key, alias, and avatar) for the
+           author.
+time:      the author-specified timestamp when the message was created.
+message:   the textual body of the shout, if any (a reshout will not
+           contain a message).
+signature: a signature over the {parent,author,time,message} fields
+           using the private key associated with the public key
+           referenced by the author field.
+
+A shout must have a valid signature to be valid.  Note that a shout
+may be uniquely identified by a secure hash of a canonical form of
+these parameters (this document does not define a canonical form,
+however).
+
+----------------------------------------------------------------------
+Types of Shouts
+
+Shouts can be partitioned into three types {root, reshout,
+comment}.  The type is inferable from the parameters of the shouts.
+
+root:     a shout is a root iff it has no parent.  It should have a
+          message (to be useful), although this is not strictly
+          necessary.
+reshout:  a shout is a reshout iff it has a parent and no message.
+comment:  a shout is a comment iff it has a parent and a message.
+
+The ad hoc, epidemic-style routing mechanism of shout requires that a
+shout transmission include the entire preceding chain of shouts. To
+ensure that these transmissions fit in small, bounded-size packets,
+the comment depth is restricted to one and reshouts of reshouts are
+not allowed (reshouting a reshout is accomplished instead by
+reshouting the root or comment).  Thus, each shout fits one of the
+following topologies, where parental relationships are indicated by
+the arrows.
+
+root:            ||==================||
+                 || message: "adcb"  ||
+                 || author:          ||
+                 || ...              ||
+                 ||==================||
+
+
+
+comment:          |------------------|
+                  | message: "abcd"  |
+                  | author:          |
+                  | ...              |
+                  |------------------|
+                           ^
+                           |
+                 ||==================||
+                 || message: "wxyz"  ||
+                 || author:          ||
+                 || ...              ||
+                 ||==================||
+
+
+
+reshout-root:     |------------------|
+                  | message: "abcd"  |
+                  | author:          |
+                  | ...              |
+                  |------------------|
+                           ^
+                           |
+                 ||==================||
+                 || message: <null>  ||
+                 || author:          ||
+                 || ...              ||
+                 ||==================||
+
+
+
+reshout-comment:  |------------------|
+                  | message: "abcd"  |
+                  | author:          |
+                  | ...              |
+                  |------------------|
+                           ^
+                           |
+                  |------------------|
+                  | message: "wxyz"  |
+                  | author:          |
+                  | ...              |
+                  |------------------|
+                           ^
+                           -
+                 ||==================||
+                 || message: <null>  ||
+                 || author:          ||
+                 || ...              ||
+                 ||==================||
+
+
+----------------------------------------------------------------------
+Implications for Implementation
+
+This document does not describe how the shouts and shout relationships
+are represented in a computer system.  In a database or object
+hierarchy, standard foreign key relationships and pointers can be used
+to implement the references.  Unique hashes can be used for equality
+comparison of shouts (e.g., to determine if a given shout is already
+in the database).
+
+There are strong implications for the network layer and packet
+formats.  A shout network packet must be capable of holding up to three
+linked shouts (for a reshout-comment), where the message of the
+reshout-comment is known to be null.
+
+
+
