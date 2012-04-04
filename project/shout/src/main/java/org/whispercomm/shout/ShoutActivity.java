@@ -29,9 +29,9 @@ public class ShoutActivity extends ListActivity {
         super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		ArrayList<Shout> shouts = new ArrayList<Shout>();
+		ArrayList<TestShout> shouts = new ArrayList<TestShout>();
 		for (int i = 0; i < 15; i++) {
-			shouts.add(new Shout("gsingh2011", "gsingh2011", "Item " + i,
+			shouts.add(new TestShout("gsingh2011", "gsingh2011", "Item " + i,
 					DateTime.now()));
 		}
 
@@ -50,11 +50,11 @@ public class ShoutActivity extends ListActivity {
 		TextView age;
 	}
 
-	private class TimelineAdapter extends ArrayAdapter<Shout> {
+	private class TimelineAdapter extends ArrayAdapter<TestShout> {
 
-		ArrayList<Shout> items;
+		ArrayList<TestShout> items;
 
-		public TimelineAdapter(Context context, ArrayList<Shout> shouts) {
+		public TimelineAdapter(Context context, ArrayList<TestShout> shouts) {
 			super(context, R.layout.row, R.id.message, shouts);
 			this.items = shouts;
 		}
@@ -63,7 +63,7 @@ public class ShoutActivity extends ListActivity {
 		public View getView(int position, View convertView, ViewGroup parent) {
 
 			// Get current shout
-			Shout shout = items.get(position);
+			TestShout shout = items.get(position);
 			Log.v(TAG, "Shout: " + shout);
 
 			View rowView = convertView;
