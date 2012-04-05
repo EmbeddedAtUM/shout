@@ -2,7 +2,8 @@ package org.whispercomm.shout.network;
 
 import java.util.Timer;
 
-import android.net.Uri;
+import org.whispercomm.manes.client.maclib.ManesInterface;
+import org.whispercomm.shout.provider.ShoutProviderContract;
 
 /**
  * Service in charge of sending and receiving shouts from the MANES network
@@ -14,30 +15,41 @@ public class NaiveBroadcast extends NetworkUtility {
 
 	public static final String TAG = "******NaiveBroadcast******";
 	/**
-	 * scheduler that actually pushes shouts out into MANES network
+	 * instance of sendScheduler
 	 */
-	Timer sendScheduler;
+	SendScheduler sendScheduler;
+
+	/**
+	 * scheduler that pushes shouts out into MANES network
+	 */
+	class SendScheduler extends Timer {
+		ManesInterface manesIf;
+
+		public SendScheduler(ManesInterface manesIf) {
+			this.manesIf = manesIf;
+		}
+	}
 
 	@Override
 	protected boolean initialize() {
-		this.sendScheduler = new Timer();
+		this.sendScheduler = new SendScheduler(manesIf);
 		return true;
 	}
 
 	@Override
 	protected void clearUp() {
-		sendScheduler.cancel();	
+		sendScheduler.cancel();
 	}
 
 	@Override
-	protected void handleIncomingAppShout(Uri shoutUri) {
-		sendScheduler.schedule(new OneBroadcast(sendScheduler, manesIf,
-				shoutUri, NaiveBroadcast.this, 0), OneBroadcast.PERIOD);
+	protected void handleIncomingAppShout(long ShoutId) {
+		sendScheduler.schedule(new OneBroadcast(sendScheduler, ShoutId, 0),
+				OneBroadcast.PERIOD);
 	}
 
 	@Override
 	protected void handleIncomingNetworkShout(NetworkShout shout) {
-		// TODO Update the database with net shout
+		ShoutProviderContract.storeShout(shout);
 	}
-	
+
 }

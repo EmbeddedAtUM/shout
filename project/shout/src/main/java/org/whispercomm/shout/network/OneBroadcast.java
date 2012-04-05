@@ -8,6 +8,7 @@ import java.util.TimerTask;
 import org.json.JSONException;
 import org.whispercomm.manes.client.maclib.ManesFrameTooLargeException;
 import org.whispercomm.manes.client.maclib.ManesInterface;
+import org.whispercomm.shout.network.NaiveBroadcast.SendScheduler;
 
 import android.content.Context;
 import android.net.Uri;
@@ -21,7 +22,7 @@ import android.util.Log;
  */
 public class OneBroadcast extends TimerTask {
 
-	public static final String TAG = "******SendTask******";
+	public static final String TAG = "******OneBroadcast******";
 	/**
 	 * rebroadcast period in millisecond
 	 */
@@ -31,21 +32,16 @@ public class OneBroadcast extends TimerTask {
 	 */
 	public static int RESEND_NUM = 20;
 
-	Timer sendScheduler;
-	ManesInterface manesIf;
-	Uri shout;
-	Context callerContext;
+	SendScheduler sendScheduler;
+	long shoutId;
 	/**
 	 * Number of times this same shout has been sent
 	 */
 	int execTime;
 
-	public OneBroadcast(Timer scheduler, ManesInterface manesIf, Uri shout,
-			Context context, int execTime) {
+	public OneBroadcast(SendScheduler scheduler, long shoutId, int execTime) {
 		this.sendScheduler = scheduler;
-		this.manesIf = manesIf;
-		this.shout = shout;
-		this.callerContext = context;
+		this.shoutId = shoutId;
 		this.execTime = execTime;
 	}
 
@@ -64,13 +60,13 @@ public class OneBroadcast extends TimerTask {
 
 		@Override
 		public void run() {
-			// TODO query the content provider for the necessary data
+			
 			// send out the shout to MANES network
 			try {
-				NetworkShout shout = new NetworkShout(0, null, null, 0, null, null);
-				byte[] shoutBytes = shout.toBytes();
-				manesIf.send(shoutBytes);
-			} catch (JSONException e) {
+				NetworkShout shout = new NetworkShout(shoutId);
+				byte[] shoutBytes = shout.toNetworkBytes();
+				sendScheduler.manesIf.send(shoutBytes);
+			} catch (ShoutChainTooLongException e) {
 				Log.e(TAG, e.getMessage());
 			} catch (UnsupportedEncodingException e) {
 				Log.e(TAG, e.getMessage());
@@ -84,8 +80,8 @@ public class OneBroadcast extends TimerTask {
 			execTime += 1;
 			// schedule the next run
 			if(execTime >= RESEND_NUM) return;
-			else sendScheduler.schedule(new OneBroadcast(sendScheduler, manesIf,
-					shout, callerContext, execTime), PERIOD);
+			else sendScheduler.schedule(new OneBroadcast(sendScheduler, 
+					shoutId, execTime), PERIOD);
 		}
 
 	}
