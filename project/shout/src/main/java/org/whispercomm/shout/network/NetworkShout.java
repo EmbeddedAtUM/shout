@@ -162,6 +162,20 @@ public class NetworkShout implements Shout {
 	}
 
 	/**
+	 * Generate the signature of this shout
+	 * 
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
+	public static String genShoutSignature(Shout shout) throws UnsupportedEncodingException {
+		ByteBuffer byteBuffer = ByteBuffer.allocate(MAX_LEN);
+		toDataBytes(shout, byteBuffer);
+		// TODO generate digital signature of the data in byteBuffer
+		// TODO shout.setsignature();
+		return null;
+	}
+
+	/**
 	 * Get one layer of shout from raw network bytes
 	 * 
 	 * @param byteBuffer
@@ -200,11 +214,11 @@ public class NetworkShout implements Shout {
 	/**
 	 * Serialize the NetworkShout object into byte array
 	 * 
-	 * @return
+	 * @return bytes ready to be transmitted across network
 	 * @throws ShoutChainTooLongException
 	 * @throws UnsupportedEncodingException
 	 */
-	public byte[] toBytes() throws ShoutChainTooLongException,
+	public byte[] toNetworkBytes() throws ShoutChainTooLongException,
 			UnsupportedEncodingException {
 		ByteBuffer byteBuffer = ByteBuffer.allocate(MAX_LEN);
 		// Get signatures
@@ -212,10 +226,10 @@ public class NetworkShout implements Shout {
 		NetworkShout shout = this;
 		char hasReshout;
 		while (shout != null && sigNum < MAX_SHOUT_NUM) {
-			//signature
+			// signature
 			byteBuffer.put(shout.getSignature().getBytes(CHARSET_NAME));
-			//hasNext
-			hasReshout = (char) (shout.hasReshout()?1:0);
+			// hasNext
+			hasReshout = (char) (shout.hasReshout() ? 1 : 0);
 			byteBuffer.putChar(hasReshout);
 			shout = (NetworkShout) shout.shoutOri;
 			sigNum++;
@@ -223,7 +237,19 @@ public class NetworkShout implements Shout {
 		// sanity check
 		if (shout != null)
 			throw new ShoutChainTooLongException();
-		shout = this;
+		// put the body of the shout into the ByteBuffer
+		toDataBytes(this, byteBuffer);
+		return byteBuffer.array();
+	}
+
+	/**
+	 * Put the data part (not including signature) into the destination buffer
+	 * 
+	 * @param byteBuffer
+	 *            the destination ByteButter
+	 * @throws UnsupportedEncodingException
+	 */
+	static void toDataBytes(Shout shout, ByteBuffer byteBuffer) throws UnsupportedEncodingException {
 		while (shout != null) {
 			// time
 			byteBuffer.putLong(shout.getTimestamp().getMillis());
@@ -240,10 +266,8 @@ public class NetworkShout implements Shout {
 			byteBuffer.put(shout.getContent().getBytes(CHARSET_NAME));
 			// hasReshout
 			byteBuffer.putChar((char) (shout.hasReshout() ? 1 : 0));
-			shout = shout.hasReshout() ? (NetworkShout) shout
-					.getOriginalShout() : null;
+			shout = shout.hasReshout() ? shout.getOriginalShout() : null;
 		}
-		return null;
 	}
 
 	@Override
@@ -284,5 +308,10 @@ public class NetworkShout implements Shout {
 	@Override
 	public boolean hasReshout() {
 		return this.hasReshout == 0 ? false : true;
+	}
+	
+	@Override
+	public void setSignature(String sig) {
+		this.signature = sig;
 	}
 }
