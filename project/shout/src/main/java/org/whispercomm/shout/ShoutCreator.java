@@ -4,7 +4,6 @@ import java.io.UnsupportedEncodingException;
 
 import org.joda.time.DateTime;
 import org.whispercomm.shout.network.NetworkInterface;
-import org.whispercomm.shout.provider.BasicShout;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 
 import android.app.Activity;
@@ -34,7 +33,7 @@ public class ShoutCreator {
 			Log.e(TAG, e.getMessage());
 			return false;
 		}
-		Shout shout = new BasicShout(timestamp, user, content, shoutOri, signature);
+		Shout shout = new SimpleShout(timestamp, user, content, shoutOri, signature);
 	
 		// insert the shout to database and get its shout_id back
 		long shoutId = ShoutProviderContract.storeShout(shout);

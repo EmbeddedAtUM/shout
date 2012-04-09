@@ -7,7 +7,6 @@ import java.security.interfaces.ECPublicKey;
 
 import org.joda.time.DateTime;
 import org.whispercomm.shout.network.NetworkShout;
-import org.whispercomm.shout.provider.BasicUser;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
@@ -55,7 +54,7 @@ public class SignatureUtility {
 	public User getUser() {
 		String userName = sharedPrefs.getString(USER_NAME, null);
 		ECPublicKey pubKey = getPublicKey();
-		User sender = new BasicUser(userName, pubKey);
+		User sender = new SimpleUser(userName, pubKey);
 		return sender;
 	}
 

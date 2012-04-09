@@ -8,8 +8,8 @@ import org.joda.time.DateTime;
 import org.whispercomm.shout.AbstractShout;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.SignatureUtility;
+import org.whispercomm.shout.SimpleUser;
 import org.whispercomm.shout.User;
-import org.whispercomm.shout.provider.BasicUser;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 
 /**
@@ -214,7 +214,7 @@ public class NetworkShout extends AbstractShout {
 		byteBuffer.get(pubKeyBytes, 0, KEY_LENGTH);
 		// TODO get ECPublicKey from pubKeyBytes
 		ECPublicKey pubKey = null;
-		User sender = new BasicUser(senderName, pubKey);
+		User sender = new SimpleUser(senderName, pubKey);
 		// contentLen
 		int contentLen = byteBuffer.getInt();
 		// content
