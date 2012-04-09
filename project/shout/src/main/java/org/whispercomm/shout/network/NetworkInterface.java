@@ -1,6 +1,5 @@
 package org.whispercomm.shout.network;
 
-import org.whispercomm.shout.Shout;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -31,8 +30,7 @@ public class NetworkInterface {
 	ServiceConnection connection;
 	Boolean isBinded;
 
-	public NetworkInterface(Activity activity,
-			@SuppressWarnings("rawtypes") Class networkUtility) {
+	public NetworkInterface(Activity activity) {
 		this.callerActivity = activity;
 		this.isBinded = false;
 		this.connection = new ServiceConnection() {
@@ -51,7 +49,7 @@ public class NetworkInterface {
 
 		};
 		// bind to ShoutService
-		callerActivity.bindService(new Intent(callerActivity, networkUtility),
+		callerActivity.bindService(new Intent(callerActivity, NetworkUtility.class),
 				connection, Context.BIND_AUTO_CREATE);
 	}
 
@@ -62,16 +60,14 @@ public class NetworkInterface {
 	 * notification is successful. If not, the caller should either wait and try
 	 * later, or give up.
 	 * 
-	 * @param shout
-	 *            the shout to be sent out
+	 * @param shoutId
+	 *            id of the shout to be sent out
 	 * @return whether the notification is successful
 	 */
-	public boolean send(Shout shout) {
+	public boolean send(long shoutId) {
 		if (isBinded) {
-			Message msg = Message.obtain(null, NaiveBroadcast.NEW_SHOUT);
-			// TODO this object does not travel across process boundaries. To do
-			// so, this oject need to be stick in a Bundle object.
-			msg.obj = shout;
+			Message msg = Message.obtain(null, NetworkUtility.NEW_SHOUT);
+			msg.obj = shoutId;
 			try {
 				//???Does this block???
 				shoutService.send(msg);

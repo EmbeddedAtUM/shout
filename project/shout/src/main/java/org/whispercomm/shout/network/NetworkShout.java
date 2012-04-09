@@ -9,6 +9,7 @@ import org.whispercomm.shout.AbstractShout;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.SignatureUtility;
 import org.whispercomm.shout.User;
+import org.whispercomm.shout.provider.BasicUser;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 
 /**
@@ -32,11 +33,11 @@ public class NetworkShout extends AbstractShout {
 	/**
 	 * Length (in bytes) of the signing key
 	 */
-	static final int KEY_LENGTH = 256;
+	static final int KEY_LENGTH = 256/8;
 	/**
 	 * Length (in bytes) of the digital signature
 	 */
-	static final int SIGNATURE_LENGTH = 256;
+	static final int SIGNATURE_LENGTH = 256/8;
 	/**
 	 * Maximum length of re-shout chain
 	 */
@@ -213,7 +214,7 @@ public class NetworkShout extends AbstractShout {
 		byteBuffer.get(pubKeyBytes, 0, KEY_LENGTH);
 		// TODO get ECPublicKey from pubKeyBytes
 		ECPublicKey pubKey = null;
-		User sender = new NetwrokUser(senderName, pubKey);
+		User sender = new BasicUser(senderName, pubKey);
 		// contentLen
 		int contentLen = byteBuffer.getInt();
 		// content

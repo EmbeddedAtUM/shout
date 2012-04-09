@@ -20,7 +20,7 @@ public interface NetworkProtocol {
 	public void handleOutgoingAppShout(long shoutId);
 
 	/**
-	 * Handle incoming shout from from the network
+	 * Handle incoming shout from the network
 	 */
 	public void handleIncomingNetworkShout(NetworkShout shout);
 

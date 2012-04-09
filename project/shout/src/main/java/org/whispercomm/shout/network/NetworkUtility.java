@@ -70,7 +70,7 @@ public class NetworkUtility extends Service {
 		@Override
 		public void handleMessage(Message msg) {
 			if (msg.what == NEW_SHOUT) {
-				Shout shout = (Shout) msg.obj;
+				long shoutId = (Long) msg.obj;
 				networkProtocol.handleOutgoingAppShout(shoutId);
 			}
 		}

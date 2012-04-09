@@ -2,16 +2,11 @@ package org.whispercomm.shout.network;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.Timer;
 import java.util.TimerTask;
 
-import org.json.JSONException;
 import org.whispercomm.manes.client.maclib.ManesFrameTooLargeException;
-import org.whispercomm.manes.client.maclib.ManesInterface;
 import org.whispercomm.shout.network.NaiveBroadcast.SendScheduler;
 
-import android.content.Context;
-import android.net.Uri;
 import android.util.Log;
 
 /**
