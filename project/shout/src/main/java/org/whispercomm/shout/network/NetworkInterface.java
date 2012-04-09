@@ -69,8 +69,11 @@ public class NetworkInterface {
 	public boolean send(Shout shout) {
 		if (isBinded) {
 			Message msg = Message.obtain(null, NaiveBroadcast.NEW_SHOUT);
+			// TODO this object does not travel across process boundaries. To do
+			// so, this oject need to be stick in a Bundle object.
 			msg.obj = shout;
 			try {
+				//???Does this block???
 				shoutService.send(msg);
 			} catch (RemoteException e) {
 				Log.i(TAG, e.getMessage());

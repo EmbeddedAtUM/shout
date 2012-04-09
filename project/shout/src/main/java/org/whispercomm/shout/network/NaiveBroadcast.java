@@ -11,13 +11,19 @@ import org.whispercomm.shout.provider.ShoutProviderContract;
  * @author Yue Liu
  * 
  */
-public class NaiveBroadcast extends NetworkUtility {
+public class NaiveBroadcast implements NetworkProtocol {
 
 	public static final String TAG = "******NaiveBroadcast******";
 	/**
 	 * instance of sendScheduler
 	 */
 	SendScheduler sendScheduler;
+	ManesInterface manesIf;
+	
+	public NaiveBroadcast(ManesInterface manesIf){
+		this.manesIf = manesIf;
+		this.sendScheduler = new SendScheduler(manesIf);
+	}
 
 	/**
 	 * scheduler that pushes shouts out into MANES network
@@ -31,24 +37,18 @@ public class NaiveBroadcast extends NetworkUtility {
 	}
 
 	@Override
-	protected boolean initialize() {
-		this.sendScheduler = new SendScheduler(manesIf);
-		return true;
-	}
-
-	@Override
-	protected void clearUp() {
+	public void clearUp() {
 		sendScheduler.cancel();
 	}
 
 	@Override
-	protected void handleIncomingAppShout(long ShoutId) {
+	public void handleOutgoingAppShout(long ShoutId) {
 		sendScheduler.schedule(new OneBroadcast(sendScheduler, ShoutId, 0),
 				OneBroadcast.PERIOD);
 	}
 
 	@Override
-	protected void handleIncomingNetworkShout(NetworkShout shout) {
+	public void handleIncomingNetworkShout(NetworkShout shout) {
 		ShoutProviderContract.storeShout(shout);
 	}
 

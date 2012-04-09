@@ -19,7 +19,7 @@ import android.os.RemoteException;
 import android.util.Log;
 
 
-public abstract class NetworkUtility extends Service {
+public class NetworkUtility extends Service {
 
 	public static final String TAG = "******NetworkUtility******";
 	public static final int NEW_SHOUT = 1;
@@ -28,6 +28,7 @@ public abstract class NetworkUtility extends Service {
 	Messenger appMessenger;
 	ManesInterface manesIf;
 	boolean isRunning;
+	NetworkProtocol networkProtocol;
 	
 	@Override
 	public final void onCreate() {
@@ -42,11 +43,8 @@ public abstract class NetworkUtility extends Service {
 		this.isRunning = true;
 		// start receiver thread
 		new Thread(new NetworkReceiver()).run();
-		// Any other initialization specific to the particular subclass
-		if (initialize() == false){
-			Log.e(TAG, "Initialization not successful.");
-			stopSelf();
-		}
+		// initialize the network protocol
+		networkProtocol = (NetworkProtocol) new NaiveBroadcast(manesIf);
 	}
 	
 	/**
@@ -62,30 +60,8 @@ public abstract class NetworkUtility extends Service {
 		isRunning = false;
 		manesIf.unregister();
 		// Any other clear-up specific to the particular subclass
-		clearUp();
+		networkProtocol.clearUp();
 	}
-	
-	/**
-	 * Any specific initialization of the particular subclass
-	 * 
-	 * @return whether the initialization is successful
-	 */
-	abstract protected boolean initialize();
-	
-	/**
-	 * Any specific clear-up of the particular subclass
-	 */
-	abstract protected void clearUp();
-	
-	/**
-	 * Handle incoming shout from from application (e.g., UI)
-	 */
-	abstract protected void handleIncomingAppShout(long shoutId);
-	
-	/**
-	 * Handle incoming shout from from the network
-	 */
-	abstract protected void handleIncomingNetworkShout(NetworkShout shout);
 	
 	/**
 	 * Handler wrapper for processing incoming shouts from application (e.g., UI)
@@ -95,18 +71,7 @@ public abstract class NetworkUtility extends Service {
 		public void handleMessage(Message msg) {
 			if (msg.what == NEW_SHOUT) {
 				Shout shout = (Shout) msg.obj;
-				// generate the digital signature of this shout, if necessary
-				if (shout.getSignature() == null) {
-					try {
-						NetworkShout.genShoutSignature(shout);
-					} catch (UnsupportedEncodingException e1) {
-						Log.i(TAG, e1.getMessage());
-						return;
-					}
-				}
-				// insert the shout to database and get its shout_id back
-				long shoutId = ShoutProviderContract.storeShout(shout);
-				handleIncomingAppShout(shoutId);
+				networkProtocol.handleOutgoingAppShout(shoutId);
 			}
 		}
 	}
@@ -146,9 +111,9 @@ public abstract class NetworkUtility extends Service {
 					continue;
 
 				try {
-					NetworkShout shout = NetworkShout.getShoutFromNetwork(shoutBytes);
+					NetworkShout shout = new NetworkShout(shoutBytes);
 					// Handle this incoming shout
-					handleIncomingNetworkShout(shout);
+					networkProtocol.handleIncomingNetworkShout(shout);
 				} catch (UnsupportedEncodingException e) {
 					Log.e(TAG, e.getMessage());
 				} catch (AuthenticityFailureException e) {
