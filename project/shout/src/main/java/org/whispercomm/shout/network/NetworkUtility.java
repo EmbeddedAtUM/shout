@@ -3,14 +3,10 @@ package org.whispercomm.shout.network;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import org.json.JSONException;
 import org.whispercomm.manes.client.maclib.ManesInterface;
-import org.whispercomm.shout.Shout;
-import org.whispercomm.shout.provider.ShoutProviderContract;
 
 import android.app.Service;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;

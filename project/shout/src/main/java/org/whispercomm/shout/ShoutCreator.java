@@ -13,16 +13,26 @@ public class ShoutCreator {
 
 	static final String TAG = "******ShoutCreator******";
 	
+	Activity callerActivity;
 	NetworkInterface networkIf;
 	SignatureUtility signUtility;
 	User user;
 	
 	public ShoutCreator(Activity callerActivity){
-		this.networkIf = new NetworkInterface(callerActivity);
-		this.signUtility = new SignatureUtility(callerActivity);
+		this.callerActivity = callerActivity;
+		this.networkIf = new NetworkInterface(this.callerActivity);
+		this.signUtility = new SignatureUtility(this.callerActivity);
 		this.user = signUtility.getUser();
 	}
 	
+	/**
+	 * Create a new shout given user-generated message.
+	 * 
+	 * @param timestamp
+	 * @param content
+	 * @param shoutOri
+	 * @return
+	 */
 	public boolean createShout(DateTime timestamp, String content, Shout shoutOri){
 		
 		//generate a new shout with its signature
