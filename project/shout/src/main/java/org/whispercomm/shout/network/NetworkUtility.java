@@ -5,6 +5,8 @@ import java.io.UnsupportedEncodingException;
 
 import org.json.JSONException;
 import org.whispercomm.manes.client.maclib.ManesInterface;
+import org.whispercomm.shout.Shout;
+import org.whispercomm.shout.provider.ShoutProviderContract;
 
 import android.app.Service;
 import android.content.Intent;
@@ -78,7 +80,7 @@ public abstract class NetworkUtility extends Service {
 	/**
 	 * Handle incoming shout from from application (e.g., UI)
 	 */
-	abstract protected void handleIncomingAppShout(Uri shoutUri);
+	abstract protected void handleIncomingAppShout(long shoutId);
 	
 	/**
 	 * Handle incoming shout from from the network
@@ -92,7 +94,19 @@ public abstract class NetworkUtility extends Service {
 		@Override
 		public void handleMessage(Message msg) {
 			if (msg.what == NEW_SHOUT) {
-				handleIncomingAppShout((Uri) msg.obj);
+				Shout shout = (Shout) msg.obj;
+				// generate the digital signature of this shout, if necessary
+				if (shout.getSignature() == null) {
+					try {
+						NetworkShout.genShoutSignature(shout);
+					} catch (UnsupportedEncodingException e1) {
+						Log.i(TAG, e1.getMessage());
+						return;
+					}
+				}
+				// insert the shout to database and get its shout_id back
+				long shoutId = ShoutProviderContract.storeShout(shout);
+				handleIncomingAppShout(shoutId);
 			}
 		}
 	}
@@ -132,19 +146,12 @@ public abstract class NetworkUtility extends Service {
 					continue;
 
 				try {
-					NetworkShout shout = new NetworkShout(shoutBytes);
-					if (shout.isValid() == false)
-						continue;
-					// verify signature
-					if (shout.verySignature() == false) {
-						Log.i(TAG, "Received unauthenticated shout.");
-						continue;
-					}
+					NetworkShout shout = NetworkShout.getShoutFromNetwork(shoutBytes);
 					// Handle this incoming shout
 					handleIncomingNetworkShout(shout);
 				} catch (UnsupportedEncodingException e) {
 					Log.e(TAG, e.getMessage());
-				} catch (JSONException e) {
+				} catch (AuthenticityFailureException e) {
 					Log.e(TAG, e.getMessage());
 				}
 			}

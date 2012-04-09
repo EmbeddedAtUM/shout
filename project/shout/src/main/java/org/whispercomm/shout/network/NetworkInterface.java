@@ -1,13 +1,12 @@
 package org.whispercomm.shout.network;
 
-import org.whispercomm.shout.network.Shout;
+import org.whispercomm.shout.Shout;
 
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.net.Uri;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
@@ -18,8 +17,8 @@ import android.util.Log;
  * 
  * UI side interface for establishing channels to notify new shouts to send out.
  * <p>
- * Each UI activity should initiate a NetworkInterface object in order to notify the
- * network protocol.
+ * Each UI activity should initiate a NetworkInterface object in order to notify
+ * the network protocol.
  * 
  * @author Yue Liu
  */
@@ -32,7 +31,8 @@ public class NetworkInterface {
 	ServiceConnection connection;
 	Boolean isBinded;
 
-	public NetworkInterface(Activity activity, Class<NetworkUtility> networkUtility) {
+	public NetworkInterface(Activity activity,
+			@SuppressWarnings("rawtypes") Class networkUtility) {
 		this.callerActivity = activity;
 		this.isBinded = false;
 		this.connection = new ServiceConnection() {
@@ -51,8 +51,8 @@ public class NetworkInterface {
 
 		};
 		// bind to ShoutService
-		callerActivity.bindService(new Intent(callerActivity,
-				networkUtility), connection, Context.BIND_AUTO_CREATE);
+		callerActivity.bindService(new Intent(callerActivity, networkUtility),
+				connection, Context.BIND_AUTO_CREATE);
 	}
 
 	/**
@@ -67,10 +67,9 @@ public class NetworkInterface {
 	 * @return whether the notification is successful
 	 */
 	public boolean send(Shout shout) {
-		//TODO insert the shout to database and get its uri back
 		if (isBinded) {
 			Message msg = Message.obtain(null, NaiveBroadcast.NEW_SHOUT);
-			// TODO Add the uri of the shout to msg.obj: msg.obj = ***;
+			msg.obj = shout;
 			try {
 				shoutService.send(msg);
 			} catch (RemoteException e) {
