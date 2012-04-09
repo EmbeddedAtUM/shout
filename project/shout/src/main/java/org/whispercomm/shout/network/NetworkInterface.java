@@ -1,5 +1,7 @@
 package org.whispercomm.shout.network;
 
+import org.whispercomm.shout.network.Shout;
+
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -14,23 +16,23 @@ import android.util.Log;
 
 /**
  * 
- * UI side interface for establishing channels to notify new shout to send out.
+ * UI side interface for establishing channels to notify new shouts to send out.
  * <p>
- * Each UI activity should initiate a ShoutClient object in order to notify the
+ * Each UI activity should initiate a NetworkInterface object in order to notify the
  * network protocol.
  * 
  * @author Yue Liu
  */
-public class ShoutClient {
+public class NetworkInterface {
 
-	public static String TAG = "ShoutClient";
+	public static String TAG = "******NetworkInterface******";
 
 	Activity callerActivity;
 	Messenger shoutService;
 	ServiceConnection connection;
 	Boolean isBinded;
 
-	public ShoutClient(Activity activity) {
+	public NetworkInterface(Activity activity, Class<NetworkUtility> networkUtility) {
 		this.callerActivity = activity;
 		this.isBinded = false;
 		this.connection = new ServiceConnection() {
@@ -50,24 +52,25 @@ public class ShoutClient {
 		};
 		// bind to ShoutService
 		callerActivity.bindService(new Intent(callerActivity,
-				ShoutService.class), connection, Context.BIND_AUTO_CREATE);
+				networkUtility), connection, Context.BIND_AUTO_CREATE);
 	}
 
 	/**
-	 * Notifies ShoutService to shout out the given message.
+	 * Notifies ShoutService to send the given shout.
 	 * <p>
 	 * The method returns immediately, with indications of whether the
 	 * notification is successful. If not, the caller should either wait and try
 	 * later, or give up.
 	 * 
 	 * @param shout
-	 *            the uri of the message to be shouted out
+	 *            the shout to be sent out
 	 * @return whether the notification is successful
 	 */
-	public boolean shoutThisMessage(Uri shout) {
+	public boolean send(Shout shout) {
+		//TODO insert the shout to database and get its uri back
 		if (isBinded) {
-			Message msg = Message.obtain(null, ShoutService.NEW_SHOUT);
-			// TODO Add the _ID of the shout to msg.arg1
+			Message msg = Message.obtain(null, NaiveBroadcast.NEW_SHOUT);
+			// TODO Add the uri of the shout to msg.obj: msg.obj = ***;
 			try {
 				shoutService.send(msg);
 			} catch (RemoteException e) {

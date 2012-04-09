@@ -10,6 +10,7 @@ import org.whispercomm.manes.client.maclib.ManesFrameTooLargeException;
 import org.whispercomm.manes.client.maclib.ManesInterface;
 
 import android.content.Context;
+import android.net.Uri;
 import android.util.Log;
 
 /**
@@ -18,9 +19,9 @@ import android.util.Log;
  * @author Yue Liu
  * 
  */
-public class SendTask extends TimerTask {
+public class OneBroadcast extends TimerTask {
 
-	public static final String TAG = "SendTask";
+	public static final String TAG = "******SendTask******";
 	/**
 	 * rebroadcast period in millisecond
 	 */
@@ -32,18 +33,18 @@ public class SendTask extends TimerTask {
 
 	Timer sendScheduler;
 	ManesInterface manesIf;
-	int shoutId;
+	Uri shout;
 	Context callerContext;
 	/**
 	 * Number of times this same shout has been sent
 	 */
 	int execTime;
 
-	public SendTask(Timer scheduler, ManesInterface manesIf, int shoutId,
+	public OneBroadcast(Timer scheduler, ManesInterface manesIf, Uri shout,
 			Context context, int execTime) {
 		this.sendScheduler = scheduler;
 		this.manesIf = manesIf;
-		this.shoutId = shoutId;
+		this.shout = shout;
 		this.callerContext = context;
 		this.execTime = execTime;
 	}
@@ -52,22 +53,6 @@ public class SendTask extends TimerTask {
 	public void run() {
 		// create a new thread to do the hard work
 		new Thread(new SendRunnable()).run();
-	}
-
-	/**
-	 * 
-	 * Schedule the next send of this shout.
-	 * <p>
-	 * Currently we are doing simple periodic re-send up to certain times.
-	 * 
-	 * @param execTime
-	 * @return delay for next send. -1 means no next send
-	 */
-	long scheduleNextSend(int execTime) {
-		if (execTime >= RESEND_NUM)
-			return -1;
-		else
-			return PERIOD;
 	}
 
 	/**
@@ -82,7 +67,7 @@ public class SendTask extends TimerTask {
 			// TODO query the content provider for the necessary data
 			// send out the shout to MANES network
 			try {
-				Shout shout = new Shout(0, null, null, 0, null, null);
+				NetworkShout shout = new NetworkShout(0, null, null, 0, null, null);
 				byte[] shoutBytes = shout.toBytes();
 				manesIf.send(shoutBytes);
 			} catch (JSONException e) {
@@ -98,11 +83,9 @@ public class SendTask extends TimerTask {
 			// update execTime
 			execTime += 1;
 			// schedule the next run
-			long delay = scheduleNextSend(execTime);
-			if (delay < 0)
-				return;
-			sendScheduler.schedule(new SendTask(sendScheduler, manesIf,
-					execTime, callerContext, execTime), delay);
+			if(execTime >= RESEND_NUM) return;
+			else sendScheduler.schedule(new OneBroadcast(sendScheduler, manesIf,
+					shout, callerContext, execTime), PERIOD);
 		}
 
 	}
