@@ -1,0 +1,93 @@
+canonical form:  ||=================||
+      		 ||   signatures    ||
+       		 ||=================||
+       		 ||      shouts     ||
+       		 ||=================||
+
+"signatures":    ||=================|| ---------|
+		 ||    signature    ||		|
+		 ||    (32 bytes)*  ||		|
+		 ||-----------------||		\ one "signature" (sig1)
+		 ||     has_next*   ||		/ 
+		 ||     (1 byte)    ||		|
+		 ||=================|| ---------|
+		 ||    signature    ||		|
+		 ||    (32 bytes)*  ||		|
+		 ||-----------------||		\ one "signature" (sig2)
+		 ||     has_next*   ||		/ 
+		 ||     (1 byte)    ||		|
+		 ||=================|| ---------|
+		 || ...             ||
+		 || up to three     ||
+		 || "signature"s in ||
+		 || total           ||
+		 ||=================||
+
+"shouts":        ||=================||----------|
+		 ||      time       ||		|
+		 ||    (8 bytes)    ||		|
+		 ||-----------------||		|
+		 || sender_name_len*||		|
+		 ||    (4 bytes)    ||		|
+		 ||-----------------||		|
+		 ||   sender_name   ||		|
+		 || (as previous    ||		|
+		 || field specified)||		|
+		 ||-----------------||		\ one "shout" (shout1)
+		 ||   content_len   ||		/ 
+		 ||    (4 bytes)    ||		|
+		 ||-----------------||		|
+		 ||     content     ||		|
+		 || (as previous    ||		|
+		 || field specified)||		|
+		 ||-----------------||		|
+		 ||    is_reshout   ||		|
+		 ||     (1 byte)    ||		|
+		 ||=================||----------|
+		 ||      time       ||		|
+		 ||    (8 bytes)    ||		|
+		 ||-----------------||		|
+		 || sender_name_len ||		|
+		 ||    (4 bytes)    ||		|
+		 ||-----------------||		|
+		 ||   sender_name   ||		|
+		 || (as previous    ||		|
+		 || field specified)||		|
+		 ||-----------------||		\ one "shout" (shout2)
+		 ||   content_len   ||		/ 
+		 ||    (4 bytes)    ||		|
+		 ||-----------------||		|
+		 ||     content     ||		|
+		 || (as previous    ||		|
+		 || field specified)||		|
+		 ||-----------------||		|
+		 ||    is_reshout   ||		|
+		 ||     (1 byte)    ||		|
+		 ||=================||----------|
+		 || ...             ||
+		 || up to three     ||
+		 ||"shout"s in total||
+		 ||=================||
+
+The canonical form is composed of two parts, "signatures" and
+"shouts", corresponding to the digital signatures and bodies of up to
+three chained shouts. The correspondence between the signature and the
+shout body follows. "sig1" is the digital signature of "shout1" +
+"shout2" + .... "sig2" is the digital signature of "shout2" + ...
+		 
+	 
+A few notes: 
+
+* "signature" is 32 bytes because we are using 256 bit
+ECC algorithm.  
+
+* "has_next" denotes whether the next 32 bytes are
+another digital signature.
+
+* "sender_name_len" records the number of bytes "sender_name" has.
+
+* "content_len" records the number of bytes "content" has.
+
+* "is_reshout" represents whether the current shout has a parent
+  shout. If so, the next few bytes need to be interpreted as the
+  parent shout.
