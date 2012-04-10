@@ -2,6 +2,9 @@ package org.whispercomm.shout.network;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
 
 import org.whispercomm.manes.client.maclib.ManesInterface;
 
@@ -14,25 +17,24 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
 
-
 public class NetworkUtility extends Service {
 
 	public static final String TAG = "******NetworkUtility******";
 	public static final int NEW_SHOUT = 1;
 	public static final int APP_ID = 74688;// "shout" on a phone keyboard
-	
+
 	Messenger appMessenger;
 	ManesInterface manesIf;
 	boolean isRunning;
 	NetworkProtocol networkProtocol;
-	
+
 	@Override
 	public final void onCreate() {
 		this.appMessenger = new Messenger(new AppShoutHandler());
 		try {
 			this.manesIf = new ManesInterface(APP_ID, this);
 		} catch (RemoteException e) {
-			// TODO  what to do if cannot connect to ManesInterface?
+			// TODO what to do if cannot connect to ManesInterface?
 			Log.e(TAG, e.getMessage());
 			stopSelf();
 		}
@@ -42,15 +44,16 @@ public class NetworkUtility extends Service {
 		// initialize the network protocol
 		networkProtocol = (NetworkProtocol) new NaiveBroadcast(manesIf);
 	}
-	
+
 	/**
-	 * Create the channel for accepting incoming shouts from applications, e.g., UI
+	 * Create the channel for accepting incoming shouts from applications, e.g.,
+	 * UI
 	 */
 	@Override
 	public IBinder onBind(Intent arg0) {
 		return appMessenger.getBinder();
 	}
-	
+
 	@Override
 	public final void onDestroy() {
 		isRunning = false;
@@ -58,9 +61,10 @@ public class NetworkUtility extends Service {
 		// Any other clear-up specific to the particular subclass
 		networkProtocol.clearUp();
 	}
-	
+
 	/**
-	 * Handler wrapper for processing incoming shouts from application (e.g., UI)
+	 * Handler wrapper for processing incoming shouts from application (e.g.,
+	 * UI)
 	 */
 	class AppShoutHandler extends Handler {
 		@Override
@@ -71,7 +75,7 @@ public class NetworkUtility extends Service {
 			}
 		}
 	}
-	
+
 	/**
 	 * Listens and handles received shouts from MANES network
 	 */
@@ -92,7 +96,8 @@ public class NetworkUtility extends Service {
 				try {
 					shoutBytes = manesIf.receive(CHECK_PERIOD);
 				} catch (IOException e) {
-					// TODO What if receive is not successful? For now sleep and try
+					// TODO What if receive is not successful? For now sleep and
+					// try
 					// again????
 					Log.i(TAG, e.getMessage());
 					try {
@@ -106,13 +111,21 @@ public class NetworkUtility extends Service {
 				if (shoutBytes == null)
 					continue;
 
+				NetworkShout shout;
 				try {
-					NetworkShout shout = new NetworkShout(shoutBytes);
+					shout = new NetworkShout(shoutBytes);
+
 					// Handle this incoming shout
 					networkProtocol.handleIncomingNetworkShout(shout);
 				} catch (UnsupportedEncodingException e) {
 					Log.e(TAG, e.getMessage());
 				} catch (AuthenticityFailureException e) {
+					Log.e(TAG, e.getMessage());
+				} catch (InvalidKeyException e) {
+					Log.e(TAG, e.getMessage());
+				} catch (NoSuchAlgorithmException e) {
+					Log.e(TAG, e.getMessage());
+				} catch (SignatureException e) {
 					Log.e(TAG, e.getMessage());
 				}
 			}

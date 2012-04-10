@@ -2,6 +2,9 @@ package org.whispercomm.shout.network;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
 import java.security.interfaces.ECPublicKey;
 
 import org.joda.time.DateTime;
@@ -33,11 +36,11 @@ public class NetworkShout extends AbstractShout {
 	/**
 	 * Length (in bytes) of the signing key
 	 */
-	static final int KEY_LENGTH = 256/8;
+	static final int KEY_LENGTH = 256 / 8;
 	/**
 	 * Length (in bytes) of the digital signature
 	 */
-	static final int SIGNATURE_LENGTH = 256/8;
+	static final int SIGNATURE_LENGTH = 256 / 8;
 	/**
 	 * Maximum length of re-shout chain
 	 */
@@ -45,8 +48,8 @@ public class NetworkShout extends AbstractShout {
 	/**
 	 * Maximum length (in bytes) of a shout message
 	 */
-	public static final int MAX_LEN = (8 + 4 + MAX_USER_NAME_LEN + KEY_LENGTH + 4
-			+ MAX_CONTENT_LEN + 1 + SIGNATURE_LENGTH + 1)
+	public static final int MAX_LEN = (8 + 4 + MAX_USER_NAME_LEN + KEY_LENGTH
+			+ 4 + MAX_CONTENT_LEN + 1 + SIGNATURE_LENGTH + 1)
 			* MAX_SHOUT_NUM;
 
 	private DateTime timestamp;
@@ -75,9 +78,13 @@ public class NetworkShout extends AbstractShout {
 	 * @throws UnsupportedEncodingException
 	 * @throws AuthenticityFailureException
 	 *             the network data fails authenticity check.
+	 * @throws SignatureException
+	 * @throws NoSuchAlgorithmException
+	 * @throws InvalidKeyException
 	 */
 	public NetworkShout(byte[] rawData) throws UnsupportedEncodingException,
-			AuthenticityFailureException {
+			AuthenticityFailureException, InvalidKeyException,
+			NoSuchAlgorithmException, SignatureException {
 		ByteBuffer byteBuffer = ByteBuffer.wrap(rawData);
 		// Get all the signatures
 		byte[][] sigs = new byte[MAX_SHOUT_NUM][];
@@ -139,8 +146,8 @@ public class NetworkShout extends AbstractShout {
 		if (shout != null)
 			throw new ShoutChainTooLongException();
 		// put the body of the shout into the ByteBuffer
-		SignatureUtility.serialize(byteBuffer, this.timestamp, this.sender, this.content,
-				this.shoutOri);
+		SignatureUtility.serialize(byteBuffer, this.timestamp, this.sender,
+				this.content, this.shoutOri);
 		return byteBuffer.array();
 	}
 
@@ -175,16 +182,21 @@ public class NetworkShout extends AbstractShout {
 	 *         if authentic, null otherwise
 	 * 
 	 * @throws UnsupportedEncodingException
+	 * @throws SignatureException
+	 * @throws NoSuchAlgorithmException
+	 * @throws InvalidKeyException
 	 */
 	private static NetworkShout verifyShoutSignature(byte[] signature,
-			ByteBuffer byteBuffer) throws UnsupportedEncodingException {
+			ByteBuffer byteBuffer) throws UnsupportedEncodingException,
+			InvalidKeyException, NoSuchAlgorithmException, SignatureException {
 		// Slice a new ByteBuffer
 		ByteBuffer data = byteBuffer.slice();
 		// extract the public key
 		NetworkShout shout = getShoutBody(byteBuffer);
 		ECPublicKey pubKey = shout.getSender().getPublicKey();
 		// verify the signature
-		if (SignatureUtility.verifySignature(signature, pubKey, data)) {
+		// ??? not sure ByteBuffer.array() works as desired ???
+		if (SignatureUtility.verifySignature(signature, pubKey, data.array())) {
 			shout.signature = signature;
 			return shout;
 		} else
