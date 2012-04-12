@@ -4,8 +4,10 @@ import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 import java.security.interfaces.ECPublicKey;
+import java.security.spec.InvalidKeySpecException;
 
 import org.joda.time.DateTime;
 import org.whispercomm.shout.AbstractShout;
@@ -81,10 +83,13 @@ public class NetworkShout extends AbstractShout {
 	 * @throws SignatureException
 	 * @throws NoSuchAlgorithmException
 	 * @throws InvalidKeyException
+	 * @throws InvalidKeySpecException
+	 * @throws NoSuchProviderException
 	 */
 	public NetworkShout(byte[] rawData) throws UnsupportedEncodingException,
 			AuthenticityFailureException, InvalidKeyException,
-			NoSuchAlgorithmException, SignatureException {
+			NoSuchAlgorithmException, SignatureException,
+			NoSuchProviderException, InvalidKeySpecException {
 		ByteBuffer byteBuffer = ByteBuffer.wrap(rawData);
 		// Get all the signatures
 		byte[][] sigs = new byte[MAX_SHOUT_NUM][];
@@ -185,10 +190,13 @@ public class NetworkShout extends AbstractShout {
 	 * @throws SignatureException
 	 * @throws NoSuchAlgorithmException
 	 * @throws InvalidKeyException
+	 * @throws InvalidKeySpecException
+	 * @throws NoSuchProviderException
 	 */
 	private static NetworkShout verifyShoutSignature(byte[] signature,
 			ByteBuffer byteBuffer) throws UnsupportedEncodingException,
-			InvalidKeyException, NoSuchAlgorithmException, SignatureException {
+			InvalidKeyException, NoSuchAlgorithmException, SignatureException,
+			NoSuchProviderException, InvalidKeySpecException {
 		// Slice a new ByteBuffer
 		ByteBuffer data = byteBuffer.slice();
 		// extract the public key
@@ -209,9 +217,13 @@ public class NetworkShout extends AbstractShout {
 	 * @param byteBuffer
 	 * @return
 	 * @throws UnsupportedEncodingException
+	 * @throws InvalidKeySpecException
+	 * @throws NoSuchProviderException
+	 * @throws NoSuchAlgorithmException
 	 */
 	private static NetworkShout getShoutBody(ByteBuffer byteBuffer)
-			throws UnsupportedEncodingException {
+			throws UnsupportedEncodingException, NoSuchAlgorithmException,
+			NoSuchProviderException, InvalidKeySpecException {
 		// time
 		long time = byteBuffer.getLong();
 		DateTime timestamp = new DateTime(time);
@@ -224,8 +236,9 @@ public class NetworkShout extends AbstractShout {
 		// pubKey
 		byte[] pubKeyBytes = new byte[KEY_LENGTH];
 		byteBuffer.get(pubKeyBytes, 0, KEY_LENGTH);
-		// TODO get ECPublicKey from pubKeyBytes
-		ECPublicKey pubKey = null;
+		// get ECPublicKey from pubKeyBytes
+		ECPublicKey pubKey = SignatureUtility
+				.getPublicKeyFromBytes(pubKeyBytes);
 		User sender = new SimpleUser(senderName, pubKey);
 		// contentLen
 		int contentLen = byteBuffer.getInt();

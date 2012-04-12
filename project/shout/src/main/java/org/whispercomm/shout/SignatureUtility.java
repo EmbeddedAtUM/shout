@@ -104,6 +104,26 @@ public class SignatureUtility {
 	}
 
 	/**
+	 * Get ECPublicKey from X.509 encoded bytes.
+	 * 
+	 * @param keyBytes
+	 * @return
+	 * @throws NoSuchAlgorithmException
+	 * @throws NoSuchProviderException
+	 * @throws InvalidKeySpecException
+	 */
+	static public ECPublicKey getPublicKeyFromBytes(byte[] keyBytes)
+			throws NoSuchAlgorithmException, NoSuchProviderException,
+			InvalidKeySpecException {
+
+		KeyFactory kf = KeyFactory.getInstance("ECDSA", "SC");
+		X509EncodedKeySpec x509ks = new X509EncodedKeySpec(keyBytes);
+		ECPublicKey pubKey = (ECPublicKey) kf.generatePublic(x509ks);
+
+		return pubKey;
+	}
+
+	/**
 	 * @return the current user's private key from the sharedPrefs
 	 * 
 	 * @throws NoSuchProviderException

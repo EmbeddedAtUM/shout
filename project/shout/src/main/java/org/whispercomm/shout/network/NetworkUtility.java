@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.SignatureException;
+import java.security.spec.InvalidKeySpecException;
 
 import org.whispercomm.manes.client.maclib.ManesInterface;
 
@@ -126,6 +128,10 @@ public class NetworkUtility extends Service {
 				} catch (NoSuchAlgorithmException e) {
 					Log.e(TAG, e.getMessage());
 				} catch (SignatureException e) {
+					Log.e(TAG, e.getMessage());
+				} catch (NoSuchProviderException e) {
+					Log.e(TAG, e.getMessage());
+				} catch (InvalidKeySpecException e) {
 					Log.e(TAG, e.getMessage());
 				}
 			}
