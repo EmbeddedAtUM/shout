@@ -1,4 +1,4 @@
-package org.whispercomm.shout;
+package org.whispercomm.shout.id;
 
 public class UserNotInitiatedException extends Exception {
 

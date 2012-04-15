@@ -1,4 +1,4 @@
-package org.whispercomm.shout;
+package org.whispercomm.shout.id;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
@@ -17,25 +17,21 @@ import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECGenParameterSpec;
 import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
 import org.joda.time.DateTime;
 import org.spongycastle.jce.provider.BouncyCastleProvider;
+import org.whispercomm.shout.Shout;
+import org.whispercomm.shout.User;
 import org.whispercomm.shout.network.NetworkShout;
 
 import android.app.Activity;
-import android.content.SharedPreferences;
-import android.util.Base64;
 
 public class SignatureUtility {
 
-	public static final String SHARED_PREFS = "shout_user_keys";
-	static final String USER_NAME = "user_name";
-	static final String USER_PUB_KEY = "user_pub_key";
-	static final String USER_PRIV_KEY = "user_priv_key";
-
 	static final String ECC_PARAMS = "secp256r1";
+	static final String CRYPTO_ALGO = "ECDSA";
+	static final String CRYPTO_PROVIDER = "SC";
 	static final String SIGN_ALGO = "SHA1WITHECDSA";
 	static final String HASH_ALGO = "SHA-256";
 
@@ -43,10 +39,14 @@ public class SignatureUtility {
 		Security.addProvider(new BouncyCastleProvider());
 	}
 
-	SharedPreferences sharedPrefs;
+	IdStorage idStorage;
 
 	public SignatureUtility(Activity callerActivity) {
-		this.sharedPrefs = callerActivity.getSharedPreferences(SHARED_PREFS, 0);
+		this.idStorage = new IdStorageSharedPrefs(callerActivity);
+	}
+	
+	public SignatureUtility(IdStorage idStorage){
+		this.idStorage = idStorage;
 	}
 
 	/**
@@ -57,50 +57,17 @@ public class SignatureUtility {
 	 * @throws NoSuchAlgorithmException
 	 * @throws InvalidAlgorithmParameterException
 	 */
-	public void genKeyPairs() throws NoSuchAlgorithmException,
+	protected void genKeyPairs() throws NoSuchAlgorithmException,
 			NoSuchProviderException, InvalidAlgorithmParameterException {
 		// generate key pairs
 		ECGenParameterSpec ecParamSpec = new ECGenParameterSpec(ECC_PARAMS);
-		KeyPairGenerator kpg = KeyPairGenerator.getInstance("ECDSA", "SC");
+		KeyPairGenerator kpg = KeyPairGenerator.getInstance(CRYPTO_ALGO,
+				CRYPTO_PROVIDER);
 		kpg.initialize(ecParamSpec);
 
 		KeyPair kpA = kpg.generateKeyPair();
 
-		byte[] pubKeyBytes = kpA.getPublic().getEncoded();
-		String pubStr = Base64.encodeToString(pubKeyBytes, 0,
-				pubKeyBytes.length, Base64.DEFAULT);
-		byte[] privKeyBytes = kpA.getPrivate().getEncoded();
-		String privStr = Base64.encodeToString(privKeyBytes, 0,
-				privKeyBytes.length, Base64.DEFAULT);
-		// store key pair in sharedPrefs
-		SharedPreferences.Editor prefsEditor = sharedPrefs.edit();
-
-		prefsEditor.putString(USER_PUB_KEY, pubStr);
-		prefsEditor.putString(USER_PRIV_KEY, privStr);
-		prefsEditor.commit();
-	}
-
-	/**
-	 * @return the current user's public key from the sharedPrefs
-	 * 
-	 * @throws NoSuchProviderException
-	 * @throws NoSuchAlgorithmException
-	 * @throws InvalidKeySpecException
-	 * @throws UserNotInitiatedException
-	 */
-	public ECPublicKey getPublicKey() throws NoSuchAlgorithmException,
-			NoSuchProviderException, InvalidKeySpecException,
-			UserNotInitiatedException {
-		String pubKeyString = sharedPrefs.getString(USER_PUB_KEY, null);
-		if (pubKeyString == null)
-			throw new UserNotInitiatedException();
-		byte[] pubKeyBytes = Base64.decode(pubKeyString, Base64.DEFAULT);
-
-		KeyFactory kf = KeyFactory.getInstance("ECDSA", "SC");
-		X509EncodedKeySpec x509ks = new X509EncodedKeySpec(pubKeyBytes);
-		ECPublicKey pubKey = (ECPublicKey) kf.generatePublic(x509ks);
-
-		return pubKey;
+		idStorage.updateKeyPair(kpA);
 	}
 
 	/**
@@ -116,7 +83,7 @@ public class SignatureUtility {
 			throws NoSuchAlgorithmException, NoSuchProviderException,
 			InvalidKeySpecException {
 
-		KeyFactory kf = KeyFactory.getInstance("ECDSA", "SC");
+		KeyFactory kf = KeyFactory.getInstance(CRYPTO_ALGO, CRYPTO_PROVIDER);
 		X509EncodedKeySpec x509ks = new X509EncodedKeySpec(keyBytes);
 		ECPublicKey pubKey = (ECPublicKey) kf.generatePublic(x509ks);
 
@@ -124,45 +91,30 @@ public class SignatureUtility {
 	}
 
 	/**
-	 * @return the current user's private key from the sharedPrefs
+	 * Allow UI to create or update user name.
 	 * 
-	 * @throws NoSuchProviderException
-	 * @throws NoSuchAlgorithmException
-	 * @throws InvalidKeySpecException
-	 * @throws UserNotInitiatedException
+	 * @param userName
+	 * @throws Exception 
 	 */
-	private ECPrivateKey getPrivateKey() throws NoSuchAlgorithmException,
-			NoSuchProviderException, InvalidKeySpecException,
-			UserNotInitiatedException {
-		String privKeyString = sharedPrefs.getString(USER_PRIV_KEY, null);
-		if (privKeyString == null)
-			throw new UserNotInitiatedException();
-		byte[] privKeyBytes = Base64.decode(privKeyString, Base64.DEFAULT);
-
-		KeyFactory kf = KeyFactory.getInstance("ECDSA", "SC");
-		PKCS8EncodedKeySpec p8ks = new PKCS8EncodedKeySpec(privKeyBytes);
-		ECPrivateKey privKey = (ECPrivateKey) kf.generatePrivate(p8ks);
-
-		return privKey;
+	public synchronized void updateUserName(String userName)
+			throws Exception {
+		if (userName == null
+				|| userName.length() > NetworkShout.MAX_USER_NAME_LEN)
+			throw new UserNameInvalidException();
+		idStorage.updateUserName(userName);
+		// create key pair if not exist
+		if (idStorage.getPublicKey() == null
+				|| idStorage.getPrivateKey() == null) {
+			genKeyPairs();
+		}
 	}
 
 	/**
 	 * @return information of current user in form of User object.
-	 * 
-	 * @throws InvalidKeySpecException
-	 * @throws NoSuchProviderException
-	 * @throws NoSuchAlgorithmException
-	 * @throws UserNotInitiatedException
+	 * @throws Exception 
 	 */
-	public User getUser() throws NoSuchAlgorithmException,
-			NoSuchProviderException, InvalidKeySpecException,
-			UserNotInitiatedException {
-		String userName = sharedPrefs.getString(USER_NAME, null);
-		if (userName == null)
-			throw new UserNotInitiatedException();
-		ECPublicKey pubKey = getPublicKey();
-		User sender = new SimpleUser(userName, pubKey);
-		return sender;
+	public User getUser() throws Exception {
+		return idStorage.getUser();
 	}
 
 	/**
@@ -238,24 +190,15 @@ public class SignatureUtility {
 	 * @param sender
 	 * 
 	 * @return signature
-	 * 
-	 * @throws UnsupportedEncodingException
-	 * @throws UserNotInitiatedException
-	 * @throws InvalidKeySpecException
-	 * @throws NoSuchProviderException
-	 * @throws NoSuchAlgorithmException
-	 * @throws SignatureException
-	 * @throws InvalidKeyException
+	 * @throws Exception 
 	 */
 	public byte[] genShoutSignature(DateTime timestamp, User sender,
 			String content, Shout shoutOri)
-			throws UnsupportedEncodingException, NoSuchAlgorithmException,
-			NoSuchProviderException, InvalidKeySpecException,
-			UserNotInitiatedException, InvalidKeyException, SignatureException {
+			throws Exception {
 		// Serialize the shout
 		ByteBuffer byteBuffer = ByteBuffer.allocate(NetworkShout.MAX_LEN);
 		serialize(byteBuffer, timestamp, sender, content, shoutOri);
-		ECPrivateKey privKey = getPrivateKey();
+		ECPrivateKey privKey = idStorage.getPrivateKey();
 		byte[] signature = genSignature(byteBuffer.array(), privKey);
 		return signature;
 	}
