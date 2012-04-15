@@ -42,6 +42,11 @@
 			<version>1.46.99.3-UNOFFICIAL-ROBERTO-RELEASE</version>
 		</dependency>
 		<dependency>
+			<groupId>org.whispercomm.manes</groupId>
+			<artifactId>manesinterface</artifactId>
+			<version>0.0.1</version>
+		</dependency>
+		<dependency>
 			<groupId>com.pivotallabs</groupId>
 			<artifactId>robolectric</artifactId>
 			<version>1.1</version>
