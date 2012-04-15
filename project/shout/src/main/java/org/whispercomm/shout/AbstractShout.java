@@ -3,6 +3,8 @@ package org.whispercomm.shout;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 
+import org.whispercomm.shout.id.SignatureUtility;
+
 import android.util.Log;
 
 public abstract class AbstractShout implements Shout {

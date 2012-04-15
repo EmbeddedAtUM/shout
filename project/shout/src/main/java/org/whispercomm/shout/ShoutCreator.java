@@ -8,6 +8,8 @@ import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 
 import org.joda.time.DateTime;
+import org.whispercomm.shout.id.SignatureUtility;
+import org.whispercomm.shout.id.UserNotInitiatedException;
 import org.whispercomm.shout.network.NetworkInterface;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 
@@ -23,9 +25,8 @@ public class ShoutCreator {
 	SignatureUtility signUtility;
 	User user;
 
-	public ShoutCreator(Activity callerActivity, String userName)
-			throws NoSuchAlgorithmException, NoSuchProviderException,
-			InvalidKeySpecException, UserNotInitiatedException {
+	public ShoutCreator(Activity callerActivity)
+			throws Exception {
 		this.callerActivity = callerActivity;
 		this.networkIf = new NetworkInterface(this.callerActivity);
 		this.signUtility = new SignatureUtility(this.callerActivity);
@@ -60,6 +61,9 @@ public class ShoutCreator {
 			signature = signUtility.genShoutSignature(timestamp, user, content,
 					shoutOri);
 		} catch (UnsupportedEncodingException e) {
+			Log.e(TAG, e.getMessage());
+			return false;
+		} catch (Exception e) {
 			Log.e(TAG, e.getMessage());
 			return false;
 		}

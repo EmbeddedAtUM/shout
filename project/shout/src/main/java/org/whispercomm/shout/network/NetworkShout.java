@@ -12,9 +12,9 @@ import java.security.spec.InvalidKeySpecException;
 import org.joda.time.DateTime;
 import org.whispercomm.shout.AbstractShout;
 import org.whispercomm.shout.Shout;
-import org.whispercomm.shout.SignatureUtility;
 import org.whispercomm.shout.SimpleUser;
 import org.whispercomm.shout.User;
+import org.whispercomm.shout.id.SignatureUtility;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 
 /**
@@ -30,7 +30,7 @@ public class NetworkShout extends AbstractShout {
 	/**
 	 * Maximum length (in bytes) of a user name.
 	 */
-	static final int MAX_USER_NAME_LEN = 20;
+	public static final int MAX_USER_NAME_LEN = 20;
 	/**
 	 * Maximum length (in bytes) of a shout message
 	 */
@@ -42,7 +42,7 @@ public class NetworkShout extends AbstractShout {
 	/**
 	 * Length (in bytes) of the digital signature
 	 */
-	static final int SIGNATURE_LENGTH = 256 / 8;
+	static final int SIGNATURE_LENGTH = KEY_LENGTH * 2;
 	/**
 	 * Maximum length of re-shout chain
 	 */
