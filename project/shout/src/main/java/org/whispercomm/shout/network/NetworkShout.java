@@ -8,6 +8,7 @@ import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Arrays;
 
 import org.joda.time.DateTime;
 import org.whispercomm.shout.AbstractShout;
@@ -34,24 +35,50 @@ public class NetworkShout extends AbstractShout {
 	/**
 	 * Maximum length (in bytes) of a shout message
 	 */
-	static final int MAX_CONTENT_LEN = 140;
+	public static final int MAX_CONTENT_LEN = 140;
 	/**
 	 * Length (in bytes) of the signing key
 	 */
-	static final int KEY_LENGTH = 256 / 8;
+	public static final int KEY_LENGTH = 91;
 	/**
 	 * Length (in bytes) of the digital signature
 	 */
-	static final int SIGNATURE_LENGTH = KEY_LENGTH * 2;
+	public static final int MAX_SIGNATURE_LENGTH = 80;
 	/**
 	 * Maximum length of re-shout chain
 	 */
-	static final int MAX_SHOUT_NUM = 3;
+	public static final int MAX_SHOUT_NUM = 3;
+	/**
+	 * size of a long variable (which holds the time stamp of the shout)
+	 */
+	public static final int TIME_STAMP_SIZE = 8;
+	/**
+	 * use a byte to hold the size of the sender name
+	 */
+	public static final int SENDER_NAME_LEN_SIZE = 1;
+	/**
+	 * use a char to hold the size of the content
+	 */
+	public static final int CONTENT_LEN_SIZE = 2;
+	/**
+	 * use a byte to hold has_reshout
+	 */
+	public static final int HAS_RESHOUT_SIZE = 1;
+	/**
+	 * use a char to hold the size of signature
+	 */
+	public static final int SIGNATURE_LENTH_SIZE = 2;
+	/**
+	 * use a byte to hold has_next in "signatures" fields
+	 */
+	public static final int SIGN_HAS_NEXT_SIZE = 1;
 	/**
 	 * Maximum length (in bytes) of a shout message
 	 */
-	public static final int MAX_LEN = (8 + 4 + MAX_USER_NAME_LEN + KEY_LENGTH
-			+ 4 + MAX_CONTENT_LEN + 1 + SIGNATURE_LENGTH + 1)
+	public static final int MAX_LEN = (TIME_STAMP_SIZE + SENDER_NAME_LEN_SIZE
+			+ MAX_USER_NAME_LEN + KEY_LENGTH + CONTENT_LEN_SIZE
+			+ MAX_CONTENT_LEN + HAS_RESHOUT_SIZE + SIGNATURE_LENTH_SIZE
+			+ MAX_SIGNATURE_LENGTH + SIGN_HAS_NEXT_SIZE)
 			* MAX_SHOUT_NUM;
 
 	private DateTime timestamp;
@@ -74,6 +101,52 @@ public class NetworkShout extends AbstractShout {
 		this.shoutOri = shout.getOriginalShout();
 	}
 
+	/**
+	 * Usually used to construct a shout from data received from the network.
+	 * This shout needs to be stored into the database.
+	 * 
+	 * @param timestamp
+	 * @param sender
+	 * @param content
+	 * @param signature
+	 * @param shoutOri
+	 * @param hasReshout
+	 */
+	public NetworkShout(DateTime timestamp, User sender, String content,
+			byte[] signature, Shout shoutOri) {
+		this.timestamp = timestamp;
+		this.sender = sender;
+		this.content = content;
+		this.signature = signature;
+		this.shoutOri = shoutOri;
+	}
+
+	/**
+	 * extract all the signatures of the network shout
+	 * 
+	 * @param sigs
+	 *            array to hold all the signatures
+	 * @param byteBuffer
+	 *            raw data in ByteBuffer
+	 * @return
+	 */
+	public static int getSignatures(byte[][] sigs, ByteBuffer byteBuffer) {
+		byte[] sig = null;
+		byte hasNext = 1;
+		int sigNum = 0;
+		for (; hasNext != 0 && sigNum < MAX_SHOUT_NUM; sigNum++) {
+			// signature_len
+			int signature_len = byteBuffer.getChar();
+			// signature
+			sig = new byte[signature_len];
+			byteBuffer.get(sig, 0, signature_len);
+			sigs[sigNum] = sig;
+			// has_next
+			hasNext = byteBuffer.get();
+		}
+		return sigNum;
+	}
+
 	/***
 	 * Build a NetworkShout object from bytes received from the network
 	 * 
@@ -93,33 +166,25 @@ public class NetworkShout extends AbstractShout {
 		ByteBuffer byteBuffer = ByteBuffer.wrap(rawData);
 		// Get all the signatures
 		byte[][] sigs = new byte[MAX_SHOUT_NUM][];
-		byte[] sig = null;
-		char hasNext = 1;
-		int sigNum = 0;
-		for (; hasNext != 0 && sigNum < MAX_SHOUT_NUM; sigNum++) {
-			sig = new byte[SIGNATURE_LENGTH];
-			byteBuffer.get(sig, 0, SIGNATURE_LENGTH);
-			sigs[sigNum] = sig;
-			hasNext = byteBuffer.getChar();
-		}
+		int sigNum = getSignatures(sigs, byteBuffer);
 		// verify all the signatures
 		NetworkShout[] shouts = new NetworkShout[3];
 		for (int i = 0; i < sigNum; i++) {
-			sig = sigs[i];
-			shouts[i] = verifyShoutSignature(sig, byteBuffer);
+			shouts[i] = verifyShoutSignature(sigs[i], byteBuffer);
 			if (shouts[i] == null) {
 				// Verification fails
 				throw new AuthenticityFailureException();
 			}
 		}
 		// Ensemble the final shout
-		for (int i = 0; i < MAX_SHOUT_NUM; i++) {
+		for (int i = 0; i < MAX_SHOUT_NUM-1; i++) {
 			if (shouts[i + 1] == null)
 				break;
 			shouts[i].shoutOri = shouts[i + 1];
 		}
 		this.timestamp = shouts[0].getTimestamp();
 		this.sender = shouts[0].getSender();
+		this.content = shouts[0].getContent();
 		this.signature = shouts[0].getSignature();
 		this.shoutOri = shouts[0].getOriginalShout();
 	}
@@ -137,13 +202,16 @@ public class NetworkShout extends AbstractShout {
 		// Get signatures
 		int sigNum = 0;
 		NetworkShout shout = this;
-		char hasReshout;
+		byte hasReshout;
 		while (shout != null && sigNum < MAX_SHOUT_NUM) {
+			byte[] signature = shout.getSignature();
+			// signature_len
+			byteBuffer.putChar((char) signature.length);
 			// signature
-			byteBuffer.put(shout.getSignature());
+			byteBuffer.put(signature);
 			// hasNext
-			hasReshout = (char) (shout.getOriginalShout() == null ? 0 : 1);
-			byteBuffer.putChar(hasReshout);
+			hasReshout = (byte) (shout.getOriginalShout() == null ? 0 : 1);
+			byteBuffer.put(hasReshout);
 			shout = (NetworkShout) shout.shoutOri;
 			sigNum++;
 		}
@@ -151,29 +219,11 @@ public class NetworkShout extends AbstractShout {
 		if (shout != null)
 			throw new ShoutChainTooLongException();
 		// put the body of the shout into the ByteBuffer
-		SignatureUtility.serialize(byteBuffer, this.timestamp, this.sender,
-				this.content, this.shoutOri);
-		return byteBuffer.array();
-	}
+		byte[] shoutBodyBytes = SignatureUtility.serialize(this.timestamp,
+				this.sender, this.content, this.shoutOri);
+		byteBuffer.put(shoutBodyBytes);
 
-	/**
-	 * Usually used to construct a shout from data received from the network.
-	 * This shout needs to be stored into the database.
-	 * 
-	 * @param timestamp
-	 * @param sender
-	 * @param content
-	 * @param signature
-	 * @param shoutOri
-	 * @param hasReshout
-	 */
-	private NetworkShout(DateTime timestamp, User sender, String content,
-			byte[] signature, Shout shoutOri) {
-		this.timestamp = timestamp;
-		this.sender = sender;
-		this.content = content;
-		this.signature = signature;
-		this.shoutOri = shoutOri;
+		return Arrays.copyOfRange(byteBuffer.array(), 0, byteBuffer.position());
 	}
 
 	/**
@@ -193,18 +243,19 @@ public class NetworkShout extends AbstractShout {
 	 * @throws InvalidKeySpecException
 	 * @throws NoSuchProviderException
 	 */
-	private static NetworkShout verifyShoutSignature(byte[] signature,
+	public static NetworkShout verifyShoutSignature(byte[] signature,
 			ByteBuffer byteBuffer) throws UnsupportedEncodingException,
 			InvalidKeyException, NoSuchAlgorithmException, SignatureException,
 			NoSuchProviderException, InvalidKeySpecException {
 		// Slice a new ByteBuffer
 		ByteBuffer data = byteBuffer.slice();
+		byte[] dataBytes = data.array();
+		byte[] dataBytes1 = Arrays.copyOfRange(dataBytes,
+				byteBuffer.position(), dataBytes.length);
 		// extract the public key
 		NetworkShout shout = getShoutBody(byteBuffer);
 		ECPublicKey pubKey = shout.getSender().getPublicKey();
-		// verify the signature
-		// ??? not sure ByteBuffer.array() works as desired ???
-		if (SignatureUtility.verifySignature(signature, pubKey, data.array())) {
+		if (SignatureUtility.verifySignature(signature, pubKey, dataBytes1)) {
 			shout.signature = signature;
 			return shout;
 		} else
@@ -221,14 +272,14 @@ public class NetworkShout extends AbstractShout {
 	 * @throws NoSuchProviderException
 	 * @throws NoSuchAlgorithmException
 	 */
-	private static NetworkShout getShoutBody(ByteBuffer byteBuffer)
+	protected static NetworkShout getShoutBody(ByteBuffer byteBuffer)
 			throws UnsupportedEncodingException, NoSuchAlgorithmException,
 			NoSuchProviderException, InvalidKeySpecException {
 		// time
 		long time = byteBuffer.getLong();
 		DateTime timestamp = new DateTime(time);
 		// senderNameLen
-		int senderNameLen = byteBuffer.getInt();
+		int senderNameLen = byteBuffer.get();
 		// senderName
 		byte[] senderNameBytes = new byte[senderNameLen];
 		byteBuffer.get(senderNameBytes, 0, senderNameLen);
@@ -241,13 +292,13 @@ public class NetworkShout extends AbstractShout {
 				.getPublicKeyFromBytes(pubKeyBytes);
 		User sender = new SimpleUser(senderName, pubKey);
 		// contentLen
-		int contentLen = byteBuffer.getInt();
+		int contentLen = byteBuffer.getChar();
 		// content
 		byte[] contentBytes = new byte[contentLen];
 		byteBuffer.get(contentBytes, 0, contentLen);
 		String content = new String(contentBytes, CHARSET_NAME);
 		// isReshout (***no need to use this value so far)
-		byteBuffer.getChar();
+		byteBuffer.get();
 		NetworkShout shout = new NetworkShout(timestamp, sender, content, null,
 				null);
 		return shout;
