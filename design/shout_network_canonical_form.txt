@@ -5,16 +5,24 @@ canonical form:  ||=================||
        		 ||=================||
 
 "signatures":    ||=================|| ---------|
-		 ||    signature    ||		|
-		 ||    (32 bytes)*  ||		|
+		 ||  signature_len* ||		|
+		 ||    (2 bytes)    ||		|
+		 ||-----------------||		|
+		 ||    signature*   ||		|
+		 || (as previous    ||		|
+		 || field specified)||		|
 		 ||-----------------||		\ one "signature" (sig1)
 		 ||     has_next*   ||		/ 
 		 ||     (1 byte)    ||		|
 		 ||=================|| ---------|
+		 ||  signature_len  ||		|
+		 ||    (2 bytes)    ||		|
+		 ||-----------------||		|
 		 ||    signature    ||		|
-		 ||    (32 bytes)*  ||		|
-		 ||-----------------||		\ one "signature" (sig2)
-		 ||     has_next*   ||		/ 
+		 || (as previous    ||		|
+		 || field specified)||		\ one "signature" (sig2)
+		 ||-----------------||		/
+		 ||     has_next    ||		| 
 		 ||     (1 byte)    ||		|
 		 ||=================|| ---------|
 		 || ...             ||
@@ -28,46 +36,46 @@ canonical form:  ||=================||
 		 ||    (8 bytes)    ||		|
 		 ||-----------------||		|
 		 || sender_name_len*||		|
-		 ||    (4 bytes)    ||		|
+		 ||    (1 byte)     ||		|
 		 ||-----------------||		|
 		 ||   sender_name   ||		|
 		 || (as previous    ||		|
 		 || field specified)||		|
 		 ||-----------------||		|
-		 ||  sender_pub_key ||		|
-		 ||    (32 bytes)   ||		|
+		 || sender_pub_key* ||		|
+		 ||    (91 bytes)   ||		|
 		 ||-----------------||		\ one "shout" (shout1)
-		 ||   content_len   ||		/ 
-		 ||    (4 bytes)    ||		|
+		 ||   content_len*  ||		/ 
+		 ||    (2 bytes)    ||		|
 		 ||-----------------||		|
 		 ||     content     ||		|
 		 || (as previous    ||		|
 		 || field specified)||		|
 		 ||-----------------||		|
-		 ||    is_reshout   ||		|
+		 ||   has_reshout   ||		|
 		 ||     (1 byte)    ||		|
 		 ||=================||----------|
 		 ||      time       ||		|
 		 ||    (8 bytes)    ||		|
 		 ||-----------------||		|
 		 || sender_name_len ||		|
-		 ||    (4 bytes)    ||		|
+		 ||    (1 byte)     ||		|
 		 ||-----------------||		|
 		 ||   sender_name   ||		|
 		 || (as previous    ||		|
 		 || field specified)||		|
 		 ||-----------------||		|
 		 ||  sender_pub_key ||		|
-		 ||    (32 bytes)   ||		|
+		 ||    (91 bytes)   ||		|
 		 ||-----------------||		\ one "shout" (shout2)
 		 ||   content_len   ||		/ 
-		 ||    (4 bytes)    ||		|
+		 ||    (2 bytes)    ||		|
 		 ||-----------------||		|
 		 ||     content     ||		|
 		 || (as previous    ||		|
 		 || field specified)||		|
 		 ||-----------------||		|
-		 ||    is_reshout   ||		|
+		 ||   has_reshout   ||		|
 		 ||     (1 byte)    ||		|
 		 ||=================||----------|
 		 || ...             ||
@@ -84,16 +92,24 @@ shout body follows. "sig1" is the digital signature of "shout1" +
 	 
 A few notes: 
 
-* "signature" is 32 bytes because we are using 256 bit
-ECC algorithm.  
+* "signature_len" field exists because the length of ECDSA signature
+  varies according to ANSI X9.62 standards. For "secp256r1" key, ECDSA
+  usually varies between 70~80.
 
-* "has_next" denotes whether the next 32 bytes are
+* "has_next" denotes whether the next few bytes represent
 another digital signature.
 
-* "sender_name_len" records the number of bytes "sender_name" has.
+* "sender_name_len" records the number of bytes "sender_name" has. One
+  byte is enough because "sender_name" is less than 20 charactors
+  (i.e., 40 bytes in Java).
 
-* "content_len" records the number of bytes "content" has.
+* "sender_pub_key" is 91 bytes as returned by Bouncy Castle's X.509
+  encoding scheme using ECDSA and "secp256r1".
 
-* "is_reshout" represents whether the current shout has a parent
+* "content_len" records the number of bytes "content" has. Two bytes
+  are needed because "content" is less than 140 characters (i.e., 280
+  bytes in Java).
+
+* "has_reshout" represents whether the current shout has a parent
   shout. If so, the next few bytes need to be interpreted as the
   parent shout.
