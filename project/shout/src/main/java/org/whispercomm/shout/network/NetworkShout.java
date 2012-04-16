@@ -31,11 +31,11 @@ public class NetworkShout extends AbstractShout {
 	/**
 	 * Maximum length (in bytes) of a user name.
 	 */
-	public static final int MAX_USER_NAME_LEN = 20;
+	public static final int MAX_USER_NAME_LEN = 20*2;
 	/**
 	 * Maximum length (in bytes) of a shout message
 	 */
-	public static final int MAX_CONTENT_LEN = 140;
+	public static final int MAX_CONTENT_LEN = 140*2;
 	/**
 	 * Length (in bytes) of the signing key
 	 */
