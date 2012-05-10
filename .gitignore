@@ -1,7 +1,5 @@
-.settings
-.project
-.classpath
 *~
 bin
 gen
 target
+*.swp

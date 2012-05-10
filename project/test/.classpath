@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="test"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/ShoutActivity"/>
+	<classpathentry kind="lib" path="libs/robolectric-1.2-20120509.221515-54-jar-with-dependencies.jar"/>
+	<classpathentry kind="lib" path="libs/android.jar"/>
+	<classpathentry kind="lib" path="libs/maps.jar"/>
+	<classpathentry kind="lib" path="libs/mockito-all-1.8.5.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/ShoutTest/libs/mockito-all-1.9.0-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

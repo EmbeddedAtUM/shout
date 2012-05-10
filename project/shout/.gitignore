@@ -1,0 +1,7 @@
+# Automatically generated Android binaries
+bin/*
+gen/*
+
+# Still make bin and gen folders
+!bin/.gitignore
+!gen/.gitignore

@@ -1,0 +1,5 @@
+# Binaries
+bin/*
+
+# Still make bin folder
+!bin/.gitignore
