@@ -18,13 +18,13 @@ import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECGenParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Arrays;
 
 import org.joda.time.DateTime;
 import org.spongycastle.jce.provider.BouncyCastleProvider;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.User;
 import org.whispercomm.shout.network.NetworkShout;
+import org.whispercomm.shout.util.Arrays;
 
 import android.app.Activity;
 

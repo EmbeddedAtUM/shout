@@ -8,7 +8,6 @@ import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.InvalidKeySpecException;
-import java.util.Arrays;
 
 import org.joda.time.DateTime;
 import org.whispercomm.shout.AbstractShout;
@@ -17,6 +16,7 @@ import org.whispercomm.shout.SimpleUser;
 import org.whispercomm.shout.User;
 import org.whispercomm.shout.id.SignatureUtility;
 import org.whispercomm.shout.provider.ShoutProviderContract;
+import org.whispercomm.shout.util.Arrays;
 
 /**
  * Shouts processed on the network, which can be constructed from and serialized
