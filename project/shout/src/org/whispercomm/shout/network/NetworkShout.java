@@ -93,12 +93,12 @@ public class NetworkShout extends AbstractShout {
 	 * @param shout_id
 	 *            the _ID of the source shout in the database
 	 */
-	public NetworkShout(long shout_id) {
-		Shout shout = ShoutProviderContract.retrieveShoutById(shout_id);
+	public NetworkShout(int shout_id) {
+		Shout shout = ShoutProviderContract.retrieveShoutById(null, shout_id);
 		this.timestamp = shout.getTimestamp();
 		this.sender = shout.getSender();
 		this.signature = shout.getSignature();
-		this.shoutOri = shout.getOriginalShout();
+		this.shoutOri = shout.getParent();
 	}
 
 	/**
@@ -184,9 +184,9 @@ public class NetworkShout extends AbstractShout {
 		}
 		this.timestamp = shouts[0].getTimestamp();
 		this.sender = shouts[0].getSender();
-		this.content = shouts[0].getContent();
+		this.content = shouts[0].getMessage();
 		this.signature = shouts[0].getSignature();
-		this.shoutOri = shouts[0].getOriginalShout();
+		this.shoutOri = shouts[0].getParent();
 	}
 
 	/**
@@ -210,7 +210,7 @@ public class NetworkShout extends AbstractShout {
 			// signature
 			byteBuffer.put(signature);
 			// hasNext
-			hasReshout = (byte) (shout.getOriginalShout() == null ? 0 : 1);
+			hasReshout = (byte) (shout.getParent() == null ? 0 : 1);
 			byteBuffer.put(hasReshout);
 			shout = (NetworkShout) shout.shoutOri;
 			sigNum++;
@@ -310,7 +310,7 @@ public class NetworkShout extends AbstractShout {
 	}
 
 	@Override
-	public String getContent() {
+	public String getMessage() {
 		return this.content;
 	}
 
@@ -320,7 +320,7 @@ public class NetworkShout extends AbstractShout {
 	}
 
 	@Override
-	public Shout getOriginalShout() {
+	public Shout getParent() {
 		return this.shoutOri;
 	}
 

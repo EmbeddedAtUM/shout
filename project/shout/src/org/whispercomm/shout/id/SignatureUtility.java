@@ -253,8 +253,8 @@ public class SignatureUtility {
 			if (shoutOri != null) {
 				timestamp = shoutOri.getTimestamp();
 				sender = shoutOri.getSender();
-				content = shoutOri.getContent();
-				shoutOri = shoutOri.getOriginalShout();
+				content = shoutOri.getMessage();
+				shoutOri = shoutOri.getParent();
 			} else
 				timestamp = null;
 		}

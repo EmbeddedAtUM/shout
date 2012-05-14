@@ -203,8 +203,8 @@ public class SignatureUtilityTest {
 				.getEncoded()).compareToIgnoreCase(new String(pubKey
 				.getEncoded())) == 0);
 		assertTrue(shoutRecovered.getSender().getUsername().compareTo(username) == 0);
-		assertTrue(shoutRecovered.getContent().compareTo(msg) == 0);
-		assertTrue(shoutRecovered.getOriginalShout() == null);
+		assertTrue(shoutRecovered.getMessage().compareTo(msg) == 0);
+		assertTrue(shoutRecovered.getParent() == null);
 	}
 
 	@Test
@@ -244,8 +244,8 @@ public class SignatureUtilityTest {
 					.getEncoded())) == 0);
 			assertTrue(shoutRecovered.getSender().getUsername()
 					.compareTo(username) == 0);
-			assertTrue(shoutRecovered.getContent().compareTo(msg) == 0);
-			shoutRecovered = (NetworkShout) shoutRecovered.getOriginalShout();
+			assertTrue(shoutRecovered.getMessage().compareTo(msg) == 0);
+			shoutRecovered = (NetworkShout) shoutRecovered.getParent();
 		}
 	}
 }

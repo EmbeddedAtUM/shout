@@ -72,8 +72,9 @@ public class NetworkUtility extends Service {
 		@Override
 		public void handleMessage(Message msg) {
 			if (msg.what == NEW_SHOUT) {
-				long shoutId = (Long) msg.obj;
-				networkProtocol.handleOutgoingAppShout(shoutId);
+				long shoutId = (Long) msg.obj; // FIXME
+				int shoutIdInt = (int) shoutId;
+				networkProtocol.handleOutgoingAppShout(shoutIdInt);
 			}
 		}
 	}

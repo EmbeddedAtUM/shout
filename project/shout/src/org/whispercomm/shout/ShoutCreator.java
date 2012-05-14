@@ -71,7 +71,7 @@ public class ShoutCreator {
 				signature);
 
 		// insert the shout to database and get its shout_id back
-		long shoutId = ShoutProviderContract.storeShout(shout);
+		long shoutId = ShoutProviderContract.storeShout(null, shout);
 
 		// call networkUtility to send the new shout out
 		networkIf.send(shoutId);

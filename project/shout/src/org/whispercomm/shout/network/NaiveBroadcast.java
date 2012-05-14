@@ -46,7 +46,7 @@ public class NaiveBroadcast implements NetworkProtocol {
 	}
 
 	@Override
-	public void handleOutgoingAppShout(long shoutId) {
+	public void handleOutgoingAppShout(int shoutId) {
 		// get the byte[] representation of the outgoing shout.
 		NetworkShout shout = new NetworkShout(shoutId);
 		final byte[] shoutBytes;
@@ -80,7 +80,7 @@ public class NaiveBroadcast implements NetworkProtocol {
 
 	@Override
 	public void handleIncomingNetworkShout(NetworkShout shout) {
-		ShoutProviderContract.storeShout(shout);
+		ShoutProviderContract.storeShout(null, shout);
 	}
 
 }

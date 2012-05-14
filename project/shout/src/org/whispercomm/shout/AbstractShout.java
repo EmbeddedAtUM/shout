@@ -16,7 +16,7 @@ public abstract class AbstractShout implements Shout {
 		if (hashCode == null) {
 			try {
 				this.hashCode = SignatureUtility.genShoutHash(getTimestamp(),
-						getSender(), getContent(), getOriginalShout());
+						getSender(), getMessage(), getParent());
 			} catch (UnsupportedEncodingException e) {
 				Log.e("AbstractShout",
 						"Cannot generate this shout's hash becasue "

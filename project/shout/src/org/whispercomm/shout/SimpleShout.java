@@ -25,7 +25,7 @@ public class SimpleShout extends AbstractShout {
 	}
 
 	@Override
-	public String getContent() {
+	public String getMessage() {
 		return this.content;
 	}
 
@@ -35,7 +35,7 @@ public class SimpleShout extends AbstractShout {
 	}
 
 	@Override
-	public Shout getOriginalShout() {
+	public Shout getParent() {
 		return this.reshoutedShout;
 	}
 

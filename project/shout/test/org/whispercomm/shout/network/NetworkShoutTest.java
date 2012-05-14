@@ -62,8 +62,8 @@ public class NetworkShoutTest {
 				.getEncoded()).compareToIgnoreCase(new String(pubKey
 				.getEncoded())) == 0);
 		assertTrue(shoutRecovered.getSender().getUsername().compareTo(username) == 0);
-		assertTrue(shoutRecovered.getContent().compareTo(msg) == 0);
-		assertTrue(shoutRecovered.getOriginalShout() == null);
+		assertTrue(shoutRecovered.getMessage().compareTo(msg) == 0);
+		assertTrue(shoutRecovered.getParent() == null);
 	}
 	
 }

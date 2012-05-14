@@ -128,6 +128,7 @@ public class ShoutProvider extends ContentProvider {
 
 		long rowId = mDB.insert(table, null, values);
 		if (rowId < 0) { // An error occurred
+			// TODO Differentiate errors (UNIQUE vs actual error)
 			throw new SQLException("Failed to insert row into " + uri);
 		}
 		Uri insertLocation = ContentUris.withAppendedId(uri, rowId);
@@ -252,19 +253,21 @@ public class ShoutProvider extends ContentProvider {
 		private static final String SQL_CREATE_USER = "CREATE TABLE " +
 				ShoutProviderContract.Users.TABLE_NAME +
 				"(" +
-				ShoutProviderContract.Users._ID + " INTEGER PRIMARY KEY, " +
+				ShoutProviderContract.Users._ID + " INTEGER PRIMARY KEY ASC AUTOINCREMENT, " +
 				ShoutProviderContract.Users.USERNAME + " TEXT ," +
-				ShoutProviderContract.Users.PUB_KEY + " BLOB " +
+				ShoutProviderContract.Users.PUB_KEY + " TEXT UNIQUE" +
 				");";
 
 		private static final String SQL_CREATE_SHOUT = "CREATE TABLE " +
 				ShoutProviderContract.Shouts.TABLE_NAME +
 				"(" +
-				"_ID INTEGER PRIMARY KEY, " +
+				ShoutProviderContract.Shouts._ID + " INTEGER PRIMARY KEY ASC AUTOINCREMENT, " +
 				ShoutProviderContract.Shouts.AUTHOR + " INTEGER, " +
 				ShoutProviderContract.Shouts.PARENT + " INTEGER, " +
 				ShoutProviderContract.Shouts.MESSAGE + " TEXT, " +
-				ShoutProviderContract.Shouts.SIGNATURE + " BLOB, " +
+				ShoutProviderContract.Shouts.TIME + " LONG, " +
+				ShoutProviderContract.Shouts.HASH + " TEXT UNIQUE, " +
+				ShoutProviderContract.Shouts.SIGNATURE + " TEXT UNIQUE, " +
 				"FOREIGN KEY(" + ShoutProviderContract.Shouts.AUTHOR + ") REFERENCES " +
 				ShoutProviderContract.Users.TABLE_NAME +
 				"(" + ShoutProviderContract.Users._ID + ") " +

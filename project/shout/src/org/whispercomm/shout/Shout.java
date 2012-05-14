@@ -25,7 +25,7 @@ public interface Shout {
 	/**
 	 * @return The stand-alone content of this specific Shout
 	 */
-	public String getContent();
+	public String getMessage();
 
 	/**
 	 * @return The sent time on this specific Shout
@@ -38,7 +38,7 @@ public interface Shout {
 	 * 
 	 * @return {@code null} if no original shout
 	 */
-	public Shout getOriginalShout();
+	public Shout getParent();
 
 	/**
 	 * Get the signature for this specific stand-alone Shout without parents.
