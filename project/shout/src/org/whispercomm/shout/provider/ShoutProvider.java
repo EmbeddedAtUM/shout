@@ -1,170 +1,293 @@
+
 package org.whispercomm.shout.provider;
 
-/**
- * Content provider for storing Shout messages
- */
 import android.content.ContentProvider;
+import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.util.Log;
 
 public class ShoutProvider extends ContentProvider {
 
-	private static final String TAG = ShoutProvider.class.getName();
-	private static final String AUTHORITY = TAG;
+	private static final String AUTHORITY = ShoutProviderContract.AUTHORITY;
 
-	private static final String URI_ERROR = "Error: Invalid URI ";
+	private static final String MIME_SHOUT = "vnd.android.cursor.item/shout";
+	private static final String MIME_SHOUT_MANY = "vnd.android.cursor.dir/shout";
+	private static final String MIME_USER = "vnd.android.cursor.item/shout-user";
+	private static final String MIME_USER_MANY = "vnd.android.cursor.dir/shout-user";
 
-	private static final UriMatcher sURIMatcher = new UriMatcher(
+	private static final UriMatcher sUriMatcher = new UriMatcher(
 			UriMatcher.NO_MATCH);
 
-	private static final int SHOUTS = 0;
-	private static final int SHOUTS_ID = 1;
-	private static final int SHOUTS_USER_ID = 2;
-	private static final int SHOUTS_TAG_ID = 3;
-	private static final int TAGS = 4;
-	private static final int TAGS_ID = 5;
-	private static final int USERS = 6;
-	private static final int USERS_ID = 7;
+	private static final int SHOUTS = 1;
+	private static final int USERS = 2;
+	private static final int SHOUT_ID = 10;
+	private static final int USER_ID = 20;
+	private static final int SHOUTS_USER_ID = 120;
 
-	// These are the basic query strings. Note that none of them are semicolon
-	// delimited within the string.
-	private static final String SQL_QUERY_SHOUTS = "SELECT S._ID, S.User_ID, S.Content, S.Date, U.Username, U.Public_Key "
-			+ "FROM Shout AS S "
-			+ "JOIN `User` AS U "
-			+ "ON S.User_ID = U.User_ID;";
-	private static final String SQL_QUERY_SHOUTS_ID = "SELECT S._ID, S.User_ID, S.Content, S.Date, U.Username, U.Public_Key "
-			+ "FROM Shout AS S "
-			+ "JOIN `User` AS U "
-			+ "ON S.User_ID = U.User_ID " + "WHERE S.Shout_ID = ?;";
-	private static final String SQL_QUERY_SHOUTS_USER_ID = "SELECT S._ID, S.User_ID, S.Content, S.Date, U.Username, U.Public_Key "
-			+ "FROM Shout AS S "
-			+ "JOIN `User` AS U "
-			+ "ON S.User_ID = U.User_ID " + "WHERE S.User_ID = ?;";
-	private static final String SQL_QUERY_SHOUTS_TAG_ID = "SELECT S._ID, S.User_ID, S.Content, S.Date, U.Username, U.Public_Key "
-			+ "FROM Tag_Assignment AS TA "
-			+ "JOIN Shout AS S "
-			+ "ON S._ID = TA.Shout_ID "
-			+ "JOIN `User` as U "
-			+ "ON S.User_ID = U._ID " + "WHERE TA.Tag_ID = ?";
-	private static final String SQL_QUERY_TAGS = "SELECT T._ID, T.Name FROM Tag AS T;";
-	private static final String SQL_QUERY_TAGS_ID = "SELECT T._ID, T.Name FROM Tag AS T "
-			+ " WHERE T._ID = ?;";
-	private static final String SQL_QUERY_USERS = "SELECT U._ID, U.Username, U.Public_Key FROM User AS U;";
-	private static final String SQL_QUERY_USERS_ID = "SELECT U._ID, U.Username, U.Public_Key FROM User AS U "
-			+ " WHERE U._ID = ?;";
-
-	/**
-	 * Initializer block to set URIs in the UriMatcher
-	 */
 	static {
-		sURIMatcher.addURI(AUTHORITY, "shouts", SHOUTS);
-		sURIMatcher.addURI(AUTHORITY, "shouts/#", SHOUTS_ID);
-		sURIMatcher.addURI(AUTHORITY, "shouts/user/#", SHOUTS_USER_ID);
-		sURIMatcher.addURI(AUTHORITY, "shouts/tag/#", SHOUTS_TAG_ID);
-		sURIMatcher.addURI(AUTHORITY, "tags", TAGS);
-		sURIMatcher.addURI(AUTHORITY, "tags/#", TAGS_ID);
-		sURIMatcher.addURI(AUTHORITY, "users", USERS);
-		sURIMatcher.addURI(AUTHORITY, "users/#", USERS_ID);
+		sUriMatcher.addURI(AUTHORITY, "shout", SHOUTS);
+		sUriMatcher.addURI(AUTHORITY, "user", USERS);
+		sUriMatcher.addURI(AUTHORITY, "shout/#", SHOUT_ID);
+		sUriMatcher.addURI(AUTHORITY, "user/#", USER_ID);
+		sUriMatcher.addURI(AUTHORITY, "shout/user/#", SHOUTS_USER_ID);
 	}
 
+	private ShoutDatabaseHelper mOpenHelper;
+
 	private SQLiteDatabase mDB;
-	private ShoutProviderDatabaseHelper mDBHelper;
+
+	@Override
+	public int delete(Uri uri, String selection, String[] selectionArgs) {
+		mDB = mOpenHelper.getWritableDatabase();
+		int match = sUriMatcher.match(uri);
+		String id, table, whereClause = null;
+		String[] whereArgs = null;
+		switch (match) {
+			case SHOUTS:
+				table = ShoutProviderContract.Shouts.TABLE_NAME;
+				whereClause = selection;
+				whereArgs = selectionArgs;
+				break;
+			case SHOUT_ID:
+				table = ShoutProviderContract.Shouts.TABLE_NAME;
+				id = uri.getLastPathSegment();
+				if (TextUtils.isEmpty(selection)) {
+					whereClause = ShoutProviderContract.Shouts._ID + "=" + id;
+					whereArgs = null;
+				} else {
+					whereClause = selection + " and " + ShoutProviderContract.Shouts._ID + "=" + id;
+					whereArgs = selectionArgs;
+				}
+				break;
+			case USERS:
+				table = ShoutProviderContract.Users.TABLE_NAME;
+				whereClause = selection;
+				whereArgs = selectionArgs;
+				break;
+			case USER_ID:
+				table = ShoutProviderContract.Users.TABLE_NAME;
+				id = uri.getLastPathSegment();
+				if (TextUtils.isEmpty(selection)) {
+					whereClause = ShoutProviderContract.Users._ID + "=" + id;
+					whereArgs = null;
+				} else {
+					whereClause = selection + " and " + ShoutProviderContract.Users._ID + "=" + id;
+					whereArgs = selectionArgs;
+				}
+				break;
+			default:
+				throw new IllegalArgumentException("Invalid or unknown URI " + uri);
+		}
+		int rowsAffected = mDB.delete(table, whereClause, whereArgs);
+		this.getContext().getContentResolver().notifyChange(uri, null);
+		return rowsAffected;
+	}
+
+	@Override
+	public String getType(Uri uri) {
+		int match = sUriMatcher.match(uri);
+		switch (match) {
+			case SHOUTS:
+			case SHOUTS_USER_ID:
+				return MIME_SHOUT_MANY;
+			case SHOUT_ID:
+				return MIME_SHOUT;
+			case USERS:
+				return MIME_USER_MANY;
+			case USER_ID:
+				return MIME_USER;
+			default:
+				throw new IllegalArgumentException("Unknown or invalid URI " + uri);
+		}
+	}
+
+	@Override
+	public Uri insert(Uri uri, ContentValues values) {
+		mDB = mOpenHelper.getWritableDatabase();
+		int match = sUriMatcher.match(uri);
+		String table = null;
+		switch (match) {
+			case SHOUTS:
+				table = ShoutProviderContract.Shouts.TABLE_NAME;
+				break;
+			case USERS:
+				table = ShoutProviderContract.Users.TABLE_NAME;
+				break;
+			default:
+				throw new IllegalArgumentException("Unknown or invalid URI " + uri);
+		}
+
+		long rowId = mDB.insert(table, null, values);
+		if (rowId < 0) { // An error occurred
+			throw new SQLException("Failed to insert row into " + uri);
+		}
+		Uri insertLocation = ContentUris.withAppendedId(uri, rowId);
+		this.getContext().getContentResolver().notifyChange(insertLocation, null);
+		return insertLocation;
+	}
 
 	@Override
 	public boolean onCreate() {
-		Log.v(TAG, "onCreate() called");
-		mDBHelper = new ShoutProviderDatabaseHelper(super.getContext());
+		mOpenHelper = new ShoutDatabaseHelper(this.getContext());
 		return true;
 	}
 
 	@Override
 	public Cursor query(Uri uri, String[] projection, String selection,
 			String[] selectionArgs, String sortOrder) {
-		// TODO Auto-generated method stub
-		mDB = mDBHelper.getReadableDatabase();
-		int match = sURIMatcher.match(uri);
-		String query = null;
-		String[] condition = { uri.getLastPathSegment() };
+		mDB = mOpenHelper.getReadableDatabase();
+		SQLiteQueryBuilder qBuilder = new SQLiteQueryBuilder();
+		int match = sUriMatcher.match(uri);
 		switch (match) {
-		case SHOUTS:
-			query = SQL_QUERY_SHOUTS;
-			break;
-		case SHOUTS_ID:
-			query = SQL_QUERY_SHOUTS_ID;
-			break;
-		case SHOUTS_USER_ID:
-			query = SQL_QUERY_SHOUTS_USER_ID;
-			break;
-		case SHOUTS_TAG_ID:
-			query = SQL_QUERY_SHOUTS_TAG_ID;
-			break;
-		case TAGS:
-			query = SQL_QUERY_TAGS;
-			break;
-		case TAGS_ID:
-			query = SQL_QUERY_TAGS_ID;
-			break;
-		case USERS:
-			query = SQL_QUERY_USERS;
-			break;
-		case USERS_ID:
-			query = SQL_QUERY_USERS_ID;
-			break;
-		default:
-			throw new IllegalArgumentException(URI_ERROR + uri);
+			case SHOUTS:
+				qBuilder.setTables(ShoutProviderContract.Shouts.TABLE_NAME);
+				break;
+			case SHOUT_ID:
+				qBuilder.setTables(ShoutProviderContract.Shouts.TABLE_NAME);
+				qBuilder.appendWhere(ShoutProviderContract.Shouts._ID + "="
+						+ uri.getLastPathSegment());
+				break;
+			case SHOUTS_USER_ID:
+				qBuilder.setTables(ShoutProviderContract.Shouts.TABLE_NAME);
+				qBuilder.appendWhere(ShoutProviderContract.Shouts.AUTHOR + "="
+						+ uri.getLastPathSegment());
+				break;
+			case USERS:
+				qBuilder.setTables(ShoutProviderContract.Users.TABLE_NAME);
+				break;
+			case USER_ID:
+				qBuilder.setTables(ShoutProviderContract.Users.TABLE_NAME);
+				qBuilder.appendWhere(ShoutProviderContract.Shouts._ID + "="
+						+ uri.getLastPathSegment());
+				break;
+			default:
+				throw new IllegalArgumentException("Unknown or invalid URI " + uri);
 		}
-		return mDB.rawQuery(query, condition);
-	}
 
-	@Override
-	public String getType(Uri uri) {
-		int match = sURIMatcher.match(uri);
-		switch (match) {
-		case SHOUTS:
-			break;
-		case SHOUTS_ID:
-			break;
-		case SHOUTS_USER_ID:
-			break;
-		case SHOUTS_TAG_ID:
-			break;
-		case TAGS:
-			break;
-		case TAGS_ID:
-			break;
-		case USERS:
-			break;
-		case USERS_ID:
-			break;
-		default:
-			throw new IllegalArgumentException(URI_ERROR + uri);
-		}
-		return null;
-	}
+		Cursor resultCursor = qBuilder.query(mDB, projection, selection, selectionArgs, null, null,
+				sortOrder);
+		resultCursor.setNotificationUri(this.getContext().getContentResolver(), uri);
 
-	@Override
-	public Uri insert(Uri uri, ContentValues values) {
-		// TODO Auto-generated method stub
-		mDB = mDBHelper.getWritableDatabase();
-		return null;
-	}
-
-	@Override
-	public int delete(Uri uri, String selection, String[] selectionArgs) {
-		// TODO Auto-generated method stub
-		mDB = mDBHelper.getWritableDatabase();
-		return 0;
+		return resultCursor;
 	}
 
 	@Override
 	public int update(Uri uri, ContentValues values, String selection,
 			String[] selectionArgs) {
-		mDB = mDBHelper.getWritableDatabase();
-		return 0;
+		mDB = mOpenHelper.getWritableDatabase();
+		String id, whereClause, table = null;
+		String[] whereArgs = null;
+
+		int match = sUriMatcher.match(uri);
+		switch (match) {
+			case SHOUTS:
+				table = ShoutProviderContract.Shouts.TABLE_NAME;
+				whereClause = selection;
+				whereArgs = selectionArgs;
+				break;
+			case SHOUT_ID:
+				id = uri.getLastPathSegment();
+				table = ShoutProviderContract.Shouts.TABLE_NAME;
+				if (TextUtils.isEmpty(selection)) {
+					whereClause = ShoutProviderContract.Shouts._ID + "=" + id;
+					whereArgs = null;
+				} else {
+					whereClause = selection + " and " + ShoutProviderContract.Shouts._ID + "=" + id;
+					whereArgs = selectionArgs;
+				}
+				break;
+			case SHOUTS_USER_ID:
+				id = uri.getLastPathSegment();
+				table = ShoutProviderContract.Shouts.TABLE_NAME;
+				if (TextUtils.isEmpty(selection)) {
+					whereClause = ShoutProviderContract.Shouts.AUTHOR + "=" + id;
+					whereArgs = null;
+				} else {
+					whereClause = selection + " and " + ShoutProviderContract.Shouts.AUTHOR + "="
+							+ id;
+					whereArgs = selectionArgs;
+				}
+				break;
+			case USERS:
+				table = ShoutProviderContract.Users.TABLE_NAME;
+				whereClause = selection;
+				whereArgs = selectionArgs;
+				break;
+			case USER_ID:
+				id = uri.getLastPathSegment();
+				table = ShoutProviderContract.Users.TABLE_NAME;
+				if (TextUtils.isEmpty(selection)) {
+					whereClause = ShoutProviderContract.Users._ID + "=" + id;
+					whereArgs = null;
+				} else {
+					whereClause = selection + " and " + ShoutProviderContract.Users._ID + "=" + id;
+					whereArgs = selectionArgs;
+				}
+				break;
+			default:
+				throw new IllegalArgumentException("Unknown or invalid URI " + uri);
+		}
+		int rowsAffected = mDB.update(table, values, whereClause, whereArgs);
+		this.getContext().getContentResolver().notifyChange(uri, null);
+		return rowsAffected;
 	}
+
+	protected static final class ShoutDatabaseHelper extends SQLiteOpenHelper {
+
+		private static final String TAG = ShoutDatabaseHelper.class
+				.getSimpleName();
+
+		public static final int VERSION = 1;
+		public static final String DBNAME = "shout_base";
+
+		private static final String SQL_CREATE_USER = "CREATE TABLE " +
+				ShoutProviderContract.Users.TABLE_NAME +
+				"(" +
+				ShoutProviderContract.Users._ID + " INTEGER PRIMARY KEY, " +
+				ShoutProviderContract.Users.USERNAME + " TEXT ," +
+				ShoutProviderContract.Users.PUB_KEY + " BLOB " +
+				");";
+
+		private static final String SQL_CREATE_SHOUT = "CREATE TABLE " +
+				ShoutProviderContract.Shouts.TABLE_NAME +
+				"(" +
+				"_ID INTEGER PRIMARY KEY, " +
+				ShoutProviderContract.Shouts.AUTHOR + " INTEGER, " +
+				ShoutProviderContract.Shouts.PARENT + " INTEGER, " +
+				ShoutProviderContract.Shouts.MESSAGE + " TEXT, " +
+				ShoutProviderContract.Shouts.SIGNATURE + " BLOB, " +
+				"FOREIGN KEY(" + ShoutProviderContract.Shouts.AUTHOR + ") REFERENCES " +
+				ShoutProviderContract.Users.TABLE_NAME +
+				"(" + ShoutProviderContract.Users._ID + ") " +
+				");";
+
+		public ShoutDatabaseHelper(Context context) {
+			super(context, DBNAME, null, VERSION);
+		}
+
+		@Override
+		public void onCreate(SQLiteDatabase db) {
+			Log.d(TAG, SQL_CREATE_USER);
+			db.execSQL(SQL_CREATE_USER);
+			Log.d(TAG, SQL_CREATE_SHOUT);
+			db.execSQL(SQL_CREATE_SHOUT);
+		}
+
+		@Override
+		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+			Log.e(TAG, "Unsupported call to onUpgrade");
+			throw new IllegalStateException();
+		}
+
+	}
+
 }
