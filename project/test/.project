@@ -18,7 +18,7 @@
 		<link>
 			<name>test</name>
 			<type>2</type>
-			<location>/home/dadrian/SourceCode/shout/project/shout/test</location>
+			<locationURI>PARENT-1-PROJECT_LOC/shout/test</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
