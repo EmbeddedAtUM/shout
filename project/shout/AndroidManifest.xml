@@ -18,6 +18,7 @@
     
     <activity android:name=".SettingsActivity" />
     <activity android:name=".LoginActivity" />
+    <provider android:name=".provider.ShoutProvider" android:authorities="@string/providerAuthority"></provider>
   </application>
 
 </manifest>

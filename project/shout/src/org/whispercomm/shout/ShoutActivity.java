@@ -3,6 +3,7 @@ package org.whispercomm.shout;
 import java.util.ArrayList;
 
 import org.joda.time.DateTime;
+import org.whispercomm.shout.provider.ShoutProviderContract;
 
 import android.app.ListActivity;
 import android.content.Context;
@@ -40,6 +41,7 @@ public class ShoutActivity extends ListActivity {
 		setListAdapter(adapter);
 
 		Log.v(TAG, "Finished onCreate");
+		ShoutProviderContract.retrieveShoutById(getApplicationContext(), 50);
     }
     
 	static class ViewHolder {
