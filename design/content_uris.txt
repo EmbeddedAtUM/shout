@@ -1,0 +1,12 @@
+AUTHORITY = org.whispercomm.manes.provider
+
+Content URIs are of the form AUTHORITY/endpoint
+
+Content URI Endpoints          Description                     Valid Operations
+=====================          ===========                     ================
+/shout                         The shout table                 I, Q, U, D
+/shout/#                       Access shout with _ID = #       Q, U, D
+/shout/user/#                  Shouts  with AUTHOR = #         Q, U, D
+
+/user                          The user table                  I, Q, U, D
+/user/#                        Acces user with _ID = #         Q, U, D

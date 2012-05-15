@@ -5,3 +5,6 @@ gen/*
 # Still make bin and gen folders
 !bin/.gitignore
 !gen/.gitignore
+
+# Ignore the tmp folder
+tmp/*

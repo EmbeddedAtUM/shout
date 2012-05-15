@@ -1,0 +1,33 @@
+The Shout content provider should almost always be accessed using the contract
+class ShoutProviderContract, which is documented in its Javadocs. This document
+describes the actual layout of the tables, and how to safely access them without
+going through the contract class static member functions.
+
+Tables: shout, user
+
+Information about these tables is stored in the Shouts and Users inner classes
+of ShoutProviderContract, repectively. Constants for TABLE_NAME, CONTENT_URI,
+and column names are defined there.
+
+
+Table Name: shout
+
+Column Name in Contract Class || Data Type || Description
+--------------------------------------------------------------------------------
+_ID                              INTEGER      Primary Key, Autoascending
+AUTHOR                           INTEGER      Foreign Key to _ID in user table
+PARENT                           INTEGER      Foreign Key to _ID in shout table
+MESSAGE                          TEXT         Body of shout
+TIME                             LONG         Milliseconds since UNIX epoch
+SIGNATURE                        TEXT         Base64 encoding of shout signature
+HASH                             TEXT         Base64 encoding of shout hash
+
+
+Table name: user
+
+Column Name in Contract Class || Data Type || Description
+--------------------------------------------------------------------------------
+_ID                              INTEGER      Primary Key, Autoascending
+USERNAME                         TEXT         Name assigned to user
+PUB_KEY                          TEXT         Base64 encoding of public key
+
