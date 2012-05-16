@@ -111,12 +111,14 @@ public class ShoutProviderContract {
 		public static final Uri CONTENT_URI = Uri.withAppendedPath(CONTENT_URI_BASE, TABLE_NAME);
 
 		/**
-		 * The column name for the username associated with a User. Stored as text.
+		 * The column name for the username associated with a User. Stored as
+		 * text.
 		 */
 		public static final String USERNAME = "Name";
-		
+
 		/**
-		 * The column name for
+		 * The column name for a User's public key. Stored as a Base64 string
+		 * encoding of the key represented as a byte array.
 		 */
 		public static final String PUB_KEY = "Key";
 	}
