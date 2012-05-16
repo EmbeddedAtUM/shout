@@ -36,26 +36,88 @@ public class ShoutProviderContract {
 	 */
 	public static final Uri CONTENT_URI_BASE = Uri.parse("content://" + AUTHORITY);
 
+	/**
+	 * Helper class for managing static variables associated with the Shout
+	 * database table
+	 * 
+	 * @author David Adrian
+	 */
 	public static class Shouts implements BaseColumns {
+		/**
+		 * SQLite table name. Not needed for managed queries, and can be ignored
+		 * in most use cases
+		 */
 		public static final String TABLE_NAME = "shout";
 
+		/**
+		 * Base content URI for the table of Shouts
+		 */
 		public static final Uri CONTENT_URI = Uri.withAppendedPath(CONTENT_URI_BASE, TABLE_NAME);
 
+		/**
+		 * Column name of the primary key. This represents the database ID of a
+		 * Shout, which can be used in the {@code Shouts.PARENT} field to
+		 * reference another Shout in the database.
+		 */
+		public static final String _ID = BaseColumns._ID;
+
+		/**
+		 * Column name for the author of a Shout. Stored as a reference to a
+		 * user.
+		 */
 		public static final String AUTHOR = "Author";
+
+		/**
+		 * Column name for the message in a Shout. Stored as text.
+		 */
 		public static final String MESSAGE = "Message";
+
+		/**
+		 * Column name for the parent Shout. Stored as a reference to another
+		 * Shout in the database.
+		 */
 		public static final String PARENT = "Parent";
+
+		/**
+		 * Column name for the signature on a Shout. Stored as default Base64
+		 * string encoding of a byte array.
+		 */
 		public static final String SIGNATURE = "Signature";
+
+		/**
+		 * Column name for the hash of a Shout. Stored as default Base64 string
+		 * encoding of a byte array.
+		 */
 		public static final String HASH = "Hash";
+
+		/**
+		 * Column name for the timestamp on a Shout. Stored in the database as a
+		 * long representing the number of milliseconds since the UNIX epoch.
+		 */
 		public static final String TIME = "Timestamp";
 
 	}
 
 	public static class Users implements BaseColumns {
+		/**
+		 * The SQLite table name for the Users table. Not needed for managed
+		 * queries, and can be ignored in most use cases.
+		 */
 		public static final String TABLE_NAME = "user";
 
+		/**
+		 * The base content URI for the Users table.
+		 */
 		public static final Uri CONTENT_URI = Uri.withAppendedPath(CONTENT_URI_BASE, TABLE_NAME);
 
+		/**
+		 * The column name for the username associated with a User. Stored as text.
+		 */
 		public static final String USERNAME = "Name";
+		
+		/**
+		 * The column name for
+		 */
 		public static final String PUB_KEY = "Key";
 	}
 
@@ -104,8 +166,9 @@ public class ShoutProviderContract {
 			String encodedHash = cursor.getString(hashColumn);
 
 			cursor.close();
-			
-			return new ProviderShout(userId, parentId, content, time, encodedHash, encodedSignature, context);
+
+			return new ProviderShout(userId, parentId, content, time, encodedHash,
+					encodedSignature, context);
 		}
 	};
 
@@ -120,7 +183,7 @@ public class ShoutProviderContract {
 	public static int storeShout(Context context, Shout shout) {
 		String encodedHash = Base64.encodeToString(shout.getHash(), Base64.DEFAULT);
 		String encodedSignature = Base64.encodeToString(shout.getSignature(), Base64.DEFAULT);
-		
+
 		User sender = shout.getSender();
 		int author = storeUser(context, sender);
 		if (author < 0) {
