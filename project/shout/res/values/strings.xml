@@ -11,5 +11,5 @@
     <string name="postToTwitter">Post to twitter?</string>
     <string name="shout">Shout!</string>
     <string name="logoDesc">Logo</string>
-    <string name="providerAuthority">org.whispercomm.shout</string>
+    <string name="providerAuthority">org.whispercomm.shout.provider</string>
 </resources>
