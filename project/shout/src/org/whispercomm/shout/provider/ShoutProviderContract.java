@@ -76,6 +76,7 @@ public class ShoutProviderContract {
 			return null;
 		} else if (!cursor.moveToFirst()) {
 			Log.d(TAG, "No results returned on URI " + uri);
+			cursor.close();
 			return null;
 		} else {
 			int userColumn = cursor.getColumnIndex(Shouts.AUTHOR);
@@ -102,6 +103,8 @@ public class ShoutProviderContract {
 			String encodedSignature = cursor.getString(signatureColumn);
 			String encodedHash = cursor.getString(hashColumn);
 
+			cursor.close();
+			
 			return new ProviderShout(userId, parentId, content, time, encodedHash, encodedSignature, context);
 		}
 	};
@@ -140,8 +143,11 @@ public class ShoutProviderContract {
 			return -1;
 		} else if (cursor.moveToNext()) {
 			int index = cursor.getColumnIndex(Shouts._ID);
-			return cursor.getInt(index); // Shout already in the database
+			int shoutId = cursor.getInt(index);
+			cursor.close();
+			return shoutId; // Shout already in the database
 		} else {
+			cursor.close();
 			ContentValues values = new ContentValues();
 			Shout parent = shout.getParent();
 			if (parent != null) {
@@ -178,6 +184,7 @@ public class ShoutProviderContract {
 			return null;
 		} else if (!cursor.moveToFirst()) {
 			Log.d(TAG, "No results returned on URI " + uri);
+			cursor.close();
 			return null;
 		} else {
 			int nameColumn = cursor.getColumnIndex(Users.USERNAME);
@@ -185,6 +192,7 @@ public class ShoutProviderContract {
 
 			String username = cursor.getString(nameColumn);
 			String encodedKey = cursor.getString(keyColumn);
+			cursor.close();
 			return new ProviderUser(username, encodedKey);
 		}
 	}
@@ -218,8 +226,11 @@ public class ShoutProviderContract {
 			return -1;
 		} else if (cursor.moveToNext()) {
 			int index = cursor.getColumnIndex(Users._ID);
-			return cursor.getInt(index); // User already in the database
+			int userId = cursor.getInt(index);
+			cursor.close();
+			return userId; // User already in the database
 		} else {
+			cursor.close();
 			ContentValues values = new ContentValues();
 			values.put(Users.USERNAME, username);
 			values.put(Users.PUB_KEY, encodedKey);
