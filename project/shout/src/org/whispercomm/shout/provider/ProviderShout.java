@@ -6,6 +6,7 @@ import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.User;
 
 import android.content.Context;
+import android.util.Base64;
 
 public class ProviderShout implements Shout {
 
@@ -18,12 +19,12 @@ public class ProviderShout implements Shout {
 
 	private Shout parent;
 
-	public ProviderShout(int senderId, int parentId, String message, long time, byte[] hash,
-			byte[] signature, Context context) {
+	public ProviderShout(int senderId, int parentId, String message, long time, String hash,
+			String signature, Context context) {
 		this.message = message;
 		this.timestamp = new DateTime(time); // TODO Time Zone
-		this.hash = hash;
-		this.signature = signature;
+		this.hash = Base64.decode(hash, Base64.DEFAULT);
+		this.signature = Base64.decode(signature, Base64.DEFAULT);
 		this.sender = ShoutProviderContract.retrieveUserById(context, senderId);
 		if (parentId > 0) {
 			this.parent = ShoutProviderContract.retrieveShoutById(context, parentId);

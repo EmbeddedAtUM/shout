@@ -8,15 +8,18 @@ import java.security.spec.InvalidKeySpecException;
 import org.whispercomm.shout.User;
 import org.whispercomm.shout.id.SignatureUtility;
 
+import android.util.Base64;
+
 public class ProviderUser implements User {
 
 	private String username;
 	private ECPublicKey key;
 	
-	public ProviderUser(String username, byte[] publicKey) {
+	public ProviderUser(String username, String publicKey) {
 		this.username = username;
 		try {
-			this.key = SignatureUtility.getPublicKeyFromBytes(publicKey);
+			byte[] byteKey = Base64.decode(publicKey, Base64.DEFAULT);
+			this.key = SignatureUtility.getPublicKeyFromBytes(byteKey);
 			// TODO Fix these exceptions
 		} catch (NoSuchAlgorithmException e) {
 			// TODO Auto-generated catch block

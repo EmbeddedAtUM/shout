@@ -99,10 +99,10 @@ public class ShoutProviderContract {
 				parentId = cursor.getInt(parentColumn);
 			}
 
-			byte[] signature = cursor.getBlob(signatureColumn);
-			byte[] hash = cursor.getBlob(hashColumn);
+			String encodedSignature = cursor.getString(signatureColumn);
+			String encodedHash = cursor.getString(hashColumn);
 
-			return new ProviderShout(userId, parentId, content, time, hash, signature, context);
+			return new ProviderShout(userId, parentId, content, time, encodedHash, encodedSignature, context);
 		}
 	};
 
@@ -184,8 +184,8 @@ public class ShoutProviderContract {
 			int keyColumn = cursor.getColumnIndex(Users.PUB_KEY);
 
 			String username = cursor.getString(nameColumn);
-			byte[] key = cursor.getBlob(keyColumn);
-			return new ProviderUser(username, key);
+			String encodedKey = cursor.getString(keyColumn);
+			return new ProviderUser(username, encodedKey);
 		}
 	}
 
