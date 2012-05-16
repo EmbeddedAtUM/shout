@@ -44,10 +44,13 @@ public class ShoutProvider extends ContentProvider {
 	private ShoutDatabaseHelper mOpenHelper;
 
 	private SQLiteDatabase mDB;
+	
+	private static final String ENABLE_FK = "PRAGMA foreign_keys = ON";
 
 	@Override
 	public int delete(Uri uri, String selection, String[] selectionArgs) {
 		mDB = mOpenHelper.getWritableDatabase();
+		mDB.execSQL(ENABLE_FK);
 		int match = sUriMatcher.match(uri);
 		String id, table, whereClause = null;
 		String[] whereArgs = null;
@@ -113,6 +116,7 @@ public class ShoutProvider extends ContentProvider {
 	@Override
 	public Uri insert(Uri uri, ContentValues values) {
 		mDB = mOpenHelper.getWritableDatabase();
+		mDB.execSQL(ENABLE_FK);
 		int match = sUriMatcher.match(uri);
 		String table = null;
 		switch (match) {
@@ -185,6 +189,7 @@ public class ShoutProvider extends ContentProvider {
 	public int update(Uri uri, ContentValues values, String selection,
 			String[] selectionArgs) {
 		mDB = mOpenHelper.getWritableDatabase();
+		mDB.execSQL(ENABLE_FK);
 		String id, whereClause, table = null;
 		String[] whereArgs = null;
 
@@ -254,7 +259,7 @@ public class ShoutProvider extends ContentProvider {
 				ShoutProviderContract.Users.TABLE_NAME +
 				"(" +
 				ShoutProviderContract.Users._ID + " INTEGER PRIMARY KEY ASC AUTOINCREMENT, " +
-				ShoutProviderContract.Users.USERNAME + " TEXT ," +
+				ShoutProviderContract.Users.USERNAME + " TEXT, " +
 				ShoutProviderContract.Users.PUB_KEY + " TEXT UNIQUE" +
 				");";
 
@@ -281,6 +286,8 @@ public class ShoutProvider extends ContentProvider {
 		public void onCreate(SQLiteDatabase db) {
 			Log.d(TAG, SQL_CREATE_USER);
 			db.execSQL(SQL_CREATE_USER);
+			// Enable foreign key support
+			db.execSQL(ENABLE_FK);
 			Log.d(TAG, SQL_CREATE_SHOUT);
 			db.execSQL(SQL_CREATE_SHOUT);
 		}
