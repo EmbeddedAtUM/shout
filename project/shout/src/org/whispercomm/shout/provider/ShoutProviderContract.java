@@ -7,6 +7,7 @@ import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.Tag;
 import org.whispercomm.shout.User;
 
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
@@ -148,6 +149,132 @@ public class ShoutProviderContract {
 		 */
 		public static final String TAG = "Name";
 	}
+	
+	private interface DatabaseObject {
+
+		ContentValues makeContentValues();
+
+		Uri getInsertLocation();
+
+		int saveInDatabase(Context context);
+	}
+
+	static class DatabaseUser implements DatabaseObject {
+		private int id;
+		private String username;
+		private String key;
+
+		private boolean validId = false;
+
+		public DatabaseUser(User user) {
+			username = user.getUsername();
+			key = Base64.encodeToString(user.getPublicKey().getEncoded(), Base64.DEFAULT);
+			id = -1;
+		}
+
+		public DatabaseUser(int id, String username, String key) {
+			this.id = id;
+			this.username = username;
+			this.key = key;
+			validId = true;
+		}
+
+		@Override
+		public ContentValues makeContentValues() {
+			ContentValues values = new ContentValues();
+			values.put(Users.USERNAME, username);
+			values.put(Users.PUB_KEY, key);
+			return values;
+		}
+
+		@Override
+		public Uri getInsertLocation() {
+			return Users.CONTENT_URI;
+		}
+
+		@Override
+		public int saveInDatabase(Context context) {
+			if (this.validId) {
+				return this.id;
+			} else {
+				this.id = ContractHelper.queryForUser(context.getContentResolver(), this);
+				if (this.id < 1) {
+					this.id = ContractHelper.storeInDatabase(context.getContentResolver(), this);
+				}
+				this.validId = true;
+				return this.id;
+			}
+		}
+
+		public User makeUserImplementation() {
+			return new ProviderUser(this.username, this.key);
+		}
+
+	}
+
+	static class DatabaseShout implements DatabaseObject {
+		private int id = -1;
+		private int author;
+		private int parent;
+		private String message;
+		private long time;
+		private String signature;
+		private String hash;
+
+		boolean hasParent;
+
+		public DatabaseShout(Shout shout, int author, int parent) {
+			this.message = shout.getMessage();
+			this.time = shout.getTimestamp().getMillis();
+			this.signature = Base64.encodeToString(shout.getSignature(), Base64.DEFAULT);
+			this.hash = Base64.encodeToString(shout.getHash(), Base64.DEFAULT);
+
+			this.author = author;
+			this.parent = parent;
+
+			hasParent = (shout.getParent() != null) ? true : false;
+		}
+
+		public DatabaseShout(int id, int author, int parent, String message, long time,
+				String signature, String hash, boolean hasParent) {
+			this.id = id;
+			this.author = author;
+			this.parent = parent;
+			this.message = message;
+			this.time = time;
+			this.signature = signature;
+			this.hash = hash;
+
+			this.hasParent = hasParent;
+		}
+
+		@Override
+		public ContentValues makeContentValues() {
+			ContentValues values = new ContentValues();
+			values.put(Shouts.AUTHOR, this.author);
+			values.put(Shouts.PARENT, this.parent);
+			values.put(Shouts.MESSAGE, this.message);
+			values.put(Shouts.TIME, this.time);
+			values.put(Shouts.SIGNATURE, this.signature);
+			values.put(Shouts.HASH, this.hash);
+			return values;
+		}
+
+		@Override
+		public Uri getInsertLocation() {
+			return Shouts.CONTENT_URI;
+		}
+
+		@Override
+		public int saveInDatabase(Context context) {
+			if (this.id > 0) {
+				return this.id;
+			} else {
+				this.id = ContractHelper.queryForShout(context.getContentResolver(), this);
+			}
+			return 0;
+		}
+	}
 
 	/**
 	 * Retrieve Shout with given database ID
@@ -268,23 +395,11 @@ public class ShoutProviderContract {
 	 * @return {@code null} if User is not present in the database
 	 */
 	public static User retrieveUserById(Context context, int id) {
-		Uri uri = ContentUris.withAppendedId(Users.CONTENT_URI, id);
-		Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
-		if (cursor == null) {
-			Log.e(TAG, "Null cursor returned on URI " + uri);
-			return null;
-		} else if (!cursor.moveToFirst()) {
-			Log.d(TAG, "No results returned on URI " + uri);
-			cursor.close();
+		DatabaseUser dbUser = ContractHelper.queryForUser(context.getContentResolver(), id);
+		if (dbUser == null) {
 			return null;
 		} else {
-			int nameColumn = cursor.getColumnIndex(Users.USERNAME);
-			int keyColumn = cursor.getColumnIndex(Users.PUB_KEY);
-
-			String username = cursor.getString(nameColumn);
-			String encodedKey = cursor.getString(keyColumn);
-			cursor.close();
-			return new ProviderUser(username, encodedKey);
+			return dbUser.makeUserImplementation();
 		}
 	}
 
@@ -296,40 +411,9 @@ public class ShoutProviderContract {
 	 * @return The ID of the User in the database or -1 on failure
 	 */
 	public static int storeUser(Context context, User user) {
-		String username = user.getUsername();
-		byte[] key = user.getPublicKey().getEncoded();
-		String encodedKey = Base64.encodeToString(key, Base64.DEFAULT);
-
-		String[] projection = {
-				Users._ID
-		};
-
-		String selection = Users.PUB_KEY + " = ? AND " + Users.USERNAME + " = ?";
-		String[] selectionArgs = {
-				encodedKey,
-				username
-		};
-
-		Cursor cursor = context.getContentResolver().query(Users.CONTENT_URI, projection,
-				selection, selectionArgs, null);
-		if (cursor == null) {
-			Log.e(TAG, "Null cursor on User search");
-			return -1;
-		} else if (cursor.moveToNext()) {
-			Log.v(TAG, "Found user in database");
-			int index = cursor.getColumnIndex(Users._ID);
-			int userId = cursor.getInt(index);
-			cursor.close();
-			return userId; // User already in the database
-		} else {
-			cursor.close();
-			Log.v(TAG, "Did not find user in database: " + username + " " + encodedKey);
-			ContentValues values = new ContentValues();
-			values.put(Users.USERNAME, username);
-			values.put(Users.PUB_KEY, encodedKey);
-			Uri location = context.getContentResolver().insert(Users.CONTENT_URI, values);
-			return Integer.valueOf(location.getLastPathSegment());
-		}
+		DatabaseUser dbUser = new DatabaseUser(user);
+		int id = dbUser.saveInDatabase(context);
+		return id;
 	}
 
 	public static Tag retrieveTagById(Context context, int id) {
@@ -382,5 +466,80 @@ public class ShoutProviderContract {
 
 	private ShoutProviderContract() {
 		// Don't allow this class to be instantiated
+	}
+
+	private static class ContractHelper {
+		public static int storeInDatabase(ContentResolver cr, DatabaseObject dbObject) {
+			ContentValues values = dbObject.makeContentValues();
+			Uri table = dbObject.getInsertLocation();
+			Uri location = cr.insert(table, values);
+			int id = Integer.valueOf(location.getLastPathSegment());
+			return id;
+		}
+
+		public static int queryForUser(ContentResolver cr, DatabaseUser user) {
+			String[] projection = {
+					Users._ID
+			};
+			String selection = Users.PUB_KEY + " = ? AND " + Users.USERNAME + " = ?";
+			String[] selectionArgs = {
+					user.key,
+					user.username
+			};
+			Cursor cursor = cr.query(Users.CONTENT_URI, projection, selection, selectionArgs, null);
+			if (cursor == null) {
+				Log.e(TAG, "Null cursor returned on URI " + Users.CONTENT_URI);
+				return -1;
+			} else if (cursor.moveToNext()) {
+				int index = cursor.getColumnIndex(projection[0]);
+				int id = cursor.getInt(index);
+				cursor.close();
+				return id;
+			} else {
+				return -1;
+			}
+		}
+
+		public static DatabaseUser queryForUser(ContentResolver cr, int id) {
+			Uri uri = ContentUris.withAppendedId(Users.CONTENT_URI, id);
+			Cursor cursor = cr.query(uri, null, null, null, null);
+			if (cursor == null) {
+				Log.e(TAG, "Null cursor returned on URI " + uri);
+				return null;
+			} else if (cursor.moveToNext()) {
+				int idIndex = cursor.getColumnIndex(Users._ID);
+				int nameIndex = cursor.getColumnIndex(Users.USERNAME);
+				int keyIndex = cursor.getColumnIndex(Users.PUB_KEY);
+				return new DatabaseUser(cursor.getInt(idIndex), cursor.getString(nameIndex),
+						cursor.getString(keyIndex));
+			} else {
+				return null;
+			}
+		}
+
+		public static int queryForShout(ContentResolver cr, DatabaseShout dbShout) {
+			String[] projection = {
+					Shouts._ID
+			};
+			String selectionClause = Shouts.HASH + " = ?  AND " + Shouts.SIGNATURE + " = ?";
+			String[] selectionArgs = {
+					dbShout.hash,
+					dbShout.signature
+			};
+
+			Cursor cursor = cr.query(Shouts.CONTENT_URI, projection, selectionClause,
+					selectionArgs, null);
+			if (cursor == null) {
+				Log.e(TAG, "Null cursor returned on URI " + Shouts.CONTENT_URI);
+				return -1;
+			} else if (cursor.moveToNext()) {
+				int id = cursor.getInt(0);
+				cursor.close();
+				return id;
+			} else {
+				return -1;
+			}
+		}
+
 	}
 }

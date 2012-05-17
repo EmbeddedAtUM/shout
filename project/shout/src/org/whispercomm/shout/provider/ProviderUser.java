@@ -15,10 +15,10 @@ public class ProviderUser implements User {
 	private String username;
 	private ECPublicKey key;
 	
-	public ProviderUser(String username, String publicKey) {
+	public ProviderUser(String username, String encodedPublicKey) {
 		this.username = username;
 		try {
-			byte[] byteKey = Base64.decode(publicKey, Base64.DEFAULT);
+			byte[] byteKey = Base64.decode(encodedPublicKey, Base64.DEFAULT);
 			this.key = SignatureUtility.getPublicKeyFromBytes(byteKey);
 			// TODO Fix these exceptions
 		} catch (NoSuchAlgorithmException e) {
@@ -29,6 +29,7 @@ public class ProviderUser implements User {
 			e.printStackTrace();
 		}
 	}
+
 	@Override
 	public String getUsername() {
 		return this.username;
