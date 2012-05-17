@@ -1,4 +1,3 @@
-
 package org.whispercomm.shout.provider;
 
 import static org.junit.Assert.assertArrayEquals;
