@@ -15,7 +15,9 @@ import org.whispercomm.shout.User;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.util.Base64;
+import android.util.Log;
 
 /**
  * Use SharedPrefences to implement identity storage.
@@ -68,8 +70,7 @@ class IdStorageSharedPrefs implements IdStorage {
 			NoSuchProviderException, InvalidKeySpecException,
 			UserNotInitiatedException {
 		String pubKeyString = sharedPrefs.getString(USER_PUB_KEY, null);
-		if (pubKeyString == null)
-			throw new UserNotInitiatedException();
+		if (pubKeyString == null) return null;
 		byte[] pubKeyBytes = Base64.decode(pubKeyString, Base64.DEFAULT);
 
 		KeyFactory kf = KeyFactory.getInstance("ECDSA", "SC");
@@ -92,8 +93,7 @@ class IdStorageSharedPrefs implements IdStorage {
 			NoSuchProviderException, InvalidKeySpecException,
 			UserNotInitiatedException {
 		String privKeyString = sharedPrefs.getString(USER_PRIV_KEY, null);
-		if (privKeyString == null)
-			throw new UserNotInitiatedException();
+		if (privKeyString == null) return null;
 		byte[] privKeyBytes = Base64.decode(privKeyString, Base64.DEFAULT);
 
 		KeyFactory kf = KeyFactory.getInstance("ECDSA", "SC");
@@ -111,7 +111,12 @@ class IdStorageSharedPrefs implements IdStorage {
 	@Override
 	public void updateUserName(String userName) {
 		// TODO for now just replace the old user name
-		sharedPrefs.edit().putString(USER_NAME, userName);
+		Log.d("davidedit", userName + " updateUserName called");
+		Editor editor = sharedPrefs.edit();
+		editor.putString(USER_NAME, userName);
+		if ( ! editor.commit()) {
+			Log.e("davidedit", "Seriously WTF");
+		}
 	}
 
 	/**
@@ -127,8 +132,10 @@ class IdStorageSharedPrefs implements IdStorage {
 			NoSuchProviderException, InvalidKeySpecException,
 			UserNotInitiatedException {
 		String userName = sharedPrefs.getString(USER_NAME, null);
-		if (userName == null)
-			throw new UserNotInitiatedException();
+		if (userName == null) {
+			Log.e("davidedit", "null username");
+			return null;
+		}
 		ECPublicKey pubKey = getPublicKey();
 		User sender = new SimpleUser(userName, pubKey);
 		return sender;
