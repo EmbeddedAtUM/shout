@@ -22,11 +22,12 @@ public class TestShoutBase64 {
 			0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a
 	};
 	private String encoded = "1.2.3.4.5.6.7.8.9.10.";
+	
+	private Random rand = new Random();
 
 	@Before
 	public void setUp() {
 		this.arrRandom = new byte[16];
-		Random rand = new Random();
 		rand.nextBytes(arrRandom);
 	}
 
