@@ -41,7 +41,6 @@ public class ShoutActivity extends ListActivity {
 		setListAdapter(adapter);
 
 		Log.v(TAG, "Finished onCreate");
-		ShoutProviderContract.retrieveShoutById(getApplicationContext(), 50);
     }
     
 	static class ViewHolder {
