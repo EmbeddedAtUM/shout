@@ -280,8 +280,8 @@ public class ShoutProviderContract {
 
 		String selection = Users.PUB_KEY + " = ? AND " + Users.USERNAME + " = ?";
 		String[] selectionArgs = {
-				username,
-				encodedKey
+				encodedKey,
+				username
 		};
 
 		Cursor cursor = context.getContentResolver().query(Users.CONTENT_URI, projection,
@@ -290,12 +290,14 @@ public class ShoutProviderContract {
 			Log.e(TAG, "Null cursor on User search");
 			return -1;
 		} else if (cursor.moveToNext()) {
+			Log.v(TAG, "Found user in database");
 			int index = cursor.getColumnIndex(Users._ID);
 			int userId = cursor.getInt(index);
 			cursor.close();
 			return userId; // User already in the database
 		} else {
 			cursor.close();
+			Log.v(TAG, "Did not find user in database: " + username + " " + encodedKey);
 			ContentValues values = new ContentValues();
 			values.put(Users.USERNAME, username);
 			values.put(Users.PUB_KEY, encodedKey);

@@ -130,6 +130,7 @@ public class ShoutProvider extends ContentProvider {
 				throw new IllegalArgumentException("Unknown or invalid URI " + uri);
 		}
 
+		SQLiteQueryBuilder qBuilder = new SQLiteQueryBuilder();
 		long rowId = mDB.insert(table, null, values);
 		if (rowId < 0) { // An error occurred
 			// TODO Differentiate errors (UNIQUE vs actual error)
@@ -180,7 +181,7 @@ public class ShoutProvider extends ContentProvider {
 
 		Cursor resultCursor = qBuilder.query(mDB, projection, selection, selectionArgs, null, null,
 				sortOrder);
-		resultCursor.setNotificationUri(this.getContext().getContentResolver(), uri);
+		//resultCursor.setNotificationUri(this.getContext().getContentResolver(), uri);
 
 		return resultCursor;
 	}
