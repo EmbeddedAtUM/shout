@@ -5,6 +5,7 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.SecureRandom;
 import java.security.spec.ECGenParameterSpec;
 
 import org.whispercomm.shout.id.SignatureUtility;
@@ -21,5 +22,12 @@ public class Utility {
 
 		KeyPair kpA = kpg.generateKeyPair();
 		return kpA;
+	}
+	
+	public static byte[] genByteArray(int size) {
+		byte[] arr = new byte[size];
+		SecureRandom rand = new SecureRandom();
+		rand.nextBytes(arr);
+		return arr;
 	}
 }
