@@ -130,7 +130,6 @@ public class ShoutProvider extends ContentProvider {
 				throw new IllegalArgumentException("Unknown or invalid URI " + uri);
 		}
 
-		SQLiteQueryBuilder qBuilder = new SQLiteQueryBuilder();
 		long rowId = mDB.insert(table, null, values);
 		if (rowId < 0) { // An error occurred
 			// TODO Differentiate errors (UNIQUE vs actual error)
@@ -181,7 +180,7 @@ public class ShoutProvider extends ContentProvider {
 
 		Cursor resultCursor = qBuilder.query(mDB, projection, selection, selectionArgs, null, null,
 				sortOrder);
-		//resultCursor.setNotificationUri(this.getContext().getContentResolver(), uri);
+		resultCursor.setNotificationUri(this.getContext().getContentResolver(), uri);
 
 		return resultCursor;
 	}
@@ -277,6 +276,9 @@ public class ShoutProvider extends ContentProvider {
 				"FOREIGN KEY(" + ShoutProviderContract.Shouts.AUTHOR + ") REFERENCES " +
 				ShoutProviderContract.Users.TABLE_NAME +
 				"(" + ShoutProviderContract.Users._ID + ") " +
+				"FOREIGN KEY(" + ShoutProviderContract.Shouts.PARENT + ") REFERENCES " +
+				ShoutProviderContract.Shouts.TABLE_NAME +
+				"(" + ShoutProviderContract.Shouts._ID + ") " +
 				");";
 
 		public ShoutDatabaseHelper(Context context) {
@@ -285,12 +287,14 @@ public class ShoutProvider extends ContentProvider {
 
 		@Override
 		public void onCreate(SQLiteDatabase db) {
-			Log.d(TAG, SQL_CREATE_USER);
 			db.execSQL(SQL_CREATE_USER);
-			// Enable foreign key support
-			db.execSQL(ENABLE_FK);
-			Log.d(TAG, SQL_CREATE_SHOUT);
 			db.execSQL(SQL_CREATE_SHOUT);
+		}
+		
+		@Override
+		public void onOpen(SQLiteDatabase db) {
+			super.onOpen(db);
+			db.execSQL(ENABLE_FK);
 		}
 
 		@Override
