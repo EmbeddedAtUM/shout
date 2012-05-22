@@ -67,7 +67,7 @@ public class ShoutProviderContractTest {
 	}
 
 	@Test
-	public void testStoreUser() {
+	public void testRetrieveUser() {
 		User fromDb = ShoutProviderContract.retrieveUserById(context, AUTHOR);
 		assertNotNull(fromDb);
 		assertEquals(NAME, fromDb.getUsername());
@@ -76,7 +76,7 @@ public class ShoutProviderContractTest {
 	}
 
 	@Test
-	public void testStoreShout() {
+	public void testRetrieveShout() {
 		Shout fromDb = ShoutProviderContract.retrieveShoutById(context, PARENT);
 		assertNotNull(fromDb);
 		assertNotNull(fromDb.getSender());
@@ -84,5 +84,12 @@ public class ShoutProviderContractTest {
 		assertEquals(TIME, fromDb.getTimestamp().getMillis());
 		assertArrayEquals(SIGNATURE, fromDb.getSignature());
 		assertArrayEquals(HASH, fromDb.getHash());
+	}
+	
+	@Test
+	public void testStoreShoutAlreadyInDatabase() {
+		Shout fromDb = ShoutProviderContract.retrieveShoutById(context, PARENT);
+		int id = ShoutProviderContract.storeShout(context, fromDb);
+		assertTrue(id == PARENT);
 	}
 }
