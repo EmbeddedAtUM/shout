@@ -10,18 +10,29 @@ import java.security.spec.ECGenParameterSpec;
 
 import org.whispercomm.shout.id.SignatureUtility;
 
+import static org.junit.Assert.*;
+
 public class Utility {
 	// generate key pairs
-	public static KeyPair genKeyPair() throws NoSuchAlgorithmException,
-			NoSuchProviderException, InvalidAlgorithmParameterException {
+	public static KeyPair genKeyPair() {
 		ECGenParameterSpec ecParamSpec = new ECGenParameterSpec(
 				SignatureUtility.ECC_PARAMS);
-		KeyPairGenerator kpg = KeyPairGenerator.getInstance(
-				SignatureUtility.CRYPTO_ALGO, SignatureUtility.CRYPTO_PROVIDER);
-		kpg.initialize(ecParamSpec);
-
-		KeyPair kpA = kpg.generateKeyPair();
-		return kpA;
+		KeyPairGenerator kpg;
+		try {
+			kpg = KeyPairGenerator.getInstance(
+					SignatureUtility.CRYPTO_ALGO, SignatureUtility.CRYPTO_PROVIDER);
+			kpg.initialize(ecParamSpec);
+			KeyPair kpA = kpg.generateKeyPair();
+			return kpA;
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (NoSuchProviderException e) {
+			e.printStackTrace();
+		} catch (InvalidAlgorithmParameterException e) {
+			e.printStackTrace();
+		}
+		fail("Test writer is a failure at generating Key Pairs");
+		return null;
 	}
 	
 	public static byte[] genByteArray(int size) {
