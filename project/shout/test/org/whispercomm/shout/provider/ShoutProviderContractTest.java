@@ -1,11 +1,15 @@
+
 package org.whispercomm.shout.provider;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.*;
 
 import java.security.interfaces.ECPublicKey;
 
+import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,6 +18,8 @@ import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.ShoutTestRunner;
 import org.whispercomm.shout.User;
 import org.whispercomm.shout.Utility;
+import org.whispercomm.shout.test.TestShout;
+import org.whispercomm.shout.test.TestUser;
 
 import android.app.Activity;
 import android.content.ContentResolver;
@@ -84,11 +90,56 @@ public class ShoutProviderContractTest {
 		assertEquals(TIME, fromDb.getTimestamp().getMillis());
 		assertArrayEquals(SIGNATURE, fromDb.getSignature());
 		assertArrayEquals(HASH, fromDb.getHash());
+		assertNull(fromDb.getParent());
 	}
-	
+
+	@Test
+	public void testStoreUser() {
+		String username = "drbild"; // It's funny because it looks like Dr.
+		ECPublicKey ecKey = (ECPublicKey) Utility.genKeyPair().getPublic();
+		TestUser user = new TestUser(username, ecKey);
+		int id = ShoutProviderContract.storeUser(context, user);
+		assertTrue(id > 0);
+		User testFromDb = ShoutProviderContract.retrieveUserById(context, id);
+		assertNotNull(testFromDb);
+		assertEquals(username, testFromDb.getUsername());
+		assertArrayEquals(ecKey.getEncoded(), testFromDb.getPublicKey().getEncoded());
+	}
+
+	@Test
+	public void testStoreShout() {
+		User author = ShoutProviderContract.retrieveUserById(context, AUTHOR);
+		assertNotNull(author);
+		Shout parent = ShoutProviderContract.retrieveShoutById(context, PARENT);
+		assertNull(parent.getParent());
+		assertNotNull(parent);
+		TestShout shout = new TestShout(author, parent, "This shout has a parent", new DateTime(),
+				Utility.genByteArray(8), Utility.genByteArray(12));
+		int id = ShoutProviderContract.storeShout(context, shout);
+		assertTrue(id > 0);
+		Shout fromDb = ShoutProviderContract.retrieveShoutById(context, id);
+		assertEquals(shout.getMessage(), fromDb.getMessage());
+		assertEquals(shout.getTimestamp().getMillis(), fromDb.getTimestamp().getMillis());
+		assertArrayEquals(shout.getHash(), fromDb.getHash());
+		assertArrayEquals(shout.getSignature(), fromDb.getSignature());
+		assertNotNull(fromDb.getParent());
+		assertArrayEquals(parent.getHash(), fromDb.getParent().getHash());
+		assertArrayEquals(parent.getSignature(), fromDb.getParent().getSignature());
+		assertNull(fromDb.getParent().getParent());
+	}
+
+	@Test
+	public void testStoreUserAlreadyInDatabase() {
+		User fromDb = ShoutProviderContract.retrieveUserById(context, AUTHOR);
+		assertNotNull(fromDb);
+		int id = ShoutProviderContract.storeUser(context, fromDb);
+		assertTrue(id == AUTHOR);
+	}
+
 	@Test
 	public void testStoreShoutAlreadyInDatabase() {
 		Shout fromDb = ShoutProviderContract.retrieveShoutById(context, PARENT);
+		assertNotNull(fromDb);
 		int id = ShoutProviderContract.storeShout(context, fromDb);
 		assertTrue(id == PARENT);
 	}
