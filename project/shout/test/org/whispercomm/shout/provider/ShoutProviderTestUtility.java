@@ -30,5 +30,4 @@ public class ShoutProviderTestUtility {
 		Uri location = cr.insert(ShoutProviderContract.Shouts.CONTENT_URI, values);
 		return location;
 	}
-
 }
