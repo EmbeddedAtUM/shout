@@ -3,7 +3,6 @@ package org.whispercomm.shout;
 import java.util.ArrayList;
 
 import org.joda.time.DateTime;
-import org.whispercomm.shout.provider.ShoutProviderContract;
 
 import android.app.ListActivity;
 import android.content.Context;

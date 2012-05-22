@@ -59,6 +59,7 @@ import java.util.Set;
  * @since   1.2
  */
 
+@SuppressWarnings("unchecked")
 public class Arrays {
     // Suppresses default constructor, ensuring non-instantiability.
     private Arrays() {
@@ -1149,7 +1150,8 @@ public class Arrays {
      * high is the end index in dest to end sorting
      * off is the offset to generate corresponding low, high in src
      */
-    private static void mergeSort(Object[] src,
+    @SuppressWarnings("rawtypes")
+	private static void mergeSort(Object[] src,
                                   Object[] dest,
                                   int low,
                                   int high,
@@ -1277,7 +1279,8 @@ public class Arrays {
      * high is the end index in dest to end sorting
      * off is the offset into src corresponding to low in dest
      */
-    private static void mergeSort(Object[] src,
+    @SuppressWarnings("rawtypes")
+	private static void mergeSort(Object[] src,
                                   Object[] dest,
                                   int low, int high, int off,
                                   Comparator c) {
@@ -1999,7 +2002,8 @@ public class Arrays {
     }
 
     // Like public version, but without range checks.
-    private static int binarySearch0(Object[] a, int fromIndex, int toIndex,
+    @SuppressWarnings("rawtypes")
+	private static int binarySearch0(Object[] a, int fromIndex, int toIndex,
                                      Object key) {
         int low = fromIndex;
         int high = toIndex - 1;
@@ -4126,7 +4130,8 @@ public class Arrays {
      * @see #toString(Object[])
      * @since 1.5
      */
-    public static String deepToString(Object[] a) {
+    @SuppressWarnings("rawtypes")
+	public static String deepToString(Object[] a) {
         if (a == null)
             return "null";
 
@@ -4138,7 +4143,8 @@ public class Arrays {
         return buf.toString();
     }
 
-    private static void deepToString(Object[] a, StringBuilder buf,
+    @SuppressWarnings("rawtypes")
+	private static void deepToString(Object[] a, StringBuilder buf,
                                      Set<Object[]> dejaVu) {
         if (a == null) {
             buf.append("null");
