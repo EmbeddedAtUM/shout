@@ -15,11 +15,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.whispercomm.shout.Shout;
-import org.whispercomm.shout.ShoutTestRunner;
 import org.whispercomm.shout.User;
-import org.whispercomm.shout.Utility;
-import org.whispercomm.shout.test.TestShout;
-import org.whispercomm.shout.test.TestUser;
+import org.whispercomm.shout.test.ShoutTestRunner;
+import org.whispercomm.shout.test.util.TestFactory;
+import org.whispercomm.shout.test.util.TestShout;
+import org.whispercomm.shout.test.util.TestUser;
 
 import android.app.Activity;
 import android.content.ContentResolver;
@@ -32,8 +32,8 @@ public class ShoutProviderContractTest {
 	private static final String NAME = "duiu";
 	private static final String MESSAGE = "Can you repeat the part of the stuff where you said all about the things?";
 	private static final long TIME = 8675309L;
-	private static final byte[] SIGNATURE = Utility.genByteArray(10);
-	private static final byte[] HASH = Utility.genByteArray(16);
+	private static final byte[] SIGNATURE = TestFactory.genByteArray(10);
+	private static final byte[] HASH = TestFactory.genByteArray(16);
 
 	private static final int AUTHOR = 1;
 	private static final int PARENT = 1;
@@ -52,7 +52,7 @@ public class ShoutProviderContractTest {
 		this.context = new Activity();
 		this.cr = this.context.getContentResolver();
 
-		this.ecPubKey = (ECPublicKey) Utility.genKeyPair().getPublic();
+		this.ecPubKey = (ECPublicKey) TestFactory.genKeyPair().getPublic();
 		this.keyBytes = this.ecPubKey.getEncoded();
 
 		this.firstUserLocation = ShoutProviderTestUtility.insertIntoUserTable(
@@ -96,7 +96,7 @@ public class ShoutProviderContractTest {
 	@Test
 	public void testStoreUser() {
 		String username = "drbild"; // It's funny because it looks like Dr.
-		ECPublicKey ecKey = (ECPublicKey) Utility.genKeyPair().getPublic();
+		ECPublicKey ecKey = (ECPublicKey) TestFactory.genKeyPair().getPublic();
 		TestUser user = new TestUser(username, ecKey);
 		int id = ShoutProviderContract.storeUser(context, user);
 		assertTrue(id > 0);
@@ -114,7 +114,7 @@ public class ShoutProviderContractTest {
 		assertNull(parent.getParent());
 		assertNotNull(parent);
 		TestShout shout = new TestShout(author, parent, "This shout has a parent", new DateTime(),
-				Utility.genByteArray(8), Utility.genByteArray(12));
+				TestFactory.genByteArray(8), TestFactory.genByteArray(12));
 		int id = ShoutProviderContract.storeShout(context, shout);
 		assertTrue(id > 0);
 		Shout fromDb = ShoutProviderContract.retrieveShoutById(context, id);

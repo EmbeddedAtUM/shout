@@ -1,4 +1,7 @@
-package org.whispercomm.shout;
+
+package org.whispercomm.shout.test.util;
+
+import static org.junit.Assert.fail;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyPair;
@@ -6,14 +9,22 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
+import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECGenParameterSpec;
 
 import org.whispercomm.shout.id.SignatureUtility;
 
-import static org.junit.Assert.*;
+/**
+ * Factory class to be used when generating objects for testing
+ * 
+ * @author David Adrian
+ * @author Yue Liu
+ */
+public class TestFactory {
 
-public class Utility {
-	// generate key pairs
+	/**
+	 * Generate a valid EC key pair
+	 */
 	public static KeyPair genKeyPair() {
 		ECGenParameterSpec ecParamSpec = new ECGenParameterSpec(
 				SignatureUtility.ECC_PARAMS);
@@ -34,7 +45,24 @@ public class Utility {
 		fail("Test writer is a failure at generating Key Pairs");
 		return null;
 	}
-	
+
+	/**
+	 * Generate an ECPublicKey by generating a valid key pair, then dropping the
+	 * private key and returning the public key
+	 * 
+	 * @return Valid ECPublicKey
+	 */
+	public static ECPublicKey genPublicKey() {
+		KeyPair keyPair = genKeyPair();
+		ECPublicKey pubKey = (ECPublicKey) keyPair.getPublic();
+		return pubKey;
+	}
+
+	/**
+	 * Generate a unique, random byte array of a given size
+	 * 
+	 * @param size
+	 */
 	public static byte[] genByteArray(int size) {
 		byte[] arr = new byte[size];
 		SecureRandom rand = new SecureRandom();

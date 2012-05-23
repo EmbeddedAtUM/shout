@@ -1,5 +1,5 @@
 
-package org.whispercomm.shout.test;
+package org.whispercomm.shout.test.util;
 
 import java.security.interfaces.ECPublicKey;
 

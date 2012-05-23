@@ -1,4 +1,4 @@
-package org.whispercomm.shout;
+package org.whispercomm.shout.test;
 
 import java.util.ArrayList;
 

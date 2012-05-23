@@ -1,4 +1,4 @@
-package org.whispercomm.shout.test;
+package org.whispercomm.shout.test.util;
 
 import org.joda.time.DateTime;
 import org.whispercomm.shout.Shout;

@@ -20,8 +20,8 @@ import org.spongycastle.jce.provider.BouncyCastleProvider;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.SimpleUser;
 import org.whispercomm.shout.User;
-import org.whispercomm.shout.Utility;
 import org.whispercomm.shout.id.SignatureUtility;
+import org.whispercomm.shout.test.util.TestFactory;
 
 public class NetworkShoutTest {
 
@@ -39,7 +39,7 @@ public class NetworkShoutTest {
 			NoSuchProviderException, InvalidAlgorithmParameterException {
 		username = "testuser";
 		msg = "test is so boring!!!";
-		KeyPair kpa = Utility.genKeyPair();
+		KeyPair kpa = TestFactory.genKeyPair();
 		pubKey = (ECPublicKey) kpa.getPublic();
 		privateKey = (ECPrivateKey) kpa.getPrivate();
 	}

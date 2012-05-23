@@ -1,5 +1,5 @@
 
-package org.whispercomm.shout;
+package org.whispercomm.shout.test;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;

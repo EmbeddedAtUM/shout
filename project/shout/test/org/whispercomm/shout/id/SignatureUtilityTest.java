@@ -21,11 +21,11 @@ import org.mockito.ArgumentMatcher;
 import org.spongycastle.jce.provider.BouncyCastleProvider;
 import org.whispercomm.shout.SimpleUser;
 import org.whispercomm.shout.User;
-import org.whispercomm.shout.Utility;
 import org.whispercomm.shout.id.SignatureUtility;
 import org.whispercomm.shout.id.UserNotInitiatedException;
 import org.whispercomm.shout.id.IdStorage;
 import org.whispercomm.shout.network.NetworkShout;
+import org.whispercomm.shout.test.util.TestFactory;
 
 import com.xtremelabs.robolectric.RobolectricTestRunner;
 
@@ -71,7 +71,7 @@ public class SignatureUtilityTest {
 	public void testGetPublicKeyFromBytes() throws NoSuchAlgorithmException,
 			NoSuchProviderException, InvalidAlgorithmParameterException,
 			InvalidKeySpecException {
-		ECPublicKey pubKey = (ECPublicKey) Utility.genKeyPair().getPublic();
+		ECPublicKey pubKey = (ECPublicKey) TestFactory.genKeyPair().getPublic();
 		ByteBuffer byteBuffer = ByteBuffer.allocate(NetworkShout.KEY_LENGTH);
 		byteBuffer.put(pubKey.getEncoded());
 		byteBuffer.flip();
@@ -115,7 +115,7 @@ public class SignatureUtilityTest {
 
 	@Test
 	public void testUpdateUserNameWithExistingKey() throws Exception {
-		KeyPair kpA = Utility.genKeyPair();
+		KeyPair kpA = TestFactory.genKeyPair();
 		String username = "username";
 		when(idStorage.getPublicKey())
 				.thenReturn((ECPublicKey) kpA.getPublic());
@@ -140,7 +140,7 @@ public class SignatureUtilityTest {
 			NoSuchProviderException, InvalidAlgorithmParameterException,
 			InvalidKeyException, SignatureException {
 
-		KeyPair kpA = Utility.genKeyPair();
+		KeyPair kpA = TestFactory.genKeyPair();
 		ECPublicKey pubKey = (ECPublicKey) kpA.getPublic();
 		ECPrivateKey privKey = (ECPrivateKey) kpA.getPrivate();
 		byte[] data = new String("test data").getBytes();
@@ -156,7 +156,7 @@ public class SignatureUtilityTest {
 	@Test
 	public void testGenShoutSignature() throws Exception {
 
-		KeyPair kpA = Utility.genKeyPair();
+		KeyPair kpA = TestFactory.genKeyPair();
 		ECPublicKey pubKey = (ECPublicKey) kpA.getPublic();
 		ECPrivateKey privKey = (ECPrivateKey) kpA.getPrivate();
 		when(idStorage.getPrivateKey()).thenReturn(privKey);
@@ -178,7 +178,7 @@ public class SignatureUtilityTest {
 	@Test
 	public void testNetworkShoutToFromBytesOneShout() throws Exception {
 		// setup
-		KeyPair kpA = Utility.genKeyPair();
+		KeyPair kpA = TestFactory.genKeyPair();
 		ECPublicKey pubKey = (ECPublicKey) kpA.getPublic();
 		ECPrivateKey privKey = (ECPrivateKey) kpA.getPrivate();
 		when(idStorage.getPrivateKey()).thenReturn(privKey);
@@ -209,7 +209,7 @@ public class SignatureUtilityTest {
 
 	@Test
 	public void testNetworkShoutToFromBytesThreeShouts() throws Exception {
-		KeyPair kpA = Utility.genKeyPair();
+		KeyPair kpA = TestFactory.genKeyPair();
 		ECPublicKey pubKey = (ECPublicKey) kpA.getPublic();
 		ECPrivateKey privKey = (ECPrivateKey) kpA.getPrivate();
 		when(idStorage.getPrivateKey()).thenReturn(privKey);
