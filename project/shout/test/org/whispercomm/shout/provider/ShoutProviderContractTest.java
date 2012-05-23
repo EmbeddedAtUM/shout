@@ -185,6 +185,7 @@ public class ShoutProviderContractTest {
 		Shout fromDb = ShoutProviderContract.retrieveShoutById(context, PARENT);
 		assertNotNull(fromDb);
 		int id = ShoutProviderContract.storeShout(context, fromDb);
+		assertTrue(id > 0);
 		assertTrue(id == PARENT);
 	}
 	
