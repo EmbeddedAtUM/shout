@@ -104,7 +104,6 @@ public class ShoutProviderTest {
 
 	@Test
 	public void testShoutInsert() {
-
 		assertTrue(shoutId > 0);
 
 		Cursor cursor = cr.query(shoutLocation, null, null, null, null);
@@ -264,7 +263,7 @@ public class ShoutProviderTest {
 		this.hashes = new byte[messages.length][];
 		this.sigs = new byte[messages.length][];
 		for (int i = 0; i < messages.length; i++) {
-			hashes[i] = TestFactory.genByteArray(10); 
+			hashes[i] = TestFactory.genByteArray(10);
 			sigs[i] = TestFactory.genByteArray(32);
 			Uri at = ShoutProviderTestUtility.insertIntoShoutTable(cr, authors[i], parent,
 					messages[i], times[i], sigs[i], hashes[i]);
