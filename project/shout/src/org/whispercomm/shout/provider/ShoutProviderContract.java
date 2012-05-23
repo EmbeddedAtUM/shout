@@ -23,6 +23,7 @@ import android.util.Log;
  * @author David Adrian
  */
 public class ShoutProviderContract {
+	// TODO Move functions into related inner class for each table
 
 	private static final String TAG = ShoutProviderContract.class.getSimpleName();
 
@@ -316,5 +317,9 @@ public class ShoutProviderContract {
 
 	public static long storeTag(Context context, Tag tag) {
 		return -1;
+	}
+	
+	private ShoutProviderContract() {
+		// Don't allow this class to be instantiated	
 	}
 }
