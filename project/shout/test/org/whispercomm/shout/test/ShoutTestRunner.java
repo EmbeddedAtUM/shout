@@ -13,7 +13,6 @@ public class ShoutTestRunner extends RobolectricTestRunner {
 
 	public ShoutTestRunner(Class<?> testClass) throws InitializationError {
 		super(testClass, new RobolectricConfig(new File(".")), new SQLiteMap());
-		// TODO Auto-generated constructor stub
 	}
 	
 	@Override

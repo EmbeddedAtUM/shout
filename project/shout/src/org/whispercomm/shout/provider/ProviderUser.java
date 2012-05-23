@@ -22,13 +22,10 @@ public class ProviderUser implements User {
 			this.key = SignatureUtility.getPublicKeyFromBytes(byteKey);
 			// TODO Fix these exceptions
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoSuchProviderException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvalidKeySpecException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

@@ -111,12 +111,8 @@ class IdStorageSharedPrefs implements IdStorage {
 	@Override
 	public void updateUserName(String userName) {
 		// TODO for now just replace the old user name
-		Log.d("davidedit", userName + " updateUserName called");
 		Editor editor = sharedPrefs.edit();
 		editor.putString(USER_NAME, userName);
-		if ( ! editor.commit()) {
-			Log.e("davidedit", "Seriously WTF");
-		}
 	}
 
 	/**

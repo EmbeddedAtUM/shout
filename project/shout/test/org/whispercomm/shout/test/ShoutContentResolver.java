@@ -44,27 +44,26 @@ public class ShoutContentResolver {
 			ArrayList<ContentProviderOperation> operations) throws RemoteException,
 			OperationApplicationException {
 				return null;
-		// TODO Auto-generated method stub
 	}
 
 	@Implementation
 	public void cancelSync(Uri uri) {
-		// TODO Auto-generated method stub
+		return;
 	}
 
 	@Implementation
 	public void notifyChange(Uri uri, ContentObserver observer, boolean syncToNetwork) {
-		// TODO Auto-generated method stub
+		return;
 	}
 
 	@Implementation
 	public void notifyChange(Uri uri, ContentObserver observer) {
-		// TODO Auto-generated method stub
+		return;
 	}
 
 	@Implementation
 	public void startSync(Uri uri, Bundle extras) {
-		// TODO Auto-generated method stub
+		return;
 	}
 
 }
