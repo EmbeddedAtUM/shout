@@ -1,12 +1,17 @@
 
 package org.whispercomm.shout.provider;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import org.whispercomm.shout.test.util.TestFactory;
+
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.net.Uri;
 import android.util.Base64;
 
-public class ShoutProviderTestUtility {
+public class ProviderTestUtility {
 	
 	public static Uri insertIntoUserTable(ContentResolver cr, String name, byte[] publicKey) {
 		ContentValues values = new ContentValues();
@@ -29,5 +34,34 @@ public class ShoutProviderTestUtility {
 		values.put(ShoutProviderContract.Shouts.HASH, Base64.encodeToString(hash, Base64.DEFAULT));
 		Uri location = cr.insert(ShoutProviderContract.Shouts.CONTENT_URI, values);
 		return location;
+	}
+	
+	public static void insertFourUsers(ContentResolver cr, String[] usernames) {
+		byte[][] keys = new byte[usernames.length][];
+		for (int i = 0; i < usernames.length; i++) {
+			keys[i] = TestFactory.genByteArray(32);
+			Uri at = ProviderTestUtility.insertIntoUserTable(cr, usernames[i], keys[i]);
+			assertNotNull(at);
+			assertTrue(Integer.valueOf(at.getLastPathSegment()) > 0);
+		}
+	}
+
+	public static void insertFourShouts(ContentResolver cr, String[] messages, int[] parents) {
+		int[] authors = {
+				1, 1, 2, 2
+		};
+		long[] times = {
+				100, 200, 300, 400
+		};
+		byte[][] hashes = new byte[messages.length][];
+		byte[][] sigs = new byte[messages.length][];
+		for (int i = 0; i < messages.length; i++) {
+			hashes[i] = TestFactory.genByteArray(10);
+			sigs[i] = TestFactory.genByteArray(32);
+			Uri at = ProviderTestUtility.insertIntoShoutTable(cr, authors[i], parents[i],
+					messages[i], times[i], sigs[i], hashes[i]);
+			assertNotNull(at);
+			assertTrue(Integer.valueOf(at.getLastPathSegment()) > 0);
+		}
 	}
 }

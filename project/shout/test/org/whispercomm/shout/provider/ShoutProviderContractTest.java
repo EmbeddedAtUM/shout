@@ -55,12 +55,12 @@ public class ShoutProviderContractTest {
 		this.ecPubKey = (ECPublicKey) TestFactory.genKeyPair().getPublic();
 		this.keyBytes = this.ecPubKey.getEncoded();
 
-		this.firstUserLocation = ShoutProviderTestUtility.insertIntoUserTable(
+		this.firstUserLocation = ProviderTestUtility.insertIntoUserTable(
 				cr, NAME, this.keyBytes);
 		assertEquals(AUTHOR,
 				Integer.valueOf(firstUserLocation.getLastPathSegment())
 						.intValue());
-		this.firstShoutLocation = ShoutProviderTestUtility
+		this.firstShoutLocation = ProviderTestUtility
 				.insertIntoShoutTable(cr, 1, -1, MESSAGE, TIME, SIGNATURE, HASH);
 		assertEquals(PARENT,
 				Integer.valueOf(firstShoutLocation.getLastPathSegment())

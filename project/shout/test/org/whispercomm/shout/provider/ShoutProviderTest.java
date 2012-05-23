@@ -44,7 +44,7 @@ public class ShoutProviderTest {
 
 	private static final String USERNAME_DUPE = "David";
 	private static final String[] USERNAMES = {
-			USERNAME_DUPE, USERNAME_DUPE, "Yue", "Prof Dick"
+			USERNAME_DUPE, USERNAME_DUPE, "Yue is not " + USERNAME_DUPE, "Prof Dick"
 	};
 	private static final int NUM_USER_SAME_NAME = 2;
 
@@ -52,23 +52,17 @@ public class ShoutProviderTest {
 			"Herp", "Derp", "Narwal", "Bacon"
 	};
 
-	private byte[][] hashes;
-
-	private byte[][] sigs;
-
-	private byte[][] keys;
-
 	@Before
 	public void setUp() {
 		userKey = TestFactory.genByteArray(16);
-		userLocation = ShoutProviderTestUtility.insertIntoUserTable(cr, NAME, userKey);
+		userLocation = ProviderTestUtility.insertIntoUserTable(cr, NAME, userKey);
 		assertNotNull(userLocation);
 		userId = Integer.valueOf(userLocation.getLastPathSegment());
 		assertTrue(userId > 0);
 
 		hash = TestFactory.genByteArray(16);
 		sig = TestFactory.genByteArray(16);
-		shoutLocation = ShoutProviderTestUtility.insertIntoShoutTable(cr, userId, -1, MESSAGE,
+		shoutLocation = ProviderTestUtility.insertIntoShoutTable(cr, userId, -1, MESSAGE,
 				TIME, sig, hash);
 		assertNotNull(shoutLocation);
 		shoutId = Integer.valueOf(shoutLocation.getLastPathSegment());
@@ -139,7 +133,7 @@ public class ShoutProviderTest {
 
 	@Test
 	public void testSelectManyUser() {
-		insertFourUsers(USERNAMES);
+		ProviderTestUtility.insertFourUsers(cr, USERNAMES);
 		String[] projection = {
 				ShoutProviderContract.Users._ID,
 				ShoutProviderContract.Users.USERNAME
@@ -166,8 +160,9 @@ public class ShoutProviderTest {
 
 	@Test
 	public void testSelectShoutsWithParameters() {
-		insertFourUsers(USERNAMES);
-		insertFourShouts(MESSAGES);
+		ProviderTestUtility.insertFourUsers(cr, USERNAMES);
+		int[] parents = TestFactory.genArrayWithSingleValue(4, userId);
+		ProviderTestUtility.insertFourShouts(cr, MESSAGES, parents);
 		String[] projection = {
 				ShoutProviderContract.Shouts.AUTHOR,
 				ShoutProviderContract.Shouts.MESSAGE
@@ -175,8 +170,8 @@ public class ShoutProviderTest {
 		String selection = ShoutProviderContract.Shouts.AUTHOR + " = ? AND "
 				+ ShoutProviderContract.Shouts.MESSAGE + " = ?";
 		String[] selectionArgs = {
-				"1",
-				"Derp"
+				Integer.toString(userId),
+				MESSAGES[1]
 		};
 		Cursor cursor = cr.query(ShoutProviderContract.Shouts.CONTENT_URI, projection, selection,
 				selectionArgs, null);
@@ -186,8 +181,8 @@ public class ShoutProviderTest {
 		int messageIndex = cursor.getColumnIndex(ShoutProviderContract.Shouts.MESSAGE);
 		int author = cursor.getInt(authorIndex);
 		String message = cursor.getString(messageIndex);
-		assertEquals(1, author);
-		assertEquals("Derp", message);
+		assertEquals(userId, author);
+		assertEquals(MESSAGES[1], message);
 		assertFalse(cursor.moveToNext());
 	}
 
@@ -230,45 +225,21 @@ public class ShoutProviderTest {
 
 	@Test
 	public void testSelectShoutByUserURI() {
-		insertFourUsers(USERNAMES);
-		insertFourShouts(MESSAGES);
-		Uri uri = Uri.withAppendedPath(ShoutProviderContract.Shouts.CONTENT_URI, "user/2");
+		ProviderTestUtility.insertFourUsers(cr, USERNAMES);
+		int otherUser = userId + 1;
+		int[] parents = {
+				userId, userId, otherUser, otherUser
+		};
+		int numOtherUser = 2;
+		ProviderTestUtility.insertFourShouts(cr, MESSAGES, parents);
+		Uri uri = Uri.withAppendedPath(ShoutProviderContract.Shouts.CONTENT_URI,
+				"user/" + Integer.toString(otherUser));
 		Cursor cursor = cr.query(uri, null, null, null, null);
 		assertNotNull(cursor);
-		assertTrue(cursor.getCount() == 2);
+		assertTrue(cursor.getCount() == numOtherUser);
 		int authorIndex = cursor.getColumnIndex(ShoutProviderContract.Shouts.AUTHOR);
 		while (cursor.moveToNext()) {
-			assertEquals(2, cursor.getInt(authorIndex));
-		}
-	}
-
-	private void insertFourUsers(String[] usernames) {
-		this.keys = new byte[usernames.length][];
-		for (int i = 0; i < usernames.length; i++) {
-			keys[i] = TestFactory.genByteArray(32);
-			Uri at = ShoutProviderTestUtility.insertIntoUserTable(cr, usernames[i], keys[i]);
-			assertNotNull(at);
-			assertTrue(Integer.valueOf(at.getLastPathSegment()) > 0);
-		}
-	}
-
-	private void insertFourShouts(String[] messages) {
-		int[] authors = {
-				1, 1, 2, 2
-		};
-		int parent = shoutId;
-		long[] times = {
-				100, 200, 300, 400
-		};
-		this.hashes = new byte[messages.length][];
-		this.sigs = new byte[messages.length][];
-		for (int i = 0; i < messages.length; i++) {
-			hashes[i] = TestFactory.genByteArray(10);
-			sigs[i] = TestFactory.genByteArray(32);
-			Uri at = ShoutProviderTestUtility.insertIntoShoutTable(cr, authors[i], parent,
-					messages[i], times[i], sigs[i], hashes[i]);
-			assertNotNull(at);
-			assertTrue(Integer.valueOf(at.getLastPathSegment()) > 0);
+			assertEquals(otherUser, cursor.getInt(authorIndex));
 		}
 	}
 }
