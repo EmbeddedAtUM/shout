@@ -306,7 +306,8 @@ public class ShoutProviderContract {
 			return Integer.valueOf(location.getLastPathSegment());
 		}
 	}
-
+	
+	// TODO Support for Tags
 	public static Tag retrieveTagById(Context context, long id) {
 		return null;
 	}
