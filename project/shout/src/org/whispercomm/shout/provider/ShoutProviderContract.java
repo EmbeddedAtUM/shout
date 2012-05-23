@@ -19,6 +19,10 @@ import android.util.Log;
 /**
  * A provider of shouts and shout users seen by this device, to be used for user
  * interface generation and authentication of senders.
+ * <p>
+ * Instead of querying the database directly, access the database using this
+ * contract class in order to guarantee business logic is sound and reduce
+ * coupling to the Content Provider implementation.
  * 
  * @author David Adrian
  */
@@ -149,12 +153,30 @@ public class ShoutProviderContract {
 		public static final String TAG = "Name";
 	}
 	
+	/**
+	 * Private interface to make inserting objects into the database easier
+	 * 
+	 * @author David Adrian
+	 */
 	private interface DatabaseObject {
-
+		/**
+		 * Construct a representation of the DatabaseObject as a ContentValues
+		 * object with the necessary key/value pairs.
+		 * 
+		 * @return ContentValues representation of {@code this}
+		 */
 		ContentValues makeContentValues();
 
+		/**
+		 * @return The URI where this object should be inserted
+		 */
 		Uri getInsertLocation();
 
+		/**
+		 * Save self in database, if not already in the database.
+		 * 
+		 * @return id of {@code this} in the database.
+		 */
 		int saveInDatabase();
 	}
 
@@ -212,7 +234,7 @@ public class ShoutProviderContract {
 
 	}
 
-	static class DatabaseShout implements DatabaseObject {
+	private static class DatabaseShout implements DatabaseObject {
 		private int id = -1;
 		private int author;
 		private int parent;
@@ -404,7 +426,20 @@ public class ShoutProviderContract {
 		// Don't allow this class to be instantiated
 	}
 
+	/**
+	 * Helper class for storing and retrieving both Shout and User objects
+	 * (specifically the DatabaseObject representations of)
+	 * 
+	 * @author David Adrian
+	 */
 	private static class ContractHelper {
+		/**
+		 * Store a DatabaseObject in the database.
+		 * 
+		 * @param context
+		 * @param dbObject
+		 * @return id of the DatabaseObject in the database
+		 */
 		public static int storeInDatabase(Context context, DatabaseObject dbObject) {
 			ContentValues values = dbObject.makeContentValues();
 			Uri table = dbObject.getInsertLocation();
@@ -413,6 +448,13 @@ public class ShoutProviderContract {
 			return id;
 		}
 
+		/**
+		 * Return the ID of a given DatabaseUser
+		 * 
+		 * @param context
+		 * @param user
+		 * @return -1 if not in the database
+		 */
 		public static int queryForUser(Context context, DatabaseUser user) {
 			String[] projection = {
 					Users._ID
@@ -437,6 +479,14 @@ public class ShoutProviderContract {
 			}
 		}
 
+		/**
+		 * Return the DatabaseUser representation of the User saved in the
+		 * database with the given ID.
+		 * 
+		 * @param context
+		 * @param id
+		 * @return null if no User with that ID exists
+		 */
 		public static DatabaseUser queryForUser(Context context, int id) {
 			Uri uri = ContentUris.withAppendedId(Users.CONTENT_URI, id);
 			Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
@@ -454,6 +504,13 @@ public class ShoutProviderContract {
 			}
 		}
 
+		/**
+		 * Return the ID of a given DatabaseShout
+		 * 
+		 * @param context
+		 * @param dbShout
+		 * @return -1 on failure
+		 */
 		public static int queryForShout(Context context, DatabaseShout dbShout) {
 			String[] projection = {
 					Shouts._ID
@@ -478,6 +535,13 @@ public class ShoutProviderContract {
 			}
 		}
 
+		/**
+		 * Return a DatabaseShout representation of Shout with the given ID.
+		 * 
+		 * @param context
+		 * @param id
+		 * @return Null if no Shout with the given ID exists
+		 */
 		public static DatabaseShout queryForShout(Context context, int id) {
 			Uri uri = ContentUris.withAppendedId(Shouts.CONTENT_URI, id);
 			Cursor cursor = context.getContentResolver().query(uri, null,
