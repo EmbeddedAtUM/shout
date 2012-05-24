@@ -14,7 +14,7 @@ import org.junit.runner.RunWith;
 import com.xtremelabs.robolectric.RobolectricTestRunner;
 
 @RunWith(RobolectricTestRunner.class)
-public class TestShoutBase64 {
+public class ShoutBase64Test {
 
 	private byte[] arrRandom;
 	private byte[] hardcoded = {
