@@ -124,6 +124,32 @@ public class ShoutProviderContract {
 		public static final String PUB_KEY = "Key";
 	}
 
+	public static class Tags implements BaseColumns {
+		/**
+		 * The SQLite table name for the Tags table. Not needed for managed
+		 * queries, and can be ignored in most cases.
+		 */
+		public static final String TABLE_NAME = "tag";
+
+		/**
+		 * The base content URI for the Tags table.
+		 */
+		public static final Uri CONTENT_URI = Uri.withAppendedPath(CONTENT_URI_BASE, TABLE_NAME);
+
+		/**
+		 * Column name of the primary key. This represent the database ID of a
+		 * specific tag, which is used to assign a Tag to a Shout in the
+		 * database.
+		 */
+		public static final String _ID = BaseColumns._ID;
+		
+		/**
+		 * Column name for the tag itself. Does not store the leading #.
+		 */
+		public static final String TAG = "Name";
+
+	}
+
 	/**
 	 * Retrieve Shout with given database ID
 	 * 
@@ -306,7 +332,7 @@ public class ShoutProviderContract {
 			return Integer.valueOf(location.getLastPathSegment());
 		}
 	}
-	
+
 	// TODO Support for Tags
 	public static Tag retrieveTagById(Context context, long id) {
 		return null;
@@ -319,8 +345,8 @@ public class ShoutProviderContract {
 	public static long storeTag(Context context, Tag tag) {
 		return -1;
 	}
-	
+
 	private ShoutProviderContract() {
-		// Don't allow this class to be instantiated	
+		// Don't allow this class to be instantiated
 	}
 }

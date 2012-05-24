@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout.test.util;
 
 import org.joda.time.DateTime;
@@ -5,17 +6,16 @@ import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.User;
 
 public class TestShout implements Shout {
-	
+
 	public byte[] hash = null;
 	public User sender = null;
 	public String message = null;
 	public DateTime timestamp = null;
 	public Shout parent = null;
 	public byte[] signature = null;
-	
-	
+
 	public TestShout() {
-		
+
 	}
 
 	public TestShout(User sender, Shout parent, String message,

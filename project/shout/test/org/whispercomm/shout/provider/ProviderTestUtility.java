@@ -36,6 +36,21 @@ public class ProviderTestUtility {
 		return location;
 	}
 	
+	public static Uri insertIntoTagTable(ContentResolver cr, String tagName) {
+		ContentValues values = new ContentValues();
+		values.put(ShoutProviderContract.Tags.TAG, tagName);
+		Uri location = cr.insert(ShoutProviderContract.Tags.CONTENT_URI, values);
+		return location;
+	}
+	
+	public static void insertMultipleTags(ContentResolver cr, String[] tags) {
+		for (int i = 0; i < tags.length; i++) {
+			Uri at = insertIntoTagTable(cr, tags[i]);
+			assertNotNull(at);
+			assertTrue(Integer.valueOf(at.getLastPathSegment()) > 0);
+		}
+	}
+	
 	public static void insertFourUsers(ContentResolver cr, String[] usernames) {
 		byte[][] keys = new byte[usernames.length][];
 		for (int i = 0; i < usernames.length; i++) {
