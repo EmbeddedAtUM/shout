@@ -9,9 +9,11 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
+import java.security.Security;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECGenParameterSpec;
 
+import org.spongycastle.jce.provider.BouncyCastleProvider;
 import org.whispercomm.shout.id.SignatureUtility;
 
 /**
@@ -22,6 +24,10 @@ import org.whispercomm.shout.id.SignatureUtility;
  */
 public class TestFactory {
 
+	static {
+		Security.addProvider(new BouncyCastleProvider());
+	}
+	
 	/**
 	 * Generate a valid EC key pair
 	 */
