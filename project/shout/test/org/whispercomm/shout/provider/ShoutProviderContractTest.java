@@ -157,6 +157,20 @@ public class ShoutProviderContractTest {
 		assertArrayEquals(parent.getSignature(), fromDb.getParent().getSignature());
 		assertNull(fromDb.getParent().getParent());
 	}
+	
+	@Test
+	public void testStoreShoutWithoutUserInDatabase() {
+		User user = new TestUser("theZuck");
+		byte[] sig = TestFactory.genByteArray(7);
+		byte[] hash = TestFactory.genByteArray(19);
+		Shout testShout = new TestShout(user, null, "someMessage", new DateTime(), sig, hash );
+		int id = ShoutProviderContract.storeShout(context, testShout);
+		assertTrue(id > 0);
+		Shout fromDb = ShoutProviderContract.retrieveShoutById(context, id);
+		assertNotNull(fromDb);
+		assertNotNull(fromDb.getSender());
+		assertEquals(user.getPublicKey(), fromDb.getSender().getPublicKey());
+	}
 
 	@Test
 	public void testStoreUserAlreadyInDatabase() {
