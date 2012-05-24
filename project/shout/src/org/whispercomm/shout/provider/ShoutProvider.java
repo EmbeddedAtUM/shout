@@ -302,6 +302,12 @@ public class ShoutProvider extends ContentProvider {
 				"(" + ShoutProviderContract.Shouts._ID + ") " +
 				");";
 
+		private static final String SQL_CREATE_VIRTUAL_MESSAGE = "CREATE VIRTUAL TABLE " + 
+				ShoutSearchContract.Message.TABLE_NAME + 
+				" USING fts3(" + 
+				ShoutSearchContract.Message.SHOUT + ", " +
+				ShoutSearchContract.Message.MESSAGE + ");";
+		
 		private static final String SQL_CREATE_TAG = "CREATE TABLE " +
 				ShoutProviderContract.Tags.TABLE_NAME +
 				"(" +
@@ -318,6 +324,7 @@ public class ShoutProvider extends ContentProvider {
 			db.execSQL(SQL_CREATE_USER);
 			db.execSQL(SQL_CREATE_TAG);
 			db.execSQL(SQL_CREATE_SHOUT);
+			db.execSQL(SQL_CREATE_VIRTUAL_MESSAGE);
 		}
 
 		@Override
