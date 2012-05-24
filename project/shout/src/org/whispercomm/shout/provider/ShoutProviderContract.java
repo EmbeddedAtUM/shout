@@ -142,12 +142,11 @@ public class ShoutProviderContract {
 		 * database.
 		 */
 		public static final String _ID = BaseColumns._ID;
-		
+
 		/**
 		 * Column name for the tag itself. Does not store the leading #.
 		 */
 		public static final String TAG = "Name";
-
 	}
 
 	/**
@@ -333,17 +332,52 @@ public class ShoutProviderContract {
 		}
 	}
 
-	// TODO Support for Tags
-	public static Tag retrieveTagById(Context context, long id) {
+	public static Tag retrieveTagById(Context context, int id) {
+		Uri uri = ContentUris.withAppendedId(Tags.CONTENT_URI, id);
+		Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
+		if (cursor == null) {
+			Log.e(TAG, "Null cursor on Tag search");
+			return null;
+		} else if (cursor.moveToNext()) {
+			int nameIndex = cursor.getColumnIndex(Tags.TAG);
+			String name = cursor.getString(nameIndex);
+			Tag tag = new ProviderTag(name);
+			return tag;
+		} else {
+			return null;
+		}
+	}
+
+	public static List<Tag> retrieveTagsByShoutId(Context context, int id) {
+		// TODO Determine how Tags should be linked to Shouts
 		return null;
 	}
 
-	public static List<Tag> retrieveTagsByShoutId(Context context, long id) {
-		return null;
-	}
-
-	public static long storeTag(Context context, Tag tag) {
-		return -1;
+	public static int storeTag(Context context, Tag tag) {
+		String name = tag.getName();
+		String[] projection = {
+				Tags._ID
+		};
+		String selection = Tags.TAG + " = ?";
+		String[] selectionArgs = {
+				name
+		};
+		Cursor cursor = context.getContentResolver().query(Tags.CONTENT_URI, projection, selection,
+				selectionArgs, null);
+		if (cursor == null) {
+			Log.e(TAG, "Null cursor on Tag lookup");
+			return -1;
+		}
+		else if (cursor.moveToNext()) {
+			int id = cursor.getInt(0);
+			return id;
+		} else {
+			ContentValues values = new ContentValues();
+			values.put(Tags.TAG, name);
+			Uri at = context.getContentResolver().insert(Tags.CONTENT_URI, values);
+			int id = Integer.valueOf(at.getLastPathSegment());
+			return id;
+		}
 	}
 
 	private ShoutProviderContract() {

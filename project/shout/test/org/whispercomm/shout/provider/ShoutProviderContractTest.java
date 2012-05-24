@@ -4,8 +4,8 @@ package org.whispercomm.shout.provider;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.*;
 
 import java.security.interfaces.ECPublicKey;
 
@@ -15,10 +15,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.whispercomm.shout.Shout;
+import org.whispercomm.shout.Tag;
 import org.whispercomm.shout.User;
 import org.whispercomm.shout.test.ShoutTestRunner;
 import org.whispercomm.shout.test.util.TestFactory;
 import org.whispercomm.shout.test.util.TestShout;
+import org.whispercomm.shout.test.util.TestTag;
 import org.whispercomm.shout.test.util.TestUser;
 
 import android.app.Activity;
@@ -37,9 +39,13 @@ public class ShoutProviderContractTest {
 
 	private static final int AUTHOR = 1;
 	private static final int PARENT = 1;
+	private static final int TAG_ID = 1;
+
+	private static final String TAG_NAME = "this_is_a_tag";
 
 	Uri firstUserLocation;
 	Uri firstShoutLocation;
+	Uri firstTagLocation;
 
 	private Context context;
 	private ContentResolver cr;
@@ -65,6 +71,10 @@ public class ShoutProviderContractTest {
 		assertEquals(PARENT,
 				Integer.valueOf(firstShoutLocation.getLastPathSegment())
 						.intValue());
+
+		this.firstTagLocation = ProviderTestUtility.insertIntoTagTable(cr, TAG_NAME);
+		assertNotNull(firstTagLocation);
+		assertEquals(TAG_ID, Integer.valueOf(firstTagLocation.getLastPathSegment()).intValue());
 	}
 
 	@After
@@ -92,7 +102,27 @@ public class ShoutProviderContractTest {
 		assertArrayEquals(HASH, fromDb.getHash());
 		assertNull(fromDb.getParent());
 	}
+	
+	@Test
+	public void testRetrieveTag() {
+		Tag fromDb = ShoutProviderContract.retrieveTagById(context, TAG_ID);
+		assertNotNull(fromDb);
+		String name = fromDb.getName();
+		assertNotNull(name);
+		assertEquals(TAG_NAME, name);
+	}
 
+	@Test
+	public void testStoreTag() {
+		String tagName = "thingsthatmakedavidbfeelold";
+		TestTag tag = new TestTag(tagName);
+		int id = ShoutProviderContract.storeTag(context, tag);
+		assertTrue(id > 0);
+		assertTrue(id != TAG_ID);
+		Tag fromDb = ShoutProviderContract.retrieveTagById(context, id);
+		assertEquals(tagName, fromDb.getName());
+	}
+	
 	@Test
 	public void testStoreUser() {
 		String username = "drbild"; // It's funny because it looks like Dr.
@@ -142,5 +172,13 @@ public class ShoutProviderContractTest {
 		assertNotNull(fromDb);
 		int id = ShoutProviderContract.storeShout(context, fromDb);
 		assertTrue(id == PARENT);
+	}
+	
+	@Test
+	public void testStoreTagAlreadyInDatabase() {
+		Tag fromDb = ShoutProviderContract.retrieveTagById(context, TAG_ID);
+		assertNotNull(fromDb);
+		int id = ShoutProviderContract.storeTag(context, fromDb);
+		assertTrue(id == TAG_ID);
 	}
 }
