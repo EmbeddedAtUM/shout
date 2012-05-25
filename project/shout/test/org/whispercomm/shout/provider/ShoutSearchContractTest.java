@@ -94,6 +94,7 @@ public class ShoutSearchContractTest {
 	@Test
 	public void testSearchManyResults() {
 		List<Shout> result = ShoutSearchContract.searchShoutMessage(WORD);
+		assertNotNull(result);
 		int resultSize = result.size();
 		int expectSize = shouts.size();
 		assertTrue(expectSize == resultSize);
