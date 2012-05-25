@@ -68,7 +68,8 @@ public class ShoutSearchContractTest {
 	@Test
 	public void testSearchNoResults() {
 		List<Shout> result = ShoutSearchContract // Trololololo
-				.searchShoutMessage(context, "someStringNotInDbBecauseItContainViciousInsultsToDavidBByDavidA");
+				.searchShoutMessage(context,
+						"someStringNotInDbBecauseItContainViciousInsultsToDavidBByDavidA");
 		assertNotNull(result);
 		assertTrue(result.isEmpty());
 	}
@@ -93,6 +94,9 @@ public class ShoutSearchContractTest {
 
 	@Test
 	public void testSearchManyResults() {
+		TestShout unique = new TestShout(sender, null, "Imma firin mah lazor!", new DateTime(),
+				TestFactory.genByteArray(18), TestFactory.genByteArray(8));
+		ShoutProviderContract.storeShout(context, unique);
 		List<Shout> result = ShoutSearchContract.searchShoutMessage(context, WORD);
 		assertNotNull(result);
 		int resultSize = result.size();
@@ -111,4 +115,19 @@ public class ShoutSearchContractTest {
 		}
 	}
 
+	@Test
+	public void testSearchPrefix() {
+		TestShout unique = new TestShout(sender, null, "Imma firin mah lazor!", new DateTime(),
+				TestFactory.genByteArray(18), TestFactory.genByteArray(8));
+		ShoutProviderContract.storeShout(context, unique);
+		TestShout similar = new TestShout(sender, null,
+				"I am firing my employees because they spend too much time on Reddit",
+				new DateTime(), TestFactory.genByteArray(9), TestFactory.genByteArray(9));
+		ShoutProviderContract.storeShout(context, similar);
+		List<Shout> result = ShoutSearchContract.searchShoutMessage(context, "firin*");
+		assertNotNull(result);
+		int expectedSize = 2;
+		int resultSize = result.size();
+		assertEquals(expectedSize, resultSize);
+	}
 }
