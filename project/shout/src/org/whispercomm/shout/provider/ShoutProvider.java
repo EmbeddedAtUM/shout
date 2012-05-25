@@ -148,6 +148,7 @@ public class ShoutProvider extends ContentProvider {
 				break;
 			case MESSAGES:
 				table = ShoutSearchContract.Messages.TABLE_NAME;
+				break;
 			default:
 				throw new IllegalArgumentException("Unknown or invalid URI " + uri);
 		}

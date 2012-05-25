@@ -1,4 +1,3 @@
-
 package org.whispercomm.shout.provider;
 
 import java.util.List;
@@ -29,7 +28,8 @@ import android.util.Log;
 public class ShoutProviderContract {
 	// TODO Move functions into related inner class for each table
 
-	private static final String TAG = ShoutProviderContract.class.getSimpleName();
+	private static final String TAG = ShoutProviderContract.class
+			.getSimpleName();
 
 	/**
 	 * The authority for the Shout content provider
@@ -39,7 +39,8 @@ public class ShoutProviderContract {
 	/**
 	 * The content:// style URI for the Shout provider
 	 */
-	public static final Uri CONTENT_URI_BASE = Uri.parse("content://" + AUTHORITY);
+	public static final Uri CONTENT_URI_BASE = Uri.parse("content://"
+			+ AUTHORITY);
 
 	/**
 	 * Helper class for managing static variables associated with the Shout
@@ -57,7 +58,8 @@ public class ShoutProviderContract {
 		/**
 		 * Base content URI for the table of Shouts
 		 */
-		public static final Uri CONTENT_URI = Uri.withAppendedPath(CONTENT_URI_BASE, TABLE_NAME);
+		public static final Uri CONTENT_URI = Uri.withAppendedPath(
+				CONTENT_URI_BASE, TABLE_NAME);
 
 		/**
 		 * Column name of the primary key. This represents the database ID of a
@@ -113,7 +115,8 @@ public class ShoutProviderContract {
 		/**
 		 * The base content URI for the Users table.
 		 */
-		public static final Uri CONTENT_URI = Uri.withAppendedPath(CONTENT_URI_BASE, TABLE_NAME);
+		public static final Uri CONTENT_URI = Uri.withAppendedPath(
+				CONTENT_URI_BASE, TABLE_NAME);
 
 		/**
 		 * The column name for the username associated with a User. Stored as
@@ -138,7 +141,8 @@ public class ShoutProviderContract {
 		/**
 		 * The base content URI for the Tags table.
 		 */
-		public static final Uri CONTENT_URI = Uri.withAppendedPath(CONTENT_URI_BASE, TABLE_NAME);
+		public static final Uri CONTENT_URI = Uri.withAppendedPath(
+				CONTENT_URI_BASE, TABLE_NAME);
 
 		/**
 		 * Column name of the primary key. This represent the database ID of a
@@ -152,7 +156,7 @@ public class ShoutProviderContract {
 		 */
 		public static final String TAG = "Name";
 	}
-	
+
 	/**
 	 * Private interface to make inserting objects into the database easier
 	 * 
@@ -189,7 +193,8 @@ public class ShoutProviderContract {
 
 		public DatabaseUser(User user, Context context) {
 			username = user.getUsername();
-			key = Base64.encodeToString(user.getPublicKey().getEncoded(), Base64.DEFAULT);
+			key = Base64.encodeToString(user.getPublicKey().getEncoded(),
+					Base64.DEFAULT);
 			id = -1;
 			this.context = context;
 		}
@@ -244,10 +249,12 @@ public class ShoutProviderContract {
 		private String hash;
 		private Context context;
 
-		public DatabaseShout(Shout shout, int author, int parent, Context context) {
+		public DatabaseShout(Shout shout, int author, int parent,
+				Context context) {
 			this.message = shout.getMessage();
 			this.time = shout.getTimestamp().getMillis();
-			this.signature = Base64.encodeToString(shout.getSignature(), Base64.DEFAULT);
+			this.signature = Base64.encodeToString(shout.getSignature(),
+					Base64.DEFAULT);
 			this.hash = Base64.encodeToString(shout.getHash(), Base64.DEFAULT);
 
 			this.author = author;
@@ -256,8 +263,8 @@ public class ShoutProviderContract {
 			this.context = context;
 		}
 
-		public DatabaseShout(int id, int author, int parent, String message, long time,
-				String signature, String hash, Context context) {
+		public DatabaseShout(int id, int author, int parent, String message,
+				long time, String signature, String hash, Context context) {
 			this.id = id;
 			this.author = author;
 			this.parent = parent;
@@ -296,14 +303,50 @@ public class ShoutProviderContract {
 				this.id = ContractHelper.queryForShout(context, this);
 				if (this.id < 0) {
 					this.id = ContractHelper.storeInDatabase(context, this);
+					ShoutMessage text = new ShoutMessage(this.id, this.message);
+					text.saveInDatabase();
 				}
 			}
 			return this.id;
 		}
 
 		public Shout makeShoutImplementation() {
-			return new ProviderShout(this.author, this.parent, this.message, this.time, this.hash,
-					this.signature, this.context);
+			return new ProviderShout(this.author, this.parent, this.message,
+					this.time, this.hash, this.signature, this.context);
+		}
+		
+		private class ShoutMessage implements DatabaseObject {
+
+			private int rowId = -1;
+			private int shoutId;
+			private String message;
+			
+			public ShoutMessage(int shoutId, String message) {
+				this.shoutId = shoutId;
+				this.message = message;
+			}
+			
+			@Override
+			public ContentValues makeContentValues() {
+				ContentValues values = new ContentValues();
+				values.put(ShoutSearchContract.Messages.SHOUT, shoutId);
+				values.put(ShoutSearchContract.Messages.MESSAGE, message);
+				return values;
+			}
+
+			@Override
+			public Uri getInsertLocation() {
+				return ShoutSearchContract.Messages.CONTENT_URI;
+			}
+
+			@Override
+			public int saveInDatabase() {
+				if (this.rowId < 0) {
+					this.rowId = ContractHelper.storeInDatabase(context, this);
+				}
+				return this.rowId;
+			}
+			
 		}
 	}
 
@@ -327,19 +370,23 @@ public class ShoutProviderContract {
 	 * Stores the given Shout and its sender and parent, if not already present
 	 * in the database.
 	 * 
-	 * @param context The context the content resolver is found in
-	 * @param shout The shout to be stored
+	 * @param context
+	 *            The context the content resolver is found in
+	 * @param shout
+	 *            The shout to be stored
 	 * @return The ID of the Shout in the database, -1 on failure
 	 */
 	public static int storeShout(Context context, Shout shout) {
-		int id = ContractHelper.queryForShout(context, new DatabaseShout(shout, -1, -1, context));
+		int id = ContractHelper.queryForShout(context, new DatabaseShout(shout,
+				-1, -1, context));
 		if (id < 0) {
 			int parent = -1;
 			if (shout.getParent() != null) {
 				parent = storeShout(context, shout.getParent());
 			}
 			int author = storeUser(context, shout.getSender());
-			DatabaseShout dbShout = new DatabaseShout(shout, author, parent, context);
+			DatabaseShout dbShout = new DatabaseShout(shout, author, parent,
+					context);
 			id = dbShout.saveInDatabase();
 		}
 		return id;
@@ -376,7 +423,8 @@ public class ShoutProviderContract {
 
 	public static Tag retrieveTagById(Context context, int id) {
 		Uri uri = ContentUris.withAppendedId(Tags.CONTENT_URI, id);
-		Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
+		Cursor cursor = context.getContentResolver().query(uri, null, null,
+				null, null);
 		if (cursor == null) {
 			Log.e(TAG, "Null cursor on Tag search");
 			return null;
@@ -397,26 +445,22 @@ public class ShoutProviderContract {
 
 	public static int storeTag(Context context, Tag tag) {
 		String name = tag.getName();
-		String[] projection = {
-				Tags._ID
-		};
+		String[] projection = { Tags._ID };
 		String selection = Tags.TAG + " = ?";
-		String[] selectionArgs = {
-				name
-		};
-		Cursor cursor = context.getContentResolver().query(Tags.CONTENT_URI, projection, selection,
-				selectionArgs, null);
+		String[] selectionArgs = { name };
+		Cursor cursor = context.getContentResolver().query(Tags.CONTENT_URI,
+				projection, selection, selectionArgs, null);
 		if (cursor == null) {
 			Log.e(TAG, "Null cursor on Tag lookup");
 			return -1;
-		}
-		else if (cursor.moveToNext()) {
+		} else if (cursor.moveToNext()) {
 			int id = cursor.getInt(0);
 			return id;
 		} else {
 			ContentValues values = new ContentValues();
 			values.put(Tags.TAG, name);
-			Uri at = context.getContentResolver().insert(Tags.CONTENT_URI, values);
+			Uri at = context.getContentResolver().insert(Tags.CONTENT_URI,
+					values);
 			int id = Integer.valueOf(at.getLastPathSegment());
 			return id;
 		}
@@ -440,7 +484,8 @@ public class ShoutProviderContract {
 		 * @param dbObject
 		 * @return id of the DatabaseObject in the database
 		 */
-		public static int storeInDatabase(Context context, DatabaseObject dbObject) {
+		public static int storeInDatabase(Context context,
+				DatabaseObject dbObject) {
 			ContentValues values = dbObject.makeContentValues();
 			Uri table = dbObject.getInsertLocation();
 			Uri location = context.getContentResolver().insert(table, values);
@@ -456,16 +501,13 @@ public class ShoutProviderContract {
 		 * @return -1 if not in the database
 		 */
 		public static int queryForUser(Context context, DatabaseUser user) {
-			String[] projection = {
-					Users._ID
-			};
-			String selection = Users.PUB_KEY + " = ? AND " + Users.USERNAME + " = ?";
-			String[] selectionArgs = {
-					user.key,
-					user.username
-			};
-			Cursor cursor = context.getContentResolver().query(Users.CONTENT_URI, projection,
-					selection, selectionArgs, null);
+			String[] projection = { Users._ID };
+			String selection = Users.PUB_KEY + " = ? AND " + Users.USERNAME
+					+ " = ?";
+			String[] selectionArgs = { user.key, user.username };
+			Cursor cursor = context.getContentResolver().query(
+					Users.CONTENT_URI, projection, selection, selectionArgs,
+					null);
 			if (cursor == null) {
 				Log.e(TAG, "Null cursor returned on URI " + Users.CONTENT_URI);
 				return -1;
@@ -489,7 +531,8 @@ public class ShoutProviderContract {
 		 */
 		public static DatabaseUser queryForUser(Context context, int id) {
 			Uri uri = ContentUris.withAppendedId(Users.CONTENT_URI, id);
-			Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
+			Cursor cursor = context.getContentResolver().query(uri, null, null,
+					null, null);
 			if (cursor == null) {
 				Log.e(TAG, "Null cursor returned on URI " + uri);
 				return null;
@@ -497,7 +540,8 @@ public class ShoutProviderContract {
 				int idIndex = cursor.getColumnIndex(Users._ID);
 				int nameIndex = cursor.getColumnIndex(Users.USERNAME);
 				int keyIndex = cursor.getColumnIndex(Users.PUB_KEY);
-				return new DatabaseUser(cursor.getInt(idIndex), cursor.getString(nameIndex),
+				return new DatabaseUser(cursor.getInt(idIndex),
+						cursor.getString(nameIndex),
 						cursor.getString(keyIndex), context);
 			} else {
 				return null;
@@ -512,17 +556,14 @@ public class ShoutProviderContract {
 		 * @return -1 on failure
 		 */
 		public static int queryForShout(Context context, DatabaseShout dbShout) {
-			String[] projection = {
-					Shouts._ID
-			};
-			String selection = Shouts.HASH + " = ? AND " + Shouts.SIGNATURE + " = ?";
-			String[] selectionArgs = {
-					dbShout.hash,
-					dbShout.signature
-			};
+			String[] projection = { Shouts._ID };
+			String selection = Shouts.HASH + " = ? AND " + Shouts.SIGNATURE
+					+ " = ?";
+			String[] selectionArgs = { dbShout.hash, dbShout.signature };
 
-			Cursor cursor = context.getContentResolver().query(Shouts.CONTENT_URI, projection,
-					selection, selectionArgs, null);
+			Cursor cursor = context.getContentResolver().query(
+					Shouts.CONTENT_URI, projection, selection, selectionArgs,
+					null);
 			if (cursor == null) {
 				Log.e(TAG, "Null cursor returned on Shout query");
 				return -1;
@@ -544,8 +585,7 @@ public class ShoutProviderContract {
 		 */
 		public static DatabaseShout queryForShout(Context context, int id) {
 			Uri uri = ContentUris.withAppendedId(Shouts.CONTENT_URI, id);
-			Cursor cursor = context.getContentResolver().query(uri, null,
-					null,
+			Cursor cursor = context.getContentResolver().query(uri, null, null,
 					null, null);
 			if (cursor == null) {
 				Log.e(TAG, "Null cursor returned on URI " + Shouts.CONTENT_URI);
@@ -571,8 +611,8 @@ public class ShoutProviderContract {
 				String encodedHash = cursor.getString(hashIndex);
 				String encodedSig = cursor.getString(sigIndex);
 				cursor.close();
-				return new DatabaseShout(id, author, parent, message, time, encodedSig,
-						encodedHash, context);
+				return new DatabaseShout(id, author, parent, message, time,
+						encodedSig, encodedHash, context);
 			} else {
 				return null;
 			}

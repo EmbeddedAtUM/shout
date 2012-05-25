@@ -68,7 +68,7 @@ public class ShoutSearchContractTest {
 	@Test
 	public void testSearchNoResults() {
 		List<Shout> result = ShoutSearchContract // Trololololo
-				.searchShoutMessage("someStringNotInDbBecauseItContainViciousInsultsToDavidBByDavidA");
+				.searchShoutMessage(context, "someStringNotInDbBecauseItContainViciousInsultsToDavidBByDavidA");
 		assertNotNull(result);
 		assertTrue(result.isEmpty());
 	}
@@ -78,7 +78,7 @@ public class ShoutSearchContractTest {
 		TestShout unique = new TestShout(sender, null, "Imma firin mah lazor!", new DateTime(),
 				TestFactory.genByteArray(18), TestFactory.genByteArray(8));
 		ShoutProviderContract.storeShout(context, unique);
-		List<Shout> result = ShoutSearchContract.searchShoutMessage("lazor");
+		List<Shout> result = ShoutSearchContract.searchShoutMessage(context, "lazor");
 		assertNotNull(result);
 		assertFalse(result.isEmpty());
 		ListIterator<Shout> it = result.listIterator();
@@ -93,7 +93,7 @@ public class ShoutSearchContractTest {
 
 	@Test
 	public void testSearchManyResults() {
-		List<Shout> result = ShoutSearchContract.searchShoutMessage(WORD);
+		List<Shout> result = ShoutSearchContract.searchShoutMessage(context, WORD);
 		assertNotNull(result);
 		int resultSize = result.size();
 		int expectSize = shouts.size();
