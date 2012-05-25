@@ -27,10 +27,9 @@ public class ShoutSearchContract {
 		public static final String SHOUT = "Shout";
 		public static final String MESSAGE = "Content";
 	}
-	
 	/**
 	 * Searches for Shouts with the given string in the message body.
-	 * @param context TODO
+	 * @param context 
 	 * @param searchString
 	 * 
 	 * @return List of Shouts matching the query, empty list if no Shouts matched

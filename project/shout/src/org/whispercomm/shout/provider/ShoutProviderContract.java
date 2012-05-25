@@ -1,9 +1,6 @@
 package org.whispercomm.shout.provider;
 
-import java.util.List;
-
 import org.whispercomm.shout.Shout;
-import org.whispercomm.shout.Tag;
 import org.whispercomm.shout.User;
 
 import android.content.ContentUris;
@@ -129,32 +126,6 @@ public class ShoutProviderContract {
 		 * encoding of the key represented as a byte array.
 		 */
 		public static final String PUB_KEY = "Key";
-	}
-
-	public static class Tags implements BaseColumns {
-		/**
-		 * The SQLite table name for the Tags table. Not needed for managed
-		 * queries, and can be ignored in most cases.
-		 */
-		public static final String TABLE_NAME = "tag";
-
-		/**
-		 * The base content URI for the Tags table.
-		 */
-		public static final Uri CONTENT_URI = Uri.withAppendedPath(
-				CONTENT_URI_BASE, TABLE_NAME);
-
-		/**
-		 * Column name of the primary key. This represent the database ID of a
-		 * specific tag, which is used to assign a Tag to a Shout in the
-		 * database.
-		 */
-		public static final String _ID = BaseColumns._ID;
-
-		/**
-		 * Column name for the tag itself. Does not store the leading #.
-		 */
-		public static final String TAG = "Name";
 	}
 
 	/**
@@ -419,51 +390,6 @@ public class ShoutProviderContract {
 		DatabaseUser dbUser = new DatabaseUser(user, context);
 		int id = dbUser.saveInDatabase();
 		return id;
-	}
-
-	public static Tag retrieveTagById(Context context, int id) {
-		Uri uri = ContentUris.withAppendedId(Tags.CONTENT_URI, id);
-		Cursor cursor = context.getContentResolver().query(uri, null, null,
-				null, null);
-		if (cursor == null) {
-			Log.e(TAG, "Null cursor on Tag search");
-			return null;
-		} else if (cursor.moveToNext()) {
-			int nameIndex = cursor.getColumnIndex(Tags.TAG);
-			String name = cursor.getString(nameIndex);
-			Tag tag = new ProviderTag(name);
-			return tag;
-		} else {
-			return null;
-		}
-	}
-
-	public static List<Tag> retrieveTagsByShoutId(Context context, int id) {
-		// TODO Determine how Tags should be linked to Shouts
-		return null;
-	}
-
-	public static int storeTag(Context context, Tag tag) {
-		String name = tag.getName();
-		String[] projection = { Tags._ID };
-		String selection = Tags.TAG + " = ?";
-		String[] selectionArgs = { name };
-		Cursor cursor = context.getContentResolver().query(Tags.CONTENT_URI,
-				projection, selection, selectionArgs, null);
-		if (cursor == null) {
-			Log.e(TAG, "Null cursor on Tag lookup");
-			return -1;
-		} else if (cursor.moveToNext()) {
-			int id = cursor.getInt(0);
-			return id;
-		} else {
-			ContentValues values = new ContentValues();
-			values.put(Tags.TAG, name);
-			Uri at = context.getContentResolver().insert(Tags.CONTENT_URI,
-					values);
-			int id = Integer.valueOf(at.getLastPathSegment());
-			return id;
-		}
 	}
 
 	private ShoutProviderContract() {

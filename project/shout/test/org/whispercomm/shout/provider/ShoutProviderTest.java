@@ -41,10 +41,6 @@ public class ShoutProviderTest {
 	private Uri shoutLocation;
 	private int shoutId;
 
-	private static final String TAG_NAME = "epicfail";
-	private Uri tagLocation;
-	private int tagId;
-
 	private static final String USERNAME_DUPE = "David";
 	private static final String[] USERNAMES = {
 			USERNAME_DUPE, USERNAME_DUPE, "Yue is not " + USERNAME_DUPE, "Prof Dick"
@@ -53,10 +49,6 @@ public class ShoutProviderTest {
 
 	private static final String[] MESSAGES = {
 			"Herp", "Derp", "Narwal", "Bacon"
-	};
-
-	private static final String[] TAGS = {
-			"facebookIPO", "manes", "whisper", "vim>emacs"
 	};
 
 	@Before
@@ -74,11 +66,6 @@ public class ShoutProviderTest {
 		assertNotNull(shoutLocation);
 		shoutId = Integer.valueOf(shoutLocation.getLastPathSegment());
 		assertTrue(shoutId > 0);
-
-		tagLocation = ProviderTestUtility.insertIntoTagTable(cr, TAG_NAME);
-		assertNotNull(tagLocation);
-		tagId = Integer.valueOf(tagLocation.getLastPathSegment());
-		assertTrue(tagId > 0);
 	}
 
 	@After
@@ -143,24 +130,6 @@ public class ShoutProviderTest {
 	}
 
 	@Test
-	public void testTagInsert() {
-		Cursor cursor = cr.query(tagLocation, null, null, null, null);
-		assertNotNull(cursor);
-		assertTrue(cursor.moveToNext());
-		int idIndex = cursor.getColumnIndex(ShoutProviderContract.Tags._ID);
-		int tagIndex = cursor.getColumnIndex(ShoutProviderContract.Tags.TAG);
-
-		int newId = cursor.getInt(idIndex);
-		assertEquals(tagId, newId);
-
-		String tagName = cursor.getString(tagIndex);
-		assertNotNull(tagName);
-		assertEquals(TAG_NAME, tagName);
-
-		assertFalse(cursor.moveToNext());
-	}
-
-	@Test
 	public void testSelectManyUser() {
 		ProviderTestUtility.insertFourUsers(cr, USERNAMES);
 		String[] projection = {
@@ -185,43 +154,6 @@ public class ShoutProviderTest {
 			assertEquals(name, USERNAME_DUPE);
 			lastId = id;
 		}
-	}
-
-	@Test
-	public void testSelectTagsWithParameters() {
-		ProviderTestUtility.insertMultipleTags(cr, TAGS);
-		String[] projection = {
-				ShoutProviderContract.Tags.TAG
-		};
-		String selection = ShoutProviderContract.Tags.TAG + " = ?";
-		String[] selectionArgs = {
-				TAGS[2]
-		};
-		Cursor cursor = cr.query(ShoutProviderContract.Tags.CONTENT_URI, projection, selection,
-				selectionArgs, null);
-		assertNotNull(cursor);
-		assertTrue(cursor.getColumnCount() == projection.length);
-		assertTrue(cursor.moveToNext());
-		int nameIndex = cursor.getColumnIndex(ShoutProviderContract.Tags.TAG);
-
-		String name = cursor.getString(nameIndex);
-		assertNotNull(name);
-		assertEquals(TAGS[2], name);
-
-		assertFalse(cursor.moveToNext());
-	}
-
-	@Test
-	public void testCannotInsertDuplicateTag() {
-		String[] dupeTags = {
-				"dupe", "dupe"
-		};
-		try {
-			ProviderTestUtility.insertMultipleTags(cr, dupeTags);
-		} catch (SQLException e) {
-			return;
-		}
-		fail("Did not throw SQLException on duplicate tag entry");
 	}
 
 	@Test
