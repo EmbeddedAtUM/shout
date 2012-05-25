@@ -32,10 +32,13 @@ public class ShoutProvider extends ContentProvider {
 	private static final int SHOUTS = 1;
 	private static final int USERS = 2;
 	private static final int TAGS = 3;
+	private static final int MESSAGES = 4;
 	private static final int SHOUT_ID = 10;
 	private static final int USER_ID = 20;
 	private static final int TAG_ID = 30;
+	private static final int MESSAGE_ID = 40;
 	private static final int SHOUTS_USER_ID = 120;
+	private static final int MESSAGES_SHOUT_ID = 410;
 
 	static {
 		sUriMatcher.addURI(AUTHORITY, "shout", SHOUTS);
@@ -45,6 +48,10 @@ public class ShoutProvider extends ContentProvider {
 		sUriMatcher.addURI(AUTHORITY, "shout/user/#", SHOUTS_USER_ID);
 		sUriMatcher.addURI(AUTHORITY, "tag", TAGS);
 		sUriMatcher.addURI(AUTHORITY, "tag/#", TAG_ID);
+		
+		sUriMatcher.addURI(AUTHORITY, "message", MESSAGES);
+		sUriMatcher.addURI(AUTHORITY, "message/#", MESSAGE_ID);
+		sUriMatcher.addURI(AUTHORITY, "message/shout/#", MESSAGES_SHOUT_ID);
 	}
 
 	private ShoutDatabaseHelper mOpenHelper;
@@ -139,6 +146,8 @@ public class ShoutProvider extends ContentProvider {
 			case TAGS:
 				table = ShoutProviderContract.Tags.TABLE_NAME;
 				break;
+			case MESSAGES:
+				table = ShoutSearchContract.Messages.TABLE_NAME;
 			default:
 				throw new IllegalArgumentException("Unknown or invalid URI " + uri);
 		}
@@ -194,6 +203,17 @@ public class ShoutProvider extends ContentProvider {
 				qBuilder.setTables(ShoutProviderContract.Tags.TABLE_NAME);
 				qBuilder.appendWhere(ShoutProviderContract.Tags._ID + "="
 						+ uri.getLastPathSegment());
+				break;
+			case MESSAGES:
+				qBuilder.setTables(ShoutSearchContract.Messages.TABLE_NAME);
+				break;
+			case MESSAGE_ID:
+				qBuilder.setTables(ShoutSearchContract.Messages.TABLE_NAME);
+				qBuilder.appendWhere(ShoutSearchContract.Messages._ID + "=" + uri.getLastPathSegment());
+				break;
+			case MESSAGES_SHOUT_ID:
+				qBuilder.setTables(ShoutSearchContract.Messages.TABLE_NAME);
+				qBuilder.appendWhere(ShoutSearchContract.Messages.SHOUT + " MATCH " + uri.getLastPathSegment());
 				break;
 			default:
 				throw new IllegalArgumentException("Unknown or invalid URI " + uri);
@@ -303,10 +323,10 @@ public class ShoutProvider extends ContentProvider {
 				");";
 
 		private static final String SQL_CREATE_VIRTUAL_MESSAGE = "CREATE VIRTUAL TABLE " + 
-				ShoutSearchContract.Message.TABLE_NAME + 
+				ShoutSearchContract.Messages.TABLE_NAME + 
 				" USING fts3(" + 
-				ShoutSearchContract.Message.SHOUT + ", " +
-				ShoutSearchContract.Message.MESSAGE + ");";
+				ShoutSearchContract.Messages.SHOUT + ", " +
+				ShoutSearchContract.Messages.MESSAGE + ");";
 		
 		private static final String SQL_CREATE_TAG = "CREATE TABLE " +
 				ShoutProviderContract.Tags.TABLE_NAME +

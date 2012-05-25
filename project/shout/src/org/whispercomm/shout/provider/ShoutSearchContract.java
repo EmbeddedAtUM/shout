@@ -6,14 +6,17 @@ import java.util.List;
 import org.whispercomm.shout.Shout;
 
 import android.net.Uri;
+import android.provider.BaseColumns;
 
 public class ShoutSearchContract {
 
-	public static class Message {
+	public static class Messages implements BaseColumns {
 		public static final String TABLE_NAME = "messages";
 		
 		public static final Uri CONTENT_URI = Uri.withAppendedPath(
 				ShoutProviderContract.CONTENT_URI_BASE, TABLE_NAME);
+		
+		public static final String _ID = "rowid";
 		
 		public static final String SHOUT = "Shout";
 		public static final String MESSAGE = "Content";
