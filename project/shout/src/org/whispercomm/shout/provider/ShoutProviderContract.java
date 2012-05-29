@@ -274,8 +274,11 @@ public class ShoutProviderContract {
 				this.id = ContractHelper.queryForShout(context, this);
 				if (this.id < 0) {
 					this.id = ContractHelper.storeInDatabase(context, this);
-					ShoutMessage text = new ShoutMessage(this.id, this.message);
-					text.saveInDatabase();
+					if (this.message != null) {
+						ShoutMessage text = new ShoutMessage(this.id,
+								this.message);
+						text.saveInDatabase();
+					}
 				}
 			}
 			return this.id;
@@ -285,18 +288,18 @@ public class ShoutProviderContract {
 			return new ProviderShout(this.author, this.parent, this.message,
 					this.time, this.hash, this.signature, this.context);
 		}
-		
+
 		private class ShoutMessage implements DatabaseObject {
 
 			private int rowId = -1;
 			private int shoutId;
 			private String message;
-			
+
 			public ShoutMessage(int shoutId, String message) {
 				this.shoutId = shoutId;
 				this.message = message;
 			}
-			
+
 			@Override
 			public ContentValues makeContentValues() {
 				ContentValues values = new ContentValues();
@@ -317,7 +320,7 @@ public class ShoutProviderContract {
 				}
 				return this.rowId;
 			}
-			
+
 		}
 	}
 
