@@ -394,6 +394,12 @@ public class ShoutProviderContract {
 		int id = dbUser.saveInDatabase();
 		return id;
 	}
+	
+	public static Cursor getCursorOverAllShouts(Context context) {
+		String[] projection = { Shouts._ID };
+		Cursor result = context.getContentResolver().query(Shouts.CONTENT_URI, projection, null, null, null);
+		return result;
+	}
 
 	private ShoutProviderContract() {
 		// Don't allow this class to be instantiated
