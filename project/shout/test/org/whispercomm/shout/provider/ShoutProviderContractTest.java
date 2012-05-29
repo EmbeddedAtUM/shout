@@ -1,13 +1,9 @@
 
 package org.whispercomm.shout.provider;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
-import java.security.interfaces.ECPublicKey;
 
 import org.joda.time.DateTime;
 import org.junit.After;
@@ -20,11 +16,10 @@ import org.whispercomm.shout.test.ShoutTestRunner;
 import org.whispercomm.shout.test.util.TestFactory;
 import org.whispercomm.shout.test.util.TestShout;
 import org.whispercomm.shout.test.util.TestUser;
+import org.whispercomm.shout.test.util.TestUtility;
 
 import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.Context;
-import android.net.Uri;
 
 @RunWith(ShoutTestRunner.class)
 public class ShoutProviderContractTest {
@@ -35,127 +30,97 @@ public class ShoutProviderContractTest {
 	private static final byte[] SIGNATURE = TestFactory.genByteArray(10);
 	private static final byte[] HASH = TestFactory.genByteArray(16);
 
-	private static final int AUTHOR = 1;
-	private static final int PARENT = 1;
-
-	private Uri firstUserLocation;
-	private Uri firstShoutLocation;
-
 	private Context context;
-	private ContentResolver cr;
-
-	private ECPublicKey ecPubKey;
-	private byte[] keyBytes;
+	private User testUser;
+	private Shout testShout;
 
 	@Before
 	public void setUp() {
 		this.context = new Activity();
-		this.cr = this.context.getContentResolver();
-
-		this.ecPubKey = (ECPublicKey) TestFactory.genKeyPair().getPublic();
-		this.keyBytes = this.ecPubKey.getEncoded();
-
-		this.firstUserLocation = ProviderTestUtility.insertIntoUserTable(
-				cr, NAME, this.keyBytes);
-		assertEquals(AUTHOR,
-				Integer.valueOf(firstUserLocation.getLastPathSegment())
-						.intValue());
-		this.firstShoutLocation = ProviderTestUtility
-				.insertIntoShoutTable(cr, 1, -1, MESSAGE, TIME, SIGNATURE, HASH);
-		assertEquals(PARENT,
-				Integer.valueOf(firstShoutLocation.getLastPathSegment())
-						.intValue());
+		testUser = new TestUser(NAME);
+		testShout = new TestShout(testUser, null, MESSAGE, new DateTime(TIME), SIGNATURE, HASH);
 	}
 
 	@After
 	public void takeDown() {
-		this.cr = null;
+		this.context = null;
+		this.testUser = null;
+		this.testShout = null;
 	}
 
 	@Test
 	public void testRetrieveUser() {
-		User fromDb = ShoutProviderContract.retrieveUserById(context, AUTHOR);
+		int id = ShoutProviderContract.storeUser(context, testUser);
+		User fromDb = ShoutProviderContract.retrieveUserById(context, id);
 		assertNotNull(fromDb);
-		assertEquals(NAME, fromDb.getUsername());
-		assertEquals(this.ecPubKey, fromDb.getPublicKey());
-		assertArrayEquals(this.keyBytes, fromDb.getPublicKey().getEncoded());
+		assertTrue(TestUtility.testEqualUserFields(testUser, fromDb));
 	}
 
 	@Test
 	public void testRetrieveShout() {
-		Shout fromDb = ShoutProviderContract.retrieveShoutById(context, PARENT);
+		ShoutProviderContract.storeUser(context, testUser);
+		int shoutId = ShoutProviderContract.storeShout(context, testShout);
+		Shout fromDb = ShoutProviderContract.retrieveShoutById(context, shoutId);
 		assertNotNull(fromDb);
-		assertNotNull(fromDb.getSender());
-		assertEquals(MESSAGE, fromDb.getMessage());
-		assertEquals(TIME, fromDb.getTimestamp().getMillis());
-		assertArrayEquals(SIGNATURE, fromDb.getSignature());
-		assertArrayEquals(HASH, fromDb.getHash());
-		assertNull(fromDb.getParent());
+		assertTrue(TestUtility.testEqualShoutFields(testShout, fromDb));
+	}
+
+	@Test
+	public void testStoreShoutWithParent() {
+		User sender = new TestUser("drbeagle");
+		Shout withParent = new TestShout(sender, testShout,
+				"This is what happens when you Google people you work with", new DateTime(),
+				TestFactory.genByteArray(10), TestFactory.genByteArray(10));
+		int commentId = ShoutProviderContract.storeShout(context, withParent);
+		assertTrue(commentId > 0);
+		Shout fromDbWithParent = ShoutProviderContract.retrieveShoutById(context, commentId);
+		assertTrue(TestUtility.testEqualShoutFields(withParent, fromDbWithParent));
+		
+		Shout withGrandparent = new TestShout(testUser, withParent, null, new DateTime(),
+				TestFactory.genByteArray(4), TestFactory.genByteArray(8));
+		int commentReshoutId = ShoutProviderContract.storeShout(context, withGrandparent);
+		assertTrue(commentReshoutId > 0);
+		Shout fromDbWithGrandParent = ShoutProviderContract.retrieveShoutById(context, commentReshoutId);
+		assertTrue(TestUtility.testEqualShoutFields(withGrandparent, fromDbWithGrandParent));
 	}
 
 	@Test
 	public void testStoreUser() {
-		String username = "drbild"; // It's funny because it looks like Dr.
-		ECPublicKey ecKey = (ECPublicKey) TestFactory.genKeyPair().getPublic();
-		TestUser user = new TestUser(username, ecKey);
-		int id = ShoutProviderContract.storeUser(context, user);
+		int id = ShoutProviderContract.storeUser(context, testUser);
 		assertTrue(id > 0);
-		User testFromDb = ShoutProviderContract.retrieveUserById(context, id);
-		assertNotNull(testFromDb);
-		assertEquals(username, testFromDb.getUsername());
-		assertArrayEquals(ecKey.getEncoded(), testFromDb.getPublicKey().getEncoded());
 	}
 
 	@Test
 	public void testStoreShout() {
-		User author = ShoutProviderContract.retrieveUserById(context, AUTHOR);
-		assertNotNull(author);
-		Shout parent = ShoutProviderContract.retrieveShoutById(context, PARENT);
-		assertNull(parent.getParent());
-		assertNotNull(parent);
-		TestShout shout = new TestShout(author, parent, "This shout has a parent", new DateTime(),
-				TestFactory.genByteArray(8), TestFactory.genByteArray(12));
-		int id = ShoutProviderContract.storeShout(context, shout);
-		assertTrue(id > 0);
-		Shout fromDb = ShoutProviderContract.retrieveShoutById(context, id);
-		assertEquals(shout.getMessage(), fromDb.getMessage());
-		assertEquals(shout.getTimestamp().getMillis(), fromDb.getTimestamp().getMillis());
-		assertArrayEquals(shout.getHash(), fromDb.getHash());
-		assertArrayEquals(shout.getSignature(), fromDb.getSignature());
-		assertNotNull(fromDb.getParent());
-		assertArrayEquals(parent.getHash(), fromDb.getParent().getHash());
-		assertArrayEquals(parent.getSignature(), fromDb.getParent().getSignature());
-		assertNull(fromDb.getParent().getParent());
+		int userId = ShoutProviderContract.storeUser(context, testUser);
+		assertTrue(userId > 0);
+		int shoutId = ShoutProviderContract.storeShout(context, testShout);
+		assertTrue(shoutId > 0);
 	}
 
 	@Test
 	public void testStoreShoutWithoutUserInDatabase() {
-		User user = new TestUser("theZuck");
-		byte[] sig = TestFactory.genByteArray(7);
-		byte[] hash = TestFactory.genByteArray(19);
-		Shout testShout = new TestShout(user, null, "someMessage", new DateTime(), sig, hash);
 		int id = ShoutProviderContract.storeShout(context, testShout);
 		assertTrue(id > 0);
 		Shout fromDb = ShoutProviderContract.retrieveShoutById(context, id);
-		assertNotNull(fromDb);
-		assertNotNull(fromDb.getSender());
-		assertEquals(user.getPublicKey(), fromDb.getSender().getPublicKey());
+		assertTrue(TestUtility.testEqualShoutFields(testShout, fromDb));
 	}
 
 	@Test
 	public void testStoreUserAlreadyInDatabase() {
-		User fromDb = ShoutProviderContract.retrieveUserById(context, AUTHOR);
+		int id = ShoutProviderContract.storeUser(context, testUser);
+		User fromDb = ShoutProviderContract.retrieveUserById(context, id);
 		assertNotNull(fromDb);
-		int id = ShoutProviderContract.storeUser(context, fromDb);
-		assertTrue(id == AUTHOR);
+		int newId = ShoutProviderContract.storeUser(context, fromDb);
+		assertEquals(id, newId);
 	}
 
 	@Test
 	public void testStoreShoutAlreadyInDatabase() {
-		Shout fromDb = ShoutProviderContract.retrieveShoutById(context, PARENT);
+		int id = ShoutProviderContract.storeShout(context, testShout);
+		Shout fromDb = ShoutProviderContract.retrieveShoutById(context, id);
 		assertNotNull(fromDb);
-		int id = ShoutProviderContract.storeShout(context, fromDb);
-		assertTrue(id > 0);
-		assertTrue(id == PARENT);
+		int newId = ShoutProviderContract.storeShout(context, fromDb);
+		assertEquals(id, newId);
 	}
 }
