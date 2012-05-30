@@ -113,6 +113,7 @@ class IdStorageSharedPrefs implements IdStorage {
 		// TODO for now just replace the old user name
 		Editor editor = sharedPrefs.edit();
 		editor.putString(USER_NAME, userName);
+		editor.commit();
 	}
 
 	/**

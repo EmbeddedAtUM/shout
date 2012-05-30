@@ -1,8 +1,10 @@
 package org.whispercomm.shout;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
 
 import org.joda.time.DateTime;
+import org.whispercomm.shout.id.SignatureUtility;
 
 import android.app.ListActivity;
 import android.content.Context;
@@ -29,14 +31,32 @@ public class ShoutActivity extends ListActivity {
         super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		ArrayList<TestShout> shouts = new ArrayList<TestShout>();
+		SignatureUtility sigU = new SignatureUtility(this);
+		try {
+			sigU.updateUserName("Tony");
+		} catch (Exception e) {
+			//TODO: auto-generated catch
+			Log.v(TAG, "Error setting up Signature Utility");
+		}
+		
+		ArrayList<Shout> shouts = new ArrayList<Shout>();
+		
+		byte[] arr = new byte[10];
+		SecureRandom rand = new SecureRandom();
+		SimpleShout s = null;
+		
 		for (int i = 0; i < 15; i++) {
-			shouts.add(new TestShout("gsingh2011", "gsingh2011", "Item " + i,
-					DateTime.now()));
+			rand.nextBytes(arr);
+			try {
+				s = new SimpleShout(DateTime.now(), sigU.getUser(), "Hello Shout", null, arr);
+			} catch (Exception e) {
+				//TODO: auto-generated catch
+				Log.v(TAG, "Error creating SimpleShout #" + i);
+			}
+			shouts.add(s);
 		}
 
-		TimelineAdapter adapter = new TimelineAdapter(
-				this.getApplicationContext(), shouts);
+		TimelineAdapter adapter = new TimelineAdapter(this.getApplicationContext(), shouts);
 		setListAdapter(adapter);
 
 		Log.v(TAG, "Finished onCreate");
@@ -50,11 +70,11 @@ public class ShoutActivity extends ListActivity {
 		TextView age;
 	}
 
-	private class TimelineAdapter extends ArrayAdapter<TestShout> {
+	private class TimelineAdapter extends ArrayAdapter<Shout> {
 
-		ArrayList<TestShout> items;
+		ArrayList<Shout> items;
 
-		public TimelineAdapter(Context context, ArrayList<TestShout> shouts) {
+		public TimelineAdapter(Context context, ArrayList<Shout> shouts) {
 			super(context, R.layout.row, R.id.message, shouts);
 			this.items = shouts;
 		}
@@ -63,7 +83,7 @@ public class ShoutActivity extends ListActivity {
 		public View getView(int position, View convertView, ViewGroup parent) {
 
 			// Get current shout
-			TestShout shout = items.get(position);
+			Shout shout = items.get(position);
 			Log.v(TAG, "Shout: " + shout);
 
 			View rowView = convertView;
@@ -74,14 +94,10 @@ public class ShoutActivity extends ListActivity {
 				rowView = inflater.inflate(R.layout.row, parent, false);
 
 				ViewHolder viewHolder = new ViewHolder();
-				viewHolder.avatar = (ImageView) rowView
-						.findViewById(R.id.avatar);
-				viewHolder.origSender = (TextView) rowView
-						.findViewById(R.id.origsender);
-				viewHolder.sender = (TextView) rowView
-						.findViewById(R.id.sender);
-				viewHolder.message = (TextView) rowView
-						.findViewById(R.id.message);
+				viewHolder.avatar = (ImageView) rowView.findViewById(R.id.avatar);
+				viewHolder.origSender = (TextView) rowView.findViewById(R.id.origsender);
+				viewHolder.sender = (TextView) rowView.findViewById(R.id.sender);
+				viewHolder.message = (TextView) rowView.findViewById(R.id.message);
 				viewHolder.age = (TextView) rowView.findViewById(R.id.age);
 
 				rowView.setTag(viewHolder);
@@ -92,24 +108,27 @@ public class ShoutActivity extends ListActivity {
 			// Gets the view information
 			ViewHolder holder = (ViewHolder) rowView.getTag();
 
-			String ageText = shout.getAgeMessage();
-
-			Log.v(TAG, ageText);
+			DateTime ageText = shout.getTimestamp();
+			
 			holder.avatar.setImageResource(R.drawable.defaultavatar);
-			holder.origSender.setText(shout.getOrigSender());
-			holder.sender.setText(shout.getSender());
-			holder.age.setText(ageText);
-			holder.message.setText(shout.getContent());
+			holder.origSender.setText(shout.getSender().getUsername());
+			holder.sender.setText(shout.getSender().getUsername());
+			holder.age.setText(DateTimeConvert.dtToString(ageText));
+			holder.message.setText(shout.getMessage());
 			Log.v(TAG, "Textview text set");
 
 			// TODO: Color will always alternate, but white should never be the
 			// first color (bug was seen when starting this Activity from
 			// another)
+			// TODO: Shout doesn't have a .id member so alternating colors doesn't work
+			/*
 			if (shout.id % 2 == 0)
-				rowView.setBackgroundColor(0xFFE2F7FF);
+				rowView.setBackgroundColor(0xFFD2F7FF);
 			else
 				rowView.setBackgroundColor(0xFFFFFFFF);
-
+			*/
+			rowView.setBackgroundColor(0xFFFFFFFF);
+			
 			return rowView;
 		}
 	}
