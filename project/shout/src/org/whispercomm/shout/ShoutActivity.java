@@ -1,14 +1,15 @@
 package org.whispercomm.shout;
 
 import java.security.SecureRandom;
-import java.util.ArrayList;
 
 import org.joda.time.DateTime;
 import org.whispercomm.shout.id.SignatureUtility;
+import org.whispercomm.shout.provider.ShoutProviderContract;
 
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,122 +18,107 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 public class ShoutActivity extends ListActivity {
-	
+
 	private static final String TAG = "ShoutActivity";
-	
-    /** Called when the activity is first created. */
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+
+	/** Called when the activity is first created. */
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		SignatureUtility sigU = new SignatureUtility(this);
-		try {
-			sigU.updateUserName("Tony");
-		} catch (Exception e) {
-			//TODO: auto-generated catch
-			Log.v(TAG, "Error setting up Signature Utility");
-		}
-		
-		ArrayList<Shout> shouts = new ArrayList<Shout>();
-		
-		byte[] arr = new byte[10];
-		SecureRandom rand = new SecureRandom();
-		SimpleShout s = null;
-		
-		for (int i = 0; i < 15; i++) {
-			rand.nextBytes(arr);
-			try {
-				s = new SimpleShout(DateTime.now(), sigU.getUser(), "Hello Shout", null, arr);
-			} catch (Exception e) {
-				//TODO: auto-generated catch
-				Log.v(TAG, "Error creating SimpleShout #" + i);
-			}
-			shouts.add(s);
-		}
-
-		TimelineAdapter adapter = new TimelineAdapter(this.getApplicationContext(), shouts);
-		setListAdapter(adapter);
-
 		Log.v(TAG, "Finished onCreate");
-    }
-    
+
+		SignatureUtility sigUtility = new SignatureUtility(this);
+		try {
+			sigUtility.updateUserName("duiu");
+			byte[] arr = new byte[16];
+			SecureRandom rand = new SecureRandom();
+			for (int i = 0; i < 15; i++) {
+				rand.nextBytes(arr);
+				Shout s = new SimpleShout(DateTime.now(), sigUtility.getUser(),
+						"Hello Shout " + i, null, arr);
+				ShoutProviderContract.storeShout(getApplicationContext(), s);
+			}
+			TimelineAdapter adapter = new TimelineAdapter(
+					getApplicationContext(),
+					ShoutProviderContract
+							.getCursorOverAllShouts(getApplicationContext()));
+			setListAdapter(adapter);
+		} catch (Exception e) {
+			return;
+			// TODO
+		}
+	}
+
 	static class ViewHolder {
 		ImageView avatar;
 		TextView origSender;
 		TextView sender;
 		TextView message;
 		TextView age;
+		
 	}
 
-	private class TimelineAdapter extends ArrayAdapter<Shout> {
+	private class TimelineAdapter extends CursorAdapter {
 
-		ArrayList<Shout> items;
+		private int count;
 
-		public TimelineAdapter(Context context, ArrayList<Shout> shouts) {
-			super(context, R.layout.row, R.id.message, shouts);
-			this.items = shouts;
+		public TimelineAdapter(Context context, Cursor c) {
+			super(context, c);
+			count = 0;
 		}
 
 		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-
-			// Get current shout
-			Shout shout = items.get(position);
-			Log.v(TAG, "Shout: " + shout);
-
-			View rowView = convertView;
-			Log.v(TAG, "Entered getView");
-			// Inflate the view
-			if (rowView == null) {
-				LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-				rowView = inflater.inflate(R.layout.row, parent, false);
-
-				ViewHolder viewHolder = new ViewHolder();
-				viewHolder.avatar = (ImageView) rowView.findViewById(R.id.avatar);
-				viewHolder.origSender = (TextView) rowView.findViewById(R.id.origsender);
-				viewHolder.sender = (TextView) rowView.findViewById(R.id.sender);
-				viewHolder.message = (TextView) rowView.findViewById(R.id.message);
-				viewHolder.age = (TextView) rowView.findViewById(R.id.age);
-
-				rowView.setTag(viewHolder);
-
-				Log.v(TAG, "View inflated");
-			}
-
-			// Gets the view information
-			ViewHolder holder = (ViewHolder) rowView.getTag();
-
-			DateTime ageText = shout.getTimestamp();
+		public void bindView(View view, Context context, Cursor cursor) {
+			ViewHolder holder = (ViewHolder) view.getTag();
+			int idIndex = cursor.getColumnIndex(ShoutProviderContract.Shouts._ID);
+			int id = cursor.getInt(idIndex);
+			Shout shout = ShoutProviderContract.retrieveShoutById(context, id);
 			
 			holder.avatar.setImageResource(R.drawable.defaultavatar);
 			holder.origSender.setText(shout.getSender().getUsername());
 			holder.sender.setText(shout.getSender().getUsername());
-			holder.age.setText(DateTimeConvert.dtToString(ageText));
+			holder.age
+					.setText(DateTimeConvert.dtToString(shout.getTimestamp()));
 			holder.message.setText(shout.getMessage());
-			Log.v(TAG, "Textview text set");
+			Log.v(TAG, "View " + id + " set");
+			return;
+		}
 
-			// TODO: Color will always alternate, but white should never be the
-			// first color (bug was seen when starting this Activity from
-			// another)
-			// TODO: Shout doesn't have a .id member so alternating colors doesn't work
-			/*
-			if (shout.id % 2 == 0)
-				rowView.setBackgroundColor(0xFFD2F7FF);
-			else
-				rowView.setBackgroundColor(0xFFFFFFFF);
-			*/
-			rowView.setBackgroundColor(0xFFFFFFFF);
+		@Override
+		public View newView(Context context, Cursor cursor, ViewGroup parent) {
+			LayoutInflater inflater = LayoutInflater.from(context);
+			View rowView = inflater.inflate(R.layout.row, parent, false);
+
+			ViewHolder holder = new ViewHolder();
+			holder.avatar = (ImageView) rowView.findViewById(R.id.avatar);
+			holder.origSender = (TextView) rowView
+					.findViewById(R.id.origsender);
+			holder.sender = (TextView) rowView.findViewById(R.id.sender);
+			holder.message = (TextView) rowView.findViewById(R.id.message);
+			holder.age = (TextView) rowView.findViewById(R.id.age);
 			
+			if (count % 2 == 0) {
+				rowView.setBackgroundColor(0xFFD2F7FF);
+			} else {
+				rowView.setBackgroundColor(0XFFFFFFFF);
+			}
+			count++;
+
+
+			rowView.setTag(holder);
+			Log.v(TAG, "View inflated");
 			return rowView;
 		}
+
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
