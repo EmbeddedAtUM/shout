@@ -16,7 +16,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
-import android.os.RemoteException;
 import android.util.Log;
 
 public class NetworkUtility extends Service {
@@ -33,16 +32,16 @@ public class NetworkUtility extends Service {
 	@Override
 	public final void onCreate() {
 		this.appMessenger = new Messenger(new AppShoutHandler());
-		try {
-			this.manesIf = new ManesInterface(APP_ID, this);
-		} catch (RemoteException e) {
-			// TODO what to do if cannot connect to ManesInterface?
-			Log.e(TAG, e.getMessage());
-			stopSelf();
-		}
-		this.isRunning = true;
-		// start receiver thread
-		new Thread(new NetworkReceiver()).run();
+		this.manesIf = new ManesInterface(APP_ID, this);
+		Thread register = new Thread() {
+			@Override
+			public void run() {
+				manesIf.initialize(APP_ID);
+				// start receiver thread
+				new Thread(new NetworkReceiver()).start();
+			}
+		};
+		register.start();
 		// initialize the network protocol
 		networkProtocol = (NetworkProtocol) new NaiveBroadcast(manesIf);
 	}
@@ -59,7 +58,7 @@ public class NetworkUtility extends Service {
 	@Override
 	public final void onDestroy() {
 		isRunning = false;
-		manesIf.unregister();
+		manesIf.disconnect();
 		// Any other clear-up specific to the particular subclass
 		networkProtocol.clearUp();
 	}

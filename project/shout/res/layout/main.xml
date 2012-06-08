@@ -2,47 +2,54 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical">
-    
-    <!-- Title Bar -->
-   	<RelativeLayout style="@style/TitleBar" >
+    android:orientation="vertical" >
 
-	<ImageView style="@style/TitleBarLogo"
-	     android:contentDescription="@string/logoDesc" />
-    
-    <ImageButton style="@style/TitleBarButton"
-        android:id="@+id/settingsButton"
-        android:layout_alignParentRight="true"
-        android:src="@drawable/gear"
-        android:onClick="onClickSettings"
-        android:contentDescription="@string/settingsDesc" />
-    
-    <ImageButton style="@style/TitleBarButton"
-        android:id="@+id/composeButton"
-        android:layout_toLeftOf="@id/settingsButton"
-        android:src="@drawable/chat"
-        android:onClick="onClickShout"
-        android:contentDescription="@string/shoutDesc"/>
-    
-	</RelativeLayout>
-	
-   	<!-- Title of page -->
-   	<TextView style="@style/PageTitle"
-   	    android:text="All Shouts" />
-        
+    <!-- Title Bar -->
+
+    <RelativeLayout style="@style/TitleBar" >
+
+        <ImageView
+            style="@style/TitleBarLogo"
+            android:contentDescription="@string/logoDesc" />
+
+        <ImageButton
+            android:id="@+id/settingsButton"
+            style="@style/TitleBarButton"
+            android:layout_alignParentRight="true"
+            android:contentDescription="@string/settingsDesc"
+            android:onClick="onClickSettings"
+            android:src="@drawable/gear" />
+
+        <ImageButton
+            android:id="@+id/composeButton"
+            style="@style/TitleBarButton"
+            android:layout_toLeftOf="@id/settingsButton"
+            android:contentDescription="@string/shoutDesc"
+            android:onClick="onClickShout"
+            android:src="@drawable/chat" />
+    </RelativeLayout>
+
+    <!-- Title of page -->
+
+    <TextView
+        style="@style/PageTitle"
+        android:text="All Shouts" />
+
     <!-- ListView displaying the shouts -->
-	<ListView
-	    android:id="@android:id/list"
-	    android:layout_width="fill_parent"
-	    android:layout_height="fill_parent"
-	    android:background="@android:color/white"
-	    android:divider="#000000" />
-	
-	<!-- TextView displayed if the ListView is empty -->
-	<TextView 
-	    android:id="@android:id/empty"
-	    android:layout_width="fill_parent"
-	    android:layout_height="fill_parent"
-	    android:text="@string/no_shouts" />        
+
+    <ListView
+        android:id="@android:id/list"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@android:color/white"
+        android:divider="#000000" />
+
+    <!-- TextView displayed if the ListView is empty -->
+
+    <TextView
+        android:id="@android:id/empty"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:text="@string/no_shouts" />
 
 </LinearLayout>

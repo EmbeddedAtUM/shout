@@ -75,12 +75,13 @@ public class ShoutProviderContractTest {
 		assertTrue(commentId > 0);
 		Shout fromDbWithParent = ShoutProviderContract.retrieveShoutById(context, commentId);
 		assertTrue(TestUtility.testEqualShoutFields(withParent, fromDbWithParent));
-		
+
 		Shout withGrandparent = new TestShout(testUser, withParent, null, new DateTime(),
 				TestFactory.genByteArray(4), TestFactory.genByteArray(8));
 		int commentReshoutId = ShoutProviderContract.storeShout(context, withGrandparent);
 		assertTrue(commentReshoutId > 0);
-		Shout fromDbWithGrandParent = ShoutProviderContract.retrieveShoutById(context, commentReshoutId);
+		Shout fromDbWithGrandParent = ShoutProviderContract.retrieveShoutById(context,
+				commentReshoutId);
 		assertTrue(TestUtility.testEqualShoutFields(withGrandparent, fromDbWithGrandParent));
 	}
 
