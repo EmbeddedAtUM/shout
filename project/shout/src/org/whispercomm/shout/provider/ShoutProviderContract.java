@@ -394,10 +394,11 @@ public class ShoutProviderContract {
 		int id = dbUser.saveInDatabase();
 		return id;
 	}
-	
+
 	public static Cursor getCursorOverAllShouts(Context context) {
 		String[] projection = { Shouts._ID };
-		Cursor result = context.getContentResolver().query(Shouts.CONTENT_URI, projection, null, null, null);
+		Cursor result = context.getContentResolver().query(Shouts.CONTENT_URI,
+				projection, null, null, null);
 		return result;
 	}
 
@@ -452,6 +453,7 @@ public class ShoutProviderContract {
 				cursor.close();
 				return id;
 			} else {
+				cursor.close();
 				return -1;
 			}
 		}
@@ -472,13 +474,14 @@ public class ShoutProviderContract {
 				Log.e(TAG, "Null cursor returned on URI " + uri);
 				return null;
 			} else if (cursor.moveToNext()) {
-				int idIndex = cursor.getColumnIndex(Users._ID);
 				int nameIndex = cursor.getColumnIndex(Users.USERNAME);
 				int keyIndex = cursor.getColumnIndex(Users.PUB_KEY);
-				return new DatabaseUser(cursor.getInt(idIndex),
-						cursor.getString(nameIndex),
-						cursor.getString(keyIndex), context);
+				String name = cursor.getString(nameIndex);
+				String key = cursor.getString(keyIndex);
+				cursor.close();
+				return new DatabaseUser(id, name, key, context);
 			} else {
+				cursor.close();
 				return null;
 			}
 		}
@@ -505,8 +508,10 @@ public class ShoutProviderContract {
 			} else if (cursor.moveToNext()) {
 				int idIndex = cursor.getColumnIndex(Shouts._ID);
 				int id = cursor.getInt(idIndex); // Only one column
+				cursor.close();
 				return id;
 			} else {
+				cursor.close();
 				return -1;
 			}
 		}
@@ -549,6 +554,7 @@ public class ShoutProviderContract {
 				return new DatabaseShout(id, author, parent, message, time,
 						encodedSig, encodedHash, context);
 			} else {
+				cursor.close();
 				return null;
 			}
 		}
