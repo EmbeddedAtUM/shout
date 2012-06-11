@@ -42,9 +42,17 @@ public class SignatureUtility {
 		Security.addProvider(new BouncyCastleProvider());
 	}
 
-	IdStorage idStorage;
+	private static SignatureUtility instance = null;
+	private IdStorage idStorage;
 
-	public SignatureUtility(Context context) {
+	public static SignatureUtility getInstance(Context context) {
+		if (instance == null) {
+			instance = new SignatureUtility(context);
+		}
+		return instance;
+	}
+	
+	private SignatureUtility(Context context) {
 		this.idStorage = new IdStorageSharedPrefs(context);
 	}
 

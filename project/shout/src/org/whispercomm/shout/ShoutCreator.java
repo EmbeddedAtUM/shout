@@ -18,7 +18,7 @@ import android.util.Log;
 
 public class ShoutCreator {
 
-	static final String TAG = "******ShoutCreator******";
+	static final String TAG = ShoutCreator.class.getSimpleName();
 
 	Context context;
 	NetworkInterface networkIf;
@@ -40,13 +40,6 @@ public class ShoutCreator {
 	 * @param shoutOri
 	 * 
 	 * @return
-	 * 
-	 * @throws UserNotInitiatedException
-	 * @throws SignatureException
-	 * @throws InvalidKeySpecException
-	 * @throws NoSuchProviderException
-	 * @throws NoSuchAlgorithmException
-	 * @throws InvalidKeyException
 	 */
 	public boolean createShout(DateTime timestamp, String content,
 			Shout shoutOri) {
@@ -64,11 +57,10 @@ public class ShoutCreator {
 				signature);
 
 		// insert the shout to database and get its shout_id back
-		long shoutId = ShoutProviderContract.storeShout(context, shout);
+		int shoutId = ShoutProviderContract.storeShout(context, shout);
 
 		// call networkUtility to send the new shout out
 		networkIf.send(shoutId);
 		return true;
 	}
-
 }
