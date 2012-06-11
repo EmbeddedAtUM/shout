@@ -13,23 +13,22 @@ import org.whispercomm.shout.id.UserNotInitiatedException;
 import org.whispercomm.shout.network.NetworkInterface;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 
-import android.app.Activity;
+import android.content.Context;
 import android.util.Log;
 
 public class ShoutCreator {
 
 	static final String TAG = "******ShoutCreator******";
 
-	Activity callerActivity;
+	Context context;
 	NetworkInterface networkIf;
 	SignatureUtility signUtility;
 	User user;
 
-	public ShoutCreator(Activity callerActivity)
-			throws Exception {
-		this.callerActivity = callerActivity;
-		this.networkIf = new NetworkInterface(this.callerActivity);
-		this.signUtility = new SignatureUtility(this.callerActivity);
+	public ShoutCreator(Context context) {
+		this.context = context;
+		this.networkIf = new NetworkInterface(context);
+		this.signUtility = new SignatureUtility(context);
 		this.user = signUtility.getUser();
 	}
 
@@ -50,10 +49,7 @@ public class ShoutCreator {
 	 * @throws InvalidKeyException
 	 */
 	public boolean createShout(DateTime timestamp, String content,
-			Shout shoutOri) throws InvalidKeyException,
-			NoSuchAlgorithmException, NoSuchProviderException,
-			InvalidKeySpecException, SignatureException,
-			UserNotInitiatedException {
+			Shout shoutOri) {
 
 		// generate a new shout with its signature
 		byte[] signature;
@@ -61,9 +57,6 @@ public class ShoutCreator {
 			signature = signUtility.genShoutSignature(timestamp, user, content,
 					shoutOri);
 		} catch (UnsupportedEncodingException e) {
-			Log.e(TAG, e.getMessage());
-			return false;
-		} catch (Exception e) {
 			Log.e(TAG, e.getMessage());
 			return false;
 		}

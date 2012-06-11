@@ -1,7 +1,6 @@
 package org.whispercomm.shout.network;
 
 
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -25,13 +24,13 @@ public class NetworkInterface {
 
 	public static String TAG = "******NetworkInterface******";
 
-	Activity callerActivity;
+	Context context;
 	Messenger shoutService;
 	ServiceConnection connection;
 	Boolean isBinded;
 
-	public NetworkInterface(Activity activity) {
-		this.callerActivity = activity;
+	public NetworkInterface(Context context) {
+		this.context = context;
 		this.isBinded = false;
 		this.connection = new ServiceConnection() {
 
@@ -49,7 +48,7 @@ public class NetworkInterface {
 
 		};
 		// bind to ShoutService
-		callerActivity.bindService(new Intent(callerActivity, NetworkUtility.class),
+		context.bindService(new Intent(context, NetworkUtility.class),
 				connection, Context.BIND_AUTO_CREATE);
 	}
 
@@ -86,7 +85,7 @@ public class NetworkInterface {
 	 */
 	public void unBind() {
 		if (isBinded == true) {
-			callerActivity.unbindService(connection);
+			context.unbindService(connection);
 			isBinded = false;
 		}
 	}

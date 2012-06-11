@@ -17,13 +17,13 @@ interface IdStorage {
 
 	public void updateKeyPair(KeyPair keyPair);
 
-	public ECPublicKey getPublicKey() throws Exception;
+	public ECPublicKey getPublicKey();
 
-	public ECPrivateKey getPrivateKey() throws Exception;
+	public ECPrivateKey getPrivateKey();
 
 	public void updateUserName(String userName);
 
-	public User getUser() throws Exception;
+	public User getUser();
 	
 	public void clear();
 

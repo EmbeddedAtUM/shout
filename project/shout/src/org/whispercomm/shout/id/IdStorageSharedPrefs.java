@@ -13,7 +13,7 @@ import java.security.spec.X509EncodedKeySpec;
 import org.whispercomm.shout.SimpleUser;
 import org.whispercomm.shout.User;
 
-import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.util.Base64;
@@ -32,11 +32,13 @@ class IdStorageSharedPrefs implements IdStorage {
 	static final String USER_NAME = "user_name";
 	static final String USER_PUB_KEY = "user_pub_key";
 	static final String USER_PRIV_KEY = "user_priv_key";
+	private static final String TAG = IdStorageSharedPrefs.class
+			.getSimpleName();
 
 	SharedPreferences sharedPrefs;
 
-	public IdStorageSharedPrefs(Activity callerActivity) {
-		this.sharedPrefs = callerActivity.getSharedPreferences(SHARED_PREFS,
+	public IdStorageSharedPrefs(Context context) {
+		this.sharedPrefs = context.getSharedPreferences(SHARED_PREFS,
 				SHARED_PREFS_ACESS_MODE);
 	}
 
@@ -54,7 +56,6 @@ class IdStorageSharedPrefs implements IdStorage {
 		prefsEditor.putString(USER_PUB_KEY, pubStr);
 		prefsEditor.putString(USER_PRIV_KEY, privStr);
 		prefsEditor.commit();
-
 	}
 
 	/**
@@ -66,18 +67,27 @@ class IdStorageSharedPrefs implements IdStorage {
 	 * @throws UserNotInitiatedException
 	 */
 	@Override
-	public ECPublicKey getPublicKey() throws NoSuchAlgorithmException,
-			NoSuchProviderException, InvalidKeySpecException,
-			UserNotInitiatedException {
-		String pubKeyString = sharedPrefs.getString(USER_PUB_KEY, null);
-		if (pubKeyString == null) return null;
-		byte[] pubKeyBytes = Base64.decode(pubKeyString, Base64.DEFAULT);
+	public ECPublicKey getPublicKey() {
+		try {
+			String pubKeyString = sharedPrefs.getString(USER_PUB_KEY, null);
+			if (pubKeyString == null)
+				return null;
+			byte[] pubKeyBytes = Base64.decode(pubKeyString, Base64.DEFAULT);
 
-		KeyFactory kf = KeyFactory.getInstance("ECDSA", "SC");
-		X509EncodedKeySpec x509ks = new X509EncodedKeySpec(pubKeyBytes);
-		ECPublicKey pubKey = (ECPublicKey) kf.generatePublic(x509ks);
+			KeyFactory kf = KeyFactory.getInstance("ECDSA", "SC");
+			X509EncodedKeySpec x509ks = new X509EncodedKeySpec(pubKeyBytes);
+			ECPublicKey pubKey;
+			pubKey = (ECPublicKey) kf.generatePublic(x509ks);
+			return pubKey;
+		} catch (InvalidKeySpecException e) {
+			Log.e(TAG, e.getMessage());
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (NoSuchProviderException e) {
+			e.printStackTrace();
+		}
 
-		return pubKey;
+		return null;
 	}
 
 	/**
@@ -89,18 +99,26 @@ class IdStorageSharedPrefs implements IdStorage {
 	 * @throws UserNotInitiatedException
 	 */
 	@Override
-	public ECPrivateKey getPrivateKey() throws NoSuchAlgorithmException,
-			NoSuchProviderException, InvalidKeySpecException,
-			UserNotInitiatedException {
-		String privKeyString = sharedPrefs.getString(USER_PRIV_KEY, null);
-		if (privKeyString == null) return null;
-		byte[] privKeyBytes = Base64.decode(privKeyString, Base64.DEFAULT);
+	public ECPrivateKey getPrivateKey() {
+		try {
+			String privKeyString = sharedPrefs.getString(USER_PRIV_KEY, null);
+			if (privKeyString == null)
+				return null;
+			byte[] privKeyBytes = Base64.decode(privKeyString, Base64.DEFAULT);
 
-		KeyFactory kf = KeyFactory.getInstance("ECDSA", "SC");
-		PKCS8EncodedKeySpec p8ks = new PKCS8EncodedKeySpec(privKeyBytes);
-		ECPrivateKey privKey = (ECPrivateKey) kf.generatePrivate(p8ks);
+			KeyFactory kf = KeyFactory.getInstance("ECDSA", "SC");
+			PKCS8EncodedKeySpec p8ks = new PKCS8EncodedKeySpec(privKeyBytes);
+			ECPrivateKey privKey = (ECPrivateKey) kf.generatePrivate(p8ks);
 
-		return privKey;
+			return privKey;
+		} catch (NoSuchProviderException e) {
+			Log.e(TAG, e.getMessage());
+		} catch (InvalidKeySpecException e) {
+			Log.e(TAG, e.getMessage());
+		} catch (NoSuchAlgorithmException e) {
+			Log.e(TAG, e.getMessage());
+		}
+		return null;
 	}
 
 	/**
@@ -119,18 +137,11 @@ class IdStorageSharedPrefs implements IdStorage {
 	/**
 	 * @return information of current user in form of User object.
 	 * 
-	 * @throws InvalidKeySpecException
-	 * @throws NoSuchProviderException
-	 * @throws NoSuchAlgorithmException
-	 * @throws UserNotInitiatedException
 	 */
 	@Override
-	public User getUser() throws NoSuchAlgorithmException,
-			NoSuchProviderException, InvalidKeySpecException,
-			UserNotInitiatedException {
+	public User getUser() {
 		String userName = sharedPrefs.getString(USER_NAME, null);
 		if (userName == null) {
-			Log.e("davidedit", "null username");
 			return null;
 		}
 		ECPublicKey pubKey = getPublicKey();
@@ -143,5 +154,4 @@ class IdStorageSharedPrefs implements IdStorage {
 		sharedPrefs.edit().clear();
 		sharedPrefs.edit().commit();
 	}
-
 }
