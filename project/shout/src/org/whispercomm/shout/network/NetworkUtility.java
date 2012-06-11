@@ -1,12 +1,13 @@
 package org.whispercomm.shout.network;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import org.whispercomm.manes.client.maclib.ManesInterface;
 
@@ -20,7 +21,7 @@ import android.util.Log;
 
 public class NetworkUtility extends Service {
 
-	public static final String TAG = "******NetworkUtility******";
+	public static final String TAG = NetworkUtility.class.getSimpleName();
 	public static final int NEW_SHOUT = 1;
 	public static final int APP_ID = 74688;// "shout" on a phone keyboard
 
@@ -32,18 +33,28 @@ public class NetworkUtility extends Service {
 	@Override
 	public final void onCreate() {
 		this.appMessenger = new Messenger(new AppShoutHandler());
-		this.manesIf = new ManesInterface(APP_ID, this);
+		this.manesIf = new ManesInterface(APP_ID, getApplicationContext());
 		Thread register = new Thread() {
 			@Override
 			public void run() {
-				manesIf.initialize(APP_ID);
-				// start receiver thread
-				new Thread(new NetworkReceiver()).start();
+				Future<Boolean> initTask = manesIf.initialize();
+				try {
+					boolean status = initTask.get();
+					if (status) {
+						networkProtocol = new NaiveBroadcast(manesIf);
+						new Thread(new NetworkReceiver()).start();
+					} else {
+						// TODO
+					}
+				} catch (InterruptedException e) {
+					Log.e(TAG, e.getMessage());
+				} catch (ExecutionException e) {
+					Log.e(TAG, e.getMessage());
+				}
+
 			}
 		};
 		register.start();
-		// initialize the network protocol
-		networkProtocol = (NetworkProtocol) new NaiveBroadcast(manesIf);
 	}
 
 	/**
@@ -83,7 +94,7 @@ public class NetworkUtility extends Service {
 	 */
 	class NetworkReceiver implements Runnable {
 
-		public static final String TAG = "******NetworkReceiver******";
+		public static final String TAG = "NetworkReceiver";
 
 		/**
 		 * Period to return from ManesInterface.receive() and check for whether
@@ -95,20 +106,7 @@ public class NetworkUtility extends Service {
 		public void run() {
 			byte[] shoutBytes = null;
 			while (isRunning) {
-				try {
-					shoutBytes = manesIf.receive(CHECK_PERIOD);
-				} catch (IOException e) {
-					// TODO What if receive is not successful? For now sleep and
-					// try
-					// again????
-					Log.i(TAG, e.getMessage());
-					try {
-						Thread.sleep(CHECK_PERIOD);
-					} catch (InterruptedException e1) {
-						Log.e(TAG, e1.getMessage());
-					}
-					continue;
-				}
+				shoutBytes = manesIf.receive(CHECK_PERIOD);
 
 				if (shoutBytes == null)
 					continue;
@@ -136,7 +134,5 @@ public class NetworkUtility extends Service {
 				}
 			}
 		}
-
 	}
-
 }
