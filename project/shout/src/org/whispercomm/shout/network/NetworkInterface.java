@@ -21,15 +21,25 @@ import android.util.Log;
  * @author Yue Liu
  */
 public class NetworkInterface {
+	
+	private static NetworkInterface instance = null;
+	private Context context;
 
-	public static String TAG = "******NetworkInterface******";
+	public static String TAG = NetworkInterface.class.getSimpleName();
 
-	Context context;
-	Messenger shoutService;
-	ServiceConnection connection;
-	Boolean isBinded;
+	private Messenger shoutService;
+	private ServiceConnection connection;
+	private Boolean isBinded;
 
-	public NetworkInterface(Context context) {
+	public static NetworkInterface getInstance(Context context) {
+		// TODO Multi-context support with Map context->instance
+		if (instance == null) {
+			instance = new NetworkInterface(context);
+		}
+		return instance;
+	}
+	
+	private NetworkInterface(Context context) {
 		this.context = context;
 		this.isBinded = false;
 		this.connection = new ServiceConnection() {
