@@ -9,6 +9,7 @@ import org.whispercomm.manes.client.maclib.ManesFrameTooLargeException;
 import org.whispercomm.manes.client.maclib.ManesInterface;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 
+import android.content.Context;
 import android.util.Log;
 
 /**
@@ -34,10 +35,12 @@ public class NaiveBroadcast implements NetworkProtocol {
 	 */
 	Timer sendScheduler;
 	ManesInterface manesIf;
+	Context context;
 
-	public NaiveBroadcast(ManesInterface manesIf) {
+	public NaiveBroadcast(ManesInterface manesIf, Context context) {
 		this.manesIf = manesIf;
 		this.sendScheduler = new Timer();
+		this.context = context;
 	}
 
 	@Override
@@ -48,7 +51,7 @@ public class NaiveBroadcast implements NetworkProtocol {
 	@Override
 	public void handleOutgoingAppShout(int shoutId) {
 		// get the byte[] representation of the outgoing shout.
-		NetworkShout shout = new NetworkShout(shoutId);
+		NetworkShout shout = new NetworkShout(shoutId, context);
 		final byte[] shoutBytes;
 		try {
 			shoutBytes = shout.toNetworkBytes();
@@ -80,7 +83,7 @@ public class NaiveBroadcast implements NetworkProtocol {
 
 	@Override
 	public void handleIncomingNetworkShout(NetworkShout shout) {
-		ShoutProviderContract.storeShout(null, shout);
+		ShoutProviderContract.storeShout(context, shout);
 	}
 
 }

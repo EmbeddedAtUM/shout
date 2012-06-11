@@ -28,6 +28,7 @@ public class ProviderShout implements Shout {
 		this.sender = ShoutProviderContract.retrieveUserById(context, senderId);
 		if (parentId > 0) {
 			this.parent = ShoutProviderContract.retrieveShoutById(context, parentId);
+			// TODO Lazy load parent
 		} else {
 			this.parent = null;
 		}

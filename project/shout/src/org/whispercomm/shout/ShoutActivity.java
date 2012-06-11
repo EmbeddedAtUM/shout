@@ -1,9 +1,5 @@
 package org.whispercomm.shout;
 
-import java.security.SecureRandom;
-
-import org.joda.time.DateTime;
-import org.whispercomm.shout.id.SignatureUtility;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 
 import android.app.ListActivity;
@@ -34,26 +30,10 @@ public class ShoutActivity extends ListActivity {
 
 		Log.v(TAG, "Finished onCreate");
 
-		SignatureUtility sigUtility = new SignatureUtility(this);
-		try {
-			sigUtility.updateUserName("duiu");
-			byte[] arr = new byte[16];
-			SecureRandom rand = new SecureRandom();
-			for (int i = 0; i < 15; i++) {
-				rand.nextBytes(arr);
-				Shout s = new SimpleShout(DateTime.now(), sigUtility.getUser(),
-						"Hello Shout " + i, null, arr);
-				ShoutProviderContract.storeShout(getApplicationContext(), s);
-			}
-			TimelineAdapter adapter = new TimelineAdapter(
-					getApplicationContext(),
-					ShoutProviderContract
-							.getCursorOverAllShouts(getApplicationContext()));
-			setListAdapter(adapter);
-		} catch (Exception e) {
-			return;
-			// TODO
-		}
+		TimelineAdapter adapter = new TimelineAdapter(getApplicationContext(),
+				ShoutProviderContract
+						.getCursorOverAllShouts(getApplicationContext()));
+		setListAdapter(adapter);
 	}
 
 	static class ViewHolder {
@@ -62,7 +42,7 @@ public class ShoutActivity extends ListActivity {
 		TextView sender;
 		TextView message;
 		TextView age;
-		
+
 	}
 
 	private class TimelineAdapter extends CursorAdapter {
@@ -77,24 +57,25 @@ public class ShoutActivity extends ListActivity {
 		@Override
 		public void bindView(View view, Context context, Cursor cursor) {
 			ViewHolder holder = (ViewHolder) view.getTag();
-			int idIndex = cursor.getColumnIndex(ShoutProviderContract.Shouts._ID);
+			int idIndex = cursor
+					.getColumnIndex(ShoutProviderContract.Shouts._ID);
 			int id = cursor.getInt(idIndex);
 			Shout shout = ShoutProviderContract.retrieveShoutById(context, id);
-			
+
 			holder.avatar.setImageResource(R.drawable.defaultavatar);
 			holder.origSender.setText(shout.getSender().getUsername());
 			holder.sender.setText(shout.getSender().getUsername());
 			holder.age
 					.setText(DateTimeConvert.dtToString(shout.getTimestamp()));
 			holder.message.setText(shout.getMessage());
-			
+
 			if (count % 2 == 0) {
 				view.setBackgroundColor(0xFFD2F7FF);
 			} else {
 				view.setBackgroundColor(0XFFFFFFFF);
 			}
 			count++;
-			
+
 			Log.v(TAG, "View " + id + " set");
 			return;
 		}
@@ -111,7 +92,6 @@ public class ShoutActivity extends ListActivity {
 			holder.sender = (TextView) rowView.findViewById(R.id.sender);
 			holder.message = (TextView) rowView.findViewById(R.id.message);
 			holder.age = (TextView) rowView.findViewById(R.id.age);
-
 
 			rowView.setTag(holder);
 			Log.v(TAG, "View inflated");

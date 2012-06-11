@@ -41,7 +41,8 @@ public class NetworkUtility extends Service {
 				try {
 					boolean status = initTask.get();
 					if (status) {
-						networkProtocol = new NaiveBroadcast(manesIf);
+						networkProtocol = new NaiveBroadcast(manesIf,
+								getApplicationContext());
 						new Thread(new NetworkReceiver()).start();
 					} else {
 						// TODO

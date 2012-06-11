@@ -18,6 +18,8 @@ import org.whispercomm.shout.id.SignatureUtility;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.util.Arrays;
 
+import android.content.Context;
+
 /**
  * Shouts processed on the network, which can be constructed from and serialized
  * to byte array. This object can be also constructed given the shout_if in the
@@ -93,8 +95,8 @@ public class NetworkShout extends AbstractShout {
 	 * @param shout_id
 	 *            the _ID of the source shout in the database
 	 */
-	public NetworkShout(int shout_id) {
-		Shout shout = ShoutProviderContract.retrieveShoutById(null, shout_id);
+	public NetworkShout(int shout_id, Context context) {
+		Shout shout = ShoutProviderContract.retrieveShoutById(context, shout_id);
 		this.timestamp = shout.getTimestamp();
 		this.sender = shout.getSender();
 		this.signature = shout.getSignature();
