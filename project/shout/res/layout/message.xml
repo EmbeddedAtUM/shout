@@ -6,6 +6,7 @@
     android:background="@drawable/messageviewgradient" >
     
     <EditText 
+        android:id="@+id/compose"
         android:inputType="textMultiLine"
         android:layout_height="0dip"
         android:layout_width="fill_parent"

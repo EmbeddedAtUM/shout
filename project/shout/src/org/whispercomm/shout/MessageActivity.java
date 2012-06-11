@@ -1,10 +1,13 @@
 package org.whispercomm.shout;
 
+import org.joda.time.DateTime;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
 public class MessageActivity extends Activity {
@@ -27,7 +30,11 @@ public class MessageActivity extends Activity {
 
 	public void onClickSend(View v) {
 		Log.v(TAG, "Send button clicked");
-
+		EditText editor = (EditText) findViewById(R.id.compose);
+		String content = editor.getText().toString();
+		Log.v(TAG, "Shout text received as: " + content);
+		ShoutCreator creator = new ShoutCreator(getApplicationContext());
+		creator.createShout(DateTime.now(), content, null);
 		Intent intent = new Intent();
 		setResult(RESULT_OK, intent);
 		finish();
