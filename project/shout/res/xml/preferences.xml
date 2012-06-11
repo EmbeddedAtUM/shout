@@ -2,7 +2,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- defaultValue should be changed to default username, i.e. user123 -->
     <org.whispercomm.shout.customwidgets.MyPreferenceCategory
-        android:title="General Preferences" >
+        android:title="Identity Settings" >
             <org.whispercomm.shout.customwidgets.MyEditTextPreference
                 android:name="Username"
                 android:summary="This is the username which will be displayed by your Shouts"

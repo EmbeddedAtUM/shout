@@ -28,7 +28,7 @@ public class ShoutCreator {
 	public ShoutCreator(Context context) {
 		this.context = context;
 		this.networkIf = NetworkInterface.getInstance(context); 
-		this.signUtility = new SignatureUtility(context);
+		this.signUtility = SignatureUtility.getInstance(context);
 		this.user = signUtility.getUser();
 	}
 
