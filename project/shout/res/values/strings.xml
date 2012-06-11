@@ -12,4 +12,5 @@
     <string name="shout">Shout!</string>
     <string name="logoDesc">Logo</string>
     <string name="providerAuthority">org.whispercomm.shout.provider</string>
+    <string name="timelineTitle">All Shouts</string>
 </resources>

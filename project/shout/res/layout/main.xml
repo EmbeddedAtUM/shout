@@ -33,7 +33,7 @@
 
     <TextView
         style="@style/PageTitle"
-        android:text="All Shouts" />
+        android:text="@string/timelineTitle" />
 
     <!-- ListView displaying the shouts -->
 
