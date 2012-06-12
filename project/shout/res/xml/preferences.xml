@@ -3,42 +3,24 @@
 
     <!-- defaultValue should be changed to default username, i.e. user123 -->
     <org.whispercomm.shout.customwidgets.ShoutPreferenceCategory android:title="Identity Settings" >
-        <org.whispercomm.shout.customwidgets.ShoutEditTextPreference
-            android:name="Username"
-            android:defaultValue="Nothing"
+        <org.whispercomm.shout.customwidgets.ShoutUsernamePreference
+            android:name="Username Custom Preference"
+            android:defaultValue="duiu"
             android:key="usernamePref"
-            android:summary="This is the username which will be displayed by your Shouts"
-            android:title="Username" />
-        <org.whispercomm.shout.customwidgets.ShoutEditTextPreference
-            android:name="Username"
-            android:defaultValue="Nothing"
-            android:key="usernamePref"
-            android:summary="This is the username which will be displayed by your Shouts"
-            android:title="Username" />
-        <org.whispercomm.shout.customwidgets.ShoutEditTextPreference
-            android:name="Username"
-            android:defaultValue="Nothing"
-            android:key="usernamePref"
-            android:summary="This is the username which will be displayed by your Shouts"
-            android:title="Username" />
-        <org.whispercomm.shout.customwidgets.ShoutEditTextPreference
-            android:name="Username"
-            android:defaultValue="Nothing"
-            android:key="usernamePref"
-            android:summary="This is the username which will be displayed by your Shouts"
+            android:summary="Your username and associated unique keys are used to authenticate Shouts behind the scenes, so try to pick a good username the first time."
             android:title="Username" />
 
         <org.whispercomm.shout.customwidgets.ShoutCheckBoxPreference
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:key="rotatePref"
-            android:summary="If checked, the screen will automatically rotate when tilted"
+            android:summary="If checked, the screen will automatically rotate when tilted. Just kidding, this preference doesn&apos;t actually do anything besides light up."
             android:title="Auto Rotate" />
     </org.whispercomm.shout.customwidgets.ShoutPreferenceCategory>
 
     <PreferenceCategory android:title="Twitter Account" >
         <org.whispercomm.shout.customwidgets.TwitterPreference
             android:key="twitterLoginPref"
-            android:summary="Login to Twitter to tweet your Shouts"
+            android:summary="Login to Twitter to tweet your Shouts."
             android:title="Login to Twitter" />
     </PreferenceCategory>
 
