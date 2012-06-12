@@ -22,6 +22,7 @@ import java.security.spec.X509EncodedKeySpec;
 import org.joda.time.DateTime;
 import org.spongycastle.jce.provider.BouncyCastleProvider;
 import org.whispercomm.shout.Shout;
+import org.whispercomm.shout.SingletonContext;
 import org.whispercomm.shout.User;
 import org.whispercomm.shout.network.NetworkShout;
 import org.whispercomm.shout.util.Arrays;
@@ -45,8 +46,9 @@ public class SignatureUtility {
 	private static SignatureUtility instance = null;
 	private IdStorage idStorage;
 
-	public static SignatureUtility getInstance(Context context) {
+	public static SignatureUtility getInstance() {
 		if (instance == null) {
+			Context context = SingletonContext.getContext();
 			instance = new SignatureUtility(context);
 		}
 		return instance;

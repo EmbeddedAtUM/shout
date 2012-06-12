@@ -21,6 +21,12 @@ public class ShoutEditTextPreference extends EditTextPreference {
 	public ShoutEditTextPreference(Context context, AttributeSet attrs,
 			int defstyle) {
 		super(context, attrs, defstyle);
+
+	}
+	
+	@Override
+	public void onClick() {
+		super.onClick();
 	}
 
 	@Override

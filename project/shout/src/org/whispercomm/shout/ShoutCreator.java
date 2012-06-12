@@ -1,15 +1,9 @@
 package org.whispercomm.shout;
 
 import java.io.UnsupportedEncodingException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SignatureException;
-import java.security.spec.InvalidKeySpecException;
 
 import org.joda.time.DateTime;
 import org.whispercomm.shout.id.SignatureUtility;
-import org.whispercomm.shout.id.UserNotInitiatedException;
 import org.whispercomm.shout.network.NetworkInterface;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 
@@ -20,20 +14,9 @@ public class ShoutCreator {
 
 	static final String TAG = ShoutCreator.class.getSimpleName();
 
-	Context context;
-	NetworkInterface networkIf;
-	SignatureUtility signUtility;
-	User user;
-
-	public ShoutCreator(Context context) {
-		this.context = context;
-		this.networkIf = NetworkInterface.getInstance(context); 
-		this.signUtility = SignatureUtility.getInstance(context);
-		this.user = signUtility.getUser();
-	}
-
 	/**
-	 * Create a new shout given user-generated message.
+	 * Create a new shout given user-generated message. Store the Shout in the
+	 * database and send it out over the network.
 	 * 
 	 * @param timestamp
 	 * @param content
@@ -41,8 +24,11 @@ public class ShoutCreator {
 	 * 
 	 * @return
 	 */
-	public boolean createShout(DateTime timestamp, String content,
+	public static boolean createShout(DateTime timestamp, String content,
 			Shout shoutOri) {
+		Context context = SingletonContext.getContext();
+		SignatureUtility signUtility = SignatureUtility.getInstance();
+		User user = signUtility.getUser();
 
 		// generate a new shout with its signature
 		byte[] signature;
@@ -60,6 +46,7 @@ public class ShoutCreator {
 		int shoutId = ShoutProviderContract.storeShout(context, shout);
 
 		// call networkUtility to send the new shout out
+		NetworkInterface networkIf = NetworkInterface.getInstance();
 		networkIf.send(shoutId);
 		return true;
 	}

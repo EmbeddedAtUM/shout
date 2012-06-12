@@ -40,7 +40,7 @@ public class SettingsActivity extends PreferenceActivity {
 	}
 
 	public void onStart(Bundle savedInstanceState) {
-		//getPrefs();
+		getPrefs();
 	}
 
 	private void getPrefs() {

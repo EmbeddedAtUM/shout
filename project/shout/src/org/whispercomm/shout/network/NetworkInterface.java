@@ -1,6 +1,8 @@
 package org.whispercomm.shout.network;
 
 
+import org.whispercomm.shout.SingletonContext;
+
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -31,9 +33,10 @@ public class NetworkInterface {
 	private ServiceConnection connection;
 	private Boolean isBinded;
 
-	public static NetworkInterface getInstance(Context context) {
+	public static NetworkInterface getInstance() {
 		// TODO Multi-context support with Map context->instance
 		if (instance == null) {
+			Context context = SingletonContext.getContext();
 			instance = new NetworkInterface(context);
 		}
 		return instance;

@@ -33,8 +33,7 @@ public class MessageActivity extends Activity {
 		EditText editor = (EditText) findViewById(R.id.compose);
 		String content = editor.getText().toString();
 		Log.v(TAG, "Shout text received as: " + content);
-		ShoutCreator creator = new ShoutCreator(getApplicationContext());
-		creator.createShout(DateTime.now(), content, null);
+		ShoutCreator.createShout(DateTime.now(), content, null);
 		Intent intent = new Intent();
 		setResult(RESULT_OK, intent);
 		finish();

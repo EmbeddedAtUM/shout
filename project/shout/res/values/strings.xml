@@ -13,4 +13,5 @@
     <string name="logoDesc">Logo</string>
     <string name="providerAuthority">org.whispercomm.shout.provider</string>
     <string name="timelineTitle">All Shouts</string>
+    <string name="splashText">I am a Splash screen, look at me load!</string>
 </resources>
