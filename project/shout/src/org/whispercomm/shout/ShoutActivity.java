@@ -29,11 +29,13 @@ public class ShoutActivity extends ListActivity {
 		setContentView(R.layout.main);
 
 		Log.v(TAG, "Finished onCreate");
-
-		TimelineAdapter adapter = new TimelineAdapter(getApplicationContext(),
-				ShoutProviderContract
-						.getCursorOverAllShouts(getApplicationContext()));
-		setListAdapter(adapter);
+		Cursor cursor = ShoutProviderContract
+				.getCursorOverAllShouts(getApplicationContext());
+		if (cursor.getCount() > 0) {
+			TimelineAdapter adapter = new TimelineAdapter(
+					getApplicationContext(), cursor);
+			setListAdapter(adapter);
+		}
 	}
 
 	static class ViewHolder {
@@ -69,13 +71,6 @@ public class ShoutActivity extends ListActivity {
 					.setText(DateTimeConvert.dtToString(shout.getTimestamp()));
 			holder.message.setText(shout.getMessage());
 
-			if (count % 2 == 0) {
-				view.setBackgroundColor(0xFFD2F7FF);
-			} else {
-				view.setBackgroundColor(0XFFFFFFFF);
-			}
-			count++;
-
 			Log.v(TAG, "View " + id + " set");
 			return;
 		}
@@ -94,6 +89,13 @@ public class ShoutActivity extends ListActivity {
 			holder.age = (TextView) rowView.findViewById(R.id.age);
 
 			rowView.setTag(holder);
+			if (count % 2 == 0) {
+				rowView.setBackgroundColor(0xFFD2F7FF);
+			} else {
+				rowView.setBackgroundColor(0XFFFFFFFF);
+			}
+
+			count++;
 			Log.v(TAG, "View inflated");
 			return rowView;
 		}

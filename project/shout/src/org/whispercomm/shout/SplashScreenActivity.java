@@ -29,18 +29,18 @@ public class SplashScreenActivity extends Activity {
 				SingletonContext.setContext(getApplicationContext());
 				NetworkInterface networkIf = NetworkInterface.getInstance();
 				SignatureUtility utility = SignatureUtility.getInstance();
-				SplashScreenActivity.this.endSplash(500);
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					// Do nothing
+				}
+				SplashScreenActivity.this.endSplash();
 			}
 		};
 		loader.start();
 	}
 
-	private void endSplash(long delay) {
-		try {
-			Thread.sleep(delay);
-		} catch (InterruptedException e) {
-			// Do nothing
-		}
+	private void endSplash() {
 		finish();
 		Intent mainIntent = new Intent(this, ShoutActivity.class);
 		startActivity(mainIntent);
