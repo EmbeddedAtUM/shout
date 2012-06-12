@@ -35,6 +35,8 @@ public class ShoutActivity extends ListActivity {
 			TimelineAdapter adapter = new TimelineAdapter(
 					getApplicationContext(), cursor);
 			setListAdapter(adapter);
+		} else {
+			cursor.close();
 		}
 	}
 
