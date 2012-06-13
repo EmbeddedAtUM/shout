@@ -49,6 +49,7 @@ public class NetworkInterface {
 
 			@Override
 			public void onServiceConnected(ComponentName name, IBinder service) {
+				Log.v(TAG, "Bound to Network utility");
 				shoutService = new Messenger(service);
 				isBinded = true;
 			}

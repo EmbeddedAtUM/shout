@@ -7,7 +7,7 @@ public interface Shout {
 	/**
 	 * String encode/decode character set
 	 */
-	public static String CHARSET_NAME = "UTF-8";
+	public static final String CHARSET_NAME = "UTF-8";
 
 	/**
 	 * This hash is a full hash of all included Shouts that were sent with this

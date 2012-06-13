@@ -164,7 +164,7 @@ public class SignatureUtility {
 			ECPublicKey pubKey, byte[] data) {
 		Signature signature;
 		try {
-			signature = Signature.getInstance(SIGN_ALGO);
+			signature = Signature.getInstance(SIGN_ALGO, CRYPTO_PROVIDER);
 			signature.initVerify(pubKey);
 			signature.update(data);
 			return signature.verify(DataSignature);
@@ -173,6 +173,8 @@ public class SignatureUtility {
 		} catch (InvalidKeyException e) {
 			Log.e(TAG, e.getMessage());
 		} catch (SignatureException e) {
+			Log.e(TAG, e.getMessage());
+		} catch (NoSuchProviderException e) {
 			Log.e(TAG, e.getMessage());
 		}
 		return false;
@@ -191,7 +193,7 @@ public class SignatureUtility {
 	public static byte[] genSignature(byte[] data, ECPrivateKey privKey) {
 		Signature signature;
 		try {
-			signature = Signature.getInstance(SIGN_ALGO);
+			signature = Signature.getInstance(SIGN_ALGO, CRYPTO_PROVIDER);
 			signature.initSign(privKey);
 			signature.update(data);
 			byte[] dataSignature = signature.sign();
@@ -201,6 +203,8 @@ public class SignatureUtility {
 		} catch (InvalidKeyException e) {
 			Log.e(TAG, e.getMessage());
 		} catch (SignatureException e) {
+			Log.e(TAG, e.getMessage());
+		} catch (NoSuchProviderException e) {
 			Log.e(TAG, e.getMessage());
 		}
 		return null;

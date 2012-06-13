@@ -43,6 +43,7 @@ public class NetworkUtility extends Service {
 					if (status) {
 						networkProtocol = new NaiveBroadcast(manesIf,
 								getApplicationContext());
+						isRunning = true;
 						new Thread(new NetworkReceiver()).start();
 					} else {
 						// TODO

@@ -65,7 +65,6 @@ public class NaiveBroadcast implements NetworkProtocol {
 		// schedule periodic re-broadcast up to RESEND_NUM times.
 		long delay = 0;
 		for (int i = 1; i <= RESEND_NUM; i++) {
-			delay += PERIOD;
 			sendScheduler.schedule(new TimerTask() {
 				@Override
 				public void run() {
@@ -78,6 +77,7 @@ public class NaiveBroadcast implements NetworkProtocol {
 					}
 				}
 			}, delay);
+			delay += PERIOD;
 		}
 	}
 

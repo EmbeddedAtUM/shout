@@ -101,6 +101,7 @@ public class NetworkShout extends AbstractShout {
 		this.sender = shout.getSender();
 		this.signature = shout.getSignature();
 		this.shoutOri = shout.getParent();
+		this.content = shout.getMessage();
 	}
 
 	/**
