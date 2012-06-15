@@ -1,8 +1,10 @@
+
 package org.whispercomm.shout;
 
 import org.whispercomm.shout.network.NetworkInterface;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -24,21 +26,25 @@ public class SplashScreenActivity extends Activity {
 			// Force constructor calls
 			@Override
 			public void run() {
-				NetworkInterface networkIf = NetworkInterface.getInstance(getApplicationContext());
+				Context context = getApplicationContext();
+				NetworkInterface networkIf = NetworkInterface.getInstance(context);
 				try {
 					Thread.sleep(500);
 				} catch (InterruptedException e) {
 					// Do nothing
 				}
-				SplashScreenActivity.this.endSplash();
+				SplashScreenActivity.this.runOnUiThread(endSplash);
 			}
 		};
 		loader.start();
 	}
 
-	private void endSplash() {
-		finish();
-		Intent mainIntent = new Intent(this, ShoutActivity.class);
-		startActivity(mainIntent);
-	}
+	private Runnable endSplash = new Runnable() {
+		@Override
+		public void run() {
+			finish();
+			Intent mainIntent = new Intent(SplashScreenActivity.this, ShoutActivity.class);
+			startActivity(mainIntent);
+		}
+	};
 }
