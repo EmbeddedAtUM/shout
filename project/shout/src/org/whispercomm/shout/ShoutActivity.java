@@ -21,6 +21,8 @@ import android.widget.TextView;
 public class ShoutActivity extends ListActivity {
 
 	private static final String TAG = "ShoutActivity";
+	
+	private Cursor cursor;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -28,16 +30,17 @@ public class ShoutActivity extends ListActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		Log.v(TAG, "Finished onCreate");
-		Cursor cursor = ShoutProviderContract
+		this.cursor = ShoutProviderContract
 				.getCursorOverAllShouts(getApplicationContext());
-		if (cursor.getCount() > 0) {
-			TimelineAdapter adapter = new TimelineAdapter(
-					getApplicationContext(), cursor);
-			setListAdapter(adapter);
-		} else {
-			cursor.close();
-		}
+		setListAdapter(new TimelineAdapter(getApplicationContext(), cursor));
+		Log.v(TAG, "Finished onCreate");
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		cursor.close();
+		Log.v(TAG, "Finished onDestroy");
 	}
 
 	static class ViewHolder {
