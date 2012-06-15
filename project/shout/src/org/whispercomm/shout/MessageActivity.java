@@ -34,6 +34,7 @@ public class MessageActivity extends Activity {
 		failedToast = Toast
 				.makeText(this, "An error occured, please try again later.",
 						Toast.LENGTH_SHORT);
+		signUtility = new SignatureUtility(getApplicationContext());
 		creator = new ShoutCreator(getApplicationContext(), signUtility);
 	}
 
