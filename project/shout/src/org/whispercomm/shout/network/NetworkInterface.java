@@ -1,5 +1,5 @@
-package org.whispercomm.shout.network;
 
+package org.whispercomm.shout.network;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -10,9 +10,9 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
+import android.widget.Toast;
 
 /**
- * 
  * UI side interface for establishing channels to notify new shouts to send out.
  * <p>
  * Each UI activity should initiate a NetworkInterface object in order to notify
@@ -21,7 +21,7 @@ import android.util.Log;
  * @author Yue Liu
  */
 public class NetworkInterface {
-	
+
 	private static NetworkInterface instance = null;
 	private Context context;
 
@@ -39,7 +39,7 @@ public class NetworkInterface {
 		}
 		return instance;
 	}
-	
+
 	private NetworkInterface(Context context) {
 		this.context = context;
 		this.isBinded = false;
@@ -56,6 +56,8 @@ public class NetworkInterface {
 			public void onServiceDisconnected(ComponentName name) {
 				shoutService = null;
 				Log.d(TAG, "Network service unbound");
+				Toast.makeText(NetworkInterface.this.context, "Network service unbound...",
+						Toast.LENGTH_LONG);
 				isBinded = false;
 			}
 
@@ -72,8 +74,7 @@ public class NetworkInterface {
 	 * notification is successful. If not, the caller should either wait and try
 	 * later, or give up.
 	 * 
-	 * @param shoutId
-	 *            id of the shout to be sent out
+	 * @param shoutId id of the shout to be sent out
 	 * @return whether the notification is successful
 	 */
 	public boolean send(long shoutId) {
@@ -81,7 +82,7 @@ public class NetworkInterface {
 			Message msg = Message.obtain(null, NetworkUtility.NEW_SHOUT);
 			msg.obj = shoutId;
 			try {
-				//???Does this block???
+				// ???Does this block???
 				shoutService.send(msg);
 			} catch (RemoteException e) {
 				Log.i(TAG, e.getMessage());
