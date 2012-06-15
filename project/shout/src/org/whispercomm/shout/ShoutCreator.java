@@ -27,27 +27,8 @@ public class ShoutCreator {
 	public static boolean createShout(DateTime timestamp, String content,
 			Shout shoutOri) {
 		Context context = SingletonContext.getContext();
-		SignatureUtility signUtility = SignatureUtility.getInstance();
-		User user = signUtility.getUser();
-
-		// generate a new shout with its signature
-		byte[] signature;
-		try {
-			signature = signUtility.genShoutSignature(timestamp, user, content,
-					shoutOri);
-		} catch (UnsupportedEncodingException e) {
-			Log.e(TAG, e.getMessage());
-			return false;
-		}
-		Shout shout = new SimpleShout(timestamp, user, content, shoutOri,
-				signature);
-
-		// insert the shout to database and get its shout_id back
-		int shoutId = ShoutProviderContract.storeShout(context, shout);
-
-		// call networkUtility to send the new shout out
-		NetworkInterface networkIf = NetworkInterface.getInstance();
-		return networkIf.send(shoutId);
+		Shout shout = saveShout(timestamp, content, shoutOri, context);
+		return sendShout(shout, context);
 	}
 
 	public static Shout saveShout(DateTime timestamp, String content, Shout shoutOri,
