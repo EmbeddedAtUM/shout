@@ -2,6 +2,7 @@
 package org.whispercomm.shout;
 
 import org.joda.time.DateTime;
+import org.whispercomm.shout.id.SignatureUtility;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -14,10 +15,14 @@ import android.widget.Toast;
 
 public class MessageActivity extends Activity {
 
+
+	public static final String TAG = "MessageActivity";
+	
 	private Toast successToast;
 	private Toast failedToast;
-	public static final String TAG = "MessageActivity";
-
+	private SignatureUtility signUtility;
+	private ShoutCreator creator;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -29,6 +34,7 @@ public class MessageActivity extends Activity {
 		failedToast = Toast
 				.makeText(this, "An error occured, please try again later.",
 						Toast.LENGTH_SHORT);
+		creator = new ShoutCreator(getApplicationContext(), signUtility);
 	}
 
 	public void onClickSend(View v) {
@@ -48,7 +54,7 @@ public class MessageActivity extends Activity {
 		
 		@Override
 		protected Boolean doInBackground(String... params) {
-			return ShoutCreator.createShout(DateTime.now(), params[0], null);
+			return creator.createShout(DateTime.now(), params[0], null);
 		}
 		
 		@Override

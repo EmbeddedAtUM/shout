@@ -1,6 +1,5 @@
 package org.whispercomm.shout;
 
-import org.whispercomm.shout.id.SignatureUtility;
 import org.whispercomm.shout.network.NetworkInterface;
 
 import android.app.Activity;
@@ -25,13 +24,7 @@ public class SplashScreenActivity extends Activity {
 			// Force constructor calls
 			@Override
 			public void run() {
-				try {
-					SingletonContext.setContext(getApplicationContext());
-				} catch (IllegalStateException e) {
-					// Do nothing
-				}
-				NetworkInterface networkIf = NetworkInterface.getInstance();
-				SignatureUtility utility = SignatureUtility.getInstance();
+				NetworkInterface networkIf = NetworkInterface.getInstance(getApplicationContext());
 				try {
 					Thread.sleep(500);
 				} catch (InterruptedException e) {

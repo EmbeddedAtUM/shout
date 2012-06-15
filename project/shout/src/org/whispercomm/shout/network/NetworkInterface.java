@@ -1,8 +1,6 @@
 package org.whispercomm.shout.network;
 
 
-import org.whispercomm.shout.SingletonContext;
-
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -33,10 +31,10 @@ public class NetworkInterface {
 	private ServiceConnection connection;
 	private Boolean isBinded;
 
-	public static NetworkInterface getInstance() {
+	public static NetworkInterface getInstance(Context context) {
 		// TODO Multi-context support with Map context->instance
+		// TODO Remove this Singleton while still keeping it a singleton
 		if (instance == null) {
-			Context context = SingletonContext.getContext();
 			instance = new NetworkInterface(context);
 		}
 		return instance;
@@ -57,6 +55,7 @@ public class NetworkInterface {
 			@Override
 			public void onServiceDisconnected(ComponentName name) {
 				shoutService = null;
+				Log.d(TAG, "Network service unbound");
 				isBinded = false;
 			}
 

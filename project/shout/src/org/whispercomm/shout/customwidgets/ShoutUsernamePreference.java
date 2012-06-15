@@ -14,23 +14,25 @@ import android.util.Log;
 
 public class ShoutUsernamePreference extends ShoutEditTextPreference {
 
-	protected static final String TAG = ShoutUsernamePreference.class
+	private static final String TAG = ShoutUsernamePreference.class
 			.getSimpleName();
 
+	private Context context;
+	
 	public ShoutUsernamePreference(Context context, AttributeSet attrs,
 			int defStyle) {
 		super(context, attrs, defStyle);
-		this.setListeners();
+		this.setListeners(context);
 	}
 
 	public ShoutUsernamePreference(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		this.setListeners();
+		this.setListeners(context);
 	}
 
 	public ShoutUsernamePreference(Context context) {
 		super(context);
-		this.setListeners();
+		this.setListeners(context);
 	}
 
 	@Override
@@ -39,9 +41,10 @@ public class ShoutUsernamePreference extends ShoutEditTextPreference {
 		super.setOnPreferenceClickListener(onPreferenceClickListener);
 	}
 
-	private void setListeners() {
+	private void setListeners(Context context) {
 		this.setOnPreferenceClickListener(preListener);
 		this.setOnPreferenceChangeListener(postListener);
+		this.context = context;
 	}
 
 	private OnPreferenceClickListener preListener = new OnPreferenceClickListener() {
@@ -71,7 +74,7 @@ public class ShoutUsernamePreference extends ShoutEditTextPreference {
 		@Override
 		public boolean onPreferenceChange(Preference preference, Object newValue) {
 			String newName = (String) newValue;
-			SignatureUtility signUtility = SignatureUtility.getInstance();
+			SignatureUtility signUtility = new SignatureUtility(context);
 			User current = signUtility.getUser(); // TODO Fix lifecycle
 			if (current == null) {
 				try {

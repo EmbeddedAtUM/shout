@@ -78,7 +78,6 @@ public class ShoutActivity extends ListActivity {
 				view.setBackgroundColor(0XFFFFFFFF);
 			}
 
-			Log.v(TAG, "View " + id + " set");
 			return;
 		}
 
