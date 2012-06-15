@@ -397,8 +397,9 @@ public class ShoutProviderContract {
 
 	public static Cursor getCursorOverAllShouts(Context context) {
 		String[] projection = { Shouts._ID };
+		String sortOrder = Shouts.TIME + " DESC";
 		Cursor result = context.getContentResolver().query(Shouts.CONTENT_URI,
-				projection, null, null, null);
+				projection, null, null, sortOrder);
 		return result;
 	}
 
