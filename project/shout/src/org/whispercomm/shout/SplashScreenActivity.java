@@ -17,8 +17,8 @@ public class SplashScreenActivity extends Activity {
 	}
 
 	@Override
-	public void onResume() {
-		super.onResume();
+	public void onStart() {
+		super.onStart();
 
 		Thread loader = new Thread() {
 			@SuppressWarnings("unused")
@@ -48,5 +48,4 @@ public class SplashScreenActivity extends Activity {
 		Intent mainIntent = new Intent(this, ShoutActivity.class);
 		startActivity(mainIntent);
 	}
-
 }
