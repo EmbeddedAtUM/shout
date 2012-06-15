@@ -129,7 +129,7 @@ public class SignatureUtility {
 	 */
 	public synchronized void updateUserName(String userName)
 			throws UserNameInvalidException {
-		if (userName == null
+		if (userName == null // FIXME Check byte size
 				|| userName.length() > NetworkShout.MAX_USER_NAME_LEN)
 			throw new UserNameInvalidException();
 		idStorage.updateUserName(userName);

@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout;
 
 import java.io.UnsupportedEncodingException;
@@ -21,7 +22,6 @@ public class ShoutCreator {
 	 * @param timestamp
 	 * @param content
 	 * @param shoutOri
-	 * 
 	 * @return
 	 */
 	public static boolean createShout(DateTime timestamp, String content,
@@ -47,7 +47,35 @@ public class ShoutCreator {
 
 		// call networkUtility to send the new shout out
 		NetworkInterface networkIf = NetworkInterface.getInstance();
-		networkIf.send(shoutId);
-		return true;
+		return networkIf.send(shoutId);
+	}
+
+	public static Shout saveShout(DateTime timestamp, String content, Shout shoutOri,
+			Context context) {
+		SignatureUtility signUtility = SignatureUtility.getInstance();
+		User user = signUtility.getUser();
+		try {
+			byte[] signature = signUtility.genShoutSignature(timestamp, user, content, shoutOri);
+			Shout shout = new SimpleShout(timestamp, user, content, shoutOri, signature);
+			int shoutId = ShoutProviderContract.storeShout(context, shout);
+			if (shoutId >= 0) {
+				return shout;
+			} else {
+				return null;
+			}
+		} catch (UnsupportedEncodingException e) {
+			Log.e(TAG, e.getMessage());
+			return null;
+		}
+	}
+
+	public static boolean sendShout(Shout shout, Context context) {
+		int shoutId = ShoutProviderContract.storeShout(context, shout);
+		if (shoutId >= 0) {
+			NetworkInterface networkIf = NetworkInterface.getInstance();
+			return networkIf.send(shoutId);
+		} else {
+			return false;
+		}
 	}
 }
