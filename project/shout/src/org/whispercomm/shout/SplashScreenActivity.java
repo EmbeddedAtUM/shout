@@ -16,17 +16,20 @@ public class SplashScreenActivity extends Activity {
 		setContentView(R.layout.splash);
 	}
 
-
 	@Override
 	public void onResume() {
 		super.onResume();
 
 		Thread loader = new Thread() {
-			@SuppressWarnings("unused") // Force constructor calls
+			@SuppressWarnings("unused")
+			// Force constructor calls
 			@Override
 			public void run() {
-				// Load / set singletons
-				SingletonContext.setContext(getApplicationContext());
+				try {
+					SingletonContext.setContext(getApplicationContext());
+				} catch (IllegalStateException e) {
+					// Do nothing
+				}
 				NetworkInterface networkIf = NetworkInterface.getInstance();
 				SignatureUtility utility = SignatureUtility.getInstance();
 				try {

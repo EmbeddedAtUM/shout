@@ -21,7 +21,7 @@ public class SingletonContext {
 			return context;
 		}
 	}
-	
+
 	private SingletonContext() {
 		throw new IllegalStateException();
 	}
