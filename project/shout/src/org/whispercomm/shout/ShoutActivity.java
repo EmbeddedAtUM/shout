@@ -54,11 +54,8 @@ public class ShoutActivity extends ListActivity {
 
 	private class TimelineAdapter extends CursorAdapter {
 
-		private int count;
-
 		public TimelineAdapter(Context context, Cursor c) {
 			super(context, c);
-			count = 0;
 		}
 
 		@Override
@@ -75,6 +72,11 @@ public class ShoutActivity extends ListActivity {
 			holder.age
 					.setText(DateTimeConvert.dtToString(shout.getTimestamp()));
 			holder.message.setText(shout.getMessage());
+			if (cursor.getPosition() % 2 == 0) {
+				view.setBackgroundColor(0xFFD2F7FF);
+			} else {
+				view.setBackgroundColor(0XFFFFFFFF);
+			}
 
 			Log.v(TAG, "View " + id + " set");
 			return;
@@ -94,13 +96,7 @@ public class ShoutActivity extends ListActivity {
 			holder.age = (TextView) rowView.findViewById(R.id.age);
 
 			rowView.setTag(holder);
-			if (count % 2 == 0) {
-				rowView.setBackgroundColor(0xFFD2F7FF);
-			} else {
-				rowView.setBackgroundColor(0XFFFFFFFF);
-			}
 
-			count++;
 			Log.v(TAG, "View inflated");
 			return rowView;
 		}
