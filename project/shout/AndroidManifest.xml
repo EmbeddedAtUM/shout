@@ -38,6 +38,7 @@
             android:enabled="true"
             android:exported="false" >
         </service>
+        <activity android:name="ShoutDetailsActivity"></activity>
     </application>
 
 </manifest>
