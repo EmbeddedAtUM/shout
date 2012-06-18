@@ -42,7 +42,9 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:background="@android:color/white"
-        android:divider="#000000" />
+        android:clickable="true"
+        android:divider="@drawable/titlegradient"
+        android:dividerHeight="10dp" />
 
     <!-- TextView displayed if the ListView is empty -->
 

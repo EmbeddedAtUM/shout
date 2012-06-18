@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout;
 
 import org.whispercomm.shout.provider.ShoutProviderContract;
@@ -22,7 +23,7 @@ import android.widget.TextView;
 public class ShoutActivity extends ListActivity {
 
 	private static final String TAG = "ShoutActivity";
-	
+
 	private Cursor cursor;
 
 	/** Called when the activity is first created. */
@@ -73,12 +74,6 @@ public class ShoutActivity extends ListActivity {
 			holder.age
 					.setText(DateTimeConvert.dtToString(shout.getTimestamp()));
 			holder.message.setText(shout.getMessage());
-			if (cursor.getPosition() % 2 == 0) {
-				view.setBackgroundColor(0xFFD2F7FF);
-			} else {
-				view.setBackgroundColor(0XFFFFFFFF);
-			}
-
 			return;
 		}
 
@@ -121,14 +116,14 @@ public class ShoutActivity extends ListActivity {
 		Intent intent;
 
 		switch (item.getItemId()) {
-		case R.id.settings:
-			intent = new Intent(this, SettingsActivity.class);
-			break;
-		case R.id.compose:
-			intent = new Intent(this, MessageActivity.class);
-			break;
-		default:
-			return super.onOptionsItemSelected(item);
+			case R.id.settings:
+				intent = new Intent(this, SettingsActivity.class);
+				break;
+			case R.id.compose:
+				intent = new Intent(this, MessageActivity.class);
+				break;
+			default:
+				return super.onOptionsItemSelected(item);
 		}
 
 		startActivity(intent);
@@ -143,7 +138,6 @@ public class ShoutActivity extends ListActivity {
 
 	public void onClickSettings(View v) {
 		Log.v(TAG, "Settings button clicked");
-
 		startActivity(new Intent(this, SettingsActivity.class));
 	}
 }
