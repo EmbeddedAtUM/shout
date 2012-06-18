@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 public class ShoutActivity extends ListActivity {
@@ -100,6 +101,12 @@ public class ShoutActivity extends ListActivity {
 			return rowView;
 		}
 
+	}
+
+	@Override
+	protected void onListItemClick(ListView l, View v, int position, long id) {
+		super.onListItemClick(l, v, position, id);
+		Log.v(TAG, "Click at position " + position + ", id " + id);
 	}
 
 	@Override
