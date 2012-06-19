@@ -109,6 +109,9 @@ public class ShoutActivity extends ListActivity {
 						ids[0]);
 				if (parent == null) {
 					return false;
+				} else if (parent.getMessage() == null) {
+					// Parent was a reshout, get the original
+					parent = parent.getParent();
 				}
 				SignatureUtility signUtility = new SignatureUtility(getApplicationContext());
 				ShoutCreator creator = new ShoutCreator(getApplicationContext(), signUtility);
