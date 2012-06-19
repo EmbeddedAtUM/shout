@@ -38,6 +38,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Matchers.argThat;
 
 //*** serialize and getshoutsignature will be tested in the NetworkShoutTest
+//TODO add test cases for re-shouts with no content.
 @RunWith(RobolectricTestRunner.class)
 public class SignatureUtilityTest {
 
