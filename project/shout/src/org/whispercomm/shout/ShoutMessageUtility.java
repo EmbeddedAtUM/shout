@@ -4,8 +4,19 @@ package org.whispercomm.shout;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
-public class DateTimeConvert {
-	public static String dtToString(DateTime dt) {
+public class ShoutMessageUtility {
+	public static ShoutType getShoutType(Shout shout) {
+		if (shout.getParent() == null) {
+			return ShoutType.SHOUT;
+		} else if (shout.getMessage() != null) {
+			return ShoutType.COMMENT;
+		} else if (shout.getParent().getParent() != null) {
+			return ShoutType.RECOMMENT;
+		} else {
+			return ShoutType.RESHOUT;
+		}
+	}
+	public static String getDateTimeAge(DateTime dt) {
 		long timePassed;
 		String unit;
 

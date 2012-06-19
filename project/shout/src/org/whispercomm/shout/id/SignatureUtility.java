@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout.id;
 
 import java.io.UnsupportedEncodingException;
@@ -43,7 +44,7 @@ public class SignatureUtility {
 	}
 
 	private IdStorage idStorage;
-	
+
 	public SignatureUtility(Context context) {
 		this.idStorage = new IdStorageSharedPrefs(context);
 	}
@@ -57,7 +58,6 @@ public class SignatureUtility {
 	 * is first launched.
 	 * 
 	 * @return TODO
-	 * 
 	 * @throws NoSuchProviderException
 	 * @throws NoSuchAlgorithmException
 	 * @throws InvalidAlgorithmParameterException
@@ -143,8 +143,7 @@ public class SignatureUtility {
 	 * 
 	 * @param signature
 	 * @param pubKey
-	 * @param data
-	 *            in ByteBuffer
+	 * @param data in ByteBuffer
 	 * @return
 	 * @throws NoSuchAlgorithmException
 	 * @throws InvalidKeyException
@@ -239,7 +238,6 @@ public class SignatureUtility {
 	 * @param content
 	 * @param shoutOri
 	 * @param sender
-	 * 
 	 * @return signature
 	 * @throws UnsupportedEncodingException
 	 */
@@ -256,17 +254,11 @@ public class SignatureUtility {
 	 * Serialize a shout message (not including signature) into the destination
 	 * buffer
 	 * 
-	 * @param timestamp
-	 *            send time of the shout
-	 * @param sender
-	 *            sender of the shout
-	 * @param content
-	 *            content of the shout
-	 * @param shoutOri
-	 *            the original shout of the shout
-	 * 
+	 * @param timestamp send time of the shout
+	 * @param sender sender of the shout
+	 * @param content content of the shout
+	 * @param shoutOri the original shout of the shout
 	 * @return a Shout serialized into a network packet
-	 * 
 	 * @throws UnsupportedEncodingException
 	 */
 	public static byte[] serialize(DateTime timestamp, User sender,
@@ -293,7 +285,8 @@ public class SignatureUtility {
 			byteBuffer.put(pubKeyBytes);
 			size += NetworkShout.KEY_LENGTH;
 			// contentLen and content
-			byte[] contentBytes = content.getBytes(Shout.CHARSET_NAME);
+			byte[] contentBytes = content == null ? new byte[0]
+					: content.getBytes(Shout.CHARSET_NAME);
 			int contentLen = contentBytes.length;
 			byteBuffer.putChar((char) contentLen);
 			size += NetworkShout.CONTENT_LEN_SIZE;

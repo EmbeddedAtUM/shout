@@ -28,4 +28,7 @@
    	    <item name="android:background">@drawable/titlegradient</item>
    	    <item name="android:textColor">@android:color/black</item>
 	</style>
+	<style parent="TitleBarButton" name="ShoutActionButton">
+		<item name="android:background">@color/action_bg</item>
+	</style>
 </resources> 

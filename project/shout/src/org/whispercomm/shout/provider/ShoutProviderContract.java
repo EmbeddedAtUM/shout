@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout.provider;
 
 import org.whispercomm.shout.Shout;
@@ -344,10 +345,8 @@ public class ShoutProviderContract {
 	 * Stores the given Shout and its sender and parent, if not already present
 	 * in the database.
 	 * 
-	 * @param context
-	 *            The context the content resolver is found in
-	 * @param shout
-	 *            The shout to be stored
+	 * @param context The context the content resolver is found in
+	 * @param shout The shout to be stored
 	 * @return The ID of the Shout in the database, -1 on failure
 	 */
 	public static int storeShout(Context context, Shout shout) {
@@ -396,10 +395,26 @@ public class ShoutProviderContract {
 	}
 
 	public static Cursor getCursorOverAllShouts(Context context) {
-		String[] projection = { Shouts._ID };
+		String[] projection = {
+			Shouts._ID
+		};
 		String sortOrder = Shouts.TIME + " DESC";
 		Cursor result = context.getContentResolver().query(Shouts.CONTENT_URI,
 				projection, null, null, sortOrder);
+		return result;
+	}
+
+	public static Cursor getCursorOverShoutComments(Context context, int shoutId) {
+		String[] projection = {
+			Shouts._ID
+		};
+		String sortOrder = Shouts.TIME + " DESC";
+		String selection = Shouts._ID + " < ?";
+		String[] selectionArgs = {
+			"5"
+		};
+		Cursor result = context.getContentResolver().query(Shouts.CONTENT_URI, projection,
+				selection, selectionArgs, sortOrder);
 		return result;
 	}
 
@@ -438,10 +453,14 @@ public class ShoutProviderContract {
 		 * @return -1 if not in the database
 		 */
 		public static int queryForUser(Context context, DatabaseUser user) {
-			String[] projection = { Users._ID };
+			String[] projection = {
+				Users._ID
+			};
 			String selection = Users.PUB_KEY + " = ? AND " + Users.USERNAME
 					+ " = ?";
-			String[] selectionArgs = { user.key, user.username };
+			String[] selectionArgs = {
+					user.key, user.username
+			};
 			Cursor cursor = context.getContentResolver().query(
 					Users.CONTENT_URI, projection, selection, selectionArgs,
 					null);
@@ -495,10 +514,14 @@ public class ShoutProviderContract {
 		 * @return -1 on failure
 		 */
 		public static int queryForShout(Context context, DatabaseShout dbShout) {
-			String[] projection = { Shouts._ID };
+			String[] projection = {
+				Shouts._ID
+			};
 			String selection = Shouts.HASH + " = ? AND " + Shouts.SIGNATURE
 					+ " = ?";
-			String[] selectionArgs = { dbShout.hash, dbShout.signature };
+			String[] selectionArgs = {
+					dbShout.hash, dbShout.signature
+			};
 
 			Cursor cursor = context.getContentResolver().query(
 					Shouts.CONTENT_URI, projection, selection, selectionArgs,

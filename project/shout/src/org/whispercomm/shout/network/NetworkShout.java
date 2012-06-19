@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout.network;
 
 import java.io.UnsupportedEncodingException;
@@ -26,18 +27,17 @@ import android.content.Context;
  * database.
  * 
  * @author Yue Liu
- * 
  */
 public class NetworkShout extends AbstractShout {
 
 	/**
 	 * Maximum length (in bytes) of a user name.
 	 */
-	public static final int MAX_USER_NAME_LEN = 20*2;
+	public static final int MAX_USER_NAME_LEN = 20 * 2;
 	/**
 	 * Maximum length (in bytes) of a shout message
 	 */
-	public static final int MAX_CONTENT_LEN = 140*2;
+	public static final int MAX_CONTENT_LEN = 140 * 2;
 	/**
 	 * Length (in bytes) of the signing key
 	 */
@@ -92,8 +92,7 @@ public class NetworkShout extends AbstractShout {
 	/**
 	 * Generate a NetworkShout from a shout stored in the database
 	 * 
-	 * @param shout_id
-	 *            the _ID of the source shout in the database
+	 * @param shout_id the _ID of the source shout in the database
 	 */
 	public NetworkShout(int shout_id, Context context) {
 		Shout shout = ShoutProviderContract.retrieveShoutById(context, shout_id);
@@ -127,10 +126,8 @@ public class NetworkShout extends AbstractShout {
 	/**
 	 * extract all the signatures of the network shout
 	 * 
-	 * @param sigs
-	 *            array to hold all the signatures
-	 * @param byteBuffer
-	 *            raw data in ByteBuffer
+	 * @param sigs array to hold all the signatures
+	 * @param byteBuffer raw data in ByteBuffer
 	 * @return
 	 */
 	public static int getSignatures(byte[][] sigs, ByteBuffer byteBuffer) {
@@ -154,8 +151,8 @@ public class NetworkShout extends AbstractShout {
 	 * Build a NetworkShout object from bytes received from the network
 	 * 
 	 * @throws UnsupportedEncodingException
-	 * @throws AuthenticityFailureException
-	 *             the network data fails authenticity check.
+	 * @throws AuthenticityFailureException the network data fails authenticity
+	 *             check.
 	 * @throws SignatureException
 	 * @throws NoSuchAlgorithmException
 	 * @throws InvalidKeyException
@@ -180,7 +177,7 @@ public class NetworkShout extends AbstractShout {
 			}
 		}
 		// Ensemble the final shout
-		for (int i = 0; i < MAX_SHOUT_NUM-1; i++) {
+		for (int i = 0; i < MAX_SHOUT_NUM - 1; i++) {
 			if (shouts[i + 1] == null)
 				break;
 			shouts[i].shoutOri = shouts[i + 1];
@@ -215,7 +212,13 @@ public class NetworkShout extends AbstractShout {
 			// hasNext
 			hasReshout = (byte) (shout.getParent() == null ? 0 : 1);
 			byteBuffer.put(hasReshout);
-			shout = (NetworkShout) shout.shoutOri;
+			if (shout.shoutOri != null) {
+				shout = new NetworkShout(shout.shoutOri.getTimestamp(), shout.shoutOri.getSender(),
+						shout.shoutOri.getMessage(), shout.shoutOri.getSignature(),
+						shout.shoutOri.getParent());
+			} else {
+				shout = null;
+			}
 			sigNum++;
 		}
 		// sanity check
@@ -233,12 +236,9 @@ public class NetworkShout extends AbstractShout {
 	 * Verify whether a shout is authentic
 	 * 
 	 * @param signature
-	 * @param byteBuffer
-	 *            that holds the body of a shout
-	 * 
+	 * @param byteBuffer that holds the body of a shout
 	 * @return a new NetworkShout (with its original shout yet to be completed)
 	 *         if authentic, null otherwise
-	 * 
 	 * @throws UnsupportedEncodingException
 	 * @throws SignatureException
 	 * @throws NoSuchAlgorithmException
@@ -296,10 +296,15 @@ public class NetworkShout extends AbstractShout {
 		User sender = new SimpleUser(senderName, pubKey);
 		// contentLen
 		int contentLen = byteBuffer.getChar();
-		// content
-		byte[] contentBytes = new byte[contentLen];
-		byteBuffer.get(contentBytes, 0, contentLen);
-		String content = new String(contentBytes, CHARSET_NAME);
+		String content;
+		if (contentLen > 0) {
+			// content
+			byte[] contentBytes = new byte[contentLen];
+			byteBuffer.get(contentBytes, 0, contentLen);
+			content = new String(contentBytes, CHARSET_NAME);
+		} else {
+			content = null;
+		}
 		// isReshout (***no need to use this value so far)
 		byteBuffer.get();
 		NetworkShout shout = new NetworkShout(timestamp, sender, content, null,

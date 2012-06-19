@@ -18,4 +18,6 @@
     <string name="login_stub">lol jk.\n\n\nCan you imagine how ridiculous &quot;Twouting&quot; could end up sounding? Besides, I don\'t like implementing OAuth, anyway.</string>
     <string name="reshoutDesc">reshoutIcon</string>
     <string name="comment">Comments (0)</string>
+    <string name="reshoutDescription">Reshout</string>
+    <string name="commentDescription">Comment</string>
 </resources>

@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="100dip" >
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="100dp"
         android:background="@color/list_bg" >
 
         <ImageView
@@ -52,7 +53,7 @@
             android:textColor="@android:color/black" />
 
         <TextView
-            android:id="@+id/comments"
+            android:id="@+id/commentCount"
             android:layout_width="fill_parent"
             android:layout_height="20dip"
             android:layout_alignParentBottom="true"
@@ -71,6 +72,30 @@
             android:layout_marginRight="5dip"
             android:gravity="right"
             android:textColor="@android:color/black" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:background="@color/blue"
+        android:id="@+id/buttonHolder"
+        android:orientation="horizontal" >
+
+        <ImageButton
+            android:id="@+id/reshoutButton"
+            style="@style/TitleBarButton"
+            android:layout_alignParentTop="true"
+            android:contentDescription="@string/reshoutDescription"
+            android:onClick="onClickReshout"
+            android:src="@drawable/reshouticon" />
+
+        <ImageButton
+            android:id="@+id/imageButton1"
+            style="@style/TitleBarButton"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:contentDescription="@string/commentDescription"
+            android:src="@drawable/chat" />
     </RelativeLayout>
 
 </LinearLayout>
