@@ -5,7 +5,7 @@
     <org.whispercomm.shout.customwidgets.ShoutPreferenceCategory android:title="Identity Settings" >
         <org.whispercomm.shout.customwidgets.ShoutUsernamePreference
             android:name="Username Custom Preference"
-            android:defaultValue="duiu"
+            android:defaultValue="@string/defaultUsername"
             android:key="usernamePref"
             android:summary="Your username and associated unique keys are used to authenticate Shouts behind the scenes, so try to pick a good username the first time."
             android:title="Username" />

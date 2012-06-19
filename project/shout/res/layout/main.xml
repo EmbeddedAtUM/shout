@@ -52,6 +52,10 @@
         android:id="@android:id/empty"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:text="@string/no_shouts" />
+        android:background="@drawable/titlegradient"
+        android:gravity="center|center_horizontal"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/no_shouts"
+        android:textColor="@android:color/black" />
 
 </LinearLayout>
