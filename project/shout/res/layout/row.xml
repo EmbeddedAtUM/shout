@@ -75,27 +75,37 @@
     </RelativeLayout>
 
     <RelativeLayout
+        android:id="@+id/buttonHolder"
         android:layout_width="match_parent"
         android:layout_height="45dp"
         android:background="@color/blue"
-        android:id="@+id/buttonHolder"
         android:orientation="horizontal" >
 
         <ImageButton
             android:id="@+id/reshoutButton"
             style="@style/TitleBarButton"
             android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/commentButton"
             android:contentDescription="@string/reshoutDescription"
             android:onClick="onClickReshout"
             android:src="@drawable/reshouticon" />
 
         <ImageButton
-            android:id="@+id/imageButton1"
+            android:id="@+id/commentButton"
             style="@style/TitleBarButton"
             android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
+            android:layout_toLeftOf="@+id/detailsButton"
             android:contentDescription="@string/commentDescription"
             android:src="@drawable/chat" />
+
+        <ImageButton
+            android:id="@+id/detailsButton"
+            style="@style/TitleBarButton"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:contentDescription="@string/detailsDescription"
+            android:onClick="onClickDetails"
+            android:src="@drawable/gear" />
     </RelativeLayout>
 
 </LinearLayout>

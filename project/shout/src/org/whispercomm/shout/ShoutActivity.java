@@ -96,7 +96,8 @@ public class ShoutActivity extends ListActivity {
 
 	public void onClickReshout(View v) {
 		Log.v(TAG, "Reshout button clicked");
-		ViewGroup rowView = (ViewGroup) v.getParent().getParent(); // bad
+		// Hack to get shout ID
+		ViewGroup rowView = (ViewGroup) v.getParent().getParent();
 		ViewHolder holder = (ViewHolder) rowView.getTag();
 		int id = holder.id;
 		Log.v(TAG, "Shout ID received as " + id);
@@ -133,6 +134,24 @@ public class ShoutActivity extends ListActivity {
 		reshoutTask.execute(new Integer[] {
 				id
 		});
+	}
+
+	public void onClickComment(View v) {
+		Log.v(TAG, "Comment button clicked");
+		/*
+		 * TODO Launch message activity with intent parameter indicating that
+		 * this is a comment, not a new Shout, so that it can construct the
+		 * Shout accordingly. Relevant changes will need to be made in
+		 * MessageActivity.
+		 */
+	}
+
+	public void onClickDetails(View v) {
+		Log.v(TAG, "Details buttons clicked");
+		/*
+		 * TODO Launch Details Activity with Shout ID as an Intent extra. See
+		 * onClickReshout() for how to get Shout ID
+		 */
 	}
 
 	static class ViewHolder {
