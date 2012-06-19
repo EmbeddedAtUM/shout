@@ -15,14 +15,14 @@ import android.widget.Toast;
 
 public class MessageActivity extends Activity {
 
-
 	public static final String TAG = "MessageActivity";
-	
+
 	private Toast successToast;
 	private Toast failedToast;
+	private Toast noUserToast;
 	private SignatureUtility signUtility;
 	private ShoutCreator creator;
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -34,8 +34,22 @@ public class MessageActivity extends Activity {
 		failedToast = Toast
 				.makeText(this, "An error occured, please try again later.",
 						Toast.LENGTH_SHORT);
+		noUserToast = Toast.makeText(getApplicationContext(), "Set up a user before you Shout!",
+				Toast.LENGTH_LONG);
 		signUtility = new SignatureUtility(getApplicationContext());
 		creator = new ShoutCreator(getApplicationContext(), signUtility);
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		User user = signUtility.getUser();
+		if (user == null) {
+			finish();
+			noUserToast.show();
+			Intent intent = new Intent(this, SettingsActivity.class);
+			startActivity(intent);
+		}
 	}
 
 	public void onClickSend(View v) {
@@ -48,16 +62,16 @@ public class MessageActivity extends Activity {
 		setResult(RESULT_OK, intent);
 		finish();
 	}
-	
+
 	private class SendShoutTask extends AsyncTask<String, Void, Boolean> {
 
 		// TODO Progress indicator?
-		
+
 		@Override
 		protected Boolean doInBackground(String... params) {
 			return creator.createShout(DateTime.now(), params[0], null);
 		}
-		
+
 		@Override
 		protected void onPostExecute(Boolean result) {
 			if (result.booleanValue()) {

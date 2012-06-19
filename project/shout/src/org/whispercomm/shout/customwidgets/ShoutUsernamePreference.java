@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout.customwidgets;
 
 import org.whispercomm.shout.User;
@@ -17,8 +18,8 @@ public class ShoutUsernamePreference extends ShoutEditTextPreference {
 	private static final String TAG = ShoutUsernamePreference.class
 			.getSimpleName();
 
-	private Context context;
-	
+	private SignatureUtility signUtility;
+
 	public ShoutUsernamePreference(Context context, AttributeSet attrs,
 			int defStyle) {
 		super(context, attrs, defStyle);
@@ -44,7 +45,7 @@ public class ShoutUsernamePreference extends ShoutEditTextPreference {
 	private void setListeners(Context context) {
 		this.setOnPreferenceClickListener(preListener);
 		this.setOnPreferenceChangeListener(postListener);
-		this.context = context;
+		this.signUtility = new SignatureUtility(context);
 	}
 
 	private OnPreferenceClickListener preListener = new OnPreferenceClickListener() {
@@ -61,10 +62,11 @@ public class ShoutUsernamePreference extends ShoutEditTextPreference {
 		@Override
 		public boolean onPreferenceClick(Preference preference) {
 			Log.v(TAG, "Username preference clicked");
-
-			AlertDialog dialog = DialogFactory.buildUsernameChangeDialog(
-					getContext(), positive);
-			dialog.show();
+			if (signUtility.getUser() != null) {
+				AlertDialog dialog = DialogFactory.buildUsernameChangeDialog(
+						getContext(), positive);
+				dialog.show();
+			}
 			return true;
 		}
 	};
@@ -74,7 +76,6 @@ public class ShoutUsernamePreference extends ShoutEditTextPreference {
 		@Override
 		public boolean onPreferenceChange(Preference preference, Object newValue) {
 			String newName = (String) newValue;
-			SignatureUtility signUtility = new SignatureUtility(context);
 			User current = signUtility.getUser(); // TODO Fix lifecycle
 			if (current == null) {
 				try {
