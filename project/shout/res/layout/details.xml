@@ -12,40 +12,9 @@
             android:id="@+id/imageView1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:contentDescription="TODO"
+            android:contentDescription="@string/avatarDesc"
             android:src="@drawable/defaultavatar" />
 
-        <TextView
-            android:id="@+id/textView1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/imageView1"
-            android:text="Medium Text"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-
-        <TextView
-            android:id="@+id/detailsSender"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/imageView1"
-            android:text="TextView" />
-
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/imageView1"
-            android:layout_toRightOf="@+id/detailsSender"
-            android:layout_alignParentRight="true"
-            android:gravity="right"
-            android:text="TextView" />
-
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/Comments"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
     </RelativeLayout>
 
     <ListView

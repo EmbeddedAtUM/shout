@@ -9,6 +9,7 @@ import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,7 +21,6 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,8 +53,9 @@ public class ShoutActivity extends ListActivity {
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
 		Log.v(TAG, "Click at position " + position + ", id " + id);
-		RelativeLayout buttons = (RelativeLayout) v.findViewById(R.id.buttonHolder);
-		buttons.setVisibility(View.VISIBLE);
+		ViewHolder holder = (ViewHolder) v.getTag();
+		holder.buttonHolder.setVisibility(View.VISIBLE);
+		holder.expanded = true;
 	}
 
 	@Override
@@ -85,13 +86,53 @@ public class ShoutActivity extends ListActivity {
 
 	public void onClickShout(View v) {
 		Log.v(TAG, "Shout button clicked");
-
 		startActivity(new Intent(this, MessageActivity.class));
 	}
 
 	public void onClickSettings(View v) {
 		Log.v(TAG, "Settings button clicked");
 		startActivity(new Intent(this, SettingsActivity.class));
+	}
+
+	public void onClickReshout(View v) {
+		Log.v(TAG, "Reshout button clicked");
+		ViewGroup rowView = (ViewGroup) v.getParent().getParent(); // bad
+		ViewHolder holder = (ViewHolder) rowView.getTag();
+		int id = holder.id;
+		Log.v(TAG, "Shout ID received as " + id);
+		AsyncTask<Integer, Void, Boolean> reshoutTask = new AsyncTask<Integer, Void, Boolean>() {
+
+			@Override
+			protected Boolean doInBackground(Integer... ids) {
+				Shout parent = ShoutProviderContract.retrieveShoutById(getApplicationContext(),
+						ids[0]);
+				if (parent == null) {
+					return false;
+				}
+				SignatureUtility signUtility = new SignatureUtility(getApplicationContext());
+				ShoutCreator creator = new ShoutCreator(getApplicationContext(), signUtility);
+				Shout reshout = creator.saveShout(DateTime.now(), null, parent);
+				if (reshout == null) {
+					return false;
+				}
+				return creator.sendShout(reshout);
+			}
+
+			@Override
+			protected void onPostExecute(Boolean result) {
+				if (result.booleanValue()) {
+					Toast.makeText(getApplicationContext(), "Reshout successfully sent!",
+							Toast.LENGTH_LONG)
+							.show();
+				} else {
+					Toast.makeText(getApplicationContext(), "Reshout unsuccessful...",
+							Toast.LENGTH_LONG);
+				}
+			}
+		};
+		reshoutTask.execute(new Integer[] {
+				id
+		});
 	}
 
 	static class ViewHolder {
@@ -103,21 +144,6 @@ public class ShoutActivity extends ListActivity {
 		ViewGroup buttonHolder;
 		boolean expanded = false;
 		int id = -1;
-	}
-
-	public void onClickReshout(View v) {
-		Log.v(TAG, "Reshout button clicked");
-		ViewGroup rowView = (ViewGroup) v.getParent().getParent();																			// bad
-		ViewHolder holder = (ViewHolder) rowView.getTag();
-		int id = holder.id;
-		Log.v(TAG, "Shout ID received as " + id);
-		Shout parent = ShoutProviderContract.retrieveShoutById(getApplicationContext(), id);
-		SignatureUtility signUtility = new SignatureUtility(getApplicationContext());
-		ShoutCreator creator = new ShoutCreator(getApplicationContext(), signUtility);
-		Shout reshout = creator.saveShout(DateTime.now(), null, parent);
-		creator.sendShout(reshout);
-		Toast.makeText(getApplicationContext(), "Reshout successfully sent!", Toast.LENGTH_LONG)
-				.show();
 	}
 
 	private class TimelineAdapter extends CursorAdapter {
@@ -182,6 +208,5 @@ public class ShoutActivity extends ListActivity {
 			Log.v(TAG, "View inflated");
 			return rowView;
 		}
-
 	}
 }
