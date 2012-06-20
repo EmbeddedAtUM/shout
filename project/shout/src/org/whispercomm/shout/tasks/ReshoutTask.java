@@ -42,6 +42,9 @@ public class ReshoutTask extends AsyncTask<Integer, Void, Shout> {
 		}
 		SignatureUtility utility = new SignatureUtility(context);
 		User user = utility.getUser();
+		if (user == null) {
+			return null;
+		}
 		if (parent.getSender().getPublicKey().equals(user.getPublicKey())) {
 			return parent;
 		} else {
