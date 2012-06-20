@@ -1,15 +1,13 @@
 
 package org.whispercomm.shout;
 
-import org.joda.time.DateTime;
-import org.whispercomm.shout.id.SignatureUtility;
 import org.whispercomm.shout.provider.ShoutProviderContract;
+import org.whispercomm.shout.tasks.ReshoutTask;
 
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,7 +20,6 @@ import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class ShoutActivity extends ListActivity {
 
@@ -101,42 +98,9 @@ public class ShoutActivity extends ListActivity {
 		ViewHolder holder = (ViewHolder) rowView.getTag();
 		int id = holder.id;
 		Log.v(TAG, "Shout ID received as " + id);
-		AsyncTask<Integer, Void, Boolean> reshoutTask = new AsyncTask<Integer, Void, Boolean>() {
-
-			@Override
-			protected Boolean doInBackground(Integer... ids) {
-				Shout parent = ShoutProviderContract.retrieveShoutById(getApplicationContext(),
-						ids[0]);
-				if (parent == null) {
-					return false;
-				} else if (parent.getMessage() == null) {
-					// Parent was a reshout, get the original
-					parent = parent.getParent();
-				}
-				SignatureUtility signUtility = new SignatureUtility(getApplicationContext());
-				ShoutCreator creator = new ShoutCreator(getApplicationContext(), signUtility);
-				Shout reshout = creator.saveShout(DateTime.now(), null, parent);
-				if (reshout == null) {
-					return false;
-				}
-				return creator.sendShout(reshout);
-			}
-
-			@Override
-			protected void onPostExecute(Boolean result) {
-				if (result.booleanValue()) {
-					Toast.makeText(getApplicationContext(), "Reshout successfully sent!",
-							Toast.LENGTH_LONG)
-							.show();
-				} else {
-					Toast.makeText(getApplicationContext(), "Reshout unsuccessful...",
-							Toast.LENGTH_LONG);
-				}
-			}
-		};
-		reshoutTask.execute(new Integer[] {
-				id
-		});
+		// Handle the reshout
+		ReshoutTask reshoutTask = new ReshoutTask(getApplicationContext());
+		reshoutTask.execute(id);
 	}
 
 	public void onClickComment(View v) {

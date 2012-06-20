@@ -66,7 +66,7 @@ public class MessageActivity extends Activity {
 	private class SendShoutTask extends AsyncTask<String, Void, Boolean> {
 
 		// TODO Progress indicator?
-
+		// TODO Merge this into OutgoingShoutTask?
 		@Override
 		protected Boolean doInBackground(String... params) {
 			return creator.createShout(DateTime.now(), params[0], null);
