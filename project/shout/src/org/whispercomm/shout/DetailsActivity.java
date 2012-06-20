@@ -24,8 +24,7 @@ public class DetailsActivity extends ListActivity {
 		setContentView(R.layout.details);
 		int shoutId = 1; // FIXME
 		cursor = ShoutProviderContract.getCursorOverShoutComments(getApplicationContext(), shoutId);
-		CommentsAdapter adapter = new CommentsAdapter(this, cursor); 
-		setListAdapter(adapter);
+		setListAdapter(new CommentsAdapter(this, cursor));
 	}
 
 	@Override
