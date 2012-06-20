@@ -13,6 +13,8 @@ import android.widget.CursorAdapter;
 
 public class DetailsActivity extends ListActivity {
 
+	public static final String SHOUT_ID = "shout_id";
+	
 	private Cursor cursor;
 	
 	/** Called when the activity is first created. */

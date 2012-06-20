@@ -115,10 +115,13 @@ public class ShoutActivity extends ListActivity {
 
 	public void onClickDetails(View v) {
 		Log.v(TAG, "Details buttons clicked");
-		/*
-		 * TODO Launch Details Activity with Shout ID as an Intent extra. See
-		 * onClickReshout() for how to get Shout ID
-		 */
+		ViewGroup rowView = (ViewGroup) v.getParent().getParent();
+		ViewHolder holder = (ViewHolder) rowView.getTag();
+		int id = holder.id;
+		Log.v(TAG, "Shout ID received as " + id);
+		Intent intent = new Intent(this, DetailsActivity.class);
+		intent.putExtra(DetailsActivity.SHOUT_ID, id);
+		startActivity(intent);
 	}
 
 	static class ViewHolder {
