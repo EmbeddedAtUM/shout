@@ -32,7 +32,7 @@
             android:layout_marginLeft="20dip"
             android:layout_toRightOf="@+id/origsender"
             android:contentDescription="@string/reshoutDesc"
-            android:src="@drawable/reshouticon" />
+            android:src="@drawable/reshoutblue" />
 
         <TextView
             android:id="@+id/sender"
@@ -88,7 +88,7 @@
             android:layout_toLeftOf="@+id/commentButton"
             android:contentDescription="@string/reshoutDescription"
             android:onClick="onClickReshout"
-            android:src="@drawable/reshouticon" />
+            android:src="@drawable/reshout" />
 
         <ImageButton
             android:id="@+id/commentButton"

@@ -7,7 +7,7 @@
     <RelativeLayout
         android:id="@+id/commentRow"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_marginLeft="25dp" >
 
         <TextView
@@ -24,6 +24,14 @@
             android:layout_height="wrap_content"
             android:layout_toRightOf="@+id/commentingUser"
             android:hint="Comment Text"
+            android:textColor="@android:color/black" />
+        
+        <TextView
+            android:id="@+id/age"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:hint="time passed"
             android:textColor="@android:color/black" />
     </RelativeLayout>
 
