@@ -32,6 +32,7 @@ public class DetailsActivity extends ListActivity {
 		//get shout id from intent
 		//shoutprovidercontract with id
 		int shoutId = 1; // FIXME
+		shout =  ShoutProviderContract.retrieveShoutById(getBaseContext(), shoutId);
 		cursor = ShoutProviderContract.getCursorOverShoutComments(getApplicationContext(), shoutId);
 		setListAdapter(new CommentsAdapter(this, cursor));
 	}
