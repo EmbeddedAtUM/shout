@@ -14,7 +14,7 @@ import android.widget.Toast;
  * 
  * @author David Adrian
  */
-public class OutgoingShoutTask extends AsyncTask<Shout, Void, Boolean> {
+public class OutgoingShoutTask extends AsyncTask<Integer, Void, Boolean> {
 
 	private Context context;
 	private int successResId;
@@ -34,7 +34,7 @@ public class OutgoingShoutTask extends AsyncTask<Shout, Void, Boolean> {
 	}
 
 	@Override
-	protected Boolean doInBackground(Shout... shouts) {
+	protected Boolean doInBackground(Integer... shouts) {
 		if (shouts.length < 1) {
 			return false;
 		}

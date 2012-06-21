@@ -21,7 +21,7 @@ import android.widget.Toast;
  * 
  * @author David Adrian 
  */
-public class ReshoutTask extends AsyncTask<Integer, Void, Shout> {
+public class ReshoutTask extends AsyncTask<Integer, Void, Integer> {
 
 	private Context context;
 
@@ -30,7 +30,7 @@ public class ReshoutTask extends AsyncTask<Integer, Void, Shout> {
 	}
 
 	@Override
-	protected Shout doInBackground(Integer... params) {
+	protected Integer doInBackground(Integer... params) {
 		Shout parent = ShoutProviderContract.retrieveShoutById(context, params[0]);
 		ShoutType type = ShoutMessageUtility.getShoutType(parent);
 		switch (type) {
@@ -46,16 +46,16 @@ public class ReshoutTask extends AsyncTask<Integer, Void, Shout> {
 			return null;
 		}
 		if (parent.getSender().getPublicKey().equals(user.getPublicKey())) {
-			return parent;
+			return params[0];
 		} else {
 			ShoutCreator creator = new ShoutCreator(context, utility);
-			Shout reshout = creator.saveShout(DateTime.now(), null, parent);
-			return reshout;
+			int reshoutId = creator.saveShout(DateTime.now(), null, parent);
+			return reshoutId;
 		}
 	}
 
 	@Override
-	protected void onPostExecute(Shout result) {
+	protected void onPostExecute(Integer result) {
 		if (result == null) {
 			// TODO Make this situation not happen
 			Toast.makeText(context, "Make a user before you Shout!", Toast.LENGTH_LONG).show();
