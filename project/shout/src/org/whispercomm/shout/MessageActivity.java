@@ -44,10 +44,12 @@ public class MessageActivity extends Activity {
 				case COMMENT:
 				case RESHOUT:
 					parent = parent.getParent();
+					parentId = ShoutProviderContract.storeShout(getApplicationContext(), parent);
 					Log.v(TAG, "Parent was a comment/reshout, resetting parent to grandparent");
 					break;
 				case RECOMMENT:
 					parent = parent.getParent().getParent();
+					parentId = ShoutProviderContract.storeShout(getApplicationContext(), parent);
 					Log.v(TAG, "Parent was a recomment, resetting parent to great grandparent");
 					break;
 				default:
