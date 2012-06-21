@@ -398,9 +398,10 @@ public class ShoutProviderContract {
 		String[] projection = {
 			Shouts._ID
 		};
+		String selection = "NOT (" + Shouts.PARENT + " IS NOT NULL AND " + Shouts.MESSAGE + " IS NOT NULL)";
 		String sortOrder = Shouts.TIME + " DESC";
 		Cursor result = context.getContentResolver().query(Shouts.CONTENT_URI,
-				projection, null, null, sortOrder);
+				projection, selection, null, sortOrder);
 		return result;
 	}
 
@@ -409,9 +410,9 @@ public class ShoutProviderContract {
 			Shouts._ID
 		};
 		String sortOrder = Shouts.TIME + " DESC";
-		String selection = Shouts._ID + " < ? AND " + Shouts.MESSAGE + " IS NOT NULL";
+		String selection = Shouts.PARENT + " = ? AND " + Shouts.MESSAGE + " IS NOT NULL";
 		String[] selectionArgs = {
-			"5"
+			Integer.toString(shoutId)
 		};
 		Cursor result = context.getContentResolver().query(Shouts.CONTENT_URI, projection,
 				selection, selectionArgs, sortOrder);

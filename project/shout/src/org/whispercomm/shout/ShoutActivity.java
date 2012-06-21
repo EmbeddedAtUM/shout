@@ -125,6 +125,7 @@ public class ShoutActivity extends ListActivity {
 
 	static class ViewHolder {
 		ImageView avatar;
+		ImageView reshoutIcon;
 		TextView origSender;
 		TextView sender;
 		TextView message;
@@ -155,25 +156,27 @@ public class ShoutActivity extends ListActivity {
 
 			// Set the Shout data in the views
 			holder.avatar.setImageResource(R.drawable.defaultavatar);
-			holder.sender.setText(shout.getSender().getUsername());
 			holder.age.setText(ShoutMessageUtility.getDateTimeAge(shout.getTimestamp()));
 			ShoutType type = ShoutMessageUtility.getShoutType(shout);
 			switch (type) {
 				case SHOUT:
 					holder.message.setText(shout.getMessage());
 					holder.origSender.setText(shout.getSender().getUsername());
+					holder.reshoutIcon.setVisibility(View.GONE);
+					holder.sender.setVisibility(View.GONE);
 					break;
 				case RESHOUT:
+					holder.reshoutIcon.setVisibility(View.VISIBLE);
 					holder.message.setText(shout.getParent().getMessage());
 					holder.origSender.setText(shout.getParent().getSender().getUsername());
+					holder.sender.setText(shout.getSender().getUsername());
+					holder.sender.setVisibility(View.VISIBLE);
 					break;
 				case COMMENT:
-					holder.message.setText(shout.getMessage());
-					holder.origSender.setText("comment"); // FIXME
+					// Should never happen
 					break;
 				case RECOMMENT:
-					holder.message.setText(shout.getParent().getMessage());
-					holder.origSender.setText(shout.getParent().getSender().getUsername());
+					// Should never happen
 					break;
 				default:
 					throw new IllegalStateException("Did not get valid ShoutType");
@@ -192,6 +195,7 @@ public class ShoutActivity extends ListActivity {
 			holder.age = (TextView) rowView.findViewById(R.id.age);
 			holder.message = (TextView) rowView.findViewById(R.id.message);
 			holder.buttonHolder = (ViewGroup) rowView.findViewById(R.id.buttonHolder);
+			holder.reshoutIcon = (ImageView) rowView.findViewById(R.id.reshoutIcon);
 			rowView.setTag(holder);
 			Log.v(TAG, "View inflated");
 			return rowView;

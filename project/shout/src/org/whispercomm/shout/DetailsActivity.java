@@ -31,7 +31,20 @@ public class DetailsActivity extends ListActivity {
 		setContentView(R.layout.details);
 		Bundle extras = getIntent().getExtras();
 		shoutId = extras.getInt(SHOUT_ID);
-		cursor = ShoutProviderContract.getCursorOverShoutComments(getApplicationContext(), shoutId);
+		shout = ShoutProviderContract.retrieveShoutById(getApplicationContext(), shoutId);
+		ShoutType type = ShoutMessageUtility.getShoutType(shout);
+		switch (type) {
+			case RESHOUT:
+				int parentId = ShoutProviderContract.storeShout(getApplicationContext(),
+						shout.getParent());
+				cursor = ShoutProviderContract.getCursorOverShoutComments(getApplicationContext(),
+						parentId);
+				break;
+			default:
+				cursor = ShoutProviderContract.getCursorOverShoutComments(getApplicationContext(),
+						shoutId);
+				break;
+		}
 		setListAdapter(new CommentsAdapter(this, cursor));
 	}
 
@@ -41,9 +54,8 @@ public class DetailsActivity extends ListActivity {
 		shout = ShoutProviderContract.retrieveShoutById(getApplicationContext(), shoutId);
 		/*
 		 * TODO 1) Figure out how to get access to the views that show the
-		 * information about the Shout we're viewing the details of.
-		 * 
-		 * 2) Populate those fields with content from this.shout
+		 * information about the Shout we're viewing the details of. 2) Populate
+		 * those fields with content from this.shout
 		 */
 		Log.v(TAG, "Finished onResume");
 	}
