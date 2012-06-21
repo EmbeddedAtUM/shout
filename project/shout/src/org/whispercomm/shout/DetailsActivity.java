@@ -1,7 +1,6 @@
 
 package org.whispercomm.shout;
 
-import org.whispercomm.shout.ShoutActivity.ViewHolder;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 
 import android.app.ListActivity;
@@ -13,28 +12,40 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
+// TODO Make this page not look terrible
 public class DetailsActivity extends ListActivity {
 
 	private static final String TAG = "DetailsActivity";
 	public static final String SHOUT_ID = "shout_id";
 	private Shout shout;
-	
+	private int shoutId;
+
 	private Cursor cursor;
-	
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.details);
-		//get shout id from intent
-		//shoutprovidercontract with id
-		int shoutId = 1; // FIXME
-		shout =  ShoutProviderContract.retrieveShoutById(getBaseContext(), shoutId);
+		Bundle extras = getIntent().getExtras();
+		shoutId = extras.getInt(SHOUT_ID);
 		cursor = ShoutProviderContract.getCursorOverShoutComments(getApplicationContext(), shoutId);
 		setListAdapter(new CommentsAdapter(this, cursor));
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		shout = ShoutProviderContract.retrieveShoutById(getApplicationContext(), shoutId);
+		/*
+		 * TODO 1) Figure out how to get access to the views that show the
+		 * information about the Shout we're viewing the details of.
+		 * 
+		 * 2) Populate those fields with content from this.shout
+		 */
+		Log.v(TAG, "Finished onResume");
 	}
 
 	@Override
@@ -43,11 +54,12 @@ public class DetailsActivity extends ListActivity {
 		cursor.close();
 		Log.v(TAG, "Finished onDestroy");
 	}
-	
+
 	static class DetailsViewHolder {
 		TextView origSender;
 		TextView message;
 		TextView age;
+		int id = -1;
 	}
 
 	private class CommentsAdapter extends CursorAdapter {
@@ -58,11 +70,17 @@ public class DetailsActivity extends ListActivity {
 
 		@Override
 		public void bindView(View view, Context context, Cursor cursor) {
-			// TODO Auto-generated method stub
-			/*
-			 * Set the text in the relevant view fields.
-			 */
 			// Get the shout
+			int idIndex = cursor.getColumnIndex(ShoutProviderContract.Shouts._ID);
+			int id = cursor.getInt(idIndex);
+			Shout comment = ShoutProviderContract.retrieveShoutById(getApplicationContext(), id);
+
+			// Set the view content
+			DetailsViewHolder holder = (DetailsViewHolder) view.getTag();
+			holder.id = id;
+			holder.age.setText(ShoutMessageUtility.getDateTimeAge(comment.getTimestamp()));
+			holder.message.setText(comment.getMessage());
+			holder.origSender.setText(comment.getSender().getUsername());
 		}
 
 		@Override
@@ -74,9 +92,9 @@ public class DetailsActivity extends ListActivity {
 			LayoutInflater inflater = LayoutInflater.from(context);
 			View rowView = inflater.inflate(R.layout.comment, parent, false);
 			DetailsViewHolder holder = new DetailsViewHolder();
-			holder.origSender = (TextView) rowView.findViewById(R.id.origsender);
+			holder.origSender = (TextView) rowView.findViewById(R.id.commentingUser);
 			holder.age = (TextView) rowView.findViewById(R.id.age);
-			holder.message = (TextView) rowView.findViewById(R.id.message);
+			holder.message = (TextView) rowView.findViewById(R.id.commentText);
 			rowView.setTag(holder);
 			Log.v(TAG, "View inflated");
 			return rowView;

@@ -409,7 +409,7 @@ public class ShoutProviderContract {
 			Shouts._ID
 		};
 		String sortOrder = Shouts.TIME + " DESC";
-		String selection = Shouts._ID + " < ?";
+		String selection = Shouts._ID + " < ? AND " + Shouts.MESSAGE + " IS NOT NULL";
 		String[] selectionArgs = {
 			"5"
 		};
