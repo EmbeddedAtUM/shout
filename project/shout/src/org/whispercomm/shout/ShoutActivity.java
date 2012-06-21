@@ -65,7 +65,6 @@ public class ShoutActivity extends ListActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		Intent intent;
-
 		switch (item.getItemId()) {
 			case R.id.settings:
 				intent = new Intent(this, SettingsActivity.class);
@@ -105,12 +104,12 @@ public class ShoutActivity extends ListActivity {
 
 	public void onClickComment(View v) {
 		Log.v(TAG, "Comment button clicked");
-		/*
-		 * TODO Launch message activity with intent parameter indicating that
-		 * this is a comment, not a new Shout, so that it can construct the
-		 * Shout accordingly. Relevant changes will need to be made in
-		 * MessageActivity.
-		 */
+		ViewGroup rowView = (ViewGroup) v.getParent().getParent();
+		ViewHolder holder = (ViewHolder) rowView.getTag();
+		int id = holder.id;
+		Intent intent = new Intent(this, MessageActivity.class);
+		intent.putExtra(MessageActivity.PARENT_ID, id);
+		startActivity(intent);
 	}
 
 	public void onClickDetails(View v) {

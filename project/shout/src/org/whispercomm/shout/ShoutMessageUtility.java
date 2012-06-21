@@ -16,10 +16,11 @@ public class ShoutMessageUtility {
 			return ShoutType.RESHOUT;
 		}
 	}
+
 	public static String getDateTimeAge(DateTime dt) {
 		long timePassed;
 		String unit;
-
+		// TODO Handle timestamps FROM THE FUTURE!!!!!
 		Duration age = new Duration(dt, null);
 		if (age.getStandardDays() >= 7) {
 			timePassed = age.getStandardDays() / 7;

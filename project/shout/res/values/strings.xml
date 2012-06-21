@@ -26,4 +26,6 @@
     <string name="reshoutFail">Reshout unsuccessful…</string>
     <string name="shoutSuccess">Shout successfully sent!</string>
     <string name="shoutFail">Shout unsuccessful…</string>
+    <string name="commentSuccess">Comment successfully sent!</string>
+    <string name="commentFail">Comment unsuccessful…</string>
 </resources>

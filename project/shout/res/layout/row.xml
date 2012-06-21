@@ -96,6 +96,7 @@
             android:layout_alignParentTop="true"
             android:layout_toLeftOf="@+id/detailsButton"
             android:contentDescription="@string/commentDescription"
+            android:onClick="onClickComment"
             android:src="@drawable/chat" />
 
         <ImageButton
