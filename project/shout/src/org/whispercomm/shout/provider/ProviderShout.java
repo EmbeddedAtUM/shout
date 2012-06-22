@@ -1,4 +1,3 @@
-
 package org.whispercomm.shout.provider;
 
 import org.joda.time.DateTime;
@@ -8,6 +7,14 @@ import org.whispercomm.shout.User;
 import android.content.Context;
 import android.util.Base64;
 
+/**
+ * An implementation of {@link Shout} backed by the Shout ContentProvider
+ * database.
+ * 
+ * @author David Adrian
+ * @author David R. Bild
+ * 
+ */
 public class ProviderShout implements Shout {
 
 	private byte[] signature;
@@ -19,15 +26,29 @@ public class ProviderShout implements Shout {
 
 	private Shout parent;
 
-	public ProviderShout(int senderId, int parentId, String message, long time, String hash,
-			String signature, Context context) {
+	/**
+	 * Constructs a new ProviderShout from the specified parameters.
+	 * 
+	 * @param senderId
+	 * @param parentId
+	 * @param message
+	 * @param time
+	 * @param hash
+	 * @param signature
+	 * @param context
+	 */
+	// TODO If such a Shout is really backed by an entry in the ContentProvider,
+	// this constructor should not be publically visible. Maybe package-private?
+	public ProviderShout(int senderId, int parentId, String message, long time,
+			String hash, String signature, Context context) {
 		this.message = message;
 		this.timestamp = new DateTime(time); // TODO Time Zone
 		this.hash = Base64.decode(hash, Base64.DEFAULT);
 		this.signature = Base64.decode(signature, Base64.DEFAULT);
 		this.sender = ShoutProviderContract.retrieveUserById(context, senderId);
 		if (parentId > 0) {
-			this.parent = ShoutProviderContract.retrieveShoutById(context, parentId);
+			this.parent = ShoutProviderContract.retrieveShoutById(context,
+					parentId);
 			// TODO Lazy load parent
 		} else {
 			this.parent = null;
