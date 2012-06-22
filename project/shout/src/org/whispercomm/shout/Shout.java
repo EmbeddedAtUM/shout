@@ -2,6 +2,12 @@ package org.whispercomm.shout;
 
 import org.joda.time.DateTime;
 
+/**
+ * A Shout message.
+ * 
+ * @author David Adrian
+ * 
+ */
 public interface Shout {
 
 	/**
