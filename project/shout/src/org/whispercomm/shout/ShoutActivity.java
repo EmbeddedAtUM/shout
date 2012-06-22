@@ -1,6 +1,7 @@
 
 package org.whispercomm.shout;
 
+import org.whispercomm.shout.provider.ShoutProvider;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.tasks.ReshoutTask;
 
@@ -126,6 +127,7 @@ public class ShoutActivity extends ListActivity {
 	static class ViewHolder {
 		ImageView avatar;
 		ImageView reshoutIcon;
+		TextView commentCount;
 		TextView origSender;
 		TextView sender;
 		TextView message;
@@ -143,16 +145,20 @@ public class ShoutActivity extends ListActivity {
 
 		@Override
 		public void bindView(View view, Context context, Cursor cursor) {
+			Log.v(TAG, "bindView called");
 			// Get the shout
 			int idIndex = cursor
 					.getColumnIndex(ShoutProviderContract.Shouts._ID);
 			int id = cursor.getInt(idIndex);
 			Shout shout = ShoutProviderContract.retrieveShoutById(context, id);
-
+			int countIndex = cursor.getColumnIndex(ShoutProvider.COMMENT_COUNT_COLUMN);
+			int commentCount = cursor.getInt(countIndex);
+			
 			// Find the views
 			ViewHolder holder = (ViewHolder) view.getTag();
 			holder.id = id;
 			holder.buttonHolder.setVisibility(View.GONE);
+			holder.commentCount.setText("Comments (" + commentCount + ")");
 
 			// Set the Shout data in the views
 			holder.avatar.setImageResource(R.drawable.defaultavatar);
@@ -196,6 +202,7 @@ public class ShoutActivity extends ListActivity {
 			holder.message = (TextView) rowView.findViewById(R.id.message);
 			holder.buttonHolder = (ViewGroup) rowView.findViewById(R.id.buttonHolder);
 			holder.reshoutIcon = (ImageView) rowView.findViewById(R.id.reshoutIcon);
+			holder.commentCount = (TextView) rowView.findViewById(R.id.commentCount);
 			rowView.setTag(holder);
 			Log.v(TAG, "View inflated");
 			return rowView;

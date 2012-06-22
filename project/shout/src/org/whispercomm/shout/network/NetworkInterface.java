@@ -55,6 +55,7 @@ public class NetworkInterface {
 			@Override
 			public void onServiceDisconnected(ComponentName name) {
 				shoutService = null;
+				// TODO dump to SD card
 				Log.d(TAG, "Network service unbound");
 				Toast.makeText(NetworkInterface.this.context, "Network service unbound...",
 						Toast.LENGTH_LONG);

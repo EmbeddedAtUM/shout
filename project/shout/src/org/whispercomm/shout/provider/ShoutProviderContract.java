@@ -395,24 +395,20 @@ public class ShoutProviderContract {
 	}
 
 	public static Cursor getCursorOverAllShouts(Context context) {
-		String[] projection = {
-			Shouts._ID
-		};
-		String selection = "NOT (" + Shouts.PARENT + " IS NOT NULL AND " + Shouts.MESSAGE + " IS NOT NULL)";
-		String sortOrder = Shouts.TIME + " DESC";
-		Cursor result = context.getContentResolver().query(Shouts.CONTENT_URI,
-				projection, selection, null, sortOrder);
+		Uri uri = Uri.withAppendedPath(Shouts.CONTENT_URI, "all");
+		Cursor result = context.getContentResolver().query(uri,
+				null, null, null, null);
 		return result;
 	}
 
 	public static Cursor getCursorOverShoutComments(Context context, int shoutId) {
 		String[] projection = {
-			Shouts._ID
+				Shouts._ID
 		};
 		String sortOrder = Shouts.TIME + " DESC";
 		String selection = Shouts.PARENT + " = ? AND " + Shouts.MESSAGE + " IS NOT NULL";
 		String[] selectionArgs = {
-			Integer.toString(shoutId)
+				Integer.toString(shoutId)
 		};
 		Cursor result = context.getContentResolver().query(Shouts.CONTENT_URI, projection,
 				selection, selectionArgs, sortOrder);
@@ -455,7 +451,7 @@ public class ShoutProviderContract {
 		 */
 		public static int queryForUser(Context context, DatabaseUser user) {
 			String[] projection = {
-				Users._ID
+					Users._ID
 			};
 			String selection = Users.PUB_KEY + " = ? AND " + Users.USERNAME
 					+ " = ?";
@@ -516,7 +512,7 @@ public class ShoutProviderContract {
 		 */
 		public static int queryForShout(Context context, DatabaseShout dbShout) {
 			String[] projection = {
-				Shouts._ID
+					Shouts._ID
 			};
 			String selection = Shouts.HASH + " = ? AND " + Shouts.SIGNATURE
 					+ " = ?";

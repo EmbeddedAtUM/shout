@@ -1,6 +1,8 @@
 
 package org.whispercomm.shout.provider;
 
+import org.whispercomm.shout.provider.ShoutProviderContract.Shouts;
+
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -35,6 +37,11 @@ public class ShoutProvider extends ContentProvider {
 	private static final int MESSAGE_ID = 40;
 	private static final int SHOUTS_USER_ID = 120;
 	private static final int MESSAGES_SHOUT_ID = 410;
+	private static final int SHOUTS_FANCY = 9001;
+
+	public static final String COMMENT_COUNT_COLUMN = "comment_count";
+
+	public static final String FANCY_ASS_QUERY = "SELECT s1._id AS _id, COUNT(s2._id) AS comment_count FROM Shout AS s1 LEFT OUTER JOIN Shout AS s2 ON (s2.parent = s1._id AND s2.Message IS NOT NULL) WHERE NOT (s1.Parent IS NOT NULL AND s1.Message IS NOT NULL) GROUP BY s1._id;";
 
 	static {
 		sUriMatcher.addURI(AUTHORITY, "shout", SHOUTS);
@@ -42,10 +49,11 @@ public class ShoutProvider extends ContentProvider {
 		sUriMatcher.addURI(AUTHORITY, "shout/#", SHOUT_ID);
 		sUriMatcher.addURI(AUTHORITY, "user/#", USER_ID);
 		sUriMatcher.addURI(AUTHORITY, "shout/user/#", SHOUTS_USER_ID);
-		
+
 		sUriMatcher.addURI(AUTHORITY, "message", MESSAGES);
 		sUriMatcher.addURI(AUTHORITY, "message/#", MESSAGE_ID);
 		sUriMatcher.addURI(AUTHORITY, "message/shout/#", MESSAGES_SHOUT_ID);
+		sUriMatcher.addURI(AUTHORITY, "shout/all", SHOUTS_FANCY);
 	}
 
 	private ShoutDatabaseHelper mOpenHelper;
@@ -189,12 +197,18 @@ public class ShoutProvider extends ContentProvider {
 				break;
 			case MESSAGE_ID:
 				qBuilder.setTables(ShoutSearchContract.Messages.TABLE_NAME);
-				qBuilder.appendWhere(ShoutSearchContract.Messages._ID + "=" + uri.getLastPathSegment());
+				qBuilder.appendWhere(ShoutSearchContract.Messages._ID + "="
+						+ uri.getLastPathSegment());
 				break;
 			case MESSAGES_SHOUT_ID:
 				qBuilder.setTables(ShoutSearchContract.Messages.TABLE_NAME);
-				qBuilder.appendWhere(ShoutSearchContract.Messages.SHOUT + " MATCH " + uri.getLastPathSegment());
+				qBuilder.appendWhere(ShoutSearchContract.Messages.SHOUT + " MATCH "
+						+ uri.getLastPathSegment());
 				break;
+			case SHOUTS_FANCY:
+				Cursor result = mDB.rawQuery(FANCY_ASS_QUERY, null);
+				result.setNotificationUri(this.getContext().getContentResolver(), Shouts.CONTENT_URI);
+				return result;
 			default:
 				throw new IllegalArgumentException("Unknown or invalid URI " + uri);
 		}
@@ -302,12 +316,12 @@ public class ShoutProvider extends ContentProvider {
 				"(" + ShoutProviderContract.Shouts._ID + ") " +
 				");";
 
-		private static final String SQL_CREATE_VIRTUAL_MESSAGE = "CREATE VIRTUAL TABLE " + 
-				ShoutSearchContract.Messages.TABLE_NAME + 
-				" USING fts3(" + 
+		private static final String SQL_CREATE_VIRTUAL_MESSAGE = "CREATE VIRTUAL TABLE " +
+				ShoutSearchContract.Messages.TABLE_NAME +
+				" USING fts3(" +
 				ShoutSearchContract.Messages.SHOUT + ", " +
 				ShoutSearchContract.Messages.MESSAGE + ");";
-		
+
 		public ShoutDatabaseHelper(Context context) {
 			super(context, DBNAME, null, VERSION);
 		}

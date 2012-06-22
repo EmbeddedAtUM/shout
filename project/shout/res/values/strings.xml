@@ -17,7 +17,7 @@
     <string name="username_change_warning">Hey, you! Changing your username is a big deal! Changing it will generate a new authentication key, which means none of your previous Shouts wil be linked to this new username.\n\nRemember, once you change your username, there is no going back.</string>
     <string name="login_stub">lol jk.\n\n\nCan you imagine how ridiculous &quot;Twouting&quot; could end up sounding? Besides, I don\'t like implementing OAuth, anyway.</string>
     <string name="reshoutDesc">reshoutIcon</string>
-    <string name="comment">Comments (0)</string>
+    <string name="comment">Comments</string>
     <string name="reshoutDescription">Reshout</string>
     <string name="commentDescription">Comment</string>
     <string name="detailsDescription">Details</string>
@@ -28,4 +28,7 @@
     <string name="shoutFail">Shout unsuccessful…</string>
     <string name="commentSuccess">Comment successfully sent!</string>
     <string name="commentFail">Comment unsuccessful…</string>
+    <string name="serviceTickerText">Starting Shout listener service</string>
+    <string name="serviceTitleText">Shout Service</string>
+    <string name="serviceDescriptionText">Currently listening for nearby Shouts</string>
 </resources>
