@@ -1,4 +1,3 @@
-
 package org.whispercomm.shout;
 
 import org.whispercomm.shout.provider.ShoutProvider;
@@ -67,14 +66,14 @@ public class ShoutActivity extends ListActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		Intent intent;
 		switch (item.getItemId()) {
-			case R.id.settings:
-				intent = new Intent(this, SettingsActivity.class);
-				break;
-			case R.id.compose:
-				intent = new Intent(this, MessageActivity.class);
-				break;
-			default:
-				return super.onOptionsItemSelected(item);
+		case R.id.settings:
+			intent = new Intent(this, SettingsActivity.class);
+			break;
+		case R.id.compose:
+			intent = new Intent(this, MessageActivity.class);
+			break;
+		default:
+			return super.onOptionsItemSelected(item);
 		}
 
 		startActivity(intent);
@@ -151,9 +150,14 @@ public class ShoutActivity extends ListActivity {
 					.getColumnIndex(ShoutProviderContract.Shouts._ID);
 			int id = cursor.getInt(idIndex);
 			Shout shout = ShoutProviderContract.retrieveShoutById(context, id);
-			int countIndex = cursor.getColumnIndex(ShoutProvider.COMMENT_COUNT_COLUMN);
-			int commentCount = cursor.getInt(countIndex);
-			
+			int commentIndex = cursor
+					.getColumnIndex(ShoutProvider.COMMENT_COUNT_COLUMN);
+			int commentCount = cursor.getInt(commentIndex);
+
+			int reshoutIndex = cursor
+					.getColumnIndex(ShoutProvider.RESHOUT_COUNT_COLUMN);
+			int reshoutCount = cursor.getInt(reshoutIndex);
+
 			// Find the views
 			ViewHolder holder = (ViewHolder) view.getTag();
 			holder.id = id;
@@ -162,30 +166,40 @@ public class ShoutActivity extends ListActivity {
 
 			// Set the Shout data in the views
 			holder.avatar.setImageResource(R.drawable.defaultavatar);
-			holder.age.setText(ShoutMessageUtility.getDateTimeAge(shout.getTimestamp()));
+			holder.age.setText(ShoutMessageUtility.getDateTimeAge(shout
+					.getTimestamp()));
 			ShoutType type = ShoutMessageUtility.getShoutType(shout);
 			switch (type) {
-				case SHOUT:
-					holder.message.setText(shout.getMessage());
-					holder.origSender.setText(shout.getSender().getUsername());
+			case SHOUT:
+				holder.message.setText(shout.getMessage());
+				holder.origSender.setText(shout.getSender().getUsername());
+				if (reshoutCount > 0) {
+					holder.reshoutIcon.setVisibility(View.VISIBLE);
+					holder.sender.setVisibility(View.VISIBLE);
+					holder.sender.setText(String.format("Reshouted %s.",
+							ShoutMessageUtility.getCountAsText(reshoutCount)));
+				} else {
 					holder.reshoutIcon.setVisibility(View.GONE);
 					holder.sender.setVisibility(View.GONE);
-					break;
-				case RESHOUT:
-					holder.reshoutIcon.setVisibility(View.VISIBLE);
-					holder.message.setText(shout.getParent().getMessage());
-					holder.origSender.setText(shout.getParent().getSender().getUsername());
-					holder.sender.setText(shout.getSender().getUsername());
-					holder.sender.setVisibility(View.VISIBLE);
-					break;
-				case COMMENT:
-					// Should never happen
-					break;
-				case RECOMMENT:
-					// Should never happen
-					break;
-				default:
-					throw new IllegalStateException("Did not get valid ShoutType");
+				}
+				break;
+			case RESHOUT:
+				// Should never happen
+				// holder.reshoutIcon.setVisibility(View.VISIBLE);
+				// holder.message.setText(shout.getParent().getMessage());
+				// holder.origSender.setText(shout.getParent().getSender()
+				// .getUsername());
+				// holder.sender.setText(shout.getSender().getUsername());
+				// holder.sender.setVisibility(View.VISIBLE);
+				break;
+			case COMMENT:
+				// Should never happen
+				break;
+			case RECOMMENT:
+				// Should never happen
+				break;
+			default:
+				throw new IllegalStateException("Did not get valid ShoutType");
 			}
 			return;
 		}
@@ -196,13 +210,17 @@ public class ShoutActivity extends ListActivity {
 			View rowView = inflater.inflate(R.layout.row, parent, false);
 			ViewHolder holder = new ViewHolder();
 			holder.avatar = (ImageView) rowView.findViewById(R.id.avatar);
-			holder.origSender = (TextView) rowView.findViewById(R.id.origsender);
+			holder.origSender = (TextView) rowView
+					.findViewById(R.id.origsender);
 			holder.sender = (TextView) rowView.findViewById(R.id.sender);
 			holder.age = (TextView) rowView.findViewById(R.id.age);
 			holder.message = (TextView) rowView.findViewById(R.id.message);
-			holder.buttonHolder = (ViewGroup) rowView.findViewById(R.id.buttonHolder);
-			holder.reshoutIcon = (ImageView) rowView.findViewById(R.id.reshoutIcon);
-			holder.commentCount = (TextView) rowView.findViewById(R.id.commentCount);
+			holder.buttonHolder = (ViewGroup) rowView
+					.findViewById(R.id.buttonHolder);
+			holder.reshoutIcon = (ImageView) rowView
+					.findViewById(R.id.reshoutIcon);
+			holder.commentCount = (TextView) rowView
+					.findViewById(R.id.commentCount);
 			rowView.setTag(holder);
 			Log.v(TAG, "View inflated");
 			return rowView;

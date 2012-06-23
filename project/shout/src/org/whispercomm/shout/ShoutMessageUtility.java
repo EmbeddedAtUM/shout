@@ -1,4 +1,3 @@
-
 package org.whispercomm.shout;
 
 import org.joda.time.DateTime;
@@ -41,5 +40,18 @@ public class ShoutMessageUtility {
 
 		return String.format("%d %s%s ago.", timePassed, unit,
 				timePassed == 1 ? "" : "s");
+	}
+
+	public static String getCountAsText(int count) {
+		switch (count) {
+		case 0:
+			return "never";
+		case 1:
+			return "once";
+		case 2:
+			return "twice";
+		default:
+			return String.format("%d times", count);
+		}
 	}
 }
