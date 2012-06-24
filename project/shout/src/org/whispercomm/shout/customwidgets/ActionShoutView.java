@@ -2,6 +2,9 @@ package org.whispercomm.shout.customwidgets;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.whispercomm.shout.R;
 import org.whispercomm.shout.Shout;
@@ -9,9 +12,7 @@ import org.whispercomm.shout.Shout;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -32,12 +33,15 @@ public class ActionShoutView extends LinearLayout {
 	private ImageButton btnComment;
 	private ImageButton btnDetails;
 
-	private boolean barVisible;
+	private boolean actionBarVisibility;
 
 	// Listeners called when a button is clicked
 	private OnClickListener reshoutListener;
 	private OnClickListener commentListener;
 	private OnClickListener detailsListener;
+
+	// Listeners called when the action bar is toggled
+	private List<ActionBarStateChangeListener> actionBarStateChangeListeners;
 
 	public ActionShoutView(Context context, AttributeSet attributeSet) {
 		super(context, attributeSet);
@@ -71,7 +75,11 @@ public class ActionShoutView extends LinearLayout {
 	}
 
 	private void initializeActionBar() {
-		setBarVisibility(false);
+		actionBarStateChangeListeners = Collections
+				.synchronizedList(new ArrayList<ActionBarStateChangeListener>());
+
+		setActionBarVisibility(false);
+		this.setToggleActionBarOnClick(true);		
 
 		btnReshout.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -166,26 +174,49 @@ public class ActionShoutView extends LinearLayout {
 	}
 
 	/**
+	 * Enables or disables toggling of the action bar visibility when the view
+	 * is clicked.
+	 * 
+	 * @param toggle
+	 *            {@code true} to toggle on click; {@code false} otherwise.
+	 */
+	public void setToggleActionBarOnClick(boolean toggle) {
+		if (toggle) {
+			this.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					toggleActionBarVisibility();
+				}
+			});
+		} else {
+			this.setOnClickListener(null);
+		}
+	}
+
+	/**
 	 * Sets the visibility of the action bar displayed below the shout.
 	 * 
 	 * @param visibility
 	 *            {@code true} to show the action bar; {@code false} otherwise.
 	 */
-	public void setBarVisibility(boolean visibility) {
+	public void setActionBarVisibility(boolean visibility) {
 		if (visibility) {
-			barVisible = true;
+			actionBarVisibility = true;
 			actionBar.setVisibility(VISIBLE);
 		} else {
-			barVisible = false;
+			actionBarVisibility = false;
 			actionBar.setVisibility(GONE);
+		}
+		for (ActionBarStateChangeListener l : actionBarStateChangeListeners) {
+			l.stateChanged(actionBarVisibility);
 		}
 	}
 
 	/**
 	 * Toggles the visibility of the action bar displayed below the shout.
 	 */
-	public void toggleBarVisibility() {
-		setBarVisibility(!barVisible);
+	public void toggleActionBarVisibility() {
+		setActionBarVisibility(!actionBarVisibility);
 	}
 
 	/**
@@ -203,7 +234,7 @@ public class ActionShoutView extends LinearLayout {
 	 */
 	public void bindShout(Shout shout, int numComments, int numReshouts) {
 		shoutView.bindShout(shout, numComments, numReshouts);
-		setBarVisibility(false);
+		setActionBarVisibility(false);
 
 		// Hide comment button when displaying a comment.
 		switch (shout.getType()) {
@@ -247,6 +278,35 @@ public class ActionShoutView extends LinearLayout {
 	}
 
 	/**
+	 * Registers the listener to be called when the action bar visibility
+	 * changes.
+	 * <p>
+	 * Each listener is called as many times as it was registered. But you
+	 * probably don't actually want to register a listener more than once.
+	 * 
+	 * @param l
+	 *            the listener to register
+	 */
+	public void registerActionBarStateChangeListener(
+			ActionBarStateChangeListener l) {
+		this.actionBarStateChangeListeners.add(l);
+	}
+
+	/**
+	 * Unregisters the listener, if it was registered. If the listener was
+	 * registered more than once, only a single registration is removed.
+	 * 
+	 * @param l
+	 *            the listener to unregister
+	 * @return {@code true} if the listener was unregistered, {@code false} is
+	 *         the listener was not already registered.
+	 */
+	public boolean unregisterActionBarStateChangeListener(
+			ActionBarStateChangeListener l) {
+		return this.actionBarStateChangeListeners.remove(l);
+	}
+
+	/**
 	 * Callback class called when an action button is clicked.
 	 * 
 	 * @author David R. Bild
@@ -254,6 +314,21 @@ public class ActionShoutView extends LinearLayout {
 	 */
 	public static interface OnClickListener {
 		public void onClick(Shout shout);
+	}
+
+	/**
+	 * Callback class called when the visibility of the action bar changes.
+	 * 
+	 * @author David R. Bild
+	 * 
+	 */
+	public static interface ActionBarStateChangeListener {
+		/**
+		 * @param visibility
+		 *            {@code true} if the action bar is now visibile,
+		 *            {@code false} otherwise.
+		 */
+		public void stateChanged(boolean visibility);
 	}
 
 }

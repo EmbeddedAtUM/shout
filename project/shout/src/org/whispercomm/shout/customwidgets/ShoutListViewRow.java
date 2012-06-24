@@ -6,7 +6,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
@@ -42,19 +41,19 @@ public class ShoutListViewRow extends LinearLayout {
 		border = (LinearLayout) findViewById(R.id.border);
 
 		expanded = false;
-		this.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				toggleExpanded();
-			}
-		});
+		actionShoutView
+				.registerActionBarStateChangeListener(new ActionShoutView.ActionBarStateChangeListener() {
+					@Override
+					public void stateChanged(boolean visibility) {
+						setExpanded(visibility);
+					}
+				});
 	}
 
 	/**
 	 * Expands the display of the shout.
 	 * 
-	 * The shout is offset by margins in the listview and the children views are
-	 * expanded (e.g., the action bar and comments are shown).
+	 * The shout is offset by margins in the listview.
 	 * 
 	 * @param expanded
 	 *            {@code true} if the view should be expanded; {@code false}
@@ -63,7 +62,6 @@ public class ShoutListViewRow extends LinearLayout {
 	public void setExpanded(boolean expanded) {
 		this.expanded = expanded;
 		setMargins(expanded);
-		actionShoutView.setBarVisibility(expanded);
 	}
 
 	public void toggleExpanded() {
