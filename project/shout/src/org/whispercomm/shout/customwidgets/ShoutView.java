@@ -3,6 +3,7 @@ package org.whispercomm.shout.customwidgets;
 import org.whispercomm.shout.R;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.ShoutMessageUtility;
+import org.whispercomm.shout.ShoutType;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -30,6 +31,11 @@ public class ShoutView extends RelativeLayout {
 
 	private TextView commentCount;
 	private TextView age;
+
+	/**
+	 * The shout current bound to this view
+	 */
+	private Shout shout;
 
 	// TODO: Get rid of this. Use global id (hash) or LocalShout#localId
 	// instead.
@@ -75,13 +81,19 @@ public class ShoutView extends RelativeLayout {
 	 *            the reshout count for the shout to be displayed
 	 */
 	public void bindShout(Shout shout, int numComments, int numReshouts) {
+		this.shout = shout;
+
 		sender.setText(shout.getSender().getUsername());
 		avatar.setImageResource(R.drawable.defaultavatar);
 
 		message.setText(shout.getMessage());
-
-		commentCount.setText(String.format("Comments (%d)", numComments));
 		age.setText(ShoutMessageUtility.getDateTimeAge(shout.getTimestamp()));
+
+		if (shout.getType() == ShoutType.SHOUT) {
+			commentCount.setText(String.format("Comments (%d)", numComments));
+		} else {
+			commentCount.setText("");
+		}
 
 		if (numReshouts > 0) {
 			reshoutIcon.setVisibility(View.VISIBLE);
@@ -92,6 +104,15 @@ public class ShoutView extends RelativeLayout {
 			reshoutIcon.setVisibility(View.GONE);
 			reshouters.setVisibility(View.GONE);
 		}
+	}
+
+	/**
+	 * Returns the shout currently shout.
+	 * 
+	 * @return the currently bound shout; {@code null} if none is bound.
+	 */
+	public Shout getBoundShout() {
+		return this.shout;
 	}
 
 }
