@@ -12,14 +12,12 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
-import android.widget.LinearLayout;
 
 public class ShoutActivity extends ListActivity {
 
@@ -156,26 +154,18 @@ public class ShoutActivity extends ListActivity {
 			RowHolder holder = (RowHolder) view.getTag();
 
 			// Bind the shout to the shout view
-			holder.rowView.setExpanded(false);
-			holder.actionShoutView.bindShout(shout, commentCount, reshoutCount);
+			holder.rowView.bindShout(shout, commentCount, reshoutCount);
 		}
 
 		@Override
 		public View newView(final Context context, Cursor cursor,
 				ViewGroup parent) {
 			final RowHolder holder = new RowHolder();
-			
+
 			ShoutListViewRow row = new ShoutListViewRow(context);
 			holder.rowView = row;
 			holder.actionShoutView = (ActionShoutView) row
 					.findViewById(R.id.actionshoutview);
-
-			// ShoutChainView commentsView = new ShoutChainView(
-			// context);
-			// commentsView.bindShouts(ShoutProviderContract
-			// .getCursorOverShoutComments(context,
-			// holder.shoutView.id));
-			// holder.rowView.addView(commentsView);
 
 			row.setTag(holder);
 			return row;

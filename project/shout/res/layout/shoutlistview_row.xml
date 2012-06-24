@@ -8,18 +8,31 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dip"
         android:layout_marginRight="10dip"
-        android:background="@color/SeparatorGray"
-        android:paddingTop="1dip" >
+        android:orientation="vertical" >
 
-        <org.whispercomm.shout.customwidgets.ActionShoutView
-            android:id="@+id/actionshoutview"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:paddingTop="5dip"
-            custom:onCommentClick="onClickComment"
-            custom:onDetailsClick="onClickDetails"
-            custom:onReshoutClick="onClickReshout" />
+            android:background="@color/SeparatorGray"
+            android:paddingTop="1dip" >
+
+            <org.whispercomm.shout.customwidgets.ActionShoutView
+                android:id="@+id/actionshoutview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:paddingTop="5dip"
+                custom:onCommentClick="onClickComment"
+                custom:onDetailsClick="onClickDetails"
+                custom:onReshoutClick="onClickReshout" />
+        </LinearLayout>
+
+        <org.whispercomm.shout.customwidgets.ShoutChainView
+            android:id="@+id/commentsview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dip"
+            android:orientation="vertical" />
     </LinearLayout>
 
 </merge>
