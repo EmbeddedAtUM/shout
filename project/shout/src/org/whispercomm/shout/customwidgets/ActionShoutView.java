@@ -9,7 +9,9 @@ import org.whispercomm.shout.Shout;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -70,12 +72,6 @@ public class ActionShoutView extends LinearLayout {
 
 	private void initializeActionBar() {
 		setBarVisibility(false);
-		this.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				toggleBarVisibility();
-			}
-		});
 
 		btnReshout.setOnClickListener(new View.OnClickListener() {
 			@Override

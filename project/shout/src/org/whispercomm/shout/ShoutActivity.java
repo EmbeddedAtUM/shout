@@ -1,6 +1,7 @@
 package org.whispercomm.shout;
 
 import org.whispercomm.shout.customwidgets.ActionShoutView;
+import org.whispercomm.shout.customwidgets.ShoutListViewRow;
 import org.whispercomm.shout.provider.ShoutProvider;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.tasks.ReshoutTask;
@@ -123,7 +124,7 @@ public class ShoutActivity extends ListActivity {
 
 	// TODO: Get rid of this. RowHolder should be it's own custom component.
 	static class RowHolder {
-		LinearLayout rowView;
+		ShoutListViewRow rowView;
 		ActionShoutView actionShoutView;
 	}
 
@@ -155,18 +156,18 @@ public class ShoutActivity extends ListActivity {
 			RowHolder holder = (RowHolder) view.getTag();
 
 			// Bind the shout to the shout view
+			holder.rowView.setExpanded(false);
 			holder.actionShoutView.bindShout(shout, commentCount, reshoutCount);
 		}
 
 		@Override
 		public View newView(final Context context, Cursor cursor,
 				ViewGroup parent) {
-			LayoutInflater inflater = LayoutInflater.from(context);
-			View rowView = inflater.inflate(R.layout.row, parent, false);
-
 			final RowHolder holder = new RowHolder();
-			holder.rowView = (LinearLayout) rowView;
-			holder.actionShoutView = (ActionShoutView) rowView
+			
+			ShoutListViewRow row = new ShoutListViewRow(context);
+			holder.rowView = row;
+			holder.actionShoutView = (ActionShoutView) row
 					.findViewById(R.id.actionshoutview);
 
 			// ShoutChainView commentsView = new ShoutChainView(
@@ -176,8 +177,8 @@ public class ShoutActivity extends ListActivity {
 			// holder.shoutView.id));
 			// holder.rowView.addView(commentsView);
 
-			rowView.setTag(holder);
-			return rowView;
+			row.setTag(holder);
+			return row;
 		}
 	}
 }
