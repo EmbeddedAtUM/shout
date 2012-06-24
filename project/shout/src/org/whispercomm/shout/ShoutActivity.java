@@ -16,9 +16,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
-import android.widget.ListView;
 
 public class ShoutActivity extends ListActivity {
 
@@ -43,14 +43,6 @@ public class ShoutActivity extends ListActivity {
 		super.onDestroy();
 		cursor.close();
 		Log.v(TAG, "Finished onDestroy");
-	}
-
-	@Override
-	protected void onListItemClick(ListView l, View v, int position, long id) {
-		super.onListItemClick(l, v, position, id);
-		Log.v(TAG, "Click at position " + position + ", id " + id);
-		RowHolder holder = (RowHolder) v.getTag();
-		holder.buttonHolder.setVisibility(View.VISIBLE);
 	}
 
 	@Override
@@ -128,6 +120,7 @@ public class ShoutActivity extends ListActivity {
 	static class RowHolder {
 		ShoutView shoutView;
 		ViewGroup buttonHolder;
+		boolean expanded = false;
 	}
 
 	private class TimelineAdapter extends CursorAdapter {
@@ -158,6 +151,7 @@ public class ShoutActivity extends ListActivity {
 			RowHolder holder = (RowHolder) view.getTag();
 
 			// Hide the buttons
+			holder.expanded = false;
 			holder.buttonHolder.setVisibility(View.GONE);
 
 			// Bind the shout to the shout view
@@ -170,10 +164,23 @@ public class ShoutActivity extends ListActivity {
 			LayoutInflater inflater = LayoutInflater.from(context);
 			View rowView = inflater.inflate(R.layout.row, parent, false);
 
-			RowHolder holder = new RowHolder();
+			final RowHolder holder = new RowHolder();
 			holder.buttonHolder = (ViewGroup) rowView
 					.findViewById(R.id.buttonHolder);
 			holder.shoutView = (ShoutView) rowView.findViewById(R.id.shoutview);
+
+			holder.shoutView.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					if (holder.expanded) {
+						holder.buttonHolder.setVisibility(View.GONE);
+						holder.expanded = false;
+					} else {
+						holder.buttonHolder.setVisibility(View.VISIBLE);
+						holder.expanded = true;
+					}
+				}
+			});
 
 			rowView.setTag(holder);
 			return rowView;
