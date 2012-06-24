@@ -96,8 +96,7 @@ public class ShoutListViewRow extends LinearLayout {
 		int id = ShoutProviderContract.storeShout(getContext(), shout);
 
 		actionShoutView.bindShout(shout, numComments, numReshouts);
-		commentsView.bindShouts(ShoutProviderContract
-				.getCursorOverShoutComments(getContext(), id));
+		commentsView.bindShouts(id);
 	}
 
 	private void setMargins(boolean expanded) {

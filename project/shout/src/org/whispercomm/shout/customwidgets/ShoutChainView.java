@@ -11,6 +11,9 @@ import android.widget.LinearLayout;
 
 public class ShoutChainView extends LinearLayout {
 
+	private boolean loaded;
+	private int parentId;
+
 	public ShoutChainView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 	}
@@ -19,8 +22,24 @@ public class ShoutChainView extends LinearLayout {
 		super(context);
 	}
 
-	public void bindShouts(Cursor cursor) {
+	@Override
+	public void setVisibility(int visibility) {
+		if (visibility == VISIBLE && !loaded) {
+			loadShouts();
+		}
+		super.setVisibility(visibility);
+	}
+
+	public void bindShouts(int parentId) {
 		this.removeAllViews();
+		this.loaded = false;
+		this.parentId = parentId;
+
+	}
+
+	private void loadShouts() {
+		Cursor cursor = ShoutProviderContract.getCursorOverShoutComments(
+				getContext(), parentId);
 
 		final int idIndex = cursor
 				.getColumnIndex(ShoutProviderContract.Shouts._ID);
@@ -32,6 +51,8 @@ public class ShoutChainView extends LinearLayout {
 			this.addView(createChild(comment));
 			cursor.moveToNext();
 		}
+		this.loaded = true;
+
 	}
 
 	private View createChild(Shout shout) {
