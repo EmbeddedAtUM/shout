@@ -1,4 +1,3 @@
-
 package org.whispercomm.shout.network;
 
 import java.io.UnsupportedEncodingException;
@@ -13,6 +12,8 @@ import java.security.spec.InvalidKeySpecException;
 import org.joda.time.DateTime;
 import org.whispercomm.shout.AbstractShout;
 import org.whispercomm.shout.Shout;
+import org.whispercomm.shout.ShoutMessageUtility;
+import org.whispercomm.shout.ShoutType;
 import org.whispercomm.shout.SimpleUser;
 import org.whispercomm.shout.User;
 import org.whispercomm.shout.id.SignatureUtility;
@@ -92,10 +93,12 @@ public class NetworkShout extends AbstractShout {
 	/**
 	 * Generate a NetworkShout from a shout stored in the database
 	 * 
-	 * @param shout_id the _ID of the source shout in the database
+	 * @param shout_id
+	 *            the _ID of the source shout in the database
 	 */
 	public NetworkShout(int shout_id, Context context) {
-		Shout shout = ShoutProviderContract.retrieveShoutById(context, shout_id);
+		Shout shout = ShoutProviderContract
+				.retrieveShoutById(context, shout_id);
 		this.timestamp = shout.getTimestamp();
 		this.sender = shout.getSender();
 		this.signature = shout.getSignature();
@@ -126,8 +129,10 @@ public class NetworkShout extends AbstractShout {
 	/**
 	 * extract all the signatures of the network shout
 	 * 
-	 * @param sigs array to hold all the signatures
-	 * @param byteBuffer raw data in ByteBuffer
+	 * @param sigs
+	 *            array to hold all the signatures
+	 * @param byteBuffer
+	 *            raw data in ByteBuffer
 	 * @return
 	 */
 	public static int getSignatures(byte[][] sigs, ByteBuffer byteBuffer) {
@@ -151,8 +156,8 @@ public class NetworkShout extends AbstractShout {
 	 * Build a NetworkShout object from bytes received from the network
 	 * 
 	 * @throws UnsupportedEncodingException
-	 * @throws AuthenticityFailureException the network data fails authenticity
-	 *             check.
+	 * @throws AuthenticityFailureException
+	 *             the network data fails authenticity check.
 	 * @throws SignatureException
 	 * @throws NoSuchAlgorithmException
 	 * @throws InvalidKeyException
@@ -213,8 +218,10 @@ public class NetworkShout extends AbstractShout {
 			hasReshout = (byte) (shout.getParent() == null ? 0 : 1);
 			byteBuffer.put(hasReshout);
 			if (shout.shoutOri != null) {
-				shout = new NetworkShout(shout.shoutOri.getTimestamp(), shout.shoutOri.getSender(),
-						shout.shoutOri.getMessage(), shout.shoutOri.getSignature(),
+				shout = new NetworkShout(shout.shoutOri.getTimestamp(),
+						shout.shoutOri.getSender(),
+						shout.shoutOri.getMessage(),
+						shout.shoutOri.getSignature(),
 						shout.shoutOri.getParent());
 			} else {
 				shout = null;
@@ -236,7 +243,8 @@ public class NetworkShout extends AbstractShout {
 	 * Verify whether a shout is authentic
 	 * 
 	 * @param signature
-	 * @param byteBuffer that holds the body of a shout
+	 * @param byteBuffer
+	 *            that holds the body of a shout
 	 * @return a new NetworkShout (with its original shout yet to be completed)
 	 *         if authentic, null otherwise
 	 * @throws UnsupportedEncodingException
@@ -335,6 +343,11 @@ public class NetworkShout extends AbstractShout {
 	@Override
 	public byte[] getSignature() {
 		return this.signature;
+	}
+
+	@Override
+	public ShoutType getType() {
+		return ShoutMessageUtility.getShoutType(this);
 	}
 
 }

@@ -46,4 +46,11 @@ public interface Shout {
 	 * @return The ECC signature for this Shout object
 	 */
 	public byte[] getSignature();
+
+	/**
+	 * Returns the type of the shout (SHOUT, RESHOUT, COMMENT, RECOMMENT).
+	 * 
+	 * @return the type of shout.
+	 */
+	public ShoutType getType();
 }

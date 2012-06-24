@@ -1,8 +1,9 @@
-
 package org.whispercomm.shout.provider;
 
 import org.joda.time.DateTime;
 import org.whispercomm.shout.Shout;
+import org.whispercomm.shout.ShoutMessageUtility;
+import org.whispercomm.shout.ShoutType;
 import org.whispercomm.shout.User;
 
 import android.content.Context;
@@ -19,15 +20,16 @@ public class ProviderShout implements Shout {
 
 	private Shout parent;
 
-	public ProviderShout(int senderId, int parentId, String message, long time, String hash,
-			String signature, Context context) {
+	public ProviderShout(int senderId, int parentId, String message, long time,
+			String hash, String signature, Context context) {
 		this.message = message;
 		this.timestamp = new DateTime(time); // TODO Time Zone
 		this.hash = Base64.decode(hash, Base64.DEFAULT);
 		this.signature = Base64.decode(signature, Base64.DEFAULT);
 		this.sender = ShoutProviderContract.retrieveUserById(context, senderId);
 		if (parentId > 0) {
-			this.parent = ShoutProviderContract.retrieveShoutById(context, parentId);
+			this.parent = ShoutProviderContract.retrieveShoutById(context,
+					parentId);
 			// TODO Lazy load parent
 		} else {
 			this.parent = null;
@@ -64,6 +66,11 @@ public class ProviderShout implements Shout {
 	@Override
 	public byte[] getSignature() {
 		return this.signature;
+	}
+
+	@Override
+	public ShoutType getType() {
+		return ShoutMessageUtility.getShoutType(this);
 	}
 
 }
