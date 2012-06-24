@@ -37,10 +37,6 @@ public class ShoutView extends RelativeLayout {
 	 */
 	private Shout shout;
 
-	// TODO: Get rid of this. Use global id (hash) or LocalShout#localId
-	// instead.
-	public int id = -1;
-
 	public ShoutView(Context context, AttributeSet attributeSet) {
 		super(context, attributeSet);
 		LayoutInflater inflater = (LayoutInflater) context
