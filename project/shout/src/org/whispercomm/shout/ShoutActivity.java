@@ -152,7 +152,7 @@ public class ShoutActivity extends ListActivity {
 
 			// Find the views
 			RowHolder holder = (RowHolder) view.getTag();
-
+			// TODO Cast directly to rowView, drop holder?
 			// Bind the shout to the shout view
 			holder.rowView.bindShout(shout, commentCount, reshoutCount);
 		}

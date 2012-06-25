@@ -201,39 +201,32 @@ public class NetworkShout extends AbstractShout {
 	 * @throws ShoutChainTooLongException
 	 * @throws UnsupportedEncodingException
 	 */
-	public byte[] toNetworkBytes() throws ShoutChainTooLongException,
-			UnsupportedEncodingException {
+	public static byte[] toNetworkBytes(Shout shout)
+			throws ShoutChainTooLongException, UnsupportedEncodingException {
 		ByteBuffer byteBuffer = ByteBuffer.allocate(MAX_LEN);
 		// Get signatures
 		int sigNum = 0;
-		NetworkShout shout = this;
 		byte hasReshout;
-		while (shout != null && sigNum < MAX_SHOUT_NUM) {
-			byte[] signature = shout.getSignature();
+		Shout current = shout;
+		while (current != null && sigNum < MAX_SHOUT_NUM) {
+			byte[] signature = current.getSignature();
 			// signature_len
 			byteBuffer.putChar((char) signature.length);
 			// signature
 			byteBuffer.put(signature);
 			// hasNext
-			hasReshout = (byte) (shout.getParent() == null ? 0 : 1);
+			hasReshout = (byte) (current.getParent() == null ? 0 : 1);
 			byteBuffer.put(hasReshout);
-			if (shout.shoutOri != null) {
-				shout = new NetworkShout(shout.shoutOri.getTimestamp(),
-						shout.shoutOri.getSender(),
-						shout.shoutOri.getMessage(),
-						shout.shoutOri.getSignature(),
-						shout.shoutOri.getParent());
-			} else {
-				shout = null;
-			}
+			current = current.getParent();
 			sigNum++;
 		}
 		// sanity check
-		if (shout != null)
+		if (current != null)
 			throw new ShoutChainTooLongException();
 		// put the body of the shout into the ByteBuffer
-		byte[] shoutBodyBytes = SignatureUtility.serialize(this.timestamp,
-				this.sender, this.content, this.shoutOri);
+		byte[] shoutBodyBytes = SignatureUtility.serialize(
+				shout.getTimestamp(), shout.getSender(), shout.getMessage(),
+				shout.getParent());
 		byteBuffer.put(shoutBodyBytes);
 
 		return Arrays.copyOfRange(byteBuffer.array(), 0, byteBuffer.position());

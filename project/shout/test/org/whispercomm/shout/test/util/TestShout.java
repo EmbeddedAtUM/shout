@@ -3,6 +3,7 @@ package org.whispercomm.shout.test.util;
 
 import org.joda.time.DateTime;
 import org.whispercomm.shout.Shout;
+import org.whispercomm.shout.ShoutType;
 import org.whispercomm.shout.User;
 
 public class TestShout implements Shout {
@@ -56,6 +57,12 @@ public class TestShout implements Shout {
 	@Override
 	public byte[] getSignature() {
 		return signature;
+	}
+
+	@Override
+	public ShoutType getType() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

@@ -195,7 +195,7 @@ public class SignatureUtilityTest {
 				null);
 
 		// get network bytes of the shout
-		byte[] shoutBytes = shout.toNetworkBytes();
+		byte[] shoutBytes = NetworkShout.toNetworkBytes(shout);
 
 		NetworkShout shoutRecovered = new NetworkShout(shoutBytes);
 
@@ -234,7 +234,7 @@ public class SignatureUtilityTest {
 				signature3, shout2);
 
 		// get network bytes of the shout
-		byte[] shoutBytes = shout3.toNetworkBytes();
+		byte[] shoutBytes = NetworkShout.toNetworkBytes(shout3);
 
 		NetworkShout shoutRecovered = new NetworkShout(shoutBytes);
 

@@ -54,7 +54,7 @@ public class NaiveBroadcast implements NetworkProtocol {
 		NetworkShout shout = new NetworkShout(shoutId, context);
 		final byte[] shoutBytes;
 		try {
-			shoutBytes = shout.toNetworkBytes();
+			shoutBytes = NetworkShout.toNetworkBytes(shout);
 		} catch (UnsupportedEncodingException e) {
 			Log.e(TAG, e.getMessage());
 			return;

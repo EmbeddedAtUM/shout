@@ -19,7 +19,7 @@
         android:layout_marginLeft="10dip"
         android:layout_marginTop="5dip"
         android:layout_toRightOf="@+id/avatar"
-        android:text="OriginalSender"
+        android:hint="OriginalSender"
         android:textColor="@android:color/black"
         android:textStyle="bold" />
 
@@ -41,7 +41,7 @@
         android:layout_alignParentTop="true"
         android:layout_marginRight="5dip"
         android:layout_marginTop="5dip"
-        android:text="Reshouter"
+        android:hint="Reshouter"
         android:textColor="@color/gray" />
 
     <TextView
@@ -52,7 +52,7 @@
         android:layout_below="@+id/origsender"
         android:layout_marginRight="5dip"
         android:layout_marginTop="5dip"
-        android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque quis purus id dolor laoreet tristique. Vivamus lacus felis, pulvinar nec vestibulum ut, rutrum nec felis. Fusce ac sapien quis est viverra iaculis at ac enim. Cras dictum mi id arcu tincidunt varius. Proin id lacus tortor, sed dictum elit. Nam."
+        android:hint="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque quis purus id dolor laoreet tristique. Vivamus lacus felis, pulvinar nec vestibulum ut, rutrum nec felis. Fusce ac sapien quis est viverra iaculis at ac enim. Cras dictum mi id arcu tincidunt varius. Proin id lacus tortor, sed dictum elit. Nam."
         android:textColor="@android:color/black" />
 
     <TextView
@@ -64,7 +64,7 @@
         android:layout_below="@+id/message"
         android:layout_marginBottom="5dip"
         android:layout_marginTop="5dip"
-        android:text="@string/comment"
+        android:hint="@string/comment"
         android:textColor="@color/gray" />
 
     <TextView
@@ -77,7 +77,7 @@
         android:layout_marginBottom="5dip"
         android:layout_marginRight="5dip"
         android:layout_marginTop="5dip"
-        android:text="43 minutes ago"
+        android:hint="X minutes ago"
         android:textColor="@color/gray" />
 
 </merge>

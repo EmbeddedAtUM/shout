@@ -243,6 +243,7 @@ public class SignatureUtility {
 	 */
 	public byte[] genShoutSignature(DateTime timestamp, User sender,
 			String content, Shout shoutOri) throws UnsupportedEncodingException {
+		// TODO Don't pass User, pass a user with a public key in it
 		// Serialize the shout
 		byte[] dataBytes = serialize(timestamp, sender, content, shoutOri);
 		ECPrivateKey privKey = idStorage.getPrivateKey();
