@@ -61,7 +61,6 @@ public class TestShout implements Shout {
 
 	@Override
 	public ShoutType getType() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

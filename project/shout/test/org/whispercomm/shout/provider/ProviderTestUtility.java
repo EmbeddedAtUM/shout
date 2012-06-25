@@ -29,7 +29,7 @@ public class ProviderTestUtility {
 			values.put(ShoutProviderContract.Shouts.PARENT, parent);
 		}
 		values.put(ShoutProviderContract.Shouts.MESSAGE, message);
-		values.put(ShoutProviderContract.Shouts.TIME, time);
+		values.put(ShoutProviderContract.Shouts.TIME_SENT, time);
 		values.put(ShoutProviderContract.Shouts.SIGNATURE, Base64.encodeToString(signature, Base64.DEFAULT));
 		values.put(ShoutProviderContract.Shouts.HASH, Base64.encodeToString(hash, Base64.DEFAULT));
 		Uri location = cr.insert(ShoutProviderContract.Shouts.CONTENT_URI, values);

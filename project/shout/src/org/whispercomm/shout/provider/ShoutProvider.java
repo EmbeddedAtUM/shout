@@ -317,7 +317,8 @@ public class ShoutProvider extends ContentProvider {
 				+ ShoutProviderContract.Shouts.AUTHOR + " INTEGER, "
 				+ ShoutProviderContract.Shouts.PARENT + " INTEGER, "
 				+ ShoutProviderContract.Shouts.MESSAGE + " TEXT, "
-				+ ShoutProviderContract.Shouts.TIME + " LONG, "
+				+ ShoutProviderContract.Shouts.TIME_SENT + " LONG, "
+				+ ShoutProviderContract.Shouts.TIME_RECEIVED + " LONG, "
 				+ ShoutProviderContract.Shouts.HASH + " TEXT UNIQUE, "
 				+ ShoutProviderContract.Shouts.SIGNATURE + " TEXT UNIQUE, "
 				+ "FOREIGN KEY(" + ShoutProviderContract.Shouts.AUTHOR

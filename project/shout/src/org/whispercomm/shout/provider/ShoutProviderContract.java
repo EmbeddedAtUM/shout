@@ -96,10 +96,18 @@ public class ShoutProviderContract {
 		public static final String HASH = "Hash";
 
 		/**
-		 * Column name for the timestamp on a Shout. Stored in the database as a
-		 * long representing the number of milliseconds since the UNIX epoch.
+		 * Column name for the senders's timestamp on a Shout. Stored in the
+		 * database as a long representing the number of milliseconds since the
+		 * UNIX epoch.
 		 */
-		public static final String TIME = "Timestamp";
+		public static final String TIME_SENT = "Timestamp";
+
+		/**
+		 * Column name for the received time on a Shout. Stored in the database
+		 * as a long representing the number of milliseconds since the UNIX
+		 * epoch.
+		 */
+		public static final String TIME_RECEIVED = "Time_Received";
 
 	}
 
@@ -217,6 +225,7 @@ public class ShoutProviderContract {
 		private int parent;
 		private String message;
 		private long time;
+		private long received;
 		private String signature;
 		private String hash;
 		private Context context;
@@ -236,12 +245,13 @@ public class ShoutProviderContract {
 		}
 
 		public DatabaseShout(int id, int author, int parent, String message,
-				long time, String signature, String hash, Context context) {
+				long time, long received, String signature, String hash, Context context) {
 			this.id = id;
 			this.author = author;
 			this.parent = parent;
 			this.message = message;
 			this.time = time;
+			this.received = received;
 			this.signature = signature;
 			this.hash = hash;
 
@@ -256,7 +266,8 @@ public class ShoutProviderContract {
 				values.put(Shouts.PARENT, this.parent);
 			}
 			values.put(Shouts.MESSAGE, this.message);
-			values.put(Shouts.TIME, this.time);
+			values.put(Shouts.TIME_SENT, this.time);
+			values.put(Shouts.TIME_RECEIVED, System.currentTimeMillis());
 			values.put(Shouts.SIGNATURE, this.signature);
 			values.put(Shouts.HASH, this.hash);
 			return values;
@@ -405,7 +416,7 @@ public class ShoutProviderContract {
 		String[] projection = {
 				Shouts._ID
 		};
-		String sortOrder = Shouts.TIME + " DESC";
+		String sortOrder = Shouts.TIME_SENT + " DESC";
 		String selection = Shouts.PARENT + " = ? AND " + Shouts.MESSAGE + " IS NOT NULL";
 		String[] selectionArgs = {
 				Integer.toString(shoutId)
@@ -555,9 +566,10 @@ public class ShoutProviderContract {
 				int authorIndex = cursor.getColumnIndex(Shouts.AUTHOR);
 				int parentIndex = cursor.getColumnIndex(Shouts.PARENT);
 				int messageIndex = cursor.getColumnIndex(Shouts.MESSAGE);
-				int timeIndex = cursor.getColumnIndex(Shouts.TIME);
+				int timeIndex = cursor.getColumnIndex(Shouts.TIME_SENT);
 				int sigIndex = cursor.getColumnIndex(Shouts.SIGNATURE);
 				int hashIndex = cursor.getColumnIndex(Shouts.HASH);
+				int receivedIndex = cursor.getColumnIndex(Shouts.TIME_RECEIVED);
 
 				int author = cursor.getInt(authorIndex);
 				int parent = -1;
@@ -569,10 +581,11 @@ public class ShoutProviderContract {
 					message = cursor.getString(messageIndex);
 				}
 				long time = cursor.getLong(timeIndex);
+				long received = cursor.getLong(receivedIndex);
 				String encodedHash = cursor.getString(hashIndex);
 				String encodedSig = cursor.getString(sigIndex);
 				cursor.close();
-				return new DatabaseShout(id, author, parent, message, time,
+				return new DatabaseShout(id, author, parent, message, time, received,
 						encodedSig, encodedHash, context);
 			} else {
 				cursor.close();
