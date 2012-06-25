@@ -51,6 +51,8 @@ public class ShoutChainView extends LinearLayout {
 			this.addView(createChild(comment));
 			cursor.moveToNext();
 		}
+		cursor.close();
+
 		this.loaded = true;
 
 	}
