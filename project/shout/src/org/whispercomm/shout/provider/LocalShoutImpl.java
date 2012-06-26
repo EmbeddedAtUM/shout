@@ -3,6 +3,7 @@ package org.whispercomm.shout.provider;
 import org.joda.time.DateTime;
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.LocalUser;
+import org.whispercomm.shout.Me;
 import org.whispercomm.shout.ShoutMessageUtility;
 import org.whispercomm.shout.ShoutType;
 
@@ -84,9 +85,12 @@ public class LocalShoutImpl implements LocalShout {
 	}
 
 	@Override
-	public LocalShout getReshout() {
-		// TODO
-		return this.myReshout;
+	public LocalShout getReshout(Me me) {
+		// TODO Make a reshout if it doesn't exist
+		if (myReshout == null) {
+			myReshout = ShoutProviderContract.getReshoutIfExists(context, this, me);
+		}
+		return myReshout;
 	}
 
 	@Override

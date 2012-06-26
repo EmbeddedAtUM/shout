@@ -109,9 +109,9 @@ public class ShoutProviderContract {
 		 * epoch.
 		 */
 		public static final String TIME_RECEIVED = "Time_Received";
-		
+
 		public static final String COMMENT_COUNT = "Comment_Count";
-		
+
 		public static final String RESHOUT_COUNT = "Reshout_Count";
 
 	}
@@ -383,6 +383,23 @@ public class ShoutProviderContract {
 		return id;
 	}
 
+	public static LocalShout getReshoutIfExists(Context context, LocalShout parent,
+			LocalUser reshouter) {
+		String selection = Shouts.PARENT + " = ? AND " + Shouts.AUTHOR + " = ? AND "
+				+ Shouts.MESSAGE + " IS NULL";
+		String[] selectionArgs = {
+				Integer.toString(parent.getDatabaseId()),
+				Integer.toString(reshouter.getDatabaseId())
+		};
+		Cursor cursor = context.getContentResolver().query(Shouts.CONTENT_URI, null, selection,
+				selectionArgs, null);
+		LocalShout reshout = null;
+		if (cursor.moveToFirst()) {
+			reshout = ShoutProviderContract.retrieveShoutFromCursor(context, cursor);
+		}
+		return reshout;
+	}
+
 	/**
 	 * Retrieve the User with the given database ID
 	 * 
@@ -406,7 +423,6 @@ public class ShoutProviderContract {
 	}
 
 	/**
-	 * 
 	 * @param context
 	 * @param cursor
 	 * @return

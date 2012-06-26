@@ -14,7 +14,7 @@ public interface LocalShout extends Shout {
 	
 	public DateTime getReceivedTime();
 	
-	public LocalShout getReshout();
+	public LocalShout getReshout(Me me);
 
 	public int getDatabaseId();
 	
