@@ -1,4 +1,3 @@
-
 package org.whispercomm.shout.network;
 
 import android.content.ComponentName;
@@ -21,11 +20,10 @@ import android.widget.Toast;
  * @author Yue Liu
  */
 public class NetworkInterface {
+	public static final String TAG = NetworkInterface.class.getSimpleName();
 
 	private static NetworkInterface instance = null;
 	private Context context;
-
-	public static String TAG = NetworkInterface.class.getSimpleName();
 
 	private Messenger shoutService;
 	private ServiceConnection connection;
@@ -58,8 +56,8 @@ public class NetworkInterface {
 				shoutService = null;
 				// TODO dump to SD card
 				Log.d(TAG, "Network service unbound");
-				Toast.makeText(NetworkInterface.this.context, "Network service unbound...",
-						Toast.LENGTH_LONG);
+				Toast.makeText(NetworkInterface.this.context,
+						"Network service unbound...", Toast.LENGTH_LONG);
 				isBinded = false;
 			}
 
@@ -76,7 +74,8 @@ public class NetworkInterface {
 	 * notification is successful. If not, the caller should either wait and try
 	 * later, or give up.
 	 * 
-	 * @param shoutId id of the shout to be sent out
+	 * @param shoutId
+	 *            id of the shout to be sent out
 	 * @return whether the notification is successful
 	 */
 	public boolean send(long shoutId) {
