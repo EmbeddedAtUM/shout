@@ -1,12 +1,5 @@
 package org.whispercomm.shout.network;
 
-import java.io.UnsupportedEncodingException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SignatureException;
-import java.security.spec.InvalidKeySpecException;
-
 import org.whispercomm.manes.client.maclib.ManesInterface;
 import org.whispercomm.manes.client.maclib.ManesNotInstalledException;
 import org.whispercomm.shout.R;
@@ -22,7 +15,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
-import android.util.Log;
 
 public class NetworkService extends Service {
 	public static final String TAG = NetworkService.class.getSimpleName();
@@ -35,9 +27,8 @@ public class NetworkService extends Service {
 	private ManesInterface manes;
 	private Messenger appMessenger;
 	private NetworkProtocol networkProtocol;
-	private Runnable networkReceiver;
+	private NetworkReceiver networkReceiver;
 
-	private boolean isRunning;
 	private boolean inForeground;
 
 	@Override
@@ -51,12 +42,11 @@ public class NetworkService extends Service {
 		this.appMessenger = new Messenger(new AppShoutHandler());
 		this.networkProtocol = new NaiveNetworkProtocol(manes,
 				getApplicationContext());
-		this.networkReceiver = new NetworkReceiver();
-		isRunning = true;
-		new Thread(networkReceiver).start();
-		
-		this.networkProtocol.initialize();
+		this.networkReceiver = new NetworkReceiver(this.manes,
+				this.networkProtocol);
 
+		this.networkProtocol.initialize();
+		this.networkReceiver.initialize();
 
 		Notification notification = new Notification(R.drawable.icon,
 				getText(R.string.serviceTickerText), System.currentTimeMillis());
@@ -81,9 +71,9 @@ public class NetworkService extends Service {
 
 	@Override
 	public final void onDestroy() {
-		isRunning = false;
 		manes.disconnect();
 		networkProtocol.cleanup();
+		networkReceiver.cleanup();
 	}
 
 	/**
@@ -111,50 +101,4 @@ public class NetworkService extends Service {
 		}
 	}
 
-	/**
-	 * Listens and handles received shouts from MANES network
-	 */
-	class NetworkReceiver implements Runnable {
-
-		public static final String TAG = "NetworkReceiver";
-
-		/**
-		 * Period to return from ManesInterface.receive() and check for whether
-		 * ShoutService is still running
-		 */
-		static final long CHECK_PERIOD = 10 * 60 * 1000;
-
-		@Override
-		public void run() {
-			byte[] shoutBytes = null;
-			while (isRunning) {
-				shoutBytes = manes.receive(CHECK_PERIOD);
-
-				if (shoutBytes == null)
-					continue;
-
-				NetworkShout shout;
-				try {
-					shout = new NetworkShout(shoutBytes);
-
-					// Handle this incoming shout
-					networkProtocol.receiveShout(shout);
-				} catch (UnsupportedEncodingException e) {
-					Log.e(TAG, e.getMessage());
-				} catch (AuthenticityFailureException e) {
-					Log.e(TAG, e.getMessage());
-				} catch (InvalidKeyException e) {
-					Log.e(TAG, e.getMessage());
-				} catch (NoSuchAlgorithmException e) {
-					Log.e(TAG, e.getMessage());
-				} catch (SignatureException e) {
-					Log.e(TAG, e.getMessage());
-				} catch (NoSuchProviderException e) {
-					Log.e(TAG, e.getMessage());
-				} catch (InvalidKeySpecException e) {
-					Log.e(TAG, e.getMessage());
-				}
-			}
-		}
-	}
 }
