@@ -15,6 +15,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
+import android.util.Log;
 
 public class NetworkService extends Service {
 	public static final String TAG = NetworkService.class.getSimpleName();
@@ -33,12 +34,14 @@ public class NetworkService extends Service {
 
 	@Override
 	public final void onCreate() {
+		Log.i(TAG, "Starting service.");
 		try {
 			this.manes = new ManesInterface(APP_ID, getApplicationContext());
 		} catch (ManesNotInstalledException e) {
 			// TODO Handle this
 			throw new RuntimeException(e);
 		}
+
 		this.appMessenger = new Messenger(new AppShoutHandler());
 		this.networkProtocol = new NaiveNetworkProtocol(manes,
 				getApplicationContext());
@@ -58,6 +61,8 @@ public class NetworkService extends Service {
 				getText(R.string.serviceDescriptionText), pendingIntent);
 		startForeground(ONGOING_NOTIFICATION, notification);
 		this.inForeground = true;
+
+		Log.i(TAG, "Service started.");
 	}
 
 	/**
@@ -71,9 +76,11 @@ public class NetworkService extends Service {
 
 	@Override
 	public final void onDestroy() {
+		Log.i(TAG, "Stopping service.");
 		manes.disconnect();
 		networkProtocol.cleanup();
 		networkReceiver.cleanup();
+		Log.i(TAG, "Service stopped.");
 	}
 
 	/**
