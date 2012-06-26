@@ -32,6 +32,6 @@ public interface NetworkProtocol {
 	/**
 	 * Handle a Shout received from the network interface.
 	 */
-	public void receiveShout(Shout shout);
+	public void receivePacket(byte[] data);
 
 }

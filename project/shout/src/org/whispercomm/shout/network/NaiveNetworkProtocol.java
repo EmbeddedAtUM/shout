@@ -1,6 +1,11 @@
 package org.whispercomm.shout.network;
 
 import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SignatureException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -92,8 +97,26 @@ public class NaiveNetworkProtocol implements NetworkProtocol {
 	}
 
 	@Override
-	public void receiveShout(Shout shout) {
-		ShoutProviderContract.storeShout(context, shout);
+	public void receivePacket(byte[] data) {
+		try {
+			Shout shout = new NetworkShout(data);
+			ShoutProviderContract.storeShout(context, shout);
+		} catch (InvalidKeyException e) {
+			Log.w(TAG, "Invalid data packet received.  Dropping packet.");
+		} catch (UnsupportedEncodingException e) {
+			Log.w(TAG, "Invalid data packet received.  Dropping packet.");
+		} catch (NoSuchAlgorithmException e) {
+			Log.w(TAG, "Invalid data packet received.  Dropping packet.");
+		} catch (SignatureException e) {
+			Log.w(TAG, "Invalid data packet received.  Dropping packet.");
+		} catch (NoSuchProviderException e) {
+			Log.w(TAG, "Invalid data packet received.  Dropping packet.");
+		} catch (InvalidKeySpecException e) {
+			Log.w(TAG, "Invalid data packet received.  Dropping packet.");
+		} catch (AuthenticityFailureException e) {
+			Log.w(TAG, "Invalid data packet received.  Dropping packet.");
+		}
+
 	}
 
 }

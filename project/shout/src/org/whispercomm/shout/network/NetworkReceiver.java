@@ -1,15 +1,6 @@
 package org.whispercomm.shout.network;
 
-import java.io.UnsupportedEncodingException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SignatureException;
-import java.security.spec.InvalidKeySpecException;
-
 import org.whispercomm.manes.client.maclib.ManesInterface;
-
-import android.util.Log;
 
 /**
  * Listens for incoming Shout packets, passing them to the
@@ -20,6 +11,7 @@ import android.util.Log;
  * 
  */
 public class NetworkReceiver {
+	@SuppressWarnings("unused")
 	private static final String TAG = NetworkReceiver.class.getSimpleName();
 
 	/**
@@ -74,29 +66,12 @@ public class NetworkReceiver {
 	}
 
 	private void receivePacket() {
-		try {
-			// TODO: manes.receive returns null immediately if the manes service
-			// is not bound, so this will busy idle until it is bound.
-			// manes.receive should probably wait the full BLOCK_INTERVAL_MS
-			// before returning, even if it is not initially bound.
-			byte[] data = manes.receive(BLOCK_INTERVAL_MS);
-			if (data != null) {
-				networkProtocol.receiveShout(new NetworkShout(data));
-			}
-		} catch (InvalidKeyException e) {
-			Log.e(TAG, e.getMessage());
-		} catch (UnsupportedEncodingException e) {
-			Log.e(TAG, e.getMessage());
-		} catch (NoSuchAlgorithmException e) {
-			Log.e(TAG, e.getMessage());
-		} catch (SignatureException e) {
-			Log.e(TAG, e.getMessage());
-		} catch (NoSuchProviderException e) {
-			Log.e(TAG, e.getMessage());
-		} catch (InvalidKeySpecException e) {
-			Log.e(TAG, e.getMessage());
-		} catch (AuthenticityFailureException e) {
-			Log.e(TAG, e.getMessage());
-		}
+		// TODO: manes.receive returns null immediately if the manes service
+		// is not bound, so this will busy idle until it is bound.
+		// manes.receive should probably wait the full BLOCK_INTERVAL_MS
+		// before returning, even if it is not initially bound.
+		byte[] data = manes.receive(BLOCK_INTERVAL_MS);
+		if (data != null)
+			networkProtocol.receivePacket(data);
 	}
 }
