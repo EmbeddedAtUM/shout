@@ -22,9 +22,9 @@ import android.os.Message;
 import android.os.Messenger;
 import android.util.Log;
 
-public class NetworkUtility extends Service {
+public class NetworkService extends Service {
 
-	public static final String TAG = NetworkUtility.class.getSimpleName();
+	public static final String TAG = NetworkService.class.getSimpleName();
 	public static final int NEW_SHOUT = 1;
 	public static final int STOP_FOREGROUND = 2;
 	public static final int APP_ID = 74688;// "shout" on a phone keyboard

@@ -34,7 +34,7 @@
         </activity>
 
         <service
-            android:name=".network.NetworkUtility"
+            android:name=".network.NetworkService"
             android:enabled="true"
             android:exported="false" >
         </service>

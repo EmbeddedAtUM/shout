@@ -63,7 +63,7 @@ public class NetworkInterface {
 
 		};
 		// bind to ShoutService
-		context.bindService(new Intent(context, NetworkUtility.class),
+		context.bindService(new Intent(context, NetworkService.class),
 				connection, Context.BIND_AUTO_CREATE);
 	}
 
@@ -80,7 +80,7 @@ public class NetworkInterface {
 	 */
 	public boolean send(long shoutId) {
 		if (isBinded) {
-			Message msg = Message.obtain(null, NetworkUtility.NEW_SHOUT);
+			Message msg = Message.obtain(null, NetworkService.NEW_SHOUT);
 			msg.obj = shoutId;
 			try {
 				// ???Does this block???
