@@ -23,7 +23,7 @@ import org.whispercomm.shout.SimpleUser;
 import org.whispercomm.shout.User;
 import org.whispercomm.shout.id.SignatureUtility;
 import org.whispercomm.shout.id.UserNotInitiatedException;
-import org.whispercomm.shout.id.IdStorage;
+import org.whispercomm.shout.id.KeyStorage;
 import org.whispercomm.shout.network.NetworkShout;
 import org.whispercomm.shout.test.util.TestFactory;
 
@@ -47,7 +47,7 @@ public class SignatureUtilityTest {
 	}
 
 	Activity myActivity = new Activity();
-	IdStorage idStorage = mock(IdStorage.class);
+	KeyStorage idStorage = mock(KeyStorage.class);
 	SignatureUtility signUtility = new SignatureUtility(idStorage);
 
 	class KeyPairMatcher extends ArgumentMatcher<KeyPair> {
@@ -65,7 +65,7 @@ public class SignatureUtilityTest {
 			NoSuchProviderException, InvalidAlgorithmParameterException,
 			InvalidKeySpecException, UserNotInitiatedException {
 		signUtility.genKeyPairs();
-		verify(idStorage).updateKeyPair(argThat(new KeyPairMatcher()));
+		verify(idStorage).writeKeyPair(argThat(new KeyPairMatcher()));
 	}
 
 	@Test
@@ -111,7 +111,7 @@ public class SignatureUtilityTest {
 		when(idStorage.getPrivateKey()).thenReturn(null);
 		signUtility.updateUserName(userName);
 		verify(idStorage).updateUserName(userName);
-		verify(idStorage).updateKeyPair(argThat(new KeyPairMatcher()));
+		verify(idStorage).writeKeyPair(argThat(new KeyPairMatcher()));
 	}
 
 	@Test
@@ -124,7 +124,7 @@ public class SignatureUtilityTest {
 				(ECPrivateKey) kpA.getPrivate());
 		signUtility.updateUserName(username);
 		verify(idStorage).updateUserName(username);
-		verify(idStorage, never()).updateKeyPair(argThat(new KeyPairMatcher()));
+		verify(idStorage, never()).writeKeyPair(argThat(new KeyPairMatcher()));
 	}
 
 	/**

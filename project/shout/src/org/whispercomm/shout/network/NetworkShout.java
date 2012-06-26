@@ -29,7 +29,7 @@ import android.content.Context;
  * 
  * @author Yue Liu
  */
-public class NetworkShout extends AbstractShout {
+public class NetworkShout extends AbstractShout implements Shout {
 
 	/**
 	 * Maximum length (in bytes) of a user name.
@@ -224,9 +224,7 @@ public class NetworkShout extends AbstractShout {
 		if (current != null)
 			throw new ShoutChainTooLongException();
 		// put the body of the shout into the ByteBuffer
-		byte[] shoutBodyBytes = SignatureUtility.serialize(
-				shout.getTimestamp(), shout.getSender(), shout.getMessage(),
-				shout.getParent());
+		byte[] shoutBodyBytes = SignatureUtility.serialize(shout);
 		byteBuffer.put(shoutBodyBytes);
 
 		return Arrays.copyOfRange(byteBuffer.array(), 0, byteBuffer.position());

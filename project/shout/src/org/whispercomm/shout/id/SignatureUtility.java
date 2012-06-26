@@ -3,11 +3,8 @@ package org.whispercomm.shout.id;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
-import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -16,18 +13,19 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
-import java.security.spec.ECGenParameterSpec;
 import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
 import org.joda.time.DateTime;
 import org.spongycastle.jce.provider.BouncyCastleProvider;
+import org.whispercomm.shout.Me;
 import org.whispercomm.shout.Shout;
+import org.whispercomm.shout.UnsignedShout;
 import org.whispercomm.shout.User;
 import org.whispercomm.shout.network.NetworkShout;
 import org.whispercomm.shout.util.Arrays;
 
-import android.content.Context;
 import android.util.Log;
 
 public class SignatureUtility {
@@ -42,61 +40,24 @@ public class SignatureUtility {
 	static {
 		Security.addProvider(new BouncyCastleProvider());
 	}
-
-	private IdStorage idStorage;
-
-	public SignatureUtility(Context context) {
-		this.idStorage = new IdStorageSharedPrefs(context);
-	}
-
-	public SignatureUtility(IdStorage idStorage) {
-		this.idStorage = idStorage;
-	}
-
-	/**
-	 * Generate the public/private key pair. This is called when the application
-	 * is first launched.
-	 * 
-	 * @return TODO
-	 * @throws NoSuchProviderException
-	 * @throws NoSuchAlgorithmException
-	 * @throws InvalidAlgorithmParameterException
+	
+	/*
+	 * Make this class uninstantiable
 	 */
-	protected boolean genKeyPairs() {
-		try {
-			// generate key pairs
-			ECGenParameterSpec ecParamSpec = new ECGenParameterSpec(ECC_PARAMS);
-			KeyPairGenerator kpg = KeyPairGenerator.getInstance(CRYPTO_ALGO,
-					CRYPTO_PROVIDER);
-			kpg.initialize(ecParamSpec);
-			KeyPair kpA = kpg.generateKeyPair();
-			idStorage.updateKeyPair(kpA);
-			return true;
-		} catch (NoSuchAlgorithmException e) {
-			Log.e(TAG, e.getMessage());
-		} catch (NoSuchProviderException e) {
-			Log.e(TAG, e.getMessage());
-		} catch (InvalidAlgorithmParameterException e) {
-			Log.e(TAG, e.getMessage());
-		}
-		return false;
+	private SignatureUtility() {
+		throw new IllegalStateException("Cannot instantiate SignatureUtility!");
 	}
 
 	/**
 	 * Get ECPublicKey from X.509 encoded bytes.
 	 * 
-	 * @param keyBytes
-	 * @return
-	 * @throws NoSuchAlgorithmException
-	 * @throws NoSuchProviderException
-	 * @throws InvalidKeySpecException
+	 * @param publicKeyBytes
+	 * @return {@code null} on failure
 	 */
-	static public ECPublicKey getPublicKeyFromBytes(byte[] keyBytes) {
+	public static ECPublicKey getPublicKeyFromBytes(byte[] publicKeyBytes) {
 		try {
-			KeyFactory kf = KeyFactory
-					.getInstance(CRYPTO_ALGO, CRYPTO_PROVIDER);
-
-			X509EncodedKeySpec x509ks = new X509EncodedKeySpec(keyBytes);
+			KeyFactory kf = KeyFactory.getInstance(CRYPTO_ALGO, CRYPTO_PROVIDER);
+			X509EncodedKeySpec x509ks = new X509EncodedKeySpec(publicKeyBytes);
 			ECPublicKey pubKey = (ECPublicKey) kf.generatePublic(x509ks);
 			return pubKey;
 		} catch (NoSuchAlgorithmException e) {
@@ -106,36 +67,29 @@ public class SignatureUtility {
 		} catch (InvalidKeySpecException e) {
 			Log.e(TAG, e.getMessage());
 		}
-		// TODO
 		return null;
 	}
 
 	/**
-	 * Allow UI to create or update user name.
+	 * Get private key from PKCS8 encoded bytes
 	 * 
-	 * @param userName
-	 * @throws UserNameInvalidException
-	 * @throws Exception
+	 * @param privateKeyBytes
+	 * @return {@code null} on failure
 	 */
-	public synchronized void updateUserName(String userName)
-			throws UserNameInvalidException {
-		if (userName == null // FIXME Check byte size
-				|| userName.length() > NetworkShout.MAX_USER_NAME_LEN)
-			throw new UserNameInvalidException();
-		idStorage.updateUserName(userName);
-		// create key pair if not exist
-		if (idStorage.getPublicKey() == null
-				|| idStorage.getPrivateKey() == null) {
-			genKeyPairs();
+	public static ECPrivateKey getPrivateKeyFromBytes(byte[] privateKeyBytes) {
+		try {
+			KeyFactory kf = KeyFactory.getInstance(CRYPTO_ALGO, CRYPTO_PROVIDER);
+			PKCS8EncodedKeySpec p8ks = new PKCS8EncodedKeySpec(privateKeyBytes);
+			ECPrivateKey privateKey = (ECPrivateKey) kf.generatePrivate(p8ks);
+			return privateKey;
+		} catch (NoSuchAlgorithmException e) {
+			Log.e(TAG, e.getMessage());
+		} catch (NoSuchProviderException e) {
+			Log.e(TAG, e.getMessage());
+		} catch (InvalidKeySpecException e) {
+			Log.e(TAG, e.getMessage());
 		}
-	}
-
-	/**
-	 * @return information of current user in form of User object.
-	 * @throws Exception
-	 */
-	public User getUser() {
-		return idStorage.getUser();
+		return null;
 	}
 
 	/**
@@ -170,21 +124,44 @@ public class SignatureUtility {
 	}
 
 	/**
-	 * Sign data using privKey.
+	 * Generate the hash-code of the given shout.
 	 * 
-	 * @param data
-	 * @param privKey
-	 * @return signature
+	 * @param timestamp
+	 * @param sender
+	 * @param message
+	 * @param shoutOri
+	 * @return hash-code of the shout
+	 * @throws UnsupportedEncodingException
 	 * @throws NoSuchAlgorithmException
-	 * @throws InvalidKeyException
-	 * @throws SignatureException
 	 */
-	public static byte[] genSignature(byte[] data, ECPrivateKey privKey) {
+	public static byte[] genShoutHash(UnsignedShout shout) throws UnsupportedEncodingException {
+		byte[] shoutBody;
+		try {
+			// Serialize the shout
+			shoutBody = serialize(shout);
+
+			// Generate the hash
+			MessageDigest md = MessageDigest.getInstance(HASH_ALGO);
+			md.update(shoutBody);
+			return md.digest();
+		} catch (NoSuchAlgorithmException e) {
+			Log.e(TAG, e.getMessage());
+		}
+		// Should never happen
+		return null;
+
+	}
+
+	public static byte[] genShoutSignature(UnsignedShout shout, Me me)
+			throws UnsupportedEncodingException {
+		byte[] dataBytes;
+		dataBytes = serialize(shout);
+		ECPrivateKey privateKey = (ECPrivateKey) me.getKeyPair().getPrivate();
 		Signature signature;
 		try {
 			signature = Signature.getInstance(SIGN_ALGO, CRYPTO_PROVIDER);
-			signature.initSign(privKey);
-			signature.update(data);
+			signature.initSign(privateKey);
+			signature.update(dataBytes);
 			byte[] dataSignature = signature.sign();
 			return dataSignature;
 		} catch (NoSuchAlgorithmException e) {
@@ -196,59 +173,8 @@ public class SignatureUtility {
 		} catch (NoSuchProviderException e) {
 			Log.e(TAG, e.getMessage());
 		}
-		return null;
-	}
-
-	/**
-	 * Generate the hash-code of the given shout.
-	 * 
-	 * @param timestamp
-	 * @param sender
-	 * @param content
-	 * @param shoutOri
-	 * @return hash-code of the shout
-	 * @throws UnsupportedEncodingException
-	 * @throws NoSuchAlgorithmException
-	 */
-	public static byte[] genShoutHash(DateTime timestamp, User sender,
-			String content, Shout shoutOri) {
-		byte[] shoutBody;
-		try {
-			// Serialize the shout
-			shoutBody = serialize(timestamp, sender, content, shoutOri);
-
-			// Generate the hash
-			MessageDigest md = MessageDigest.getInstance(HASH_ALGO);
-			md.update(shoutBody);
-			return md.digest();
-		} catch (UnsupportedEncodingException e) {
-			Log.e(TAG, e.getMessage());
-		} catch (NoSuchAlgorithmException e) {
-			Log.e(TAG, e.getMessage());
-		}
 		// Should never happen
 		return null;
-
-	}
-
-	/**
-	 * Generate the signature of a given shout message.
-	 * 
-	 * @param timestamp
-	 * @param content
-	 * @param shoutOri
-	 * @param sender
-	 * @return signature
-	 * @throws UnsupportedEncodingException
-	 */
-	public byte[] genShoutSignature(DateTime timestamp, User sender,
-			String content, Shout shoutOri) throws UnsupportedEncodingException {
-		// TODO Don't pass User, pass a user with a public key in it
-		// Serialize the shout
-		byte[] dataBytes = serialize(timestamp, sender, content, shoutOri);
-		ECPrivateKey privKey = idStorage.getPrivateKey();
-		byte[] signature = genSignature(dataBytes, privKey);
-		return signature;
 	}
 
 	/**
@@ -257,13 +183,16 @@ public class SignatureUtility {
 	 * 
 	 * @param timestamp send time of the shout
 	 * @param sender sender of the shout
-	 * @param content content of the shout
+	 * @param message content of the shout
 	 * @param shoutOri the original shout of the shout
 	 * @return a Shout serialized into a network packet
 	 * @throws UnsupportedEncodingException
 	 */
-	public static byte[] serialize(DateTime timestamp, User sender,
-			String content, Shout shoutOri) throws UnsupportedEncodingException {
+	public static byte[] serialize(UnsignedShout unsignedShout) throws UnsupportedEncodingException {
+		DateTime timestamp = unsignedShout.getTimestamp();
+		User sender = unsignedShout.getSender();
+		String content = unsignedShout.getMessage();
+		Shout parent = unsignedShout.getParent();
 		ByteBuffer byteBuffer = ByteBuffer.allocate(NetworkShout.MAX_LEN);
 		int size = 0;
 		while (timestamp != null) {
@@ -294,14 +223,14 @@ public class SignatureUtility {
 			byteBuffer.put(contentBytes);
 			size += contentBytes.length;
 			// hasReshout
-			byteBuffer.put((byte) (shoutOri == null ? 0 : 1));
+			byteBuffer.put((byte) (parent == null ? 0 : 1));
 			size += NetworkShout.HAS_RESHOUT_SIZE;
 			// update
-			if (shoutOri != null) {
-				timestamp = shoutOri.getTimestamp();
-				sender = shoutOri.getSender();
-				content = shoutOri.getMessage();
-				shoutOri = shoutOri.getParent();
+			if (parent != null) {
+				timestamp = parent.getTimestamp();
+				sender = parent.getSender();
+				content = parent.getMessage();
+				parent = parent.getParent();
 			} else
 				timestamp = null;
 		}
