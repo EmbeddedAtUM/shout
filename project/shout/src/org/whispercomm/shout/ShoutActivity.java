@@ -2,6 +2,8 @@ package org.whispercomm.shout;
 
 import org.whispercomm.shout.customwidgets.ActionShoutView;
 import org.whispercomm.shout.customwidgets.ShoutListViewRow;
+import org.whispercomm.shout.network.BootReceiver;
+import org.whispercomm.shout.network.NetworkService;
 import org.whispercomm.shout.provider.ShoutProvider;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.tasks.ReshoutTask;
@@ -9,8 +11,10 @@ import org.whispercomm.shout.tasks.ReshoutTask;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,10 +35,27 @@ public class ShoutActivity extends ListActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
+		startBackgroundService();
+
 		this.cursor = ShoutProviderContract
 				.getCursorOverAllShouts(getApplicationContext());
 		setListAdapter(new TimelineAdapter(this, cursor));
 		Log.v(TAG, "Finished onCreate");
+	}
+
+	/**
+	 * Ensures that the background Shout service is started, if the user has
+	 * that option enabled.
+	 */
+	private void startBackgroundService() {
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		boolean runInBackground = prefs.getBoolean(
+				BootReceiver.START_SERVICE_ON_BOOT, true);
+		if (runInBackground) {
+			Intent intent = new Intent(this, NetworkService.class);
+			this.startService(intent);
+		}
 	}
 
 	@Override
