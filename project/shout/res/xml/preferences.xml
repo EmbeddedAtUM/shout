@@ -17,6 +17,14 @@
             android:title="Auto Rotate" />
     </org.whispercomm.shout.customwidgets.ShoutPreferenceCategory>
 
+    <PreferenceCategory android:title="Background Service" >
+        <org.whispercomm.shout.customwidgets.ShoutCheckBoxPreference
+            android:defaultValue="true"
+            android:key="runInBackground"
+            android:summary="If checked, Shout will run in the background listening for new shouts."
+            android:title="Run in Background" />
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="Twitter Account" >
         <org.whispercomm.shout.customwidgets.TwitterPreference
             android:key="twitterLoginPref"
