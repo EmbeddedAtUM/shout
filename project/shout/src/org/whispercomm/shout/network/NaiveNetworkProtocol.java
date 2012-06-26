@@ -6,25 +6,34 @@ import java.util.TimerTask;
 
 import org.whispercomm.manes.client.maclib.ManesInterface;
 import org.whispercomm.manes.client.maclib.NotRegisteredException;
+import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 
 import android.content.Context;
 import android.util.Log;
 
 /**
- * Service in charge of sending and receiving shouts from the MANES network
+ * Simple implementation of network logic for Shout.
+ * <p>
+ * Received shouts that are valid (self-signatures check and
+ * parents/grandparents exist) are stored in the content provider. Those with
+ * invalid signatures are dropped.
+ * <p>
+ * Each outgoing shout is broadcast 20 times over a 10 hour at 30 minute
+ * intervals.
  * 
  * @author Yue Liu
+ * @author David R. Bild
  * 
  */
-public class NaiveBroadcast implements NetworkProtocol {
-
-	public static final String TAG = "******NaiveBroadcast******";
+public class NaiveNetworkProtocol implements NetworkProtocol {
+	public static final String TAG = NaiveNetworkProtocol.class.getSimpleName();
 
 	/**
 	 * rebroadcast period in millisecond
 	 */
 	public static long PERIOD = 30 * 60 * 1000;
+
 	/**
 	 * total number of re-sends for each message
 	 */
@@ -33,24 +42,27 @@ public class NaiveBroadcast implements NetworkProtocol {
 	 * timer for scheduling periodic re-broadcast
 	 */
 	Timer sendScheduler;
-	ManesInterface manesIf;
+	ManesInterface manes;
 	Context context;
 
-	public NaiveBroadcast(ManesInterface manesIf, Context context) {
-		this.manesIf = manesIf;
-		this.sendScheduler = new Timer();
+	public NaiveNetworkProtocol(ManesInterface manes, Context context) {
+		this.manes = manes;
 		this.context = context;
+		this.sendScheduler = new Timer();
 	}
 
 	@Override
-	public void clearUp() {
+	public void initialize() {
+		// Nothing to do here.
+	}
+
+	@Override
+	public void cleanup() {
 		sendScheduler.cancel();
 	}
 
 	@Override
-	public void handleOutgoingAppShout(int shoutId) {
-		// get the byte[] representation of the outgoing shout.
-		NetworkShout shout = new NetworkShout(shoutId, context);
+	public void sendShout(Shout shout) {
 		final byte[] shoutBytes;
 		try {
 			shoutBytes = NetworkShout.toNetworkBytes(shout);
@@ -61,6 +73,7 @@ public class NaiveBroadcast implements NetworkProtocol {
 			Log.e(TAG, e.getMessage());
 			return;
 		}
+
 		// schedule periodic re-broadcast up to RESEND_NUM times.
 		long delay = 0;
 		for (int i = 1; i <= RESEND_NUM; i++) {
@@ -68,7 +81,7 @@ public class NaiveBroadcast implements NetworkProtocol {
 				@Override
 				public void run() {
 					try {
-						manesIf.send(shoutBytes);
+						manes.send(shoutBytes);
 					} catch (NotRegisteredException e) {
 						Log.e(TAG, "send() failed because not registered.", e);
 					}
@@ -79,7 +92,7 @@ public class NaiveBroadcast implements NetworkProtocol {
 	}
 
 	@Override
-	public void handleIncomingNetworkShout(NetworkShout shout) {
+	public void receiveShout(Shout shout) {
 		ShoutProviderContract.storeShout(context, shout);
 	}
 

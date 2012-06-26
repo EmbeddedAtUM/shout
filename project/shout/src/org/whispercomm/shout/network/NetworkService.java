@@ -11,6 +11,8 @@ import org.whispercomm.manes.client.maclib.ManesInterface;
 import org.whispercomm.manes.client.maclib.ManesNotInstalledException;
 import org.whispercomm.shout.R;
 import org.whispercomm.shout.SettingsActivity;
+import org.whispercomm.shout.Shout;
+import org.whispercomm.shout.provider.ShoutProviderContract;
 
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -47,11 +49,14 @@ public class NetworkService extends Service {
 			throw new RuntimeException(e);
 		}
 		this.appMessenger = new Messenger(new AppShoutHandler());
-		this.networkProtocol = new NaiveBroadcast(manes,
+		this.networkProtocol = new NaiveNetworkProtocol(manes,
 				getApplicationContext());
 		this.networkReceiver = new NetworkReceiver();
 		isRunning = true;
 		new Thread(networkReceiver).start();
+		
+		this.networkProtocol.initialize();
+
 
 		Notification notification = new Notification(R.drawable.icon,
 				getText(R.string.serviceTickerText), System.currentTimeMillis());
@@ -78,8 +83,7 @@ public class NetworkService extends Service {
 	public final void onDestroy() {
 		isRunning = false;
 		manes.disconnect();
-		// Any other clear-up specific to the particular subclass
-		networkProtocol.clearUp();
+		networkProtocol.cleanup();
 	}
 
 	/**
@@ -92,8 +96,12 @@ public class NetworkService extends Service {
 			if (msg.what == NEW_SHOUT) {
 				long shoutId = (Long) msg.obj; // FIXME
 				int shoutIdInt = (int) shoutId;
+				Shout shout = ShoutProviderContract
+						.retrieveShoutById(
+								NetworkService.this.getApplicationContext(),
+								shoutIdInt);
 				// TODO Find out why networkProtocol gets nulled
-				networkProtocol.handleOutgoingAppShout(shoutIdInt);
+				networkProtocol.sendShout(shout);
 			} else if (msg.what == STOP_FOREGROUND) {
 				if (inForeground) {
 					stopForeground(true);
@@ -130,7 +138,7 @@ public class NetworkService extends Service {
 					shout = new NetworkShout(shoutBytes);
 
 					// Handle this incoming shout
-					networkProtocol.handleIncomingNetworkShout(shout);
+					networkProtocol.receiveShout(shout);
 				} catch (UnsupportedEncodingException e) {
 					Log.e(TAG, e.getMessage());
 				} catch (AuthenticityFailureException e) {
