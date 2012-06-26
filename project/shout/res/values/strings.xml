@@ -31,4 +31,5 @@
     <string name="serviceTickerText">Starting Shout listener service</string>
     <string name="serviceTitleText">Shout Service</string>
     <string name="serviceDescriptionText">Currently listening for nearby Shouts</string>
+    <string name="splashDesc">Splash screen logo</string>
 </resources>
