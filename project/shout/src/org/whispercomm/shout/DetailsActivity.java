@@ -7,6 +7,7 @@ import android.app.ListActivity;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -52,6 +53,17 @@ public class DetailsActivity extends ListActivity {
 	public void onResume() {
 		super.onResume();
 		shout = ShoutProviderContract.retrieveShoutById(getApplicationContext(), shoutId);
+		//Set message details
+		TextView username = (TextView) findViewById(R.id.origsender);
+		username.setText(shout.getSender().getUsername());
+		TextView age = (TextView) findViewById(R.id.age);
+		age.setText(ShoutMessageUtility.getDateTimeAge(shout.getTimestamp()));
+		TextView message = (TextView) findViewById(R.id.message);
+		message.setText(shout.getMessage());
+		TextView signature = (TextView) findViewById(R.id.signature);
+		signature.setText(Base64.encodeToString(shout.getSignature(), Base64.DEFAULT));
+		TextView hash = (TextView) findViewById(R.id.hash);
+		hash.setText(Base64.encodeToString(shout.getHash(), Base64.DEFAULT));
 		/*
 		 * TODO 1) Figure out how to get access to the views that show the
 		 * information about the Shout we're viewing the details of. 2) Populate
