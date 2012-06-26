@@ -23,34 +23,36 @@ import android.os.Messenger;
 import android.util.Log;
 
 public class NetworkService extends Service {
-
 	public static final String TAG = NetworkService.class.getSimpleName();
+
 	public static final int NEW_SHOUT = 1;
 	public static final int STOP_FOREGROUND = 2;
 	public static final int APP_ID = 74688;// "shout" on a phone keyboard
 	private static final int ONGOING_NOTIFICATION = 1;
 
-	Messenger appMessenger;
-	ManesInterface manesIf;
+	private ManesInterface manes;
+	private Messenger appMessenger;
+	private NetworkProtocol networkProtocol;
+	private Runnable networkReceiver;
+
 	private boolean isRunning;
 	private boolean inForeground;
-	NetworkProtocol networkProtocol;
 
 	@Override
 	public final void onCreate() {
-		// TODO Create ALL THE THINGS
-		this.appMessenger = new Messenger(new AppShoutHandler());
 		try {
-			this.manesIf = new ManesInterface(APP_ID, getApplicationContext());
+			this.manes = new ManesInterface(APP_ID, getApplicationContext());
 		} catch (ManesNotInstalledException e) {
 			// TODO Handle this
 			throw new RuntimeException(e);
 		}
-		networkProtocol = new NaiveBroadcast(manesIf, getApplicationContext());
+		this.appMessenger = new Messenger(new AppShoutHandler());
+		this.networkProtocol = new NaiveBroadcast(manes,
+				getApplicationContext());
+		this.networkReceiver = new NetworkReceiver();
 		isRunning = true;
-		new Thread(new NetworkReceiver()).start();
-		// TODO Start / bind all the things in the background based on status
-		// response?
+		new Thread(networkReceiver).start();
+
 		Notification notification = new Notification(R.drawable.icon,
 				getText(R.string.serviceTickerText), System.currentTimeMillis());
 		Intent notificationIntent = new Intent(this, SettingsActivity.class);
@@ -75,7 +77,7 @@ public class NetworkService extends Service {
 	@Override
 	public final void onDestroy() {
 		isRunning = false;
-		manesIf.disconnect();
+		manes.disconnect();
 		// Any other clear-up specific to the particular subclass
 		networkProtocol.clearUp();
 	}
@@ -118,7 +120,7 @@ public class NetworkService extends Service {
 		public void run() {
 			byte[] shoutBytes = null;
 			while (isRunning) {
-				shoutBytes = manesIf.receive(CHECK_PERIOD);
+				shoutBytes = manes.receive(CHECK_PERIOD);
 
 				if (shoutBytes == null)
 					continue;
