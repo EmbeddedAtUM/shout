@@ -2,6 +2,8 @@ package org.whispercomm.shout.provider;
 
 import org.joda.time.DateTime;
 import org.whispercomm.shout.Shout;
+import org.whispercomm.shout.ShoutMessageUtility;
+import org.whispercomm.shout.ShoutType;
 import org.whispercomm.shout.User;
 
 import android.content.Context;
@@ -85,6 +87,11 @@ public class ProviderShout implements Shout {
 	@Override
 	public byte[] getSignature() {
 		return this.signature;
+	}
+
+	@Override
+	public ShoutType getType() {
+		return ShoutMessageUtility.getShoutType(this);
 	}
 
 }

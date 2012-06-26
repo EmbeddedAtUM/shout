@@ -1,6 +1,7 @@
-
 package org.whispercomm.shout;
 
+import org.whispercomm.shout.customwidgets.ActionShoutView;
+import org.whispercomm.shout.customwidgets.ShoutListViewRow;
 import org.whispercomm.shout.provider.ShoutProvider;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.tasks.ReshoutTask;
@@ -11,16 +12,12 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
 
 public class ShoutActivity extends ListActivity {
 
@@ -48,15 +45,6 @@ public class ShoutActivity extends ListActivity {
 	}
 
 	@Override
-	protected void onListItemClick(ListView l, View v, int position, long id) {
-		super.onListItemClick(l, v, position, id);
-		Log.v(TAG, "Click at position " + position + ", id " + id);
-		ViewHolder holder = (ViewHolder) v.getTag();
-		holder.buttonHolder.setVisibility(View.VISIBLE);
-		holder.expanded = true;
-	}
-
-	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.menu, menu);
@@ -67,14 +55,14 @@ public class ShoutActivity extends ListActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		Intent intent;
 		switch (item.getItemId()) {
-			case R.id.settings:
-				intent = new Intent(this, SettingsActivity.class);
-				break;
-			case R.id.compose:
-				intent = new Intent(this, MessageActivity.class);
-				break;
-			default:
-				return super.onOptionsItemSelected(item);
+		case R.id.settings:
+			intent = new Intent(this, SettingsActivity.class);
+			break;
+		case R.id.compose:
+			intent = new Intent(this, MessageActivity.class);
+			break;
+		default:
+			return super.onOptionsItemSelected(item);
 		}
 
 		startActivity(intent);
@@ -91,50 +79,51 @@ public class ShoutActivity extends ListActivity {
 		startActivity(new Intent(this, SettingsActivity.class));
 	}
 
-	public void onClickReshout(View v) {
+	public void onClickReshout(Shout shout) {
 		Log.v(TAG, "Reshout button clicked");
-		// Hack to get shout ID
-		ViewGroup rowView = (ViewGroup) v.getParent().getParent();
-		ViewHolder holder = (ViewHolder) rowView.getTag();
-		int id = holder.id;
-		Log.v(TAG, "Shout ID received as " + id);
-		// Handle the reshout
-		ReshoutTask reshoutTask = new ReshoutTask(getApplicationContext());
-		reshoutTask.execute(id);
+
+		// TODO: Pass around Shout objects, not local ids...
+		// That will avoid the need for this hack for getting the id of an
+		// already existing shout
+		int id = ShoutProviderContract.storeShout(getApplicationContext(),
+				shout);
+
+		ReshoutTask task = new ReshoutTask(getApplicationContext());
+		task.execute(id);
 	}
 
-	public void onClickComment(View v) {
+	public void onClickComment(Shout shout) {
 		Log.v(TAG, "Comment button clicked");
-		ViewGroup rowView = (ViewGroup) v.getParent().getParent();
-		ViewHolder holder = (ViewHolder) rowView.getTag();
-		int id = holder.id;
+
+		// TODO: Pass around Shout objects, not local ids...
+		// That will avoid the need for this hack for getting the id of an
+		// already existing shout
+		int id = ShoutProviderContract.storeShout(getApplicationContext(),
+				shout);
+
 		Intent intent = new Intent(this, MessageActivity.class);
 		intent.putExtra(MessageActivity.PARENT_ID, id);
 		startActivity(intent);
 	}
 
-	public void onClickDetails(View v) {
+	public void onClickDetails(Shout shout) {
 		Log.v(TAG, "Details buttons clicked");
-		ViewGroup rowView = (ViewGroup) v.getParent().getParent();
-		ViewHolder holder = (ViewHolder) rowView.getTag();
-		int id = holder.id;
-		Log.v(TAG, "Shout ID received as " + id);
+
+		// TODO: Pass around Shout objects, not local ids...
+		// That will avoid the need for this hack for getting the id of an
+		// already existing shout
+		int id = ShoutProviderContract.storeShout(getApplicationContext(),
+				shout);
+
 		Intent intent = new Intent(this, DetailsActivity.class);
 		intent.putExtra(DetailsActivity.SHOUT_ID, id);
 		startActivity(intent);
 	}
 
-	static class ViewHolder {
-		ImageView avatar;
-		ImageView reshoutIcon;
-		TextView commentCount;
-		TextView origSender;
-		TextView sender;
-		TextView message;
-		TextView age;
-		ViewGroup buttonHolder;
-		boolean expanded = false;
-		int id = -1;
+	// TODO: Get rid of this. RowHolder should be it's own custom component.
+	static class RowHolder {
+		ShoutListViewRow rowView;
+		ActionShoutView actionShoutView;
 	}
 
 	private class TimelineAdapter extends CursorAdapter {
@@ -145,67 +134,41 @@ public class ShoutActivity extends ListActivity {
 
 		@Override
 		public void bindView(View view, Context context, Cursor cursor) {
-			Log.v(TAG, "bindView called");
 			// Get the shout
 			int idIndex = cursor
 					.getColumnIndex(ShoutProviderContract.Shouts._ID);
 			int id = cursor.getInt(idIndex);
 			Shout shout = ShoutProviderContract.retrieveShoutById(context, id);
-			int countIndex = cursor.getColumnIndex(ShoutProvider.COMMENT_COUNT_COLUMN);
-			int commentCount = cursor.getInt(countIndex);
-			
-			// Find the views
-			ViewHolder holder = (ViewHolder) view.getTag();
-			holder.id = id;
-			holder.buttonHolder.setVisibility(View.GONE);
-			holder.commentCount.setText("Comments (" + commentCount + ")");
 
-			// Set the Shout data in the views
-			holder.avatar.setImageResource(R.drawable.defaultavatar);
-			holder.age.setText(ShoutMessageUtility.getDateTimeAge(shout.getTimestamp()));
-			ShoutType type = ShoutMessageUtility.getShoutType(shout);
-			switch (type) {
-				case SHOUT:
-					holder.message.setText(shout.getMessage());
-					holder.origSender.setText(shout.getSender().getUsername());
-					holder.reshoutIcon.setVisibility(View.GONE);
-					holder.sender.setVisibility(View.GONE);
-					break;
-				case RESHOUT:
-					holder.reshoutIcon.setVisibility(View.VISIBLE);
-					holder.message.setText(shout.getParent().getMessage());
-					holder.origSender.setText(shout.getParent().getSender().getUsername());
-					holder.sender.setText(shout.getSender().getUsername());
-					holder.sender.setVisibility(View.VISIBLE);
-					break;
-				case COMMENT:
-					// Should never happen
-					break;
-				case RECOMMENT:
-					// Should never happen
-					break;
-				default:
-					throw new IllegalStateException("Did not get valid ShoutType");
-			}
-			return;
+			// Get the comment count
+			int commentIndex = cursor
+					.getColumnIndex(ShoutProvider.COMMENT_COUNT_COLUMN);
+			int commentCount = cursor.getInt(commentIndex);
+
+			// Get the reshout count
+			int reshoutIndex = cursor
+					.getColumnIndex(ShoutProvider.RESHOUT_COUNT_COLUMN);
+			int reshoutCount = cursor.getInt(reshoutIndex);
+
+			// Find the views
+			RowHolder holder = (RowHolder) view.getTag();
+			// TODO Cast directly to rowView, drop holder?
+			// Bind the shout to the shout view
+			holder.rowView.bindShout(shout, commentCount, reshoutCount);
 		}
 
 		@Override
-		public View newView(Context context, Cursor cursor, ViewGroup parent) {
-			LayoutInflater inflater = LayoutInflater.from(context);
-			View rowView = inflater.inflate(R.layout.row, parent, false);
-			ViewHolder holder = new ViewHolder();
-			holder.avatar = (ImageView) rowView.findViewById(R.id.avatar);
-			holder.origSender = (TextView) rowView.findViewById(R.id.origsender);
-			holder.sender = (TextView) rowView.findViewById(R.id.sender);
-			holder.age = (TextView) rowView.findViewById(R.id.age);
-			holder.message = (TextView) rowView.findViewById(R.id.message);
-			holder.buttonHolder = (ViewGroup) rowView.findViewById(R.id.buttonHolder);
-			holder.reshoutIcon = (ImageView) rowView.findViewById(R.id.reshoutIcon);
-			holder.commentCount = (TextView) rowView.findViewById(R.id.commentCount);
-			rowView.setTag(holder);
-			Log.v(TAG, "View inflated");
-			return rowView;
+		public View newView(final Context context, Cursor cursor,
+				ViewGroup parent) {
+			final RowHolder holder = new RowHolder();
+
+			ShoutListViewRow row = new ShoutListViewRow(context);
+			holder.rowView = row;
+			holder.actionShoutView = (ActionShoutView) row
+					.findViewById(R.id.actionshoutview);
+
+			row.setTag(holder);
+			return row;
 		}
 	}
 }

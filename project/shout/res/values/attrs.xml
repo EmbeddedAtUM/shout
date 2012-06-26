@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="ActionShoutView">
+        <attr name="onReshoutClick" format="string" />
+        <attr name="onCommentClick" format="string" />
+        <attr name="onDetailsClick" format="string" />
+    </declare-styleable>
+
+</resources>

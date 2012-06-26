@@ -32,6 +32,7 @@ public class NetworkInterface {
 	private Boolean isBinded;
 
 	public static NetworkInterface getInstance(Context context) {
+		// TODO Move into context / shared state Android thang
 		// TODO Multi-context support with Map context->instance
 		// TODO Remove this Singleton while still keeping it a singleton
 		if (instance == null) {

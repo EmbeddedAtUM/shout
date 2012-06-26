@@ -1,4 +1,3 @@
-
 package org.whispercomm.shout.network;
 
 import java.io.UnsupportedEncodingException;
@@ -13,6 +12,8 @@ import java.security.spec.InvalidKeySpecException;
 import org.joda.time.DateTime;
 import org.whispercomm.shout.AbstractShout;
 import org.whispercomm.shout.Shout;
+import org.whispercomm.shout.ShoutMessageUtility;
+import org.whispercomm.shout.ShoutType;
 import org.whispercomm.shout.SimpleUser;
 import org.whispercomm.shout.User;
 import org.whispercomm.shout.id.SignatureUtility;
@@ -92,10 +93,12 @@ public class NetworkShout extends AbstractShout {
 	/**
 	 * Generate a NetworkShout from a shout stored in the database
 	 * 
-	 * @param shout_id the _ID of the source shout in the database
+	 * @param shout_id
+	 *            the _ID of the source shout in the database
 	 */
 	public NetworkShout(int shout_id, Context context) {
-		Shout shout = ShoutProviderContract.retrieveShoutById(context, shout_id);
+		Shout shout = ShoutProviderContract
+				.retrieveShoutById(context, shout_id);
 		this.timestamp = shout.getTimestamp();
 		this.sender = shout.getSender();
 		this.signature = shout.getSignature();
@@ -126,8 +129,10 @@ public class NetworkShout extends AbstractShout {
 	/**
 	 * extract all the signatures of the network shout
 	 * 
-	 * @param sigs array to hold all the signatures
-	 * @param byteBuffer raw data in ByteBuffer
+	 * @param sigs
+	 *            array to hold all the signatures
+	 * @param byteBuffer
+	 *            raw data in ByteBuffer
 	 * @return
 	 */
 	public static int getSignatures(byte[][] sigs, ByteBuffer byteBuffer) {
@@ -151,8 +156,8 @@ public class NetworkShout extends AbstractShout {
 	 * Build a NetworkShout object from bytes received from the network
 	 * 
 	 * @throws UnsupportedEncodingException
-	 * @throws AuthenticityFailureException the network data fails authenticity
-	 *             check.
+	 * @throws AuthenticityFailureException
+	 *             the network data fails authenticity check.
 	 * @throws SignatureException
 	 * @throws NoSuchAlgorithmException
 	 * @throws InvalidKeyException
@@ -196,37 +201,32 @@ public class NetworkShout extends AbstractShout {
 	 * @throws ShoutChainTooLongException
 	 * @throws UnsupportedEncodingException
 	 */
-	public byte[] toNetworkBytes() throws ShoutChainTooLongException,
-			UnsupportedEncodingException {
+	public static byte[] toNetworkBytes(Shout shout)
+			throws ShoutChainTooLongException, UnsupportedEncodingException {
 		ByteBuffer byteBuffer = ByteBuffer.allocate(MAX_LEN);
 		// Get signatures
 		int sigNum = 0;
-		NetworkShout shout = this;
 		byte hasReshout;
-		while (shout != null && sigNum < MAX_SHOUT_NUM) {
-			byte[] signature = shout.getSignature();
+		Shout current = shout;
+		while (current != null && sigNum < MAX_SHOUT_NUM) {
+			byte[] signature = current.getSignature();
 			// signature_len
 			byteBuffer.putChar((char) signature.length);
 			// signature
 			byteBuffer.put(signature);
 			// hasNext
-			hasReshout = (byte) (shout.getParent() == null ? 0 : 1);
+			hasReshout = (byte) (current.getParent() == null ? 0 : 1);
 			byteBuffer.put(hasReshout);
-			if (shout.shoutOri != null) {
-				shout = new NetworkShout(shout.shoutOri.getTimestamp(), shout.shoutOri.getSender(),
-						shout.shoutOri.getMessage(), shout.shoutOri.getSignature(),
-						shout.shoutOri.getParent());
-			} else {
-				shout = null;
-			}
+			current = current.getParent();
 			sigNum++;
 		}
 		// sanity check
-		if (shout != null)
+		if (current != null)
 			throw new ShoutChainTooLongException();
 		// put the body of the shout into the ByteBuffer
-		byte[] shoutBodyBytes = SignatureUtility.serialize(this.timestamp,
-				this.sender, this.content, this.shoutOri);
+		byte[] shoutBodyBytes = SignatureUtility.serialize(
+				shout.getTimestamp(), shout.getSender(), shout.getMessage(),
+				shout.getParent());
 		byteBuffer.put(shoutBodyBytes);
 
 		return Arrays.copyOfRange(byteBuffer.array(), 0, byteBuffer.position());
@@ -236,7 +236,8 @@ public class NetworkShout extends AbstractShout {
 	 * Verify whether a shout is authentic
 	 * 
 	 * @param signature
-	 * @param byteBuffer that holds the body of a shout
+	 * @param byteBuffer
+	 *            that holds the body of a shout
 	 * @return a new NetworkShout (with its original shout yet to be completed)
 	 *         if authentic, null otherwise
 	 * @throws UnsupportedEncodingException
@@ -335,6 +336,11 @@ public class NetworkShout extends AbstractShout {
 	@Override
 	public byte[] getSignature() {
 		return this.signature;
+	}
+
+	@Override
+	public ShoutType getType() {
+		return ShoutMessageUtility.getShoutType(this);
 	}
 
 }

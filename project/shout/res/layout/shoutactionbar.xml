@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/actionbar"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/blue"
+    android:orientation="horizontal"
+    android:paddingLeft="5dip"
+    android:paddingRight="5dip" >
+
+    <ImageButton
+        android:id="@+id/reshoutButton"
+        style="@style/TitleBarButton"
+        android:layout_gravity="center"
+        android:contentDescription="@string/reshoutDescription"
+        android:padding="5dip"
+        android:src="@drawable/reshout" />
+
+    <ImageButton
+        android:id="@+id/commentButton"
+        style="@style/TitleBarButton"
+        android:layout_gravity="center"
+        android:contentDescription="@string/commentDescription"
+        android:padding="5dip"
+        android:src="@drawable/chat" />
+
+    <ImageButton
+        android:id="@+id/detailsButton"
+        style="@style/TitleBarButton"
+        android:layout_gravity="center"
+        android:contentDescription="@string/detailsDescription"
+        android:padding="5dip"
+        android:src="@drawable/gear" />
+
+</LinearLayout>

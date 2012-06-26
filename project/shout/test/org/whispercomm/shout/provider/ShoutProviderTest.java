@@ -104,7 +104,7 @@ public class ShoutProviderTest {
 		int idIndex = cursor.getColumnIndex(ShoutProviderContract.Shouts._ID);
 		int authorIndex = cursor.getColumnIndex(ShoutProviderContract.Shouts.AUTHOR);
 		int messageIndex = cursor.getColumnIndex(ShoutProviderContract.Shouts.MESSAGE);
-		int timeIndex = cursor.getColumnIndex(ShoutProviderContract.Shouts.TIME);
+		int timeIndex = cursor.getColumnIndex(ShoutProviderContract.Shouts.TIME_SENT);
 		int hashIndex = cursor.getColumnIndex(ShoutProviderContract.Shouts.HASH);
 		int sigIndex = cursor.getColumnIndex(ShoutProviderContract.Shouts.SIGNATURE);
 
@@ -193,7 +193,7 @@ public class ShoutProviderTest {
 		values.put(ShoutProviderContract.Shouts.MESSAGE, "oh noes i dont have an author");
 		values.put(ShoutProviderContract.Shouts.SIGNATURE,
 				Base64.encodeToString(TestFactory.genByteArray(4), Base64.DEFAULT));
-		values.put(ShoutProviderContract.Shouts.TIME, 101L);
+		values.put(ShoutProviderContract.Shouts.TIME_SENT, 101L);
 		try {
 			cr.insert(ShoutProviderContract.Shouts.CONTENT_URI, values);
 		} catch (SQLException e) {
@@ -211,7 +211,7 @@ public class ShoutProviderTest {
 		values.put(ShoutProviderContract.Shouts.MESSAGE, "oh noes i dont have an author");
 		values.put(ShoutProviderContract.Shouts.SIGNATURE,
 				Base64.encodeToString(TestFactory.genByteArray(4), Base64.DEFAULT));
-		values.put(ShoutProviderContract.Shouts.TIME, 101L);
+		values.put(ShoutProviderContract.Shouts.TIME_SENT, 101L);
 		values.put(ShoutProviderContract.Shouts.PARENT, 9001);
 		try {
 			cr.insert(ShoutProviderContract.Shouts.CONTENT_URI, values);

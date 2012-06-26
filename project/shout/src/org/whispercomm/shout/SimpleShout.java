@@ -44,4 +44,9 @@ public class SimpleShout extends AbstractShout {
 		return this.signature;
 	}
 
+	@Override
+	public ShoutType getType() {
+		return ShoutMessageUtility.getShoutType(this);
+	}
+
 }

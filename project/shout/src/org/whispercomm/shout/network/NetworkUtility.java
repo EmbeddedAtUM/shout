@@ -1,4 +1,3 @@
-
 package org.whispercomm.shout.network;
 
 import java.io.UnsupportedEncodingException;
@@ -40,6 +39,7 @@ public class NetworkUtility extends Service {
 
 	@Override
 	public final void onCreate() {
+		// TODO Create ALL THE THINGS
 		this.appMessenger = new Messenger(new AppShoutHandler());
 		this.manesIf = new ManesInterface(APP_ID, getApplicationContext());
 		Thread register = new Thread() {
@@ -54,6 +54,7 @@ public class NetworkUtility extends Service {
 						isRunning = true;
 						new Thread(new NetworkReceiver()).start();
 					} else {
+						Log.v(TAG, "Manes returned false on init");
 						// TODO
 					}
 				} catch (InterruptedException e) {
@@ -65,12 +66,15 @@ public class NetworkUtility extends Service {
 			}
 		};
 		register.start();
+		// TODO Start / bind all the things in the background based on status
+		// response?
 		Notification notification = new Notification(R.drawable.icon,
-				getText(R.string.serviceTickerText),
-				System.currentTimeMillis());
+				getText(R.string.serviceTickerText), System.currentTimeMillis());
 		Intent notificationIntent = new Intent(this, SettingsActivity.class);
-		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-		notification.setLatestEventInfo(this, getText(R.string.serviceTitleText),
+		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
+				notificationIntent, 0);
+		notification.setLatestEventInfo(this,
+				getText(R.string.serviceTitleText),
 				getText(R.string.serviceDescriptionText), pendingIntent);
 		startForeground(ONGOING_NOTIFICATION, notification);
 		this.inForeground = true;
@@ -103,6 +107,7 @@ public class NetworkUtility extends Service {
 			if (msg.what == NEW_SHOUT) {
 				long shoutId = (Long) msg.obj; // FIXME
 				int shoutIdInt = (int) shoutId;
+				// TODO Find out why networkProtocol gets nulled
 				networkProtocol.handleOutgoingAppShout(shoutIdInt);
 			} else if (msg.what == STOP_FOREGROUND) {
 				if (inForeground) {

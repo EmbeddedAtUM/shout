@@ -11,6 +11,7 @@ import org.whispercomm.shout.provider.ShoutProviderContract;
 import android.content.Context;
 import android.util.Log;
 
+// TODO Switch to static after sig utility is static
 public class ShoutCreator {
 
 	static final String TAG = ShoutCreator.class.getSimpleName();
