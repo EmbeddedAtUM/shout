@@ -23,13 +23,13 @@ public class LocalShoutImpl implements LocalShout {
 	private LocalShout parent = null;
 	private LocalShout myReshout = null;
 	
-	private int commentCount = 4;
-	private int reshoutCount = 4;
+	private int commentCount;
+	private int reshoutCount;
 	
 	private Context context;
 	
 	public LocalShoutImpl(Context context, int id, LocalUser sender, String message, String encodedSig,
-			String encodedHash, Long sentTime, Long receivedTime, int parentId) {
+			String encodedHash, Long sentTime, Long receivedTime, int commentCount, int reshoutCount, int parentId) {
 		this.context = context;
 		this.id = id;
 		this.sender = sender;
@@ -39,6 +39,8 @@ public class LocalShoutImpl implements LocalShout {
 		this.sentTime = new DateTime(sentTime);
 		this.receivedTime = new DateTime(receivedTime);
 		this.parentId = parentId;
+		this.commentCount = commentCount;
+		this.reshoutCount = reshoutCount;
 	}
 
 	@Override

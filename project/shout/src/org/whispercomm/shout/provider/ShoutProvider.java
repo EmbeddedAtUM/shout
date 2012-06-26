@@ -38,11 +38,11 @@ public class ShoutProvider extends ContentProvider {
 	private static final int MESSAGES_SHOUT_ID = 410;
 	private static final int SHOUTS_FANCY = 9001;
 
-	public static final String COMMENT_COUNT_COLUMN = "comment_count";
-	public static final String RESHOUT_COUNT_COLUMN = "reshout_count";
+	public static final String COMMENT_COUNT_COLUMN = "cmnCount";
+	public static final String RESHOUT_COUNT_COLUMN = "reCnt";
 
-	public static final String FANCY_ASS_QUERY = "SELECT j._id AS _id, comment_count, COUNT(s3._id) AS reshout_count FROM "
-			+ "(SELECT s1._id AS _id, COUNT(s2._id) AS comment_count FROM "
+	public static final String FANCY_ASS_QUERY = "SELECT j._id AS _id, cmnCount, COUNT(s3._id) AS reCnt FROM "
+			+ "(SELECT s1._id AS _id, COUNT(s2._id) AS cmnCount FROM "
 			+ "Shout AS s1 LEFT OUTER JOIN Shout AS s2 ON (s2.parent = s1._id AND s2.Message IS NOT NULL) "
 			+ "WHERE s1.Parent IS NULL "
 			+ "GROUP BY s1._id) AS j "
@@ -158,7 +158,6 @@ public class ShoutProvider extends ContentProvider {
 
 		long rowId = mDB.insert(table, null, values);
 		if (rowId < 0) { // An error occurred
-			// TODO Differentiate errors (UNIQUE vs actual error)
 			throw new SQLException("Failed to insert row into " + uri);
 		}
 		Uri insertLocation = ContentUris.withAppendedId(uri, rowId);
@@ -321,6 +320,8 @@ public class ShoutProvider extends ContentProvider {
 				+ ShoutProviderContract.Shouts.TIME_RECEIVED + " LONG, "
 				+ ShoutProviderContract.Shouts.HASH + " TEXT UNIQUE, "
 				+ ShoutProviderContract.Shouts.SIGNATURE + " TEXT UNIQUE, "
+				+ ShoutProviderContract.Shouts.COMMENT_COUNT + " INTEGER DEFAULT 0, "
+				+ ShoutProviderContract.Shouts.RESHOUT_COUNT + " INTEGER DEFAULT 0, "
 				+ "FOREIGN KEY(" + ShoutProviderContract.Shouts.AUTHOR
 				+ ") REFERENCES " + ShoutProviderContract.Users.TABLE_NAME
 				+ "(" + ShoutProviderContract.Users._ID + ") " + "FOREIGN KEY("
@@ -334,6 +335,26 @@ public class ShoutProvider extends ContentProvider {
 				+ ShoutSearchContract.Messages.SHOUT
 				+ ", "
 				+ ShoutSearchContract.Messages.MESSAGE + ");";
+		
+		private static final String SQL_CREATE_TRIGGER_COMMENT = "CREATE TRIGGER "
+				+ "Update_Comment_Count AFTER INSERT ON "
+				+ ShoutProviderContract.Shouts.TABLE_NAME + "\nBEGIN\n" + "UPDATE "
+				+ ShoutProviderContract.Shouts.TABLE_NAME + " SET " 
+				+ ShoutProviderContract.Shouts.COMMENT_COUNT + " = "
+				+ ShoutProviderContract.Shouts.COMMENT_COUNT + " + 1 WHERE "
+				+ ShoutProviderContract.Shouts._ID + " = new." 
+				+ ShoutProviderContract.Shouts.PARENT + " AND new."
+				+ ShoutProviderContract.Shouts.MESSAGE + " IS NOT NULL;\nEND;";
+		
+		private static final String SQL_CREATE_TRIGGER_RESHOUT = "CREATE TRIGGER "
+				+ "Update_Reshout_Count AFTER INSERT ON "
+				+ ShoutProviderContract.Shouts.TABLE_NAME + "\nBEGIN\n" + "UPDATE "
+				+ ShoutProviderContract.Shouts.TABLE_NAME + " SET "
+				+ ShoutProviderContract.Shouts.RESHOUT_COUNT + " = "
+				+ ShoutProviderContract.Shouts.RESHOUT_COUNT + " + 1 WHERE "
+				+ ShoutProviderContract.Shouts._ID + " = new."
+				+ ShoutProviderContract.Shouts.PARENT + " AND new."
+				+ ShoutProviderContract.Shouts.MESSAGE + " IS NULL;\nEND;";
 
 		public ShoutDatabaseHelper(Context context) {
 			super(context, DBNAME, null, VERSION);
@@ -344,6 +365,8 @@ public class ShoutProvider extends ContentProvider {
 			db.execSQL(SQL_CREATE_USER);
 			db.execSQL(SQL_CREATE_SHOUT);
 			db.execSQL(SQL_CREATE_VIRTUAL_MESSAGE);
+			db.execSQL(SQL_CREATE_TRIGGER_COMMENT);
+			db.execSQL(SQL_CREATE_TRIGGER_RESHOUT);
 		}
 
 		@Override

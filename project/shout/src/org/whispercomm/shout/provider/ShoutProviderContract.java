@@ -109,6 +109,10 @@ public class ShoutProviderContract {
 		 * epoch.
 		 */
 		public static final String TIME_RECEIVED = "Time_Received";
+		
+		public static final String COMMENT_COUNT = "Comment_Count";
+		
+		public static final String RESHOUT_COUNT = "Reshout_Count";
 
 	}
 
@@ -336,6 +340,8 @@ public class ShoutProviderContract {
 		int sigIndex = cursor.getColumnIndex(Shouts.SIGNATURE);
 		int timeIndex = cursor.getColumnIndex(Shouts.TIME_SENT);
 		int revcIndex = cursor.getColumnIndex(Shouts.TIME_RECEIVED);
+		int commentIndex = cursor.getColumnIndex(Shouts.COMMENT_COUNT);
+		int reshoutIndex = cursor.getColumnIndex(Shouts.RESHOUT_COUNT);
 
 		int id = cursor.getInt(idIndex);
 		int authorId = cursor.getInt(authorIndex);
@@ -345,9 +351,11 @@ public class ShoutProviderContract {
 		String encodedHash = cursor.getString(hashIndex);
 		Long sentTime = cursor.getLong(timeIndex);
 		Long receivedTime = cursor.getLong(revcIndex);
+		int numComments = cursor.getInt(commentIndex);
+		int numReshouts = cursor.getInt(reshoutIndex);
 		LocalUser sender = retrieveUserById(context, authorId);
 		LocalShout shout = new LocalShoutImpl(context, id, sender, message, encodedSig,
-				encodedHash, sentTime, receivedTime, parentId);
+				encodedHash, sentTime, receivedTime, numComments, numReshouts, parentId);
 		return shout;
 	}
 
