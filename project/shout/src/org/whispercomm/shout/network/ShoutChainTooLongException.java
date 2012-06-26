@@ -7,7 +7,7 @@ public class ShoutChainTooLongException extends Exception {
 	 */
 	private static final long serialVersionUID = -5021448222790446105L;
 
-	public ShoutChainTooLongException(){
-		super("The length of the Shout chain is too long!");
+	public ShoutChainTooLongException() {
+		super("Maximum allowable Shout chain length is three.");
 	}
 }
