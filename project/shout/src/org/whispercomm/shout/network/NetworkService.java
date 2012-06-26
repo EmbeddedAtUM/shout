@@ -2,13 +2,9 @@ package org.whispercomm.shout.network;
 
 import org.whispercomm.manes.client.maclib.ManesInterface;
 import org.whispercomm.manes.client.maclib.ManesNotInstalledException;
-import org.whispercomm.shout.R;
-import org.whispercomm.shout.SettingsActivity;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 
-import android.app.Notification;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Handler;
@@ -21,16 +17,12 @@ public class NetworkService extends Service {
 	public static final String TAG = NetworkService.class.getSimpleName();
 
 	public static final int NEW_SHOUT = 1;
-	public static final int STOP_FOREGROUND = 2;
 	public static final int APP_ID = 74688;// "shout" on a phone keyboard
-	private static final int ONGOING_NOTIFICATION = 1;
 
 	private ManesInterface manes;
 	private Messenger appMessenger;
 	private NetworkProtocol networkProtocol;
 	private NetworkReceiver networkReceiver;
-
-	private boolean inForeground;
 
 	@Override
 	public final void onCreate() {
@@ -50,17 +42,6 @@ public class NetworkService extends Service {
 
 		this.networkProtocol.initialize();
 		this.networkReceiver.initialize();
-
-		Notification notification = new Notification(R.drawable.icon,
-				getText(R.string.serviceTickerText), System.currentTimeMillis());
-		Intent notificationIntent = new Intent(this, SettingsActivity.class);
-		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
-				notificationIntent, 0);
-		notification.setLatestEventInfo(this,
-				getText(R.string.serviceTitleText),
-				getText(R.string.serviceDescriptionText), pendingIntent);
-		startForeground(ONGOING_NOTIFICATION, notification);
-		this.inForeground = true;
 
 		Log.i(TAG, "Service started.");
 	}
@@ -99,11 +80,6 @@ public class NetworkService extends Service {
 								shoutIdInt);
 				// TODO Find out why networkProtocol gets nulled
 				networkProtocol.sendShout(shout);
-			} else if (msg.what == STOP_FOREGROUND) {
-				if (inForeground) {
-					stopForeground(true);
-					inForeground = false;
-				}
 			}
 		}
 	}
