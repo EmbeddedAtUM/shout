@@ -88,7 +88,7 @@ public class NetworkShout extends AbstractShout implements Shout {
 	private User sender;
 	private String content;
 	private byte[] signature;
-	private Shout parent;
+	private Shout shoutOri;
 
 	/**
 	 * Generate a NetworkShout from a shout stored in the database
@@ -102,7 +102,7 @@ public class NetworkShout extends AbstractShout implements Shout {
 		this.timestamp = shout.getTimestamp();
 		this.sender = shout.getSender();
 		this.signature = shout.getSignature();
-		this.parent = shout.getParent();
+		this.shoutOri = shout.getParent();
 		this.content = shout.getMessage();
 	}
 
@@ -114,16 +114,16 @@ public class NetworkShout extends AbstractShout implements Shout {
 	 * @param sender
 	 * @param content
 	 * @param signature
-	 * @param parent
+	 * @param shoutOri
 	 * @param hasReshout
 	 */
 	public NetworkShout(DateTime timestamp, User sender, String content,
-			byte[] signature, Shout parent) {
+			byte[] signature, Shout shoutOri) {
 		this.timestamp = timestamp;
 		this.sender = sender;
 		this.content = content;
 		this.signature = signature;
-		this.parent = parent;
+		this.shoutOri = shoutOri;
 	}
 
 	/**
@@ -185,13 +185,13 @@ public class NetworkShout extends AbstractShout implements Shout {
 		for (int i = 0; i < MAX_SHOUT_NUM - 1; i++) {
 			if (shouts[i + 1] == null)
 				break;
-			shouts[i].parent = shouts[i + 1];
+			shouts[i].shoutOri = shouts[i + 1];
 		}
 		this.timestamp = shouts[0].getTimestamp();
 		this.sender = shouts[0].getSender();
 		this.content = shouts[0].getMessage();
 		this.signature = shouts[0].getSignature();
-		this.parent = shouts[0].getParent();
+		this.shoutOri = shouts[0].getParent();
 	}
 
 	/**
@@ -328,7 +328,7 @@ public class NetworkShout extends AbstractShout implements Shout {
 
 	@Override
 	public Shout getParent() {
-		return this.parent;
+		return this.shoutOri;
 	}
 
 	@Override
