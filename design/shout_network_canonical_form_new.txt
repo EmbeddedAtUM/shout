@@ -78,8 +78,8 @@ message sizes of up to 240 ASCII characters, or 55 obscure 4-byte characters
 
 *has_parent: Value 0 or 1, boolean if this Shout has a parent
 
-*signed_parent_hash: If this Shout has a parent, this field is the hash of
-signed parent shout (e.g. parent data hash + parent signature) using SHA-256.
-
+*parent_hash: If this Shout has a parent, this field is the hash of
+signed parent shout. The hash should be over the following fields concatenated:
+    "shout" + "signature"
 *signature_len: Need because the length of ECDSA signatures varies from 70-80
 bytes using the ANSI X9.62 standards with a "secp256r1" key.

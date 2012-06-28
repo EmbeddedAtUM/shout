@@ -7,6 +7,7 @@ import java.util.TimerTask;
 import org.whispercomm.manes.client.maclib.ManesFrameTooLargeException;
 import org.whispercomm.manes.client.maclib.ManesInterface;
 import org.whispercomm.shout.provider.ShoutProviderContract;
+import org.whispercomm.shout.serialization.ShoutChainTooLongException;
 
 import android.content.Context;
 import android.util.Log;

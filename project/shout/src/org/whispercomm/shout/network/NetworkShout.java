@@ -19,6 +19,7 @@ import org.whispercomm.shout.User;
 import org.whispercomm.shout.id.SignatureUtility;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.serialization.SerializeUtility;
+import org.whispercomm.shout.serialization.ShoutChainTooLongException;
 import org.whispercomm.shout.util.Arrays;
 
 import android.content.Context;
