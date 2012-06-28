@@ -15,7 +15,6 @@ import android.util.Log;
 public class SerializeUtility {
 
 	private static final String TAG = SerializeUtility.class.getSimpleName();
-	public static final int MAX_SHOUT_SIZE = 415;
 	public static final int TIMESTAMP_SIZE = 8;
 	public static final int USERNAME_LENGTH_SIZE = 1;
 	public static final int MAX_USERNAME_SIZE = 40;
@@ -23,14 +22,18 @@ public class SerializeUtility {
 	public static final int MESSAGE_LENGTH_SIZE = 1;
 	public static final int MAX_MESSAGE_SIZE = 240;
 	public static final int HAS_PARENT_SIZE = 1;
-	public static final int HASH_SIZE = 32;
+	public static final int HASH_SIZE = 256/8;
 
+	public static final int MAX_SHOUT_SIZE = TIMESTAMP_SIZE + USERNAME_LENGTH_SIZE
+			+ MAX_USERNAME_SIZE + PUBLIC_KEY_SIZE + MESSAGE_LENGTH_SIZE
+			+ MAX_MESSAGE_SIZE + HAS_PARENT_SIZE + HASH_SIZE;
+	
 	public static final String HASH_ALGORITHM = "SHA-256";
 
 	/**
 	 * Serialize the Shout data (not signature).
 	 * 
-	 * @param shout
+	 * @param shout The Shout to serialize
 	 * @return A serialized version of this Shout
 	 */
 	public static byte[] serializeShoutData(UnsignedShout shout) {
@@ -100,10 +103,11 @@ public class SerializeUtility {
 	}
 
 	/**
-	 * Generate a hash over the serialized version of the data in this Shout.
+	 * Convenience method to generate a hash over the serialized version of the
+	 * data in this Shout and its signature using SHA-256.
 	 * 
-	 * @param shout
-	 * @return A hash that is not over the signature
+	 * @param shout The shout to hash
+	 * @return A unique hash over the Shout and its signature
 	 */
 	public static byte[] generateHash(Shout shout) {
 		byte[] dataBytes = serializeShoutData(shout);
@@ -112,10 +116,13 @@ public class SerializeUtility {
 	}
 
 	/**
-	 * Generate a hash over the serialized data bytes.
+	 * Generate a hash over the serialized data bytes and the signature bytes
+	 * using SHA-256. The hash is over the concatenation of
+	 * {@code data + ((byte) signature.length) + signature}.
 	 * 
-	 * @param shoutData The serialized data bytes.
-	 * @return A hash that is not over the signature
+	 * @param data The serialized data bytes.
+	 * @param signature The serialized signature bytes
+	 * @return A unique hash over data and signature.
 	 */
 	public static byte[] generateHash(byte[] data, byte[] signature) {
 		byte lengthByte = (byte) (signature.length & 0x000F);
