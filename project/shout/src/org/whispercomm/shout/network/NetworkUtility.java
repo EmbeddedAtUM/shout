@@ -6,8 +6,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 import org.whispercomm.manes.client.maclib.ManesInterface;
 import org.whispercomm.shout.R;
@@ -42,30 +40,9 @@ public class NetworkUtility extends Service {
 		// TODO Create ALL THE THINGS
 		this.appMessenger = new Messenger(new AppShoutHandler());
 		this.manesIf = new ManesInterface(APP_ID, getApplicationContext());
-		Thread register = new Thread() {
-			@Override
-			public void run() {
-				Future<Boolean> initTask = manesIf.initialize();
-				try {
-					boolean status = initTask.get();
-					if (status) {
-						networkProtocol = new NaiveBroadcast(manesIf,
-								getApplicationContext());
-						isRunning = true;
-						new Thread(new NetworkReceiver()).start();
-					} else {
-						Log.v(TAG, "Manes returned false on init");
-						// TODO
-					}
-				} catch (InterruptedException e) {
-					Log.e(TAG, e.getMessage());
-				} catch (ExecutionException e) {
-					Log.e(TAG, e.getMessage());
-				}
-
-			}
-		};
-		register.start();
+		networkProtocol = new NaiveBroadcast(manesIf, getApplicationContext());
+		isRunning = true;
+		new Thread(new NetworkReceiver()).start();
 		// TODO Start / bind all the things in the background based on status
 		// response?
 		Notification notification = new Notification(R.drawable.icon,

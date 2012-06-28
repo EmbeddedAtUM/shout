@@ -1,6 +1,5 @@
 package org.whispercomm.shout.network;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -71,8 +70,6 @@ public class NaiveBroadcast implements NetworkProtocol {
 					try {
 						manesIf.send(shoutBytes);
 					} catch (ManesFrameTooLargeException e) {
-						Log.e(TAG, e.getMessage());
-					} catch (IOException e) {
 						Log.e(TAG, e.getMessage());
 					}
 				}
