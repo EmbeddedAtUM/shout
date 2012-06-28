@@ -15,12 +15,15 @@ import android.util.Log;
 public class SerializeUtility {
 
 	private static final String TAG = SerializeUtility.class.getSimpleName();
-	private static final int MAX_SHOUT_LENGTH = 415;
-	public static final int MAX_USERNAME_LENGTH = 40;
-	public static final int MAX_MESSAGE_LENGTH = 240;
-	private static final int TIMESTAMP_LENGTH = 8;
-	public static final int PUBLIC_KEY_LENGTH = 91;
-	private static final int SIGNED_PARENT_HASH_LENGTH = 32;
+	public static final int MAX_SHOUT_SIZE = 415;
+	public static final int TIMESTAMP_SIZE = 8;
+	public static final int USERNAME_LENGTH_SIZE = 1;
+	public static final int MAX_USERNAME_SIZE = 40;
+	public static final int PUBLIC_KEY_SIZE = 91;
+	public static final int MESSAGE_LENGTH_SIZE = 1;
+	public static final int MAX_MESSAGE_SIZE = 240;
+	public static final int HAS_PARENT_SIZE = 1;
+	public static final int HASH_SIZE = 32;
 
 	public static final String HASH_ALGORITHM = "SHA-256";
 
@@ -31,13 +34,13 @@ public class SerializeUtility {
 	 * @return A serialized version of this Shout
 	 */
 	public static byte[] serializeShoutData(UnsignedShout shout) {
-		ByteBuffer buffer = ByteBuffer.allocate(MAX_SHOUT_LENGTH);
+		ByteBuffer buffer = ByteBuffer.allocate(MAX_SHOUT_SIZE);
 		int size = 0;
 		try {
 			// Put in the 8-byte timestamp
 			long time = shout.getTimestamp().getMillis();
 			buffer.putLong(time);
-			size += TIMESTAMP_LENGTH;
+			size += TIMESTAMP_SIZE;
 
 			// Get the username as UTF-8 encoded bytes
 			byte[] username = shout.getSender().getUsername().getBytes(Shout.CHARSET_NAME);
@@ -56,7 +59,7 @@ public class SerializeUtility {
 			// Put in the sender public key
 			byte[] keyBytes = shout.getSender().getPublicKey().getEncoded();
 			buffer.put(keyBytes);
-			size += PUBLIC_KEY_LENGTH;
+			size += PUBLIC_KEY_SIZE;
 
 			// Serialize the message
 			String message = shout.getMessage();
@@ -65,10 +68,9 @@ public class SerializeUtility {
 				byte[] messageBytes = message.getBytes(Shout.CHARSET_NAME);
 				int messageLength = messageBytes.length;
 				// Hack to get length as unsigned two bytes
-				char twoByteLength = (char) messageLength;
-				buffer.putChar(twoByteLength);
+				byte lengthByte = (byte) (messageLength & 0x000F);
+				buffer.put(lengthByte);
 				buffer.put(messageBytes);
-				size += 2 + messageLength;
 			} else {
 				// No message, put in 0x0000 as length
 				char zero = '\u0000';
@@ -83,7 +85,7 @@ public class SerializeUtility {
 				// Put in the parent signature hash
 				byte[] parentHash = parent.getHash();
 				buffer.put(parentHash);
-				size += 1 + SIGNED_PARENT_HASH_LENGTH;
+				size += 1 + HASH_SIZE;
 			} else {
 				// has_parent = 0x0
 				buffer.put((byte) 0x0000);
