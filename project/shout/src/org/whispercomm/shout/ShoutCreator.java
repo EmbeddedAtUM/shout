@@ -44,7 +44,7 @@ public class ShoutCreator {
 		Me me = idManager.getMe();
 		try {
 			UnsignedShout unsigned = new SimpleUnsignedShout(timestamp, me, content, parent);
-			byte[] signature = SignatureUtility.genShoutSignature(unsigned, me);
+			byte[] signature = SignatureUtility.generateSignature(unsigned, me);
 			Shout shout = new SimpleShout(timestamp, me, content, parent, signature);
 			int shoutId = ShoutProviderContract.storeShout(context, shout);
 			return shoutId;

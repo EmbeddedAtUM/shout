@@ -146,7 +146,7 @@ public class SignatureUtilityTest {
 		ECPrivateKey privKey = (ECPrivateKey) kpA.getPrivate();
 		byte[] data = new String("test data").getBytes();
 		byte[] signature = SignatureUtility.genSignature(data, privKey);
-		assertTrue(SignatureUtility.verifySignature(signature, pubKey, data));
+		assertTrue(SignatureUtility.verifySignature(data, signature, pubKey));
 	}
 
 	/**

@@ -2,7 +2,7 @@ package org.whispercomm.shout;
 
 import org.joda.time.DateTime;
 
-public class SimpleUnsignedShout extends AbstractShout implements UnsignedShout {
+public class SimpleUnsignedShout implements UnsignedShout {
 
 	private User sender;
 	private String message;
@@ -35,6 +35,11 @@ public class SimpleUnsignedShout extends AbstractShout implements UnsignedShout 
 	@Override
 	public Shout getParent() {
 		return this.parent;
+	}
+
+	@Override
+	public ShoutType getType() {
+		return ShoutMessageUtility.getShoutType(this);
 	}
 
 }

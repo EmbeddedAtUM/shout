@@ -81,8 +81,8 @@ public class SerializeUtility {
 				// has_parent = 0x1;
 				buffer.put((byte) 0x0001);
 				// Put in the parent signature hash
-				byte[] signedParentHash = generateParentHash(parent);
-				buffer.put(signedParentHash);
+				byte[] parentHash = parent.getHash();
+				buffer.put(parentHash);
 				size += 1 + SIGNED_PARENT_HASH_LENGTH;
 			} else {
 				// has_parent = 0x0
@@ -103,9 +103,10 @@ public class SerializeUtility {
 	 * @param shout
 	 * @return A hash that is not over the signature
 	 */
-	public static byte[] generateDataHash(UnsignedShout shout) {
+	public static byte[] generateHash(Shout shout) {
 		byte[] dataBytes = serializeShoutData(shout);
-		return generateDataHash(dataBytes);
+		byte[] signatureBytes = shout.getSignature();
+		return generateHash(dataBytes, signatureBytes);
 	}
 
 	/**
@@ -114,10 +115,15 @@ public class SerializeUtility {
 	 * @param shoutData The serialized data bytes.
 	 * @return A hash that is not over the signature
 	 */
-	public static byte[] generateDataHash(byte[] shoutData) {
+	public static byte[] generateHash(byte[] data, byte[] signature) {
+		byte lengthByte = (byte) (signature.length & 0x000F);
+		ByteBuffer buffer = ByteBuffer.allocate(data.length + 1 + signature.length);
+		buffer.put(data);
+		buffer.put(lengthByte);
+		buffer.put(signature);
 		try {
 			MessageDigest md = MessageDigest.getInstance(HASH_ALGORITHM);
-			md.update(shoutData);
+			md.update(buffer.array());
 			return md.digest();
 		} catch (NoSuchAlgorithmException e) {
 			Log.e(TAG, e.getMessage());
@@ -126,47 +132,4 @@ public class SerializeUtility {
 		return null;
 	}
 
-	/**
-	 * Generate a hash over the serialized shout data concatenated with the
-	 * signature.
-	 * 
-	 * @param shout
-	 */
-	public static byte[] generateHashOverSignature(Shout shout) {
-		byte[] dataBytes = serializeShoutData(shout);
-		byte[] signature = shout.getSignature();
-		try {
-			MessageDigest md = MessageDigest.getInstance(HASH_ALGORITHM);
-			md.update(dataBytes);
-			md.update(signature);
-			return md.digest();
-		} catch (NoSuchAlgorithmException e) {
-			Log.e(TAG, e.getMessage());
-		}
-		// Should never happen
-		return null;
-	}
-
-	/**
-	 * Generate a hash over the data hash concatenated with the signature, to be
-	 * put into network packets in order to uniquely identify the parent.
-	 * 
-	 * @param parent The shout to hash
-	 */
-	public static byte[] generateParentHash(Shout parent) {
-		// Get the parent data hash and signature
-		byte[] parentDataHash = parent.getHash();
-		byte[] parentSignature = parent.getSignature();
-		try {
-			MessageDigest md = MessageDigest.getInstance(HASH_ALGORITHM);
-			// Hash over parent hash + signature
-			md.update(parentDataHash);
-			md.update(parentSignature);
-			return md.digest();
-		} catch (NoSuchAlgorithmException e) {
-			Log.e(TAG, e.getMessage());
-		}
-		// Should never happen
-		return null;
-	}
 }

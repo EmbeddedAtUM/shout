@@ -1,11 +1,10 @@
-package org.whispercomm.shout;
 
+package org.whispercomm.shout;
 
 /**
  * A Shout message.
  * 
  * @author David Adrian
- * 
  */
 public interface Shout extends UnsignedShout {
 
@@ -15,5 +14,13 @@ public interface Shout extends UnsignedShout {
 	 * @return The ECC signature for this Shout object
 	 */
 	public byte[] getSignature();
+
+	/**
+	 * This hash is a full hash of all included Shouts that were sent with this
+	 * message as re-shouts or originals with comment.
+	 * 
+	 * @return The hash for the entire network packet this Shout arrived on.
+	 */
+	public byte[] getHash();
 
 }

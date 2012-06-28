@@ -18,6 +18,7 @@ import org.whispercomm.shout.SimpleUser;
 import org.whispercomm.shout.User;
 import org.whispercomm.shout.id.SignatureUtility;
 import org.whispercomm.shout.provider.ShoutProviderContract;
+import org.whispercomm.shout.serialization.SerializeUtility;
 import org.whispercomm.shout.util.Arrays;
 
 import android.content.Context;
@@ -224,7 +225,7 @@ public class NetworkShout extends AbstractShout implements Shout {
 		if (current != null)
 			throw new ShoutChainTooLongException();
 		// put the body of the shout into the ByteBuffer
-		byte[] shoutBodyBytes = SignatureUtility.serialize(shout);
+		byte[] shoutBodyBytes = SerializeUtility.serializeShoutData(shout);
 		byteBuffer.put(shoutBodyBytes);
 
 		return Arrays.copyOfRange(byteBuffer.array(), 0, byteBuffer.position());
@@ -257,7 +258,7 @@ public class NetworkShout extends AbstractShout implements Shout {
 		// extract the public key
 		NetworkShout shout = getShoutBody(byteBuffer);
 		ECPublicKey pubKey = shout.getSender().getPublicKey();
-		if (SignatureUtility.verifySignature(signature, pubKey, dataBytes1)) {
+		if (SignatureUtility.verifySignature(dataBytes1, signature, pubKey)) {
 			shout.signature = signature;
 			return shout;
 		} else
