@@ -5,15 +5,20 @@ import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.interfaces.ECPublicKey;
 
+import org.joda.time.DateTime;
 import org.whispercomm.shout.Shout;
+import org.whispercomm.shout.ShoutMessageUtility;
+import org.whispercomm.shout.ShoutType;
 import org.whispercomm.shout.UnsignedShout;
+import org.whispercomm.shout.User;
+import org.whispercomm.shout.id.SignatureUtility;
 import org.whispercomm.shout.util.Arrays;
 
 import android.util.Log;
 
 public class SerializeUtility {
-
 	private static final String TAG = SerializeUtility.class.getSimpleName();
 	public static final int TIMESTAMP_SIZE = 8;
 	public static final int USERNAME_LENGTH_SIZE = 1;
@@ -22,13 +27,19 @@ public class SerializeUtility {
 	public static final int MESSAGE_LENGTH_SIZE = 1;
 	public static final int MAX_MESSAGE_SIZE = 240;
 	public static final int HAS_PARENT_SIZE = 1;
-	public static final int HASH_SIZE = 256/8;
+	public static final int HASH_SIZE = 256 / 8;
 
 	public static final int MAX_SHOUT_SIZE = TIMESTAMP_SIZE + USERNAME_LENGTH_SIZE
 			+ MAX_USERNAME_SIZE + PUBLIC_KEY_SIZE + MESSAGE_LENGTH_SIZE
 			+ MAX_MESSAGE_SIZE + HAS_PARENT_SIZE + HASH_SIZE;
-	
+
+	public static final int SIGNATURE_LENGTH_SIZE = 1;
+	public static final int MAX_SIGNATURE_DATA_SIZE = 80;
+	public static final int MAX_SIGNATURE_SIZE = SIGNATURE_LENGTH_SIZE + MAX_SIGNATURE_DATA_SIZE;
+
 	public static final String HASH_ALGORITHM = "SHA-256";
+	
+	private static final int MASK = 0x00FF;
 
 	/**
 	 * Serialize the Shout data (not signature).
@@ -49,7 +60,7 @@ public class SerializeUtility {
 			byte[] username = shout.getSender().getUsername().getBytes(Shout.CHARSET_NAME);
 
 			// Get the length of the username
-			byte usernameLength = (byte) (username.length & 0x000F);
+			byte usernameLength = (byte) (username.length & MASK);
 
 			// Put the username length in the buffer
 			buffer.put(usernameLength);
@@ -71,9 +82,11 @@ public class SerializeUtility {
 				byte[] messageBytes = message.getBytes(Shout.CHARSET_NAME);
 				int messageLength = messageBytes.length;
 				// Hack to get length as unsigned two bytes
-				byte lengthByte = (byte) (messageLength & 0x000F);
+				byte lengthByte = (byte) (messageLength & MASK);
 				buffer.put(lengthByte);
+				size += MESSAGE_LENGTH_SIZE;
 				buffer.put(messageBytes);
+				size += messageLength;
 			} else {
 				// No message, put in 0x0000 as length
 				char zero = '\u0000';
@@ -100,6 +113,78 @@ public class SerializeUtility {
 		}
 		// Should never happen
 		return null;
+	}
+
+	public static Shout deserializeShout(int count, byte[] body) {
+		/*
+		 * TODO Make everything about this function not be awful
+		 */
+		boolean hasNext = count > 0;
+		ByteBuffer buffer = ByteBuffer.wrap(body);
+		BuildableShout shout = new BuildableShout();
+		while (hasNext) {
+			int size = 0;
+			long time = buffer.getLong();
+			size += TIMESTAMP_SIZE;
+			byte nameLengthByte = buffer.get();
+			size += USERNAME_LENGTH_SIZE;
+			int nameLength = (((int) nameLengthByte) & MASK);
+			byte[] nameBytes = new byte[nameLength];
+			buffer.get(nameBytes);
+			size += nameLength;
+			byte[] publicKeyBytes = new byte[PUBLIC_KEY_SIZE];
+			buffer.get(publicKeyBytes);
+			size += PUBLIC_KEY_SIZE;
+			String message = null;
+			byte messageLengthByte = buffer.get();
+			int messageLength = (((int) messageLengthByte) & MASK);
+			if (messageLength > 0) {
+				byte[] messageBytes = new byte[messageLength];
+				buffer.get(messageBytes);
+				size += messageLength;
+				try {
+					message = new String(messageBytes, Shout.CHARSET_NAME);
+				} catch (UnsupportedEncodingException e) {
+					// Should never happen
+					Log.e(TAG, e.getMessage());
+					return null;
+				}
+			}
+			byte hasParent = buffer.get();
+			size += HAS_PARENT_SIZE;
+			byte[] parentHash;
+			if (hasParent == (byte) 0x0001) {
+				parentHash = new byte[HASH_SIZE];
+				buffer.get(parentHash);
+				size += HASH_SIZE;
+			}
+			byte[] shoutData = Arrays.copyOfRange(buffer.array(), 0, size);
+			byte signatureLengthByte = buffer.get();
+			int signatureLength = (((int) signatureLengthByte) & MASK);
+			byte[] signatureBytes = new byte[signatureLength];
+			buffer.get(signatureBytes);
+			BuildableUser user = new BuildableUser();
+			try {
+				user.username = new String(nameBytes, Shout.CHARSET_NAME);
+				user.publicKey = SignatureUtility.getPublicKeyFromBytes(publicKeyBytes);
+			} catch (UnsupportedEncodingException e) {
+				// Should never happen
+				Log.e(TAG, e.getMessage());
+				return null;
+			}
+			shout.timestamp = new DateTime(time);
+			shout.user = user;
+			shout.message = message;
+			shout.signature = signatureBytes;
+			shout.hash = SerializeUtility.generateHash(shoutData, signatureBytes);
+			if (hasParent == 0x00) {
+				hasNext = false;
+			} else {
+				shout.parent = new BuildableShout();
+				shout = shout.parent;
+			}
+		}
+		return shout;
 	}
 
 	/**
@@ -139,6 +224,69 @@ public class SerializeUtility {
 		}
 		// Should never happen
 		return null;
+	}
+
+	private static class BuildableUser implements User {
+
+		String username;
+		ECPublicKey publicKey;
+
+		@Override
+		public String getUsername() {
+			return username;
+		}
+
+		@Override
+		public ECPublicKey getPublicKey() {
+			return publicKey;
+		}
+
+	}
+
+	private static class BuildableShout implements Shout {
+
+		User user = null;
+		String message = null;
+		DateTime timestamp = null;
+		BuildableShout parent = null;
+		byte[] signature = null;
+		byte[] hash = null;
+
+		@Override
+		public User getSender() {
+			return user;
+		}
+
+		@Override
+		public String getMessage() {
+			return message;
+		}
+
+		@Override
+		public DateTime getTimestamp() {
+			return timestamp;
+		}
+
+		@Override
+		public Shout getParent() {
+			return parent;
+		}
+
+		@Override
+		public ShoutType getType() {
+			return ShoutMessageUtility.getShoutType(this);
+		}
+
+		@Override
+		public byte[] getSignature() {
+			return signature;
+		}
+
+		@Override
+		public byte[] getHash() {
+			return hash;
+		}
+
 	}
 
 }

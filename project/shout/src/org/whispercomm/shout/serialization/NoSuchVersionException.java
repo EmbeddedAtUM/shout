@@ -7,7 +7,7 @@ package org.whispercomm.shout.serialization;
  * 
  * @author David Adrian
  */
-public class NoSuchVersionException extends Exception {
+public class NoSuchVersionException extends RuntimeException {
 
 	/**
 	 * Generated serial version UID

@@ -16,14 +16,20 @@ import org.whispercomm.shout.util.Arrays;
  */
 public class ShoutPacket {
 
-	private byte[] packet;
+	private byte[] header;
+	private byte[] body;
 	private int version;
 	private int count;
 
-	private ShoutPacket(byte[] packet, int version, int count) {
-		this.packet = packet;
+	private ShoutPacket(int version, int count, byte[] header, byte[] body) {
 		this.version = version;
-		this.packet = packet;
+		this.count = count;
+		this.header = header;
+		this.body = body;
+	}
+
+	public static ShoutPacket wrap(byte[] contents) {
+		return PacketBuilder.wrap(contents);
 	}
 
 	/**
@@ -43,12 +49,40 @@ public class ShoutPacket {
 	}
 
 	/**
-	 * Get the packet contents as bytes
+	 * Get the encoded packet header
+	 * 
+	 * @return The packet header as a byte array.
+	 */
+	public byte[] getHeaderBytes() {
+		return header;
+	}
+
+	/**
+	 * Get the encoded packet body
+	 * 
+	 * @return The packet body as a byte array.
+	 */
+	public byte[] getBodyBytes() {
+		return body;
+	}
+	
+	public Shout decodeShout() {
+		// TODO
+		return null;
+	}
+
+	/**
+	 * Get the packet contents as bytes. This includes both the header and the
+	 * body.
 	 * 
 	 * @return A well-formed byte array of packet contents
 	 */
-	public byte[] getContents() {
-		return packet;
+	public byte[] getPacketBytes() {
+		int size = header.length + body.length;
+		ByteBuffer buffer = ByteBuffer.allocate(size);
+		buffer.put(header);
+		buffer.put(body);
+		return buffer.array();
 	}
 
 	/**
@@ -62,12 +96,25 @@ public class ShoutPacket {
 		public static final int CURRENT = VERSION_0;
 		private static final int HEADER_SIZE = 2;
 		private static final int MAX_PACKET_SIZE = HEADER_SIZE + 3
-				* SerializeUtility.MAX_SHOUT_SIZE;
+				* (SerializeUtility.MAX_SHOUT_SIZE + SerializeUtility.MAX_SIGNATURE_SIZE);
 
 		private int version;
 		private int count;
 
 		private List<Shout> shouts;
+
+		private static ShoutPacket wrap(byte[] contents) {
+			ByteBuffer buffer = ByteBuffer.wrap(contents);
+			byte[] header = new byte[HEADER_SIZE];
+			buffer.get(header);
+			byte[] body = new byte[contents.length - HEADER_SIZE];
+			buffer.get(body);
+			byte versionByte = header[0];
+			int version = (((int) versionByte) & 0x000F);
+			byte countByte = header[1];
+			int count = (((int) countByte) & 0x000F);
+			return new ShoutPacket(version, count, header, contents);
+		}
 
 		/**
 		 * Construct a PacketBuilder for the current Shout version
@@ -118,15 +165,9 @@ public class ShoutPacket {
 		 * @return A ShoutPacket representation of the data in this builder.
 		 */
 		public ShoutPacket build() {
-			ByteBuffer buffer = ByteBuffer.allocate(MAX_PACKET_SIZE);
-			int size = 0;
-			buffer.put(buildHeader());
-			size += HEADER_SIZE;
+			byte[] header = buildHeader();
 			byte[] body = buildBody();
-			buffer.put(body);
-			size += body.length;
-			byte[] packet = Arrays.copyOfRange(buffer.array(), 0, size);
-			return new ShoutPacket(packet, version, count);
+			return new ShoutPacket(version, count, header, body);
 		}
 
 		/**
@@ -157,7 +198,7 @@ public class ShoutPacket {
 			 * TODO Have this place the body into a byte buffer passed as a
 			 * parameter
 			 */
-			ByteBuffer buffer = ByteBuffer.allocate(SerializeUtility.MAX_SHOUT_SIZE * count);
+			ByteBuffer buffer = ByteBuffer.allocate(MAX_PACKET_SIZE - HEADER_SIZE);
 			int size = 0;
 			for (Shout shout : shouts) {
 				byte[] data = SerializeUtility.serializeShoutData(shout);
