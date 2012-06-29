@@ -19,6 +19,7 @@ import org.whispercomm.shout.test.ShoutTestRunner;
 import org.whispercomm.shout.test.util.TestFactory;
 import org.whispercomm.shout.test.util.TestShout;
 import org.whispercomm.shout.test.util.TestUser;
+import org.whispercomm.shout.test.util.TestUtility;
 
 @RunWith(ShoutTestRunner.class)
 public class SerializeUtilityTest {
@@ -28,17 +29,21 @@ public class SerializeUtilityTest {
 	private static final DateTime TIMESTAMP = new DateTime(8675309L);
 	private static final ECPublicKey PUBLIC_KEY = TestFactory.genPublicKey();
 	private static final byte[] HASH = TestFactory.genByteArray(SerializeUtility.HASH_SIZE);
-	private static final byte[] SIGNATURE = TestFactory.genByteArray(SerializeUtility.MAX_SIGNATURE_DATA_SIZE);
+	private static final byte[] SIGNATURE = TestFactory
+			.genByteArray(SerializeUtility.MAX_SIGNATURE_DATA_SIZE);
 
 	private TestUser sender;
 	private TestShout shout;
 	private TestShout signedParent;
+	private byte[] shoutData;
 
 	@Before
 	public void setUp() {
 		this.sender = new TestUser(SENDER_NAME, PUBLIC_KEY);
 		this.shout = new TestShout(sender, null, MESSAGE, TIMESTAMP,
 				SIGNATURE, HASH);
+		this.shoutData = SerializeUtility.serializeShoutData(shout);
+		shout.hash = SerializeUtility.generateHash(shoutData, shout.signature);
 	}
 
 	@After
@@ -47,10 +52,9 @@ public class SerializeUtilityTest {
 		this.shout = null;
 		this.signedParent = null;
 	}
-	
+
 	@Test
 	public void testSerializeShoutNoParent() {
-		byte[] shoutData = SerializeUtility.serializeShoutData(shout);
 		ByteBuffer buffer = ByteBuffer.allocate(shoutData.length + 1 + shout.signature.length);
 		buffer.put(shoutData);
 		buffer.put((byte) (shout.signature.length & 0x00FF));
@@ -63,5 +67,24 @@ public class SerializeUtilityTest {
 		assertEquals(shout.getSender().getPublicKey(), fromBytes.getSender().getPublicKey());
 		assertNull(fromBytes.getParent());
 		assertEquals(shout.getTimestamp(), fromBytes.getTimestamp());
+	}
+
+	@Test
+	public void testSerializeReshout() {
+		TestUser reshouter = new TestUser("not_dadrian");
+		TestShout reshout = new TestShout(reshouter, shout, null, DateTime.now(),
+				TestFactory.genByteArray(75), null);
+		byte[] reshoutBytes = SerializeUtility.serializeShoutData(reshout);
+		reshout.hash = SerializeUtility.generateHash(reshoutBytes, reshout.signature);
+		ByteBuffer buffer = ByteBuffer.allocate(shoutData.length + 1 + shout.signature.length
+				+ reshoutBytes.length + 1 + reshout.signature.length);
+		buffer.put(reshoutBytes);
+		buffer.put((byte) (reshout.signature.length & 0x00FF));
+		buffer.put(reshout.signature);
+		buffer.put(shoutData);
+		buffer.put((byte) (shout.signature.length & 0x00FF));
+		buffer.put(shout.signature);
+		Shout fromBytes = SerializeUtility.deserializeShout(2, buffer.array());
+		TestUtility.testEqualShoutFields(reshout, fromBytes);
 	}
 }
