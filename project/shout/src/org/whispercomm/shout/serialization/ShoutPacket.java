@@ -49,7 +49,8 @@ public class ShoutPacket {
 	}
 
 	/**
-	 * Get the encoded packet header
+	 * Get the encoded packet header. Do not send this over the network.
+	 * Instead, use {@link #getPacketBytes()}.
 	 * 
 	 * @return The packet header as a byte array.
 	 */
@@ -58,23 +59,30 @@ public class ShoutPacket {
 	}
 
 	/**
-	 * Get the encoded packet body
+	 * Get the encoded packet body. Do not send this over the network. Instead,
+	 * use {@link #getPacketBytes()}.
 	 * 
 	 * @return The packet body as a byte array.
 	 */
 	public byte[] getBodyBytes() {
 		return body;
 	}
-	
+
+	/**
+	 * Deserialize the Shout described by this ShoutPacket
+	 * 
+	 * @return The Shout stored in this packet.
+	 */
 	public Shout decodeShout() {
 		return SerializeUtility.deserializeShout(count, body);
 	}
 
 	/**
 	 * Get the packet contents as bytes. This includes both the header and the
-	 * body.
+	 * body. Use this to send a Shout over the network.
 	 * 
-	 * @return A well-formed byte array of packet contents
+	 * @return A well-formed byte array of packet contents, ready to be
+	 *         transmitted via MANES.
 	 */
 	public byte[] getPacketBytes() {
 		int size = header.length + body.length;

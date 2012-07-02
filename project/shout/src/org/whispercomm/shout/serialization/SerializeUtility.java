@@ -18,6 +18,12 @@ import org.whispercomm.shout.util.Arrays;
 
 import android.util.Log;
 
+/**
+ * Static utility class for serializing and deserializing Shouts, and generating
+ * Shout hashes.
+ * 
+ * @author David Adrian
+ */
 public class SerializeUtility {
 	private static final String TAG = SerializeUtility.class.getSimpleName();
 	public static final int TIMESTAMP_SIZE = 8;
@@ -38,7 +44,7 @@ public class SerializeUtility {
 	public static final int MAX_SIGNATURE_SIZE = SIGNATURE_LENGTH_SIZE + MAX_SIGNATURE_DATA_SIZE;
 
 	public static final String HASH_ALGORITHM = "SHA-256";
-	
+
 	private static final int MASK = 0x00FF;
 
 	/**
@@ -116,6 +122,14 @@ public class SerializeUtility {
 		return null;
 	}
 
+	/**
+	 * Deserialize the body of a Shout packet. Most likely you want to pass this
+	 * function the result of {@link ShoutPacket#getBodyBytes()}.
+	 * 
+	 * @param count How long the Shout chain is.
+	 * @param body The serialized Shout chain.
+	 * @return The Java object representation of this serialized Shout chain.
+	 */
 	public static Shout deserializeShout(int count, byte[] body) {
 		/*
 		 * TODO Make everything about this function not be awful
@@ -196,8 +210,8 @@ public class SerializeUtility {
 	}
 
 	/**
-	 * Convenience method to generate a hash over the serialized version of the
-	 * data in this Shout and its signature using SHA-256.
+	 * Convenience method to serialize this Shout, and then use the serialized
+	 * data bytes and signature to generate the hash, using SHA-256.
 	 * 
 	 * @param shout The shout to hash
 	 * @return A unique hash over the Shout and its signature
