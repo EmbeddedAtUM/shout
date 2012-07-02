@@ -26,6 +26,7 @@ import android.util.Log;
  */
 public class SerializeUtility {
 	private static final String TAG = SerializeUtility.class.getSimpleName();
+	public static final int SINGLE_SHOUT_FLAG = 1;
 	public static final int TIMESTAMP_SIZE = 8;
 	public static final int USERNAME_LENGTH_SIZE = 1;
 	public static final int MAX_USERNAME_SIZE = 40;
@@ -35,7 +36,7 @@ public class SerializeUtility {
 	public static final int HAS_PARENT_SIZE = 1;
 	public static final int HASH_SIZE = 256 / 8;
 
-	public static final int MAX_SHOUT_SIZE = TIMESTAMP_SIZE + USERNAME_LENGTH_SIZE
+	public static final int MAX_SHOUT_SIZE = SINGLE_SHOUT_FLAG + TIMESTAMP_SIZE + USERNAME_LENGTH_SIZE
 			+ MAX_USERNAME_SIZE + PUBLIC_KEY_SIZE + MESSAGE_LENGTH_SIZE
 			+ MAX_MESSAGE_SIZE + HAS_PARENT_SIZE + HASH_SIZE;
 
@@ -57,6 +58,9 @@ public class SerializeUtility {
 		ByteBuffer buffer = ByteBuffer.allocate(MAX_SHOUT_SIZE);
 		int size = 0;
 		try {
+			// Put the version
+			buffer.put((byte) 0x00);
+			size += SINGLE_SHOUT_FLAG;
 			// Put in the 8-byte timestamp
 			long time = shout.getTimestamp().getMillis();
 			buffer.putLong(time);
@@ -141,6 +145,9 @@ public class SerializeUtility {
 		int start = 0;
 		while (hasNext) {
 			int size = 0;
+			@SuppressWarnings("unused")
+			byte versionFlag = buffer.get();
+			size += SINGLE_SHOUT_FLAG;
 			long time = buffer.getLong();
 			size += TIMESTAMP_SIZE;
 			byte nameLengthByte = buffer.get();
