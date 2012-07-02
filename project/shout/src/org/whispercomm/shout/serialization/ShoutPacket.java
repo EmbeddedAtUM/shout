@@ -182,10 +182,6 @@ public class ShoutPacket {
 		 * Build the packet header
 		 */
 		private byte[] buildHeader() {
-			/*
-			 * TODO Have this place the header into a byte buffer passed as a
-			 * parameter
-			 */
 			byte versionByte = (byte) (version & MASK);
 			byte countByte = (byte) (version & MASK);
 			return new byte[] {
@@ -194,10 +190,6 @@ public class ShoutPacket {
 		}
 
 		private byte[] buildBody() {
-			/*
-			 * TODO Have this place the body into a byte buffer passed as a
-			 * parameter
-			 */
 			ByteBuffer buffer = ByteBuffer.allocate(MAX_PACKET_SIZE - HEADER_SIZE);
 			int size = 0;
 			for (Shout shout : shouts) {
