@@ -72,4 +72,22 @@ public class ShoutPacketTest {
 		assertNotNull(fromBytes);
 		TestUtility.testEqualShoutFields(recomment, fromBytes);
 	}
+	
+	@Test
+	public void testBuildComment() {
+		PacketBuilder builder = new ShoutPacket.PacketBuilder();
+		try {
+			builder.addShout(comment);
+		} catch (ShoutChainTooLongException e) {
+			fail("Shout chain is only 2!");
+		}
+		ShoutPacket packet = builder.build();
+		assertNotNull(packet);
+		int count = packet.getShoutCount();
+		assertEquals(2, count);
+		byte[] body = packet.getBodyBytes();
+		assertNotNull(body);
+		Shout fromBytes = packet.decodeShout();
+		TestUtility.testEqualShoutFields(comment, fromBytes);
+	}
 }

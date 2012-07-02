@@ -37,7 +37,7 @@ public class ShoutSQLiteQueryBuilder {
 		}
 		mWhereClause.append(inWhere);
 	}
-	
+
 	@Implementation
 	public Cursor query(SQLiteDatabase db, String[] projectionIn, String selection,
 			String[] selectionArgs, String groupBy, String having, String sortOrder) {
