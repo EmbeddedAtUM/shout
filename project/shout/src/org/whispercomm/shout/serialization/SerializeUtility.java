@@ -132,8 +132,9 @@ public class SerializeUtility {
 	 * @param count How long the Shout chain is.
 	 * @param body The serialized Shout chain.
 	 * @return The Java object representation of this serialized Shout chain.
+	 * @throws BadShoutVersionException 
 	 */
-	public static Shout deserializeShout(int count, byte[] body) {
+	public static Shout deserializeShout(int count, byte[] body) throws BadShoutVersionException {
 		/*
 		 * TODO Make everything about this function not be awful
 		 */
@@ -144,13 +145,12 @@ public class SerializeUtility {
 		int start = 0;
 		while (hasNext) {
 			int size = 0;
-			@SuppressWarnings("unused")
 			byte versionFlag = buffer.get();
 			size += SINGLE_SHOUT_FLAG;
 			// Handle version
 			int version = (int) (versionFlag >>> HAS_PARENT_BITS);
 			if (version != 0) {
-				return null;
+				throw new BadShoutVersionException();
 			}
 			// Get the has_parent flag
 			int parentFlag = versionFlag & 0x01;

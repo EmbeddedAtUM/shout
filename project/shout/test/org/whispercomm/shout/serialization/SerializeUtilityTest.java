@@ -2,6 +2,7 @@
 package org.whispercomm.shout.serialization;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import java.nio.ByteBuffer;
 
@@ -61,7 +62,13 @@ public class SerializeUtilityTest {
 		buffer.put(shoutData);
 		buffer.put((byte) shout.signature.length);
 		buffer.put(shout.signature);
-		Shout fromBytes = SerializeUtility.deserializeShout(1, buffer.array());
+		Shout fromBytes;
+		try {
+			fromBytes = SerializeUtility.deserializeShout(1, buffer.array());
+		} catch (BadShoutVersionException e) {
+			fail("BadShoutVersionException thrown");
+			return;
+		}
 		assertNotNull(fromBytes);
 		TestUtility.testEqualShoutFields(shout, fromBytes);
 	}
@@ -76,7 +83,13 @@ public class SerializeUtilityTest {
 		buffer.put(shoutData);
 		buffer.put((byte) shout.signature.length);
 		buffer.put(shout.signature);
-		Shout fromBytes = SerializeUtility.deserializeShout(2, buffer.array());
+		Shout fromBytes;
+		try {
+			fromBytes = SerializeUtility.deserializeShout(2, buffer.array());
+		} catch (BadShoutVersionException e) {
+			fail("BadShoutVersionException thrown");
+			return;
+		}
 		assertNotNull(fromBytes);
 		TestUtility.testEqualShoutFields(reshout, fromBytes);
 	}

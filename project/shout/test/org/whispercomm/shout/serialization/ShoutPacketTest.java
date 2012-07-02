@@ -68,7 +68,13 @@ public class ShoutPacketTest {
 		assertEquals(3, count);
 		byte[] body = packet.getBodyBytes();
 		assertNotNull(body);
-		Shout fromBytes = packet.decodeShout();
+		Shout fromBytes;
+		try {
+			fromBytes = packet.decodeShout();
+		} catch (BadShoutVersionException e) {
+			fail("BadShoutVersionException thrown");
+			return;
+		}
 		assertNotNull(fromBytes);
 		TestUtility.testEqualShoutFields(recomment, fromBytes);
 	}
@@ -87,7 +93,13 @@ public class ShoutPacketTest {
 		assertEquals(2, count);
 		byte[] body = packet.getBodyBytes();
 		assertNotNull(body);
-		Shout fromBytes = packet.decodeShout();
+		Shout fromBytes;
+		try {
+			fromBytes = packet.decodeShout();
+		} catch (BadShoutVersionException e) {
+			fail("BadShoutVersionException thrown");
+			return;
+		}
 		TestUtility.testEqualShoutFields(comment, fromBytes);
 	}
 }
