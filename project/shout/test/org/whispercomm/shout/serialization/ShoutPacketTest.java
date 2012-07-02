@@ -19,7 +19,7 @@ import org.whispercomm.shout.test.util.TestUtility;
 @RunWith(ShoutTestRunner.class)
 public class ShoutPacketTest {
 
-	private static final int SIGNATURE_SIZE = 75;
+	private static final int SIGNATURE_SIZE = 71;
 	private TestShout shout;
 	private TestShout recomment;
 	private TestShout comment;
@@ -55,7 +55,7 @@ public class ShoutPacketTest {
 	}
 	
 	@Test
-	public void testBuildComment() {
+	public void testBuildRecomment() {
 		PacketBuilder builder = new ShoutPacket.PacketBuilder();
 		try {
 			builder.addShout(recomment);
