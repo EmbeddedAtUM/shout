@@ -62,7 +62,7 @@ public class ShoutProviderContractTest {
 		int shoutId = ShoutProviderContract.storeShout(context, testShout);
 		Shout fromDb = ShoutProviderContract.retrieveShoutById(context, shoutId);
 		assertNotNull(fromDb);
-		assertTrue(TestUtility.testEqualShoutFields(testShout, fromDb));
+		TestUtility.testEqualShoutFields(testShout, fromDb);
 	}
 
 	@Test
@@ -74,7 +74,7 @@ public class ShoutProviderContractTest {
 		int commentId = ShoutProviderContract.storeShout(context, withParent);
 		assertTrue(commentId > 0);
 		Shout fromDbWithParent = ShoutProviderContract.retrieveShoutById(context, commentId);
-		assertTrue(TestUtility.testEqualShoutFields(withParent, fromDbWithParent));
+		TestUtility.testEqualShoutFields(withParent, fromDbWithParent);
 
 		Shout withGrandparent = new TestShout(testUser, withParent, null, new DateTime(),
 				TestFactory.genByteArray(4), TestFactory.genByteArray(8));
@@ -82,7 +82,7 @@ public class ShoutProviderContractTest {
 		assertTrue(commentReshoutId > 0);
 		Shout fromDbWithGrandParent = ShoutProviderContract.retrieveShoutById(context,
 				commentReshoutId);
-		assertTrue(TestUtility.testEqualShoutFields(withGrandparent, fromDbWithGrandParent));
+		TestUtility.testEqualShoutFields(withGrandparent, fromDbWithGrandParent);
 	}
 
 	@Test
@@ -104,7 +104,7 @@ public class ShoutProviderContractTest {
 		int id = ShoutProviderContract.storeShout(context, testShout);
 		assertTrue(id > 0);
 		Shout fromDb = ShoutProviderContract.retrieveShoutById(context, id);
-		assertTrue(TestUtility.testEqualShoutFields(testShout, fromDb));
+		TestUtility.testEqualShoutFields(testShout, fromDb);
 	}
 
 	@Test

@@ -1,10 +1,13 @@
 
 package org.whispercomm.shout.test.util;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.Tag;
 import org.whispercomm.shout.User;
-import org.whispercomm.shout.util.Arrays;
 
 public class TestUtility {
 
@@ -23,33 +26,22 @@ public class TestUtility {
 		return result;
 	}
 
-	public static boolean testEqualShoutFields(Shout lhs, Shout rhs) {
-		if (lhs == rhs) {
-			return true;
-		} else if (lhs == null || rhs == null) {
-			return false;
+	public static void testEqualShoutFields(Shout lhs, Shout rhs) {
+		if (lhs == null) {
+			assertNull(rhs);
+			return;
 		}
-		boolean result = false;
-		if (Arrays.equals(lhs.getHash(), rhs.getHash())) {
-			if (Arrays.equals(lhs.getSignature(), rhs.getSignature())) {
-				if (lhs.getTimestamp().equals(rhs.getTimestamp())) {
-					result = testEqualUserFields(lhs.getSender(), rhs.getSender());
-				}
-			}
+		if (rhs == null) {
+			assertNull(lhs);
+			return;
 		}
-		if (result) {
-			if (lhs.getMessage() != null && rhs.getMessage() != null) {
-				result = lhs.getMessage().equals(rhs.getMessage());
-			} else if (lhs.getMessage() != rhs.getMessage()) {
-				result = false;
-			}
-		}
-		if (result) {
-			if (lhs.getParent() != null || rhs.getParent() != null) {
-				result = testEqualShoutFields(lhs.getParent(), rhs.getParent());
-			}
-		}
-		return result;
+		assertEquals(lhs.getMessage(), rhs.getMessage());
+		assertEquals(lhs.getTimestamp(), rhs.getTimestamp());
+		assertEquals(lhs.getSender().getUsername(), rhs.getSender().getUsername());
+		assertEquals(lhs.getSender().getPublicKey(), rhs.getSender().getPublicKey());
+		assertArrayEquals(lhs.getSignature(), rhs.getSignature());
+		assertArrayEquals(lhs.getHash(), rhs.getHash());
+		testEqualShoutFields(lhs.getParent(), rhs.getParent());
 	}
 
 }

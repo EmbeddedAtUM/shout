@@ -60,7 +60,7 @@ public class SerializeUtility {
 			byte[] username = shout.getSender().getUsername().getBytes(Shout.CHARSET_NAME);
 
 			// Get the length of the username
-			byte usernameLength = (byte) (username.length & MASK);
+			byte usernameLength = (byte) (username.length);
 
 			// Put the username length in the buffer
 			buffer.put(usernameLength);
@@ -82,26 +82,27 @@ public class SerializeUtility {
 				byte[] messageBytes = message.getBytes(Shout.CHARSET_NAME);
 				int messageLength = messageBytes.length;
 				// Hack to get length as unsigned two bytes
-				byte lengthByte = (byte) (messageLength & MASK);
+				byte lengthByte = (byte) (messageLength);
 				buffer.put(lengthByte);
 				size += MESSAGE_LENGTH_SIZE;
 				buffer.put(messageBytes);
 				size += messageLength;
 			} else {
 				// No message, put in 0x0000 as length
-				char zero = '\u0000';
-				buffer.putChar(zero);
-				size += 2;
+				byte zero = 0;
+				buffer.put(zero);
+				size += MESSAGE_LENGTH_SIZE;
 			}
 			// Handle the parent
 			Shout parent = shout.getParent();
 			if (parent != null) {
 				// has_parent = 0x1;
 				buffer.put((byte) 0x0001);
+				size += HAS_PARENT_SIZE;
 				// Put in the parent signature hash
 				byte[] parentHash = parent.getHash();
 				buffer.put(parentHash);
-				size += 1 + HASH_SIZE;
+				size += HASH_SIZE;
 			} else {
 				// has_parent = 0x0
 				buffer.put((byte) 0x0000);
@@ -122,6 +123,7 @@ public class SerializeUtility {
 		boolean hasNext = count > 0;
 		ByteBuffer buffer = ByteBuffer.wrap(body);
 		BuildableShout shout = new BuildableShout();
+		BuildableShout child = shout;
 		while (hasNext) {
 			int size = 0;
 			long time = buffer.getLong();
@@ -153,7 +155,7 @@ public class SerializeUtility {
 			byte hasParent = buffer.get();
 			size += HAS_PARENT_SIZE;
 			byte[] parentHash;
-			if (hasParent == (byte) 0x0001) {
+			if (hasParent == (byte) 0x01) {
 				parentHash = new byte[HASH_SIZE];
 				buffer.get(parentHash);
 				size += HASH_SIZE;
@@ -184,7 +186,7 @@ public class SerializeUtility {
 				shout = shout.parent;
 			}
 		}
-		return shout;
+		return child;
 	}
 
 	/**
@@ -210,7 +212,7 @@ public class SerializeUtility {
 	 * @return A unique hash over data and signature.
 	 */
 	public static byte[] generateHash(byte[] data, byte[] signature) {
-		byte lengthByte = (byte) (signature.length & 0x000F);
+		byte lengthByte = (byte) (signature.length);
 		ByteBuffer buffer = ByteBuffer.allocate(data.length + 1 + signature.length);
 		buffer.put(data);
 		buffer.put(lengthByte);

@@ -67,8 +67,7 @@ public class ShoutPacket {
 	}
 	
 	public Shout decodeShout() {
-		// TODO
-		return null;
+		return SerializeUtility.deserializeShout(count, body);
 	}
 
 	/**
@@ -97,6 +96,7 @@ public class ShoutPacket {
 		private static final int HEADER_SIZE = 2;
 		private static final int MAX_PACKET_SIZE = HEADER_SIZE + 3
 				* (SerializeUtility.MAX_SHOUT_SIZE + SerializeUtility.MAX_SIGNATURE_SIZE);
+		private static final int MASK = 0x00FF;
 
 		private int version;
 		private int count;
@@ -110,9 +110,9 @@ public class ShoutPacket {
 			byte[] body = new byte[contents.length - HEADER_SIZE];
 			buffer.get(body);
 			byte versionByte = header[0];
-			int version = (((int) versionByte) & 0x000F);
+			int version = (((int) versionByte) & MASK);
 			byte countByte = header[1];
-			int count = (((int) countByte) & 0x000F);
+			int count = (((int) countByte) & MASK);
 			return new ShoutPacket(version, count, header, contents);
 		}
 
@@ -186,8 +186,8 @@ public class ShoutPacket {
 			 * TODO Have this place the header into a byte buffer passed as a
 			 * parameter
 			 */
-			byte versionByte = (byte) (version & 0x000F);
-			byte countByte = (byte) (version & 0x000F);
+			byte versionByte = (byte) (version & MASK);
+			byte countByte = (byte) (version & MASK);
 			return new byte[] {
 					versionByte, countByte
 			};
@@ -205,7 +205,7 @@ public class ShoutPacket {
 				buffer.put(data);
 				size += data.length;
 				byte[] signature = shout.getSignature();
-				byte length = (byte) (signature.length & 0x000F);
+				byte length = (byte) signature.length;
 				buffer.put(length);
 				size += 1;
 				buffer.put(signature);
