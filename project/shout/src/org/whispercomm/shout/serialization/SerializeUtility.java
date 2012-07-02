@@ -105,8 +105,8 @@ public class SerializeUtility {
 				size += HASH_SIZE;
 			} else {
 				// has_parent = 0x0
-				buffer.put((byte) 0x0000);
-				size += 1;
+				buffer.put((byte) 0x00);
+				size += HAS_PARENT_SIZE;
 			}
 			return Arrays.copyOfRange(buffer.array(), 0, size);
 		} catch (UnsupportedEncodingException e) {
@@ -124,6 +124,7 @@ public class SerializeUtility {
 		ByteBuffer buffer = ByteBuffer.wrap(body);
 		BuildableShout shout = new BuildableShout();
 		BuildableShout child = shout;
+		int start = 0;
 		while (hasNext) {
 			int size = 0;
 			long time = buffer.getLong();
@@ -139,6 +140,7 @@ public class SerializeUtility {
 			size += PUBLIC_KEY_SIZE;
 			String message = null;
 			byte messageLengthByte = buffer.get();
+			size += MESSAGE_LENGTH_SIZE;
 			int messageLength = (((int) messageLengthByte) & MASK);
 			if (messageLength > 0) {
 				byte[] messageBytes = new byte[messageLength];
@@ -159,12 +161,18 @@ public class SerializeUtility {
 				parentHash = new byte[HASH_SIZE];
 				buffer.get(parentHash);
 				size += HASH_SIZE;
+				hasNext = true;
+			} else {
+				hasNext = false;
 			}
-			byte[] shoutData = Arrays.copyOfRange(buffer.array(), 0, size);
+			byte[] shoutData = Arrays.copyOfRange(buffer.array(), start, start + size);
 			byte signatureLengthByte = buffer.get();
+			size += SIGNATURE_LENGTH_SIZE;
 			int signatureLength = (((int) signatureLengthByte) & MASK);
 			byte[] signatureBytes = new byte[signatureLength];
 			buffer.get(signatureBytes);
+			size += signatureLength;
+			start += size;
 			BuildableUser user = new BuildableUser();
 			try {
 				user.username = new String(nameBytes, Shout.CHARSET_NAME);
@@ -179,9 +187,7 @@ public class SerializeUtility {
 			shout.message = message;
 			shout.signature = signatureBytes;
 			shout.hash = SerializeUtility.generateHash(shoutData, signatureBytes);
-			if (hasParent == 0x00) {
-				hasNext = false;
-			} else {
+			if (hasNext) {
 				shout.parent = new BuildableShout();
 				shout = shout.parent;
 			}

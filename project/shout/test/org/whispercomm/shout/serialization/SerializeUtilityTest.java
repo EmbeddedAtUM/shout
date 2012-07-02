@@ -68,18 +68,13 @@ public class SerializeUtilityTest {
 
 	@Test
 	public void testSerializeReshout() {
-		TestUser reshouter = new TestUser("not_dadrian");
-		TestShout reshout = new TestShout(reshouter, shout, null, DateTime.now(),
-				TestFactory.genByteArray(75), null);
-		byte[] reshoutBytes = SerializeUtility.serializeShoutData(reshout);
-		reshout.hash = SerializeUtility.generateHash(reshoutBytes, reshout.signature);
 		ByteBuffer buffer = ByteBuffer.allocate(shoutData.length + 1 + shout.signature.length
-				+ reshoutBytes.length + 1 + reshout.signature.length);
-		buffer.put(reshoutBytes);
-		buffer.put((byte) (reshout.signature.length & 0x00FF));
+				+ reshoutData.length + 1 + reshout.signature.length);
+		buffer.put(reshoutData);
+		buffer.put((byte) reshout.signature.length);
 		buffer.put(reshout.signature);
 		buffer.put(shoutData);
-		buffer.put((byte) (shout.signature.length & 0x00FF));
+		buffer.put((byte) shout.signature.length);
 		buffer.put(shout.signature);
 		Shout fromBytes = SerializeUtility.deserializeShout(2, buffer.array());
 		assertNotNull(fromBytes);
