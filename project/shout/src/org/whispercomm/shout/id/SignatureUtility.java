@@ -27,7 +27,7 @@ public class SignatureUtility {
 	public static final String ECC_PARAMS = "secp256r1";
 	public static final String CRYPTO_ALGO = "ECDSA";
 	public static final String CRYPTO_PROVIDER = "SC";
-	public static final String SIGN_ALGORITHM = "SHA1WITHECDSA";
+	public static final String SIGN_ALGORITHM = "SHA256withECDSA";
 	public static final String HASH_ALGO = "SHA-256";
 	private static final String TAG = SignatureUtility.class.getSimpleName();
 
@@ -113,6 +113,7 @@ public class SignatureUtility {
 		} catch (NoSuchProviderException e) {
 			Log.e(TAG, e.getMessage());
 		}
+		// Should never happen
 		return false;
 	}
 
