@@ -33,12 +33,12 @@ public class SerializeUtility {
 	public static final int PUBLIC_KEY_SIZE = 91;
 	public static final int MESSAGE_LENGTH_SIZE = 1;
 	public static final int MAX_MESSAGE_SIZE = 240;
-	public static final int HAS_PARENT_SIZE = 1;
 	public static final int HASH_SIZE = 256 / 8;
 
-	public static final int MAX_SHOUT_SIZE = SINGLE_SHOUT_FLAG + TIMESTAMP_SIZE + USERNAME_LENGTH_SIZE
+	public static final int MAX_SHOUT_SIZE = SINGLE_SHOUT_FLAG + TIMESTAMP_SIZE
+			+ USERNAME_LENGTH_SIZE
 			+ MAX_USERNAME_SIZE + PUBLIC_KEY_SIZE + MESSAGE_LENGTH_SIZE
-			+ MAX_MESSAGE_SIZE + HAS_PARENT_SIZE + HASH_SIZE;
+			+ MAX_MESSAGE_SIZE + HASH_SIZE;
 
 	public static final int SIGNATURE_LENGTH_SIZE = 1;
 	public static final int MAX_SIGNATURE_DATA_SIZE = 80;
@@ -47,6 +47,7 @@ public class SerializeUtility {
 	public static final String HASH_ALGORITHM = "SHA-256";
 
 	private static final int MASK = 0x00FF;
+	private static final int HAS_PARENT_BITS = 1;
 
 	/**
 	 * Serialize the Shout data (not signature).
@@ -58,8 +59,14 @@ public class SerializeUtility {
 		ByteBuffer buffer = ByteBuffer.allocate(MAX_SHOUT_SIZE);
 		int size = 0;
 		try {
-			// Put the version
-			buffer.put((byte) 0x00);
+			// Check if parent
+			Shout parent = shout.getParent();
+			if (parent != null) {
+				// Use the LSB as a has parent flag
+				buffer.put((byte) 0x01);
+			} else {
+				buffer.put((byte) 0x00);
+			}
 			size += SINGLE_SHOUT_FLAG;
 			// Put in the 8-byte timestamp
 			long time = shout.getTimestamp().getMillis();
@@ -104,19 +111,11 @@ public class SerializeUtility {
 				size += MESSAGE_LENGTH_SIZE;
 			}
 			// Handle the parent
-			Shout parent = shout.getParent();
 			if (parent != null) {
-				// has_parent = 0x1;
-				buffer.put((byte) 0x0001);
-				size += HAS_PARENT_SIZE;
 				// Put in the parent signature hash
 				byte[] parentHash = parent.getHash();
 				buffer.put(parentHash);
 				size += HASH_SIZE;
-			} else {
-				// has_parent = 0x0
-				buffer.put((byte) 0x00);
-				size += HAS_PARENT_SIZE;
 			}
 			return Arrays.copyOfRange(buffer.array(), 0, size);
 		} catch (UnsupportedEncodingException e) {
@@ -148,6 +147,14 @@ public class SerializeUtility {
 			@SuppressWarnings("unused")
 			byte versionFlag = buffer.get();
 			size += SINGLE_SHOUT_FLAG;
+			// Handle version
+			int version = (int) (versionFlag >>> HAS_PARENT_BITS);
+			if (version != 0) {
+				return null;
+			}
+			// Get the has_parent flag
+			int parentFlag = versionFlag & 0x01;
+			// Get the timestamp
 			long time = buffer.getLong();
 			size += TIMESTAMP_SIZE;
 			byte nameLengthByte = buffer.get();
@@ -175,10 +182,8 @@ public class SerializeUtility {
 					return null;
 				}
 			}
-			byte hasParent = buffer.get();
-			size += HAS_PARENT_SIZE;
 			byte[] parentHash;
-			if (hasParent == (byte) 0x01) {
+			if (parentFlag == 1) {
 				parentHash = new byte[HASH_SIZE];
 				buffer.get(parentHash);
 				size += HASH_SIZE;
