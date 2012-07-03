@@ -5,6 +5,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.whispercomm.manes.client.maclib.ManesInterface;
+import org.whispercomm.manes.client.maclib.NotRegisteredException;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 
 import android.content.Context;
@@ -66,7 +67,11 @@ public class NaiveBroadcast implements NetworkProtocol {
 			sendScheduler.schedule(new TimerTask() {
 				@Override
 				public void run() {
-					manesIf.send(shoutBytes);
+					try {
+						manesIf.send(shoutBytes);
+					} catch (NotRegisteredException e) {
+						Log.e(TAG, "send() failed because not registered.", e);
+					}
 				}
 			}, delay);
 			delay += PERIOD;
