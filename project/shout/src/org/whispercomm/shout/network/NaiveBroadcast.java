@@ -4,7 +4,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.whispercomm.manes.client.maclib.ManesFrameTooLargeException;
 import org.whispercomm.manes.client.maclib.ManesInterface;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 
@@ -67,11 +66,7 @@ public class NaiveBroadcast implements NetworkProtocol {
 			sendScheduler.schedule(new TimerTask() {
 				@Override
 				public void run() {
-					try {
-						manesIf.send(shoutBytes);
-					} catch (ManesFrameTooLargeException e) {
-						Log.e(TAG, e.getMessage());
-					}
+					manesIf.send(shoutBytes);
 				}
 			}, delay);
 			delay += PERIOD;
