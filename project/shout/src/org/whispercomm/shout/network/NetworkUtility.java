@@ -8,6 +8,7 @@ import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 
 import org.whispercomm.manes.client.maclib.ManesInterface;
+import org.whispercomm.manes.client.maclib.ManesNotInstalledException;
 import org.whispercomm.shout.R;
 import org.whispercomm.shout.SettingsActivity;
 
@@ -39,7 +40,12 @@ public class NetworkUtility extends Service {
 	public final void onCreate() {
 		// TODO Create ALL THE THINGS
 		this.appMessenger = new Messenger(new AppShoutHandler());
-		this.manesIf = new ManesInterface(APP_ID, getApplicationContext());
+		try {
+			this.manesIf = new ManesInterface(APP_ID, getApplicationContext());
+		} catch (ManesNotInstalledException e) {
+			// TODO Handle this
+			throw new RuntimeException(e);
+		}
 		networkProtocol = new NaiveBroadcast(manesIf, getApplicationContext());
 		isRunning = true;
 		new Thread(new NetworkReceiver()).start();
