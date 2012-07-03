@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout.id;
 
 import static org.junit.Assert.assertEquals;
@@ -21,23 +22,23 @@ public class KeyStorageImplTest {
 
 	private KeyStorage keyStore;
 	private Context context;
-	
+
 	@Before
 	public void setUp() {
 		this.context = new Activity();
 		this.keyStore = new KeyStorageSharedPrefs(context);
 	}
-	
+
 	@After
 	public void takeDown() {
 		this.keyStore = null;
 	}
-	
+
 	@Test
 	public void testInitEmptyOnCreate() {
 		assertTrue(keyStore.isEmpty());
 	}
-	
+
 	@Test
 	public void testReadWriteKeyPair() {
 		KeyPair keyPair = TestFactory.genKeyPair();
@@ -49,7 +50,7 @@ public class KeyStorageImplTest {
 		assertEquals(keyPair.getPublic(), fromStore.getPublic());
 		assertEquals(keyPair.getPrivate(), fromStore.getPrivate());
 	}
-	
+
 	@Test
 	public void testReadWriteId() {
 		int id = 1;

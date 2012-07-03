@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout.test;
 
 import java.io.File;
@@ -14,7 +15,7 @@ public class ShoutTestRunner extends RobolectricTestRunner {
 	public ShoutTestRunner(Class<?> testClass) throws InitializationError {
 		super(testClass, new RobolectricConfig(new File(".")), new SQLiteMap());
 	}
-	
+
 	@Override
 	protected void bindShadowClasses() {
 		Robolectric.bindShadowClass(ShoutBase64.class);

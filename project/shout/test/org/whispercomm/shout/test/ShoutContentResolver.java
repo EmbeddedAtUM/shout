@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout.test;
 
 import java.util.ArrayList;
@@ -21,19 +22,20 @@ import com.xtremelabs.robolectric.internal.Implements;
 
 @Implements(ContentResolver.class)
 public class ShoutContentResolver {
-	
+
 	ContentProvider provider;
-	
+
 	public ShoutContentResolver() {
 		provider = new ShoutProvider();
 		provider.onCreate();
 	}
-	
+
 	@Implementation
-	public final Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+	public final Cursor query(Uri uri, String[] projection, String selection,
+			String[] selectionArgs, String sortOrder) {
 		return provider.query(uri, projection, selection, selectionArgs, sortOrder);
 	}
-	
+
 	@Implementation
 	public final Uri insert(Uri url, ContentValues values) {
 		return provider.insert(url, values);
@@ -43,7 +45,7 @@ public class ShoutContentResolver {
 	public ContentProviderResult[] applyBatch(String authority,
 			ArrayList<ContentProviderOperation> operations) throws RemoteException,
 			OperationApplicationException {
-				return null;
+		return null;
 	}
 
 	@Implementation

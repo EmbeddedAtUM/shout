@@ -63,7 +63,7 @@ public class SignatureUtilityTest {
 		byte[] signature = SignatureUtility.generateSignature(dataBytes, me);
 		assertTrue(SignatureUtility.verifySignature(dataBytes, signature, me.getPublicKey()));
 	}
-	
+
 	@Test
 	public void testInvalidSignatureIsInvalid() {
 		byte[] dataBytes = TestFactory.genByteArray(1000);

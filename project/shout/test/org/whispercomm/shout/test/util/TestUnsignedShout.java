@@ -13,9 +13,9 @@ public class TestUnsignedShout implements UnsignedShout {
 	public String message = null;
 	public DateTime timestamp = null;
 	public Shout parent = null;
-	
+
 	public TestUnsignedShout() {
-		
+
 	}
 
 	public TestUnsignedShout(User sender, Shout parent, String message, DateTime timestamp) {

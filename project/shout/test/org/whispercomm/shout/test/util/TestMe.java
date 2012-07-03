@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout.test.util;
 
 import java.security.KeyPair;
@@ -10,7 +11,7 @@ public class TestMe implements Me {
 	public String username;
 	public KeyPair keyPair;
 	public int id = 1;
-	
+
 	public TestMe(String username) {
 		this.keyPair = TestFactory.genKeyPair();
 	}

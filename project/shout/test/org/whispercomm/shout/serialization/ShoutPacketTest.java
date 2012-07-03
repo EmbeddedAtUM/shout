@@ -53,7 +53,7 @@ public class ShoutPacketTest {
 		this.reshouter = null;
 		this.commenter = null;
 	}
-	
+
 	@Test
 	public void testBuildRecomment() {
 		PacketBuilder builder = new ShoutPacket.PacketBuilder();
@@ -78,7 +78,7 @@ public class ShoutPacketTest {
 		assertNotNull(fromBytes);
 		TestUtility.testEqualShoutFields(recomment, fromBytes);
 	}
-	
+
 	@Test
 	public void testBuildComment() {
 		PacketBuilder builder = new ShoutPacket.PacketBuilder();

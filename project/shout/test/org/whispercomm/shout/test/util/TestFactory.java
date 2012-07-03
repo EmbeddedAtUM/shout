@@ -27,7 +27,7 @@ public class TestFactory {
 	static {
 		Security.addProvider(new BouncyCastleProvider());
 	}
-	
+
 	/**
 	 * Generate a valid EC key pair
 	 */
@@ -75,7 +75,7 @@ public class TestFactory {
 		rand.nextBytes(arr);
 		return arr;
 	}
-	
+
 	public static int[] genArrayWithSingleValue(int size, int value) {
 		int[] arr = new int[size];
 		for (int i = 0; i < size; i++) {
@@ -83,5 +83,5 @@ public class TestFactory {
 		}
 		return arr;
 	}
-	
+
 }
