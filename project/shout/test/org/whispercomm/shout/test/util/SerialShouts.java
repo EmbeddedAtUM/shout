@@ -36,14 +36,14 @@ public class SerialShouts {
 	/*
 	 * Users
 	 */
-	private static User CHILD_USER = new TestUser(
-			"IAmTheChild Ù©(Í¡à¹Ì¯Í¡à¹)Û¶", generatePublic(CHILD_PUBLIC_KEY));
+	private static User CHILD_USER = new TestUser("IAmTheChild ٩(͡๏̯͡๏)۶",
+			generatePublic(CHILD_PUBLIC_KEY));
 
 	private static User PARENT_USER = new TestUser(
-			"IAmTheParent Ù©(-Ì®Ì®Ìƒâ€¢Ìƒ)", generatePublic(PARENT_PUBLIC_KEY));
+			"IAmTheParent ٩(-̮̮̃•̃)", generatePublic(PARENT_PUBLIC_KEY));
 
 	private static User GRANDPARENT_USER = new TestUser(
-			"IAmTheGrandparent Ù©(-Ì®Ì®Ìƒ-Ìƒ)Û¶",
+			"IAmTheGrandparent ٩(-̮̮̃-̃)۶",
 			generatePublic(GRANDPARENT_PUBLIC_KEY));
 
 	/*
@@ -51,7 +51,7 @@ public class SerialShouts {
 	 */
 	public static Shout GRANDPARENT = new TestShout(
 			GRANDPARENT_USER,
-			"Ù©(-Ì®Ì®Ìƒ-Ìƒ)Û¶: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus congue rutrum quam quis sollicitudin.",
+			"٩(-̮̮̃-̃)۶: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus congue rutrum quam quis sollicitudin.",
 			new DateTime(2010, 9, 8, 7, 6, 5, DateTimeZone.UTC),
 			null,
 			Hex.decode("304402205fdfb5963542a59ebb68771063c3117d4a63b080743ce8707d53ab80a70c21ff02204a091e4394ab2b95c1eb201694f35ac84993e9b85a6b5fb78e009e3ba380e7a9"),
@@ -59,7 +59,7 @@ public class SerialShouts {
 
 	public static Shout PARENT = new TestShout(
 			PARENT_USER,
-			"Ù©(-Ì®Ì®Ìƒâ€¢Ìƒ): Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti. Etiam a dui ut dolor pellentesque faucibus in vitae nibh.",
+			"٩(-̮̮̃•̃): Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti. Etiam a dui ut dolor pellentesque faucibus in vitae nibh.",
 			new DateTime(2011, 10, 9, 8, 7, 6, 5, DateTimeZone.UTC),
 			GRANDPARENT,
 			Hex.decode("30450220453471c42d032fd8ee1708d70644da4c99c72f797479199796527172df0598d8022100af718b5e41e3f4437780ef57325dca25ff3ee35332f9539621e9e7d3cdab238b"),
@@ -67,7 +67,7 @@ public class SerialShouts {
 
 	public static Shout CHILD = new TestShout(
 			CHILD_USER,
-			"Ù©(Í¡à¹Ì¯Í¡à¹)Û¶: Sed vehicula placerat velit, sed pretium lacus luctus tincidunt. Vestibulum suscipit elit et turpis tristique lobortis.",
+			"٩(͡๏̯͡๏)۶: Sed vehicula placerat velit, sed pretium lacus luctus tincidunt. Vestibulum suscipit elit et turpis tristique lobortis.",
 			new DateTime(2012, 11, 10, 9, 8, 7, DateTimeZone.UTC),
 			PARENT,
 			Hex.decode("304402203e00d21a26028659e2c1b46a8fb27d0fe307204afe289d8ff74f588ddf372aef02206e559b2c993cd8928e67949241067957863d60a644c291325121b2244b8eec29"),
@@ -135,5 +135,4 @@ public class SerialShouts {
 			throw new RuntimeException(e);
 		}
 	}
-
 }
