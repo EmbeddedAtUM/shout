@@ -4,7 +4,6 @@ import org.whispercomm.shout.customwidgets.ActionShoutView;
 import org.whispercomm.shout.customwidgets.ShoutListViewRow;
 import org.whispercomm.shout.network.BootReceiver;
 import org.whispercomm.shout.network.NetworkService;
-import org.whispercomm.shout.provider.ShoutProvider;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.tasks.ReshoutTask;
 
@@ -141,23 +140,14 @@ public class ShoutActivity extends ListActivity {
 			int idIndex = cursor
 					.getColumnIndex(ShoutProviderContract.Shouts._ID);
 			int id = cursor.getInt(idIndex);
-			LocalShout shout = ShoutProviderContract.retrieveShoutById(context, id);
-
-			// Get the comment count
-			int commentIndex = cursor
-					.getColumnIndex(ShoutProvider.COMMENT_COUNT_COLUMN);
-			int commentCount = cursor.getInt(commentIndex);
-
-			// Get the reshout count
-			int reshoutIndex = cursor
-					.getColumnIndex(ShoutProvider.RESHOUT_COUNT_COLUMN);
-			int reshoutCount = cursor.getInt(reshoutIndex);
+			LocalShout shout = ShoutProviderContract.retrieveShoutById(context,
+					id);
 
 			// Find the views
 			RowHolder holder = (RowHolder) view.getTag();
 			// TODO Cast directly to rowView, drop holder?
 			// Bind the shout to the shout view
-			holder.rowView.bindShout(shout, commentCount, reshoutCount);
+			holder.rowView.bindShout(shout);
 		}
 
 		@Override

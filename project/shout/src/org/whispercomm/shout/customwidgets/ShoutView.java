@@ -66,17 +66,10 @@ public class ShoutView extends RelativeLayout {
 	/**
 	 * Sets the Shout to be displayed by the view.
 	 * 
-	 * TODO: Ultimately this should take one parameter, a LocalShout that has
-	 * methods to return the comment and reshout counts.
-	 * 
 	 * @param shout
 	 *            the Shout to be displayed
-	 * @param numComments
-	 *            the comment count for the shout to be displayed
-	 * @param numReshouts
-	 *            the reshout count for the shout to be displayed
 	 */
-	public void bindShout(LocalShout shout, int numComments, int numReshouts) {
+	public void bindShout(LocalShout shout) {
 		this.shout = shout;
 
 		sender.setText(shout.getSender().getUsername());
@@ -86,16 +79,18 @@ public class ShoutView extends RelativeLayout {
 		age.setText(ShoutMessageUtility.getDateTimeAge(shout.getTimestamp()));
 
 		if (shout.getType() == ShoutType.SHOUT) {
-			commentCount.setText(String.format("Comments (%d)", numComments));
+			commentCount.setText(String.format("Comments (%d)",
+					shout.getCommentCount()));
 		} else {
 			commentCount.setText("");
 		}
 
-		if (numReshouts > 0) {
+		if (shout.getReshoutCount() > 0) {
 			reshoutIcon.setVisibility(View.VISIBLE);
 			reshouters.setVisibility(View.VISIBLE);
-			reshouters.setText(String.format("Reshouted %s.",
-					ShoutMessageUtility.getCountAsText(numReshouts)));
+			reshouters.setText(String
+					.format("Reshouted %s.", ShoutMessageUtility
+							.getCountAsText(shout.getReshoutCount())));
 		} else {
 			reshoutIcon.setVisibility(View.GONE);
 			reshouters.setVisibility(View.GONE);

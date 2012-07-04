@@ -78,17 +78,10 @@ public class ShoutChainViewRow extends LinearLayout {
 	/**
 	 * Sets the Shout to be displayed by the view.
 	 * 
-	 * TODO: Ultimately this should take one parameter, a LocalShout that has
-	 * methods to return the comment and reshout counts.
-	 * 
 	 * @param shout
 	 *            the Shout to be displayed
-	 * @param numComments
-	 *            the comment count for the shout to be displayed
-	 * @param numReshouts
-	 *            the reshout count for the shout to be displayed
 	 */
-	public void bindShout(LocalShout shout, int numComments, int numReshouts) {
-		actionShoutView.bindShout(shout, numComments, numReshouts);
+	public void bindShout(LocalShout shout) {
+		actionShoutView.bindShout(shout);
 	}
 }

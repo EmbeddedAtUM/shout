@@ -59,7 +59,7 @@ public class ShoutChainView extends LinearLayout {
 
 	private View createChild(LocalShout shout) {
 		ShoutChainViewRow row = new ShoutChainViewRow(getContext());
-		row.bindShout(shout, 0, 0);
+		row.bindShout(shout);
 		return row;
 	}
 

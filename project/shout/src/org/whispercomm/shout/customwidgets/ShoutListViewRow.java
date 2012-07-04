@@ -2,7 +2,6 @@ package org.whispercomm.shout.customwidgets;
 
 import org.whispercomm.shout.R;
 import org.whispercomm.shout.LocalShout;
-import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.util.Conversions;
 
 import android.content.Context;
@@ -84,15 +83,11 @@ public class ShoutListViewRow extends LinearLayout {
 	 * 
 	 * @param shout
 	 *            the Shout to be displayed
-	 * @param numComments
-	 *            the comment count for the shout to be displayed
-	 * @param numReshouts
-	 *            the reshout count for the shout to be displayed
 	 */
-	public void bindShout(LocalShout shout, int numComments, int numReshouts) {
+	public void bindShout(LocalShout shout) {
 		setExpanded(false);
 
-		actionShoutView.bindShout(shout, numComments, numReshouts);
+		actionShoutView.bindShout(shout);
 		commentsView.bindShouts(shout.getDatabaseId());
 	}
 
