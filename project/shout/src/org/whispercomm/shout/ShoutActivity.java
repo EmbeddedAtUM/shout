@@ -1,6 +1,5 @@
 package org.whispercomm.shout;
 
-import org.whispercomm.shout.customwidgets.ActionShoutView;
 import org.whispercomm.shout.customwidgets.ShoutListViewRow;
 import org.whispercomm.shout.network.BootReceiver;
 import org.whispercomm.shout.network.NetworkService;
@@ -122,12 +121,6 @@ public class ShoutActivity extends ListActivity {
 		startActivity(intent);
 	}
 
-	// TODO: Get rid of this. RowHolder should be it's own custom component.
-	static class RowHolder {
-		ShoutListViewRow rowView;
-		ActionShoutView actionShoutView;
-	}
-
 	private class TimelineAdapter extends CursorAdapter {
 
 		public TimelineAdapter(Context context, Cursor c) {
@@ -136,6 +129,8 @@ public class ShoutActivity extends ListActivity {
 
 		@Override
 		public void bindView(View view, Context context, Cursor cursor) {
+			ShoutListViewRow row = (ShoutListViewRow) view;
+
 			// Get the shout
 			int idIndex = cursor
 					.getColumnIndex(ShoutProviderContract.Shouts._ID);
@@ -143,25 +138,13 @@ public class ShoutActivity extends ListActivity {
 			LocalShout shout = ShoutProviderContract.retrieveShoutById(context,
 					id);
 
-			// Find the views
-			RowHolder holder = (RowHolder) view.getTag();
-			// TODO Cast directly to rowView, drop holder?
-			// Bind the shout to the shout view
-			holder.rowView.bindShout(shout);
+			row.bindShout(shout);
 		}
 
 		@Override
 		public View newView(final Context context, Cursor cursor,
 				ViewGroup parent) {
-			final RowHolder holder = new RowHolder();
-
-			ShoutListViewRow row = new ShoutListViewRow(context);
-			holder.rowView = row;
-			holder.actionShoutView = (ActionShoutView) row
-					.findViewById(R.id.actionshoutview);
-
-			row.setTag(holder);
-			return row;
+			return new ShoutListViewRow(context);
 		}
 	}
 }
