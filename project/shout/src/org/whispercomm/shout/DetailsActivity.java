@@ -2,6 +2,7 @@
 package org.whispercomm.shout;
 
 import org.whispercomm.shout.provider.ShoutProviderContract;
+import org.whispercomm.shout.util.ShoutMessageUtility;
 
 import android.app.ListActivity;
 import android.content.Context;

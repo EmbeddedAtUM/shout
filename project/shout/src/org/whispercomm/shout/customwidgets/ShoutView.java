@@ -2,8 +2,8 @@ package org.whispercomm.shout.customwidgets;
 
 import org.whispercomm.shout.R;
 import org.whispercomm.shout.LocalShout;
-import org.whispercomm.shout.ShoutMessageUtility;
 import org.whispercomm.shout.ShoutType;
+import org.whispercomm.shout.util.ShoutMessageUtility;
 
 import android.content.Context;
 import android.util.AttributeSet;

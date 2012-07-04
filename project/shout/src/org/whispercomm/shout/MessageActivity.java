@@ -5,6 +5,7 @@ import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.tasks.CommentTask;
 import org.whispercomm.shout.tasks.ShoutTask;
+import org.whispercomm.shout.util.ShoutMessageUtility;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;

@@ -9,6 +9,13 @@ public class Validators {
 		if (bytes.length > SerializeUtility.MAX_USERNAME_SIZE) {
 			return false;
 		}
+		char c;
+		for (int i = 0; i < username.length(); i++) {
+			c = username.charAt(i);
+			if (c == '\n') {
+				return false;
+			}
+		}
 		return true;
 	}
 	

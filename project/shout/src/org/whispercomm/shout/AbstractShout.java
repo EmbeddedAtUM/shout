@@ -2,6 +2,7 @@
 package org.whispercomm.shout;
 
 import org.whispercomm.shout.serialization.SerializeUtility;
+import org.whispercomm.shout.util.ShoutMessageUtility;
 
 public abstract class AbstractShout implements Shout {
 

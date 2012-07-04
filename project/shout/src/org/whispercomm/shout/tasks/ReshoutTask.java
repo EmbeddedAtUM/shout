@@ -6,11 +6,11 @@ import org.whispercomm.shout.Me;
 import org.whispercomm.shout.R;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.ShoutCreator;
-import org.whispercomm.shout.ShoutMessageUtility;
 import org.whispercomm.shout.ShoutType;
 import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.id.UserNotInitiatedException;
 import org.whispercomm.shout.provider.ShoutProviderContract;
+import org.whispercomm.shout.util.ShoutMessageUtility;
 
 import android.content.Context;
 import android.os.AsyncTask;

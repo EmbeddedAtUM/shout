@@ -9,12 +9,12 @@ import java.security.interfaces.ECPublicKey;
 
 import org.joda.time.DateTime;
 import org.whispercomm.shout.Shout;
-import org.whispercomm.shout.ShoutMessageUtility;
 import org.whispercomm.shout.ShoutType;
 import org.whispercomm.shout.UnsignedShout;
 import org.whispercomm.shout.User;
 import org.whispercomm.shout.id.SignatureUtility;
 import org.whispercomm.shout.util.Arrays;
+import org.whispercomm.shout.util.ShoutMessageUtility;
 
 import android.util.Log;
 

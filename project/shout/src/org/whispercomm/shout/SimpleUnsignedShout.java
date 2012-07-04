@@ -1,6 +1,7 @@
 package org.whispercomm.shout;
 
 import org.joda.time.DateTime;
+import org.whispercomm.shout.util.ShoutMessageUtility;
 
 public class SimpleUnsignedShout implements UnsignedShout {
 

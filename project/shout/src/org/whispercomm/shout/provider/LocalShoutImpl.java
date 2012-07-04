@@ -4,8 +4,8 @@ import org.joda.time.DateTime;
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.LocalUser;
 import org.whispercomm.shout.Me;
-import org.whispercomm.shout.ShoutMessageUtility;
 import org.whispercomm.shout.ShoutType;
+import org.whispercomm.shout.util.ShoutMessageUtility;
 
 import android.content.Context;
 import android.util.Base64;

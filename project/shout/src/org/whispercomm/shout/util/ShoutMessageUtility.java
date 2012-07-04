@@ -1,7 +1,9 @@
-package org.whispercomm.shout;
+package org.whispercomm.shout.util;
 
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
+import org.whispercomm.shout.ShoutType;
+import org.whispercomm.shout.UnsignedShout;
 
 public class ShoutMessageUtility {
 	public static ShoutType getShoutType(UnsignedShout shout) {
