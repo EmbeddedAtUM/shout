@@ -1,7 +1,7 @@
 package org.whispercomm.shout.customwidgets;
 
 import org.whispercomm.shout.R;
-import org.whispercomm.shout.Shout;
+import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.ShoutMessageUtility;
 import org.whispercomm.shout.ShoutType;
 
@@ -35,7 +35,7 @@ public class ShoutView extends RelativeLayout {
 	/**
 	 * The shout current bound to this view
 	 */
-	private Shout shout;
+	private LocalShout shout;
 
 	public ShoutView(Context context, AttributeSet attributeSet) {
 		super(context, attributeSet);
@@ -76,7 +76,7 @@ public class ShoutView extends RelativeLayout {
 	 * @param numReshouts
 	 *            the reshout count for the shout to be displayed
 	 */
-	public void bindShout(Shout shout, int numComments, int numReshouts) {
+	public void bindShout(LocalShout shout, int numComments, int numReshouts) {
 		this.shout = shout;
 
 		sender.setText(shout.getSender().getUsername());
@@ -107,7 +107,7 @@ public class ShoutView extends RelativeLayout {
 	 * 
 	 * @return the currently bound shout; {@code null} if none is bound.
 	 */
-	public Shout getBoundShout() {
+	public LocalShout getBoundShout() {
 		return this.shout;
 	}
 

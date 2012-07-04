@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.R;
-import org.whispercomm.shout.Shout;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -150,11 +150,11 @@ public class ActionShoutView extends LinearLayout {
 			private Method mHandler;
 
 			@Override
-			public void onClick(Shout shout) {
+			public void onClick(LocalShout shout) {
 				if (mHandler == null) {
 					try {
 						mHandler = getContext().getClass().getMethod(
-								methodName, Shout.class);
+								methodName, LocalShout.class);
 					} catch (NoSuchMethodException e) {
 						throw new IllegalStateException(String.format(
 								"%s is not a valid method in the Activity.",
@@ -232,7 +232,7 @@ public class ActionShoutView extends LinearLayout {
 	 * @param numReshouts
 	 *            the reshout count for the shout to be displayed
 	 */
-	public void bindShout(Shout shout, int numComments, int numReshouts) {
+	public void bindShout(LocalShout shout, int numComments, int numReshouts) {
 		shoutView.bindShout(shout, numComments, numReshouts);
 		setActionBarVisibility(false);
 
@@ -313,7 +313,7 @@ public class ActionShoutView extends LinearLayout {
 	 * 
 	 */
 	public static interface OnClickListener {
-		public void onClick(Shout shout);
+		public void onClick(LocalShout shout);
 	}
 
 	/**

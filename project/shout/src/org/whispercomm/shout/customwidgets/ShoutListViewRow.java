@@ -1,7 +1,7 @@
 package org.whispercomm.shout.customwidgets;
 
 import org.whispercomm.shout.R;
-import org.whispercomm.shout.Shout;
+import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.util.Conversions;
 
@@ -89,7 +89,7 @@ public class ShoutListViewRow extends LinearLayout {
 	 * @param numReshouts
 	 *            the reshout count for the shout to be displayed
 	 */
-	public void bindShout(Shout shout, int numComments, int numReshouts) {
+	public void bindShout(LocalShout shout, int numComments, int numReshouts) {
 		setExpanded(false);
 
 		// TODO: Use global ids, so this hack to get the id isn't necessary

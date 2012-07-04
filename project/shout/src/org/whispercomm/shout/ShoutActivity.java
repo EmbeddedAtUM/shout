@@ -100,7 +100,7 @@ public class ShoutActivity extends ListActivity {
 		startActivity(new Intent(this, SettingsActivity.class));
 	}
 
-	public void onClickReshout(Shout shout) {
+	public void onClickReshout(LocalShout shout) {
 		Log.v(TAG, "Reshout button clicked");
 
 		// TODO: Pass around Shout objects, not local ids...
@@ -113,7 +113,7 @@ public class ShoutActivity extends ListActivity {
 		task.execute(id);
 	}
 
-	public void onClickComment(Shout shout) {
+	public void onClickComment(LocalShout shout) {
 		Log.v(TAG, "Comment button clicked");
 
 		// TODO: Pass around Shout objects, not local ids...
@@ -127,7 +127,7 @@ public class ShoutActivity extends ListActivity {
 		startActivity(intent);
 	}
 
-	public void onClickDetails(Shout shout) {
+	public void onClickDetails(LocalShout shout) {
 		Log.v(TAG, "Details buttons clicked");
 
 		// TODO: Pass around Shout objects, not local ids...
@@ -159,7 +159,7 @@ public class ShoutActivity extends ListActivity {
 			int idIndex = cursor
 					.getColumnIndex(ShoutProviderContract.Shouts._ID);
 			int id = cursor.getInt(idIndex);
-			Shout shout = ShoutProviderContract.retrieveShoutById(context, id);
+			LocalShout shout = ShoutProviderContract.retrieveShoutById(context, id);
 
 			// Get the comment count
 			int commentIndex = cursor
