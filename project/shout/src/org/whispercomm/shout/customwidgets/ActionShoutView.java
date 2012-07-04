@@ -12,6 +12,7 @@ import org.whispercomm.shout.R;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
@@ -25,6 +26,7 @@ import android.widget.LinearLayout;
  * 
  */
 public class ActionShoutView extends LinearLayout {
+	private static final String TAG = ActionShoutView.class.getSimpleName();
 
 	private ShoutView shoutView;
 
@@ -236,6 +238,10 @@ public class ActionShoutView extends LinearLayout {
 			break;
 		case COMMENT:
 			btnComment.setVisibility(GONE);
+			break;
+		default:
+			Log.e(TAG, "Unexpected shout type in bindShout(LocalShout): "
+					+ shout.getType().name());
 			break;
 		}
 	}
