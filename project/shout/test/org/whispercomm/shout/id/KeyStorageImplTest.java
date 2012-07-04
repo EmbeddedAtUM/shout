@@ -41,10 +41,9 @@ public class KeyStorageImplTest {
 
 	@Test
 	public void testReadWriteKeyPair() {
+		int id = 1;
 		KeyPair keyPair = TestFactory.genKeyPair();
-		keyStore.writeKeyPair(keyPair);
-		assertTrue(keyStore.isEmpty());
-		keyStore.writeId(1);
+		keyStore.writeKeyPair(id, keyPair);
 		assertFalse(keyStore.isEmpty());
 		KeyPair fromStore = keyStore.readKeyPair();
 		assertEquals(keyPair.getPublic(), fromStore.getPublic());
@@ -54,10 +53,19 @@ public class KeyStorageImplTest {
 	@Test
 	public void testReadWriteId() {
 		int id = 1;
-		keyStore.writeId(id);
+		KeyPair keyPair = TestFactory.genKeyPair();
+		keyStore.writeKeyPair(1, keyPair);
 		assertFalse(keyStore.isEmpty());
 		int fromStore = keyStore.getId();
 		assertEquals(id, fromStore);
+	}
+	
+	@Test
+	public void testCannotStoreInvalidId() {
+		int id = 0;
+		KeyPair keyPair = TestFactory.genKeyPair();
+		keyStore.writeKeyPair(id, keyPair);
+		assertTrue(keyStore.isEmpty());
 	}
 
 }

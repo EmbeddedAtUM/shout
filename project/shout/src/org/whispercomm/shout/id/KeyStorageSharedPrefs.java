@@ -25,7 +25,10 @@ public class KeyStorageSharedPrefs implements KeyStorage {
 	}
 
 	@Override
-	public void writeKeyPair(KeyPair keyPair) {
+	public void writeKeyPair(int userId, KeyPair keyPair) {
+		if (userId < 1) {
+			return;
+		}
 		byte[] publicKey = keyPair.getPublic().getEncoded();
 		byte[] privateKey = keyPair.getPrivate().getEncoded();
 		String encodedPublicKey = Base64.encodeToString(publicKey, Base64.DEFAULT);
@@ -33,6 +36,7 @@ public class KeyStorageSharedPrefs implements KeyStorage {
 		Editor editor = sharedPrefs.edit();
 		editor.putString(KEY_PUBLIC, encodedPublicKey);
 		editor.putString(KEY_PRIVATE, encodedPrivateKey);
+		editor.putInt(KEY_ID, userId);
 		editor.commit();
 	}
 
@@ -51,11 +55,6 @@ public class KeyStorageSharedPrefs implements KeyStorage {
 			return null;
 		}
 		return new KeyPair(publicKey, privateKey);
-	}
-
-	@Override
-	public void writeId(int id) {
-		sharedPrefs.edit().putInt(KEY_ID, id).commit();
 	}
 
 	@Override

@@ -49,17 +49,14 @@ public class IdManager {
 					CRYPTO_PROVIDER);
 			kpg.initialize(ecParamSpec);
 			KeyPair newKeyPair = kpg.generateKeyPair();
-
-			// Write the new one
-			keyStorage.writeKeyPair(newKeyPair);
 			ECPublicKey publicKey = (ECPublicKey) newKeyPair.getPublic();
-
 			// Make a new user with the new public key and username
 			User newUser = new SimpleUser(newUsername, publicKey);
 			int id = ShoutProviderContract.storeUser(context, newUser);
+			// Write the new one
 			if (id > 0) {
 				// Successful
-				keyStorage.writeId(id);
+				keyStorage.writeKeyPair(id, newKeyPair);
 				return;
 			}
 		} catch (NoSuchAlgorithmException e) {
@@ -70,8 +67,9 @@ public class IdManager {
 			Log.e(TAG, e.getMessage());
 		}
 		// Some sort of failure, reset to old state
-		keyStorage.writeKeyPair(oldKeyPair);
-		keyStorage.writeId(oldId);
+		if (! keyStorage.isEmpty()) {
+			keyStorage.writeKeyPair(oldId, oldKeyPair);
+		}
 		return;
 	}
 
