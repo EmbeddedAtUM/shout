@@ -92,11 +92,8 @@ public class ShoutListViewRow extends LinearLayout {
 	public void bindShout(LocalShout shout, int numComments, int numReshouts) {
 		setExpanded(false);
 
-		// TODO: Use global ids, so this hack to get the id isn't necessary
-		int id = ShoutProviderContract.storeShout(getContext(), shout);
-
 		actionShoutView.bindShout(shout, numComments, numReshouts);
-		commentsView.bindShouts(id);
+		commentsView.bindShouts(shout.getDatabaseId());
 	}
 
 	private void setMargins(boolean expanded) {

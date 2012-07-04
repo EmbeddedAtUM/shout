@@ -103,41 +103,23 @@ public class ShoutActivity extends ListActivity {
 	public void onClickReshout(LocalShout shout) {
 		Log.v(TAG, "Reshout button clicked");
 
-		// TODO: Pass around Shout objects, not local ids...
-		// That will avoid the need for this hack for getting the id of an
-		// already existing shout
-		int id = ShoutProviderContract.storeShout(getApplicationContext(),
-				shout);
-
 		ReshoutTask task = new ReshoutTask(getApplicationContext());
-		task.execute(id);
+		task.execute(shout.getDatabaseId());
 	}
 
 	public void onClickComment(LocalShout shout) {
 		Log.v(TAG, "Comment button clicked");
 
-		// TODO: Pass around Shout objects, not local ids...
-		// That will avoid the need for this hack for getting the id of an
-		// already existing shout
-		int id = ShoutProviderContract.storeShout(getApplicationContext(),
-				shout);
-
 		Intent intent = new Intent(this, MessageActivity.class);
-		intent.putExtra(MessageActivity.PARENT_ID, id);
+		intent.putExtra(MessageActivity.PARENT_ID, shout.getDatabaseId());
 		startActivity(intent);
 	}
 
 	public void onClickDetails(LocalShout shout) {
 		Log.v(TAG, "Details buttons clicked");
 
-		// TODO: Pass around Shout objects, not local ids...
-		// That will avoid the need for this hack for getting the id of an
-		// already existing shout
-		int id = ShoutProviderContract.storeShout(getApplicationContext(),
-				shout);
-
 		Intent intent = new Intent(this, DetailsActivity.class);
-		intent.putExtra(DetailsActivity.SHOUT_ID, id);
+		intent.putExtra(DetailsActivity.SHOUT_ID, shout.getDatabaseId());
 		startActivity(intent);
 	}
 
