@@ -66,10 +66,6 @@ public class NetworkReceiver {
 	}
 
 	private void receivePacket() {
-		// TODO: manes.receive returns null immediately if the manes service
-		// is not bound, so this will busy idle until it is bound.
-		// manes.receive should probably wait the full BLOCK_INTERVAL_MS
-		// before returning, even if it is not initially bound.
 		byte[] data = manes.receive(BLOCK_INTERVAL_MS);
 		if (data != null)
 			networkProtocol.receivePacket(data);
