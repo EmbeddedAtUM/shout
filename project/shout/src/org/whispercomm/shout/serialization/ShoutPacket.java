@@ -72,7 +72,7 @@ public class ShoutPacket {
 	 * Deserialize the Shout described by this ShoutPacket
 	 * 
 	 * @return The Shout stored in this packet.
-	 * @throws BadShoutVersionException 
+	 * @throws BadShoutVersionException
 	 */
 	public Shout decodeShout() throws BadShoutVersionException {
 		return SerializeUtility.deserializeShout(count, body);
@@ -137,13 +137,13 @@ public class ShoutPacket {
 		 * Construct a PacketBuilder with the specified version
 		 * 
 		 * @param version
-		 * @throws NoSuchVersionException If the version specified does not
+		 * @throws BadShoutVersionException If the version specified does not
 		 *             exist.
 		 */
-		public PacketBuilder(int version) throws NoSuchVersionException {
+		public PacketBuilder(int version) throws BadShoutVersionException {
 			this.version = version;
 			if (this.version != VERSION_0) {
-				throw new NoSuchVersionException();
+				throw new BadShoutVersionException();
 			}
 			initialize();
 		}
