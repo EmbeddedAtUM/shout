@@ -9,6 +9,7 @@ import org.whispercomm.shout.ShoutCreator;
 import org.whispercomm.shout.ShoutMessageUtility;
 import org.whispercomm.shout.ShoutType;
 import org.whispercomm.shout.id.IdManager;
+import org.whispercomm.shout.id.UserNotInitiatedException;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 
 import android.content.Context;
@@ -44,7 +45,14 @@ public class ReshoutTask extends AsyncTask<Integer, Void, Integer> {
 		if (idManager.userIsNotSet()) {
 			return null;
 		}
-		Me me = idManager.getMe();
+		Me me;
+		try {
+			me = idManager.getMe();
+		} catch (UserNotInitiatedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
 		if (parent.getSender().getPublicKey().equals(me.getPublicKey())) {
 			return params[0];
 		} else {

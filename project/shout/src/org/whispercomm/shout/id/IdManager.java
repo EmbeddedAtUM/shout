@@ -79,9 +79,9 @@ public class IdManager {
 		return;
 	}
 
-	public Me getMe() {
+	public Me getMe() throws UserNotInitiatedException {
 		if (keyStorage.isEmpty()) {
-			return null;
+			throw new UserNotInitiatedException();
 		}
 		int id = keyStorage.getId();
 		LocalUser user = ShoutProviderContract.retrieveUserById(context, id);

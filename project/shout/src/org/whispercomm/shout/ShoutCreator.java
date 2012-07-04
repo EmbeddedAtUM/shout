@@ -6,6 +6,7 @@ import java.io.UnsupportedEncodingException;
 import org.joda.time.DateTime;
 import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.id.SignatureUtility;
+import org.whispercomm.shout.id.UserNotInitiatedException;
 import org.whispercomm.shout.network.NetworkInterface;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 
@@ -42,7 +43,14 @@ public class ShoutCreator {
 	}
 
 	public int saveShout(DateTime timestamp, String content, Shout parent) {
-		Me me = idManager.getMe();
+		Me me;
+		try {
+			me = idManager.getMe();
+		} catch (UserNotInitiatedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return -1;
+		}
 		try {
 			UnsignedShout unsigned = new SimpleUnsignedShout(timestamp, me, content, parent);
 			byte[] signature = SignatureUtility.generateSignature(unsigned, me);
