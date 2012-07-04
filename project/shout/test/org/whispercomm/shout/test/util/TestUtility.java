@@ -36,7 +36,7 @@ public class TestUtility {
 			return;
 		}
 		assertEquals(lhs.getMessage(), rhs.getMessage());
-		assertEquals(lhs.getTimestamp(), rhs.getTimestamp());
+		assertEquals(lhs.getTimestamp().getMillis(), rhs.getTimestamp().getMillis());
 		assertEquals(lhs.getSender().getUsername(), rhs.getSender().getUsername());
 		assertEquals(lhs.getSender().getPublicKey(), rhs.getSender().getPublicKey());
 		assertArrayEquals(lhs.getSignature(), rhs.getSignature());
