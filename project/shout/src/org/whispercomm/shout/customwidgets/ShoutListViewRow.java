@@ -78,9 +78,6 @@ public class ShoutListViewRow extends LinearLayout {
 	/**
 	 * Sets the Shout to be displayed by the view.
 	 * 
-	 * TODO: Ultimately this should take one parameter, a LocalShout that has
-	 * methods to return the comment and reshout counts.
-	 * 
 	 * @param shout
 	 *            the Shout to be displayed
 	 */
