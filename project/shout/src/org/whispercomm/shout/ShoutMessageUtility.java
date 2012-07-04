@@ -4,7 +4,7 @@ import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
 public class ShoutMessageUtility {
-	public static ShoutType getShoutType(Shout shout) {
+	public static ShoutType getShoutType(UnsignedShout shout) {
 		if (shout.getParent() == null) {
 			return ShoutType.SHOUT;
 		} else if (shout.getMessage() != null) {

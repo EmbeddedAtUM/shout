@@ -4,6 +4,7 @@ package org.whispercomm.shout;
 import java.io.UnsupportedEncodingException;
 
 import org.joda.time.DateTime;
+import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.id.SignatureUtility;
 import org.whispercomm.shout.network.NetworkInterface;
 import org.whispercomm.shout.provider.ShoutProviderContract;
@@ -17,11 +18,10 @@ public class ShoutCreator {
 	static final String TAG = ShoutCreator.class.getSimpleName();
 
 	private Context context;
-	private SignatureUtility signUtility;
+	private IdManager idManager;
 
-	public ShoutCreator(Context context, SignatureUtility signUtility) {
+	public ShoutCreator(Context context) {
 		this.context = context;
-		this.signUtility = signUtility;
 	}
 
 	/**
@@ -40,11 +40,12 @@ public class ShoutCreator {
 		return sendShout(shoutId);
 	}
 
-	public int saveShout(DateTime timestamp, String content, Shout shoutOri) {
-		User user = signUtility.getUser();
+	public int saveShout(DateTime timestamp, String content, Shout parent) {
+		Me me = idManager.getMe();
 		try {
-			byte[] signature = signUtility.genShoutSignature(timestamp, user, content, shoutOri);
-			Shout shout = new SimpleShout(timestamp, user, content, shoutOri, signature);
+			UnsignedShout unsigned = new SimpleUnsignedShout(timestamp, me, content, parent);
+			byte[] signature = SignatureUtility.generateSignature(unsigned, me);
+			Shout shout = new SimpleShout(timestamp, me, content, parent, signature);
 			int shoutId = ShoutProviderContract.storeShout(context, shout);
 			return shoutId;
 		} catch (UnsupportedEncodingException e) {

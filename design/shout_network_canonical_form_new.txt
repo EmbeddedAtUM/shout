@@ -1,0 +1,85 @@
+Shout Serialization Version 0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+canonical form:   ||====================|| 
+(1490 bytes       || header             ||
+ with 3 shouts)   ||====================||
+                  || shout              ||
+                  ||====================||
+                  || signature          ||
+                  ||====================||
+                  || shout              ||
+                  ||====================||
+                  || signature          ||
+                  ||====================||
+                          etc.
+                             .
+                             .
+
+
+
+"header":         ||====================||
+(2 bytes)         || version            ||
+                  || (1 byte)           ||
+                  ||--------------------||
+                  || shout_count*       ||
+                  || (1 byte)           ||
+                  ||====================||
+
+
+"shout":          ||====================||
+(max 415 bytes)   || time               ||
+                  || (8 bytes)          ||
+                  ||--------------------|| 
+                  || sender_name_len*   ||
+                  || (1 byte)           ||
+                  ||--------------------||
+                  || sender_name*       ||
+                  || (max 40 bytes)     ||
+                  ||--------------------||
+                  || sender_pub_key*    ||
+                  || (91 bytes)         ||
+                  ||--------------------||
+                  || message_len*       ||
+                  || (1 byte)           ||
+                  ||--------------------||
+                  || message*           ||
+                  || (max 240 bytes)    ||
+                  ||====================||
+                  || has_parent*        ||
+                  || (1 byte)           ||
+                  ||--------------------||
+                  || parent_hash*       ||
+                  || (32 or 0 bytes)    ||
+                  ||====================|| 
+
+"signature"       ||====================||
+(71 - 81 bytes)   || signature_len*     ||
+                  || (1 byte)           ||
+                  ||--------------------|| 
+                  || signature          ||
+                  || (70-80 bytes)      ||
+                  ||====================||
+
+Notes:
+*shout_count: Max is 3 to fit into a single packet with size < 1500 bytes
+
+*sender_name_len: Length of next field, values range 1 - 40 
+
+*sender_name: UTF-8 encoded sender username
+
+*sender_pub_key: 91 bytes as returned by Bouncy Castle's X.509 encoding scheme
+using ECDSA and "secp256r1"
+
+*message_len: Length of next field, values range 0 - 240. This allows for
+message sizes of up to 240 ASCII characters, or 55 obscure 4-byte characters
+
+*message: UTF-8 encoded message string
+
+*has_parent: Value 0 or 1, boolean if this Shout has a parent
+
+*parent_hash: If this Shout has a parent, this field is the hash of
+signed parent shout. The hash should be over the following fields concatenated:
+    "shout" + "signature"
+*signature_len: Need because the length of ECDSA signatures varies from 70-80
+bytes using the ANSI X9.62 standards with a "secp256r1" key.

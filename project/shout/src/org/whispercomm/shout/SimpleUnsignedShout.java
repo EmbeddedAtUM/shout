@@ -1,30 +1,22 @@
-
 package org.whispercomm.shout;
 
 import org.joda.time.DateTime;
 
-public class SimpleShout extends AbstractShout implements Shout {
+public class SimpleUnsignedShout implements UnsignedShout {
 
-	private DateTime timestamp;
 	private User sender;
 	private String message;
 	private Shout parent;
-	private byte[] signature;
+	private DateTime timestamp;
 
-	public SimpleShout(DateTime timestamp, User sender, String message,
-			Shout parent, byte[] signature) {
+	public SimpleUnsignedShout(DateTime timestamp, User sender, String message,
+			Shout parent) {
 		this.timestamp = timestamp;
 		this.sender = sender;
 		this.message = message;
-		this.parent = parent;
-		this.signature = signature;
+		this.parent= parent;
 	}
-
-	@Override
-	public byte[] getSignature() {
-		return this.signature;
-	}
-
+	
 	@Override
 	public User getSender() {
 		return this.sender;
@@ -43,6 +35,11 @@ public class SimpleShout extends AbstractShout implements Shout {
 	@Override
 	public Shout getParent() {
 		return this.parent;
+	}
+
+	@Override
+	public ShoutType getType() {
+		return ShoutMessageUtility.getShoutType(this);
 	}
 
 }

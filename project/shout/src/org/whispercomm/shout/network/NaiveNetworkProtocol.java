@@ -13,9 +13,13 @@ import org.whispercomm.manes.client.maclib.ManesInterface;
 import org.whispercomm.manes.client.maclib.NotRegisteredException;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.provider.ShoutProviderContract;
+import org.whispercomm.shout.serialization.ShoutChainTooLongException;
+import org.whispercomm.shout.serialization.ShoutPacket;
+import org.whispercomm.shout.serialization.ShoutPacket.PacketBuilder;
 
 import android.content.Context;
 import android.util.Log;
+
 
 /**
  * Simple implementation of network logic for Shout.
@@ -70,10 +74,10 @@ public class NaiveNetworkProtocol implements NetworkProtocol {
 	public void sendShout(Shout shout) {
 		final byte[] shoutBytes;
 		try {
-			shoutBytes = NetworkShout.toNetworkBytes(shout);
-		} catch (UnsupportedEncodingException e) {
-			Log.e(TAG, e.getMessage());
-			return;
+			PacketBuilder builder = new ShoutPacket.PacketBuilder();
+			builder.addShout(shout);
+			ShoutPacket packet = builder.build();
+			shoutBytes = packet.getPacketBytes();
 		} catch (ShoutChainTooLongException e) {
 			Log.e(TAG, e.getMessage());
 			return;

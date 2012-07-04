@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout.customwidgets;
 
 import java.lang.reflect.InvocationTargetException;
@@ -23,7 +24,6 @@ import android.widget.LinearLayout;
  * toggled by clicking the shout.
  * 
  * @author David R. Bild
- * 
  */
 public class ActionShoutView extends LinearLayout {
 	private static final String TAG = ActionShoutView.class.getSimpleName();
@@ -125,24 +125,24 @@ public class ActionShoutView extends LinearLayout {
 		for (int i = 0; i < array.getIndexCount(); ++i) {
 			int attr = array.getIndex(i);
 			switch (attr) {
-			case R.styleable.ActionShoutView_onReshoutClick:
-				methodName = array.getString(attr);
-				if (methodName != null) {
-					this.setReshoutOnClickListener(createOnClickListener(methodName));
-				}
-				break;
-			case R.styleable.ActionShoutView_onCommentClick:
-				methodName = array.getString(attr);
-				if (methodName != null) {
-					this.setCommentOnClickListener(createOnClickListener(methodName));
-				}
-				break;
-			case R.styleable.ActionShoutView_onDetailsClick:
-				methodName = array.getString(attr);
-				if (methodName != null) {
-					this.setDetailsOnClickListener(createOnClickListener(methodName));
-				}
-				break;
+				case R.styleable.ActionShoutView_onReshoutClick:
+					methodName = array.getString(attr);
+					if (methodName != null) {
+						this.setReshoutOnClickListener(createOnClickListener(methodName));
+					}
+					break;
+				case R.styleable.ActionShoutView_onCommentClick:
+					methodName = array.getString(attr);
+					if (methodName != null) {
+						this.setCommentOnClickListener(createOnClickListener(methodName));
+					}
+					break;
+				case R.styleable.ActionShoutView_onDetailsClick:
+					methodName = array.getString(attr);
+					if (methodName != null) {
+						this.setDetailsOnClickListener(createOnClickListener(methodName));
+					}
+					break;
 			}
 		}
 	}
@@ -179,8 +179,7 @@ public class ActionShoutView extends LinearLayout {
 	 * Enables or disables toggling of the action bar visibility when the view
 	 * is clicked.
 	 * 
-	 * @param toggle
-	 *            {@code true} to toggle on click; {@code false} otherwise.
+	 * @param toggle {@code true} to toggle on click; {@code false} otherwise.
 	 */
 	public void setToggleActionBarOnClick(boolean toggle) {
 		if (toggle) {
@@ -198,8 +197,8 @@ public class ActionShoutView extends LinearLayout {
 	/**
 	 * Sets the visibility of the action bar displayed below the shout.
 	 * 
-	 * @param visibility
-	 *            {@code true} to show the action bar; {@code false} otherwise.
+	 * @param visibility {@code true} to show the action bar; {@code false}
+	 *            otherwise.
 	 */
 	public void setActionBarVisibility(boolean visibility) {
 		if (visibility) {
@@ -222,10 +221,15 @@ public class ActionShoutView extends LinearLayout {
 	}
 
 	/**
-	 * Sets the Shout to be displayed by the view.
+	 * Sets the Shout to be displayed by the view. TODO: Ultimately this should
+	 * take one parameter, a LocalShout that has methods to return the comment
+	 * and reshout counts. <<<<<<< HEAD
 	 * 
-	 * @param shout
-	 *            the Shout to be displayed
+	 * @param shout the Shout to be displayed =======
+	 * @param shout the Shout to be displayed
+	 * @param numComments the comment count for the shout to be displayed
+	 * @param numReshouts the reshout count for the shout to be displayed
+	 *            >>>>>>> dadrian-unsigned-shout
 	 */
 	public void bindShout(LocalShout shout) {
 		shoutView.bindShout(shout);
@@ -233,24 +237,23 @@ public class ActionShoutView extends LinearLayout {
 
 		// Hide comment button when displaying a comment.
 		switch (shout.getType()) {
-		case SHOUT:
-			btnComment.setVisibility(VISIBLE);
-			break;
-		case COMMENT:
-			btnComment.setVisibility(GONE);
-			break;
-		default:
-			Log.e(TAG, "Unexpected shout type in bindShout(LocalShout): "
-					+ shout.getType().name());
-			break;
+			case SHOUT:
+				btnComment.setVisibility(VISIBLE);
+				break;
+			case COMMENT:
+				btnComment.setVisibility(GONE);
+				break;
+			default:
+				Log.e(TAG, "Unexpected shout type in bindShout(LocalShout): "
+						+ shout.getType().name());
+				break;
 		}
 	}
 
 	/**
 	 * Sets the {@link OnClickListener} callback for the reshout button.
 	 * 
-	 * @param l
-	 *            the click listener
+	 * @param l the click listener
 	 */
 	public void setReshoutOnClickListener(OnClickListener l) {
 		this.reshoutListener = l;
@@ -259,8 +262,7 @@ public class ActionShoutView extends LinearLayout {
 	/**
 	 * Sets the {@link OnClickListener} callback for the comment button.
 	 * 
-	 * @param l
-	 *            the click listener
+	 * @param l the click listener
 	 */
 	public void setCommentOnClickListener(OnClickListener l) {
 		this.commentListener = l;
@@ -269,8 +271,7 @@ public class ActionShoutView extends LinearLayout {
 	/**
 	 * Sets the {@link OnClickListener} callback for the details button.
 	 * 
-	 * @param l
-	 *            the click listener
+	 * @param l the click listener
 	 */
 	public void setDetailsOnClickListener(OnClickListener l) {
 		this.detailsListener = l;
@@ -283,8 +284,7 @@ public class ActionShoutView extends LinearLayout {
 	 * Each listener is called as many times as it was registered. But you
 	 * probably don't actually want to register a listener more than once.
 	 * 
-	 * @param l
-	 *            the listener to register
+	 * @param l the listener to register
 	 */
 	public void registerActionBarStateChangeListener(
 			ActionBarStateChangeListener l) {
@@ -295,8 +295,7 @@ public class ActionShoutView extends LinearLayout {
 	 * Unregisters the listener, if it was registered. If the listener was
 	 * registered more than once, only a single registration is removed.
 	 * 
-	 * @param l
-	 *            the listener to unregister
+	 * @param l the listener to unregister
 	 * @return {@code true} if the listener was unregistered, {@code false} is
 	 *         the listener was not already registered.
 	 */
@@ -309,7 +308,6 @@ public class ActionShoutView extends LinearLayout {
 	 * Callback class called when an action button is clicked.
 	 * 
 	 * @author David R. Bild
-	 * 
 	 */
 	public static interface OnClickListener {
 		public void onClick(LocalShout shout);
@@ -319,12 +317,10 @@ public class ActionShoutView extends LinearLayout {
 	 * Callback class called when the visibility of the action bar changes.
 	 * 
 	 * @author David R. Bild
-	 * 
 	 */
 	public static interface ActionBarStateChangeListener {
 		/**
-		 * @param visibility
-		 *            {@code true} if the action bar is now visibile,
+		 * @param visibility {@code true} if the action bar is now visibile,
 		 *            {@code false} otherwise.
 		 */
 		public void stateChanged(boolean visibility);

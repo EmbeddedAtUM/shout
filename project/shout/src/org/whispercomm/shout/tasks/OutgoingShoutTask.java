@@ -3,7 +3,6 @@ package org.whispercomm.shout.tasks;
 
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.ShoutCreator;
-import org.whispercomm.shout.id.SignatureUtility;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -38,8 +37,7 @@ public class OutgoingShoutTask extends AsyncTask<Integer, Void, Boolean> {
 		if (shouts.length < 1) {
 			return false;
 		}
-		SignatureUtility utility = new SignatureUtility(context);
-		ShoutCreator creator = new ShoutCreator(context, utility);
+		ShoutCreator creator = new ShoutCreator(context);
 		return creator.sendShout(shouts[0]);
 	}
 

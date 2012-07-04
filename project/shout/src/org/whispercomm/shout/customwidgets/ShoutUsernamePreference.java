@@ -1,9 +1,7 @@
 
 package org.whispercomm.shout.customwidgets;
 
-import org.whispercomm.shout.User;
-import org.whispercomm.shout.id.SignatureUtility;
-import org.whispercomm.shout.id.UserNameInvalidException;
+import org.whispercomm.shout.id.IdManager;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -18,22 +16,22 @@ public class ShoutUsernamePreference extends ShoutEditTextPreference {
 	private static final String TAG = ShoutUsernamePreference.class
 			.getSimpleName();
 
-	private SignatureUtility signUtility;
+	private IdManager idManager;
 
 	public ShoutUsernamePreference(Context context, AttributeSet attrs,
 			int defStyle) {
 		super(context, attrs, defStyle);
-		this.setListeners(context);
+		this.configurePreference(context);
 	}
 
 	public ShoutUsernamePreference(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		this.setListeners(context);
+		this.configurePreference(context);
 	}
 
 	public ShoutUsernamePreference(Context context) {
 		super(context);
-		this.setListeners(context);
+		this.configurePreference(context);
 	}
 
 	@Override
@@ -42,10 +40,10 @@ public class ShoutUsernamePreference extends ShoutEditTextPreference {
 		super.setOnPreferenceClickListener(onPreferenceClickListener);
 	}
 
-	private void setListeners(Context context) {
+	private void configurePreference(Context context) {
 		this.setOnPreferenceClickListener(preListener);
 		this.setOnPreferenceChangeListener(postListener);
-		this.signUtility = new SignatureUtility(context);
+		this.idManager = new IdManager(context);
 	}
 
 	private OnPreferenceClickListener preListener = new OnPreferenceClickListener() {
@@ -62,7 +60,7 @@ public class ShoutUsernamePreference extends ShoutEditTextPreference {
 		@Override
 		public boolean onPreferenceClick(Preference preference) {
 			Log.v(TAG, "Username preference clicked");
-			if (signUtility.getUser() != null) {
+			if (idManager.userIsNotSet() != true) {
 				AlertDialog dialog = DialogFactory.buildUsernameChangeDialog(
 						getContext(), positive);
 				dialog.show();
@@ -73,30 +71,12 @@ public class ShoutUsernamePreference extends ShoutEditTextPreference {
 
 	private OnPreferenceChangeListener postListener = new OnPreferenceChangeListener() {
 
+		// TODO Make this be the actual preference, not a listener
 		@Override
 		public boolean onPreferenceChange(Preference preference, Object newValue) {
-			String newName = (String) newValue;
-			User current = signUtility.getUser(); // TODO Fix lifecycle
-			if (current == null) {
-				try {
-					signUtility.updateUserName(newName);
-				} catch (UserNameInvalidException e) {
-					Log.v(TAG, e.getMessage());
-					return false;
-				}
-				return true;
-			}
-			String oldName = current.getUsername();
-			if (!oldName.equals(newName)) {
-				try {
-					signUtility.updateUserName(newName);
-					Log.v(TAG, "Updated user name to: " + newName);
-					return true;
-				} catch (UserNameInvalidException e) {
-					Log.v(TAG, e.getMessage());
-				}
-			}
-			return false;
+			String newUsername = (String) newValue;
+			idManager.resetUser(newUsername);
+			return true;
 		}
 	};
 }

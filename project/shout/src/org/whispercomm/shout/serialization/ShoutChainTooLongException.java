@@ -1,5 +1,12 @@
-package org.whispercomm.shout.network;
 
+package org.whispercomm.shout.serialization;
+
+/**
+ * An exception indicating a Shout chain was too long to be serialized into a
+ * single packet.
+ * 
+ * @author Yue Liu 
+ */
 public class ShoutChainTooLongException extends Exception {
 
 	/**

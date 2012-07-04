@@ -1,7 +1,7 @@
 
 package org.whispercomm.shout;
 
-import org.whispercomm.shout.id.SignatureUtility;
+import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.tasks.CommentTask;
 import org.whispercomm.shout.tasks.ShoutTask;
@@ -20,7 +20,7 @@ public class MessageActivity extends Activity {
 	public static final String PARENT_ID = "parent";
 
 	private Toast noUserToast;
-	private SignatureUtility signUtility;
+	private IdManager idManager;
 	private Shout parent = null;
 	private int parentId = -1;
 
@@ -31,7 +31,6 @@ public class MessageActivity extends Activity {
 
 		noUserToast = Toast.makeText(getApplicationContext(), "Set up a user before you Shout!",
 				Toast.LENGTH_LONG);
-		signUtility = new SignatureUtility(getApplicationContext());
 		Bundle extras = getIntent().getExtras();
 		if (extras == null) {
 			return;
@@ -62,8 +61,7 @@ public class MessageActivity extends Activity {
 	@Override
 	public void onResume() {
 		super.onResume();
-		User user = signUtility.getUser();
-		if (user == null) {
+		if (idManager.userIsNotSet()) {
 			finish();
 			noUserToast.show();
 			Intent intent = new Intent(this, SettingsActivity.class);

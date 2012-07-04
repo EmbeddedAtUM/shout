@@ -1,6 +1,7 @@
+
 package org.whispercomm.shout;
 
-import org.whispercomm.shout.id.SignatureUtility;
+import org.whispercomm.shout.serialization.SerializeUtility;
 
 public abstract class AbstractShout implements Shout {
 
@@ -9,10 +10,14 @@ public abstract class AbstractShout implements Shout {
 	@Override
 	public byte[] getHash() {
 		if (hashCode == null) {
-			this.hashCode = SignatureUtility.genShoutHash(getTimestamp(),
-					getSender(), getMessage(), getParent());
+			this.hashCode = SerializeUtility.generateHash(this);
 		}
 		return hashCode;
+	}
+	
+	@Override
+	public ShoutType getType() {
+		return ShoutMessageUtility.getShoutType(this);
 	}
 
 }
