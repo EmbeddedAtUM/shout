@@ -1,7 +1,9 @@
 
 package org.whispercomm.shout.serialization;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import org.joda.time.DateTime;
 import org.junit.After;
@@ -101,5 +103,49 @@ public class ShoutPacketTest {
 			return;
 		}
 		TestUtility.testEqualShoutFields(comment, fromBytes);
+	}
+	
+	@Test
+	public void testWrapShout() {
+		try {
+			PacketBuilder builder = new ShoutPacket.PacketBuilder();
+			builder.addShout(shout);
+			ShoutPacket packet = builder.build();
+			assertNotNull(packet);
+			byte[] packetBytes = packet.getPacketBytes();
+			assertNotNull(packetBytes);
+			ShoutPacket wrapper = ShoutPacket.wrap(packetBytes);
+			assertEquals(1, wrapper.getShoutCount());
+			Shout decoded = wrapper.decodeShout();
+			assertNotNull(decoded);
+			TestUtility.testEqualShoutFields(shout, decoded);
+		} catch (ShoutChainTooLongException e) {
+			fail("Shout chain was not too long");
+		} catch (BadShoutVersionException e) {
+			fail("Shout version is not bad");
+		}
+	}
+	
+	@Test
+	public void testWrapComment() {
+		try {
+			PacketBuilder builder = new ShoutPacket.PacketBuilder();
+			builder.addShout(comment);
+			ShoutPacket packet = builder.build();
+			assertNotNull(packet);
+			byte[] packetBytes = packet.getPacketBytes();
+			assertNotNull(packetBytes);
+			ShoutPacket wrapper = ShoutPacket.wrap(packetBytes);
+			assertEquals(2, wrapper.getShoutCount());
+			Shout decoded = wrapper.decodeShout();
+			assertNotNull(decoded);
+			TestUtility.testEqualShoutFields(comment, decoded);
+		} catch (BadShoutVersionException e) {
+			e.printStackTrace();
+			fail("Shout version is not bad");
+		} catch (ShoutChainTooLongException e) {
+			e.printStackTrace();
+			fail("Shout chain is not too long (2)");
+		}
 	}
 }

@@ -122,7 +122,7 @@ public class ShoutPacket {
 			int version = (((int) versionByte) & MASK);
 			byte countByte = header[1];
 			int count = (((int) countByte) & MASK);
-			return new ShoutPacket(version, count, header, contents);
+			return new ShoutPacket(version, count, header, body);
 		}
 
 		/**
@@ -191,8 +191,8 @@ public class ShoutPacket {
 		 * Build the packet header
 		 */
 		private byte[] buildHeader() {
-			byte versionByte = (byte) (version & MASK);
-			byte countByte = (byte) (version & MASK);
+			byte versionByte = (byte) version;
+			byte countByte = (byte) count;
 			return new byte[] {
 					versionByte, countByte
 			};

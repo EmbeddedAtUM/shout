@@ -6,6 +6,7 @@ import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.tasks.CommentTask;
 import org.whispercomm.shout.tasks.ShoutTask;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -24,11 +25,12 @@ public class MessageActivity extends Activity {
 	private Shout parent = null;
 	private int parentId = -1;
 
+	@SuppressLint("ShowToast")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.message);
-
+		idManager = new IdManager(getApplicationContext());
 		noUserToast = Toast.makeText(getApplicationContext(), "Set up a user before you Shout!",
 				Toast.LENGTH_LONG);
 		Bundle extras = getIntent().getExtras();

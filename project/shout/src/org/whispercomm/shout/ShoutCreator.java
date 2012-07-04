@@ -22,6 +22,7 @@ public class ShoutCreator {
 
 	public ShoutCreator(Context context) {
 		this.context = context;
+		idManager = new IdManager(context);
 	}
 
 	/**
