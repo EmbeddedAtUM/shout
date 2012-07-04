@@ -6,9 +6,11 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.Security;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECGenParameterSpec;
 
+import org.spongycastle.jce.provider.BouncyCastleProvider;
 import org.whispercomm.shout.LocalUser;
 import org.whispercomm.shout.Me;
 import org.whispercomm.shout.SimpleUser;
@@ -27,6 +29,10 @@ public class IdManager {
 
 	private KeyStorage keyStorage;
 	private Context context;
+	
+	static {
+		Security.addProvider(new BouncyCastleProvider());
+	}
 
 	public IdManager(Context context) {
 		this.keyStorage = new KeyStorageSharedPrefs(context);
@@ -74,11 +80,11 @@ public class IdManager {
 	}
 
 	public Me getMe() {
-		int id = keyStorage.getId();
-		LocalUser user = ShoutProviderContract.retrieveUserById(context, id);
-		if (user == null) {
+		if (keyStorage.isEmpty()) {
 			return null;
 		}
+		int id = keyStorage.getId();
+		LocalUser user = ShoutProviderContract.retrieveUserById(context, id);
 		KeyPair keyPair = keyStorage.readKeyPair();
 		return new MeImpl(user, keyPair);
 	}
