@@ -21,8 +21,12 @@ import org.whispercomm.shout.test.util.TestUtility;
 @RunWith(ShoutTestRunner.class)
 public class ShoutPacketTest {
 
+	private static final String VERSION_EXCEPTION_FAIL = "Shout version is not bad";
 	private static final String PACKET_EXCEPTION_FAIL = "ShoutPacketException thrown";
+	private static final String SHOUT_CHAIN_FAIL = "ShoutChainTooLongException thrown";
+	
 	private static final int SIGNATURE_SIZE = 71;
+
 	private TestShout shout;
 	private TestShout recomment;
 	private TestShout comment;
@@ -59,59 +63,56 @@ public class ShoutPacketTest {
 
 	@Test
 	public void testBuildRecomment() {
-		PacketBuilder builder = new ShoutPacket.PacketBuilder();
 		try {
+			PacketBuilder builder = new ShoutPacket.PacketBuilder();
 			builder.addShout(recomment);
-		} catch (ShoutChainTooLongException e) {
-			fail("Shout chain is only 3!");
-		}
-		ShoutPacket packet = builder.build();
-		assertNotNull(packet);
-		int count = packet.getShoutCount();
-		assertEquals(3, count);
-		byte[] body = packet.getBodyBytes();
-		assertNotNull(body);
-		Shout fromBytes;
-		try {
-			fromBytes = packet.decodeShout();
+			ShoutPacket packet = builder.build();
+			assertNotNull(packet);
+			int count = packet.getShoutCount();
+			assertEquals(3, count);
+			byte[] body = packet.getBodyBytes();
+			assertNotNull(body);
+			Shout fromBytes = packet.decodeShout();
+			assertNotNull(fromBytes);
+			TestUtility.testEqualShoutFields(recomment, fromBytes);
 		} catch (BadShoutVersionException e) {
-			fail("BadShoutVersionException thrown");
+			fail(VERSION_EXCEPTION_FAIL);
 			return;
 		} catch (ShoutPacketException e) {
 			fail(PACKET_EXCEPTION_FAIL);
 			return;
+		} catch (ShoutChainTooLongException e) {
+			e.printStackTrace();
+			fail(SHOUT_CHAIN_FAIL);
 		}
-		assertNotNull(fromBytes);
-		TestUtility.testEqualShoutFields(recomment, fromBytes);
+
 	}
 
 	@Test
 	public void testBuildComment() {
-		PacketBuilder builder = new ShoutPacket.PacketBuilder();
 		try {
+			PacketBuilder builder = new ShoutPacket.PacketBuilder();
 			builder.addShout(comment);
-		} catch (ShoutChainTooLongException e) {
-			fail("Shout chain is only 2!");
-		}
-		ShoutPacket packet = builder.build();
-		assertNotNull(packet);
-		int count = packet.getShoutCount();
-		assertEquals(2, count);
-		byte[] body = packet.getBodyBytes();
-		assertNotNull(body);
-		Shout fromBytes;
-		try {
-			fromBytes = packet.decodeShout();
+			ShoutPacket packet = builder.build();
+			assertNotNull(packet);
+			int count = packet.getShoutCount();
+			assertEquals(2, count);
+			byte[] body = packet.getBodyBytes();
+			assertNotNull(body);
+			Shout fromBytes = packet.decodeShout();
+			TestUtility.testEqualShoutFields(comment, fromBytes);
 		} catch (BadShoutVersionException e) {
-			fail("BadShoutVersionException thrown");
-			return;
+			e.printStackTrace();
+			fail(VERSION_EXCEPTION_FAIL);
 		} catch (ShoutPacketException e) {
+			e.printStackTrace();
 			fail(PACKET_EXCEPTION_FAIL);
-			return;
+		} catch (ShoutChainTooLongException e) {
+			e.printStackTrace();
+			fail(SHOUT_CHAIN_FAIL);
 		}
-		TestUtility.testEqualShoutFields(comment, fromBytes);
 	}
-	
+
 	@Test
 	public void testWrapShout() {
 		try {
@@ -127,14 +128,17 @@ public class ShoutPacketTest {
 			assertNotNull(decoded);
 			TestUtility.testEqualShoutFields(shout, decoded);
 		} catch (ShoutChainTooLongException e) {
-			fail("Shout chain was not too long");
+			e.printStackTrace();
+			fail(SHOUT_CHAIN_FAIL);
 		} catch (BadShoutVersionException e) {
-			fail("Shout version is not bad");
+			e.printStackTrace();
+			fail(VERSION_EXCEPTION_FAIL);
 		} catch (ShoutPacketException e) {
+			e.printStackTrace();
 			fail(PACKET_EXCEPTION_FAIL);
 		}
 	}
-	
+
 	@Test
 	public void testWrapComment() {
 		try {
@@ -151,13 +155,38 @@ public class ShoutPacketTest {
 			TestUtility.testEqualShoutFields(comment, decoded);
 		} catch (BadShoutVersionException e) {
 			e.printStackTrace();
-			fail("Shout version is not bad");
+			fail(VERSION_EXCEPTION_FAIL);
 		} catch (ShoutChainTooLongException e) {
 			e.printStackTrace();
-			fail("Shout chain is not too long (2)");
+			fail(SHOUT_CHAIN_FAIL);
 		} catch (ShoutPacketException e) {
 			e.printStackTrace();
 			fail(PACKET_EXCEPTION_FAIL);
+		}
+	}
+
+	@Test
+	public void testWrapRecomment() {
+		try {
+			PacketBuilder builder = new ShoutPacket.PacketBuilder();
+			builder.addShout(recomment);
+			ShoutPacket packet = builder.build();
+			assertNotNull(packet);
+			byte[] packetBytes = packet.getPacketBytes();
+			ShoutPacket wrapper = ShoutPacket.wrap(packetBytes);
+			assertEquals(3, wrapper.getShoutCount());
+			Shout decoded = wrapper.decodeShout();
+			assertNotNull(decoded);
+			TestUtility.testEqualShoutFields(recomment, decoded);
+		} catch (ShoutChainTooLongException e) {
+			e.printStackTrace();
+			fail(SHOUT_CHAIN_FAIL);
+		} catch (ShoutPacketException e) {
+			e.printStackTrace();
+			fail(PACKET_EXCEPTION_FAIL);
+		} catch (BadShoutVersionException e) {
+			e.printStackTrace();
+			fail(VERSION_EXCEPTION_FAIL);
 		}
 	}
 }

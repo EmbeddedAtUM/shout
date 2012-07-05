@@ -102,4 +102,6 @@ public class SerializeUtilityTest {
 		assertNotNull(fromBytes);
 		TestUtility.testEqualShoutFields(reshout, fromBytes);
 	}
+	
+	// TODO Test serializing a comment
 }
