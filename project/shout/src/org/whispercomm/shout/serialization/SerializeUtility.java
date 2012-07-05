@@ -139,6 +139,7 @@ public class SerializeUtility {
 	public static Shout deserializeShout(int count, byte[] body) throws BadShoutVersionException, ShoutPacketException {
 		/*
 		 * TODO Make everything about this function not be awful
+		 * TODO Check that the hash is equivalent to the parent hash
 		 */
 		boolean hasNext = count > 0;
 		ByteBuffer buffer = ByteBuffer.wrap(body);

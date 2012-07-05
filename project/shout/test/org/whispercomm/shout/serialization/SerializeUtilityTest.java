@@ -21,6 +21,9 @@ import org.whispercomm.shout.test.util.TestUtility;
 @RunWith(ShoutTestRunner.class)
 public class SerializeUtilityTest {
 
+	private static final String VERSION_EXCEPTION_FAIL = "BadShoutVersionException thrown";
+	private static final String PACKET_EXCEPTION_FAIL = "ShoutPacketException thrown";
+	
 	private static final String MESSAGE = "My shout message!";
 	private static final DateTime TIMESTAMP = new DateTime(8675309L);
 	private static final byte[] SIGNATURE = TestFactory
@@ -66,7 +69,10 @@ public class SerializeUtilityTest {
 		try {
 			fromBytes = SerializeUtility.deserializeShout(1, buffer.array());
 		} catch (BadShoutVersionException e) {
-			fail("BadShoutVersionException thrown");
+			fail(VERSION_EXCEPTION_FAIL);
+			return;
+		} catch (ShoutPacketException e) {
+			fail(PACKET_EXCEPTION_FAIL);
 			return;
 		}
 		assertNotNull(fromBytes);
@@ -87,7 +93,10 @@ public class SerializeUtilityTest {
 		try {
 			fromBytes = SerializeUtility.deserializeShout(2, buffer.array());
 		} catch (BadShoutVersionException e) {
-			fail("BadShoutVersionException thrown");
+			fail(VERSION_EXCEPTION_FAIL);
+			return;
+		} catch (ShoutPacketException e) {
+			fail(PACKET_EXCEPTION_FAIL);
 			return;
 		}
 		assertNotNull(fromBytes);

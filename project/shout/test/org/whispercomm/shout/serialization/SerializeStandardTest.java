@@ -45,6 +45,8 @@ public class SerializeStandardTest {
 			TestUtility.testEqualShoutFields(grandparent, fromBytes);
 		} catch (BadShoutVersionException e) {
 			fail("Shout version is not bad!");
+		} catch (ShoutPacketException e) {
+			fail("Shout packet is valid!");
 		}
 	}
 }

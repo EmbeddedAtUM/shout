@@ -21,6 +21,7 @@ import org.whispercomm.shout.test.util.TestUtility;
 @RunWith(ShoutTestRunner.class)
 public class ShoutPacketTest {
 
+	private static final String PACKET_EXCEPTION_FAIL = "ShoutPacketException thrown";
 	private static final int SIGNATURE_SIZE = 71;
 	private TestShout shout;
 	private TestShout recomment;
@@ -76,6 +77,9 @@ public class ShoutPacketTest {
 		} catch (BadShoutVersionException e) {
 			fail("BadShoutVersionException thrown");
 			return;
+		} catch (ShoutPacketException e) {
+			fail(PACKET_EXCEPTION_FAIL);
+			return;
 		}
 		assertNotNull(fromBytes);
 		TestUtility.testEqualShoutFields(recomment, fromBytes);
@@ -101,6 +105,9 @@ public class ShoutPacketTest {
 		} catch (BadShoutVersionException e) {
 			fail("BadShoutVersionException thrown");
 			return;
+		} catch (ShoutPacketException e) {
+			fail(PACKET_EXCEPTION_FAIL);
+			return;
 		}
 		TestUtility.testEqualShoutFields(comment, fromBytes);
 	}
@@ -123,6 +130,8 @@ public class ShoutPacketTest {
 			fail("Shout chain was not too long");
 		} catch (BadShoutVersionException e) {
 			fail("Shout version is not bad");
+		} catch (ShoutPacketException e) {
+			fail(PACKET_EXCEPTION_FAIL);
 		}
 	}
 	
@@ -146,6 +155,9 @@ public class ShoutPacketTest {
 		} catch (ShoutChainTooLongException e) {
 			e.printStackTrace();
 			fail("Shout chain is not too long (2)");
+		} catch (ShoutPacketException e) {
+			e.printStackTrace();
+			fail(PACKET_EXCEPTION_FAIL);
 		}
 	}
 }
