@@ -1,6 +1,7 @@
 
 package org.whispercomm.shout.serialization;
 
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +29,7 @@ public class ShoutPacket {
 		this.body = body;
 	}
 
-	public static ShoutPacket wrap(byte[] contents) {
+	public static ShoutPacket wrap(byte[] contents) throws ShoutPacketException {
 		return PacketBuilder.wrap(contents);
 	}
 
@@ -73,8 +74,9 @@ public class ShoutPacket {
 	 * 
 	 * @return The Shout stored in this packet.
 	 * @throws BadShoutVersionException
+	 * @throws ShoutPacketException 
 	 */
-	public Shout decodeShout() throws BadShoutVersionException {
+	public Shout decodeShout() throws BadShoutVersionException, ShoutPacketException {
 		return SerializeUtility.deserializeShout(count, body);
 	}
 
@@ -112,17 +114,21 @@ public class ShoutPacket {
 
 		private List<Shout> shouts;
 
-		private static ShoutPacket wrap(byte[] contents) {
-			ByteBuffer buffer = ByteBuffer.wrap(contents);
-			byte[] header = new byte[HEADER_SIZE];
-			buffer.get(header);
-			byte[] body = new byte[contents.length - HEADER_SIZE];
-			buffer.get(body);
-			byte versionByte = header[0];
-			int version = (((int) versionByte) & MASK);
-			byte countByte = header[1];
-			int count = (((int) countByte) & MASK);
-			return new ShoutPacket(version, count, header, body);
+		private static ShoutPacket wrap(byte[] contents) throws ShoutPacketException {
+			try {
+				ByteBuffer buffer = ByteBuffer.wrap(contents);
+				byte[] header = new byte[HEADER_SIZE];
+				buffer.get(header);
+				byte[] body = new byte[contents.length - HEADER_SIZE];
+				buffer.get(body);
+				byte versionByte = header[0];
+				int version = (((int) versionByte) & MASK);
+				byte countByte = header[1];
+				int count = (((int) countByte) & MASK);
+				return new ShoutPacket(version, count, header, body);
+			} catch (BufferUnderflowException e) {
+				throw new ShoutPacketException();
+			}
 		}
 
 		/**

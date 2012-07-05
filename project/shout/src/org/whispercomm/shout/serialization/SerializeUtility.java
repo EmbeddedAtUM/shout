@@ -2,6 +2,7 @@
 package org.whispercomm.shout.serialization;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -132,9 +133,10 @@ public class SerializeUtility {
 	 * @param count How long the Shout chain is.
 	 * @param body The serialized Shout chain.
 	 * @return The Java object representation of this serialized Shout chain.
-	 * @throws BadShoutVersionException 
+	 * @throws BadShoutVersionException If the version on the Shout is unknown
+	 * @throws ShoutPacketException If the serialization does not match any know Shout standard
 	 */
-	public static Shout deserializeShout(int count, byte[] body) throws BadShoutVersionException {
+	public static Shout deserializeShout(int count, byte[] body) throws BadShoutVersionException, ShoutPacketException {
 		/*
 		 * TODO Make everything about this function not be awful
 		 */
@@ -144,6 +146,7 @@ public class SerializeUtility {
 		BuildableShout child = shout;
 		int start = 0;
 		while (hasNext) {
+			try {
 			int size = 0;
 			byte versionFlag = buffer.get();
 			size += SINGLE_SHOUT_FLAG;
@@ -216,6 +219,9 @@ public class SerializeUtility {
 			if (hasNext) {
 				shout.parent = new BuildableShout();
 				shout = shout.parent;
+			}
+			} catch (BufferUnderflowException e) {
+				throw new ShoutPacketException();
 			}
 		}
 		return child;

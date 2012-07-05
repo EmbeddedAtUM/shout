@@ -12,6 +12,7 @@ import org.whispercomm.shout.serialization.BadShoutVersionException;
 import org.whispercomm.shout.serialization.ShoutChainTooLongException;
 import org.whispercomm.shout.serialization.ShoutPacket;
 import org.whispercomm.shout.serialization.ShoutPacket.PacketBuilder;
+import org.whispercomm.shout.serialization.ShoutPacketException;
 
 import android.content.Context;
 import android.util.Log;
@@ -101,6 +102,8 @@ public class NaiveNetworkProtocol implements NetworkProtocol {
 			Shout shout = packet.decodeShout();
 			ShoutProviderContract.storeShout(context, shout);
 		} catch (BadShoutVersionException e) {
+			Log.v(TAG, e.getMessage());
+		} catch (ShoutPacketException e) {
 			Log.v(TAG, e.getMessage());
 		}
 	}
