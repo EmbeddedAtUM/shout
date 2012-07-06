@@ -452,9 +452,10 @@ public class ShoutProviderContract {
 	}
 
 	public static Cursor getCursorOverAllShouts(Context context) {
-		Uri uri = Uri.withAppendedPath(Shouts.CONTENT_URI, "all");
+		Uri uri = Shouts.CONTENT_URI;
+		String selection = Shouts.PARENT + " IS NULL";
 		Cursor result = context.getContentResolver().query(uri,
-				null, null, null, null);
+				null, selection, null, null);
 		return result;
 	}
 

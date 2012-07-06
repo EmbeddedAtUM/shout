@@ -1,7 +1,5 @@
 package org.whispercomm.shout.provider;
 
-import org.whispercomm.shout.provider.ShoutProviderContract.Shouts;
-
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -36,18 +34,6 @@ public class ShoutProvider extends ContentProvider {
 	private static final int MESSAGE_ID = 40;
 	private static final int SHOUTS_USER_ID = 120;
 	private static final int MESSAGES_SHOUT_ID = 410;
-	private static final int SHOUTS_FANCY = 9001;
-
-	public static final String COMMENT_COUNT_COLUMN = "cmnCount";
-	public static final String RESHOUT_COUNT_COLUMN = "reCnt";
-
-	public static final String FANCY_ASS_QUERY = "SELECT j._id AS _id, cmnCount, COUNT(s3._id) AS reCnt FROM "
-			+ "(SELECT s1._id AS _id, COUNT(s2._id) AS cmnCount FROM "
-			+ "Shout AS s1 LEFT OUTER JOIN Shout AS s2 ON (s2.parent = s1._id AND s2.Message IS NOT NULL) "
-			+ "WHERE s1.Parent IS NULL "
-			+ "GROUP BY s1._id) AS j "
-			+ "LEFT OUTER JOIN Shout as s3 ON (s3.parent = j._id AND s3.Message IS NULL) "
-			+ "GROUP BY j._id;";
 
 	static {
 		sUriMatcher.addURI(AUTHORITY, "shout", SHOUTS);
@@ -59,7 +45,6 @@ public class ShoutProvider extends ContentProvider {
 		sUriMatcher.addURI(AUTHORITY, "message", MESSAGES);
 		sUriMatcher.addURI(AUTHORITY, "message/#", MESSAGE_ID);
 		sUriMatcher.addURI(AUTHORITY, "message/shout/#", MESSAGES_SHOUT_ID);
-		sUriMatcher.addURI(AUTHORITY, "shout/all", SHOUTS_FANCY);
 	}
 
 	private ShoutDatabaseHelper mOpenHelper;
@@ -213,11 +198,6 @@ public class ShoutProvider extends ContentProvider {
 			qBuilder.appendWhere(ShoutSearchContract.Messages.SHOUT + " MATCH "
 					+ uri.getLastPathSegment());
 			break;
-		case SHOUTS_FANCY:
-			Cursor result = mDB.rawQuery(FANCY_ASS_QUERY, null);
-			result.setNotificationUri(this.getContext().getContentResolver(),
-					Shouts.CONTENT_URI);
-			return result;
 		default:
 			throw new IllegalArgumentException("Unknown or invalid URI " + uri);
 		}
