@@ -37,8 +37,7 @@ public class ShoutChainView extends LinearLayout {
 	}
 
 	private void loadShouts() {
-		Cursor cursor = ShoutProviderContract.getCursorOverShoutComments(
-				getContext(), parent.getDatabaseId());
+		Cursor cursor = ShoutProviderContract.getComments(getContext(), parent);
 
 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {
