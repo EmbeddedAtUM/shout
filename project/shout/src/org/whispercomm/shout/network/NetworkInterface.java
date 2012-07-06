@@ -1,5 +1,7 @@
 package org.whispercomm.shout.network;
 
+import org.whispercomm.shout.LocalShout;
+
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -78,6 +80,7 @@ public class NetworkInterface {
 	 *            id of the shout to be sent out
 	 * @return whether the notification is successful
 	 */
+	@Deprecated
 	public boolean send(long shoutId) {
 		if (isBinded) {
 			Message msg = Message.obtain(null, NetworkService.NEW_SHOUT);
@@ -92,6 +95,21 @@ public class NetworkInterface {
 			return true;
 		} else
 			return false;
+	}
+
+	/**
+	 * Notifies ShoutService to send the given shout.
+	 * <p>
+	 * The method returns immediately, with indications of whether the
+	 * notification is successful. If not, the caller should either wait and try
+	 * later, or give up.
+	 * 
+	 * @param shout
+	 *            the shout to be sent out
+	 * @return whether the notification is successful
+	 */
+	public boolean send(LocalShout shout) {
+		return send(shout.getDatabaseId());
 	}
 
 	/**
