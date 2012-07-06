@@ -2,10 +2,13 @@ package org.whispercomm.shout.tasks;
 
 import org.joda.time.DateTime;
 import org.whispercomm.shout.LocalShout;
+import org.whispercomm.shout.Me;
 import org.whispercomm.shout.R;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.ShoutCreator;
 import org.whispercomm.shout.ShoutType;
+import org.whispercomm.shout.id.IdManager;
+import org.whispercomm.shout.id.UserNotInitiatedException;
 import org.whispercomm.shout.util.ShoutMessageUtility;
 
 import android.content.Context;
@@ -21,9 +24,16 @@ import android.widget.Toast;
 public class ReshoutTask extends AsyncTask<LocalShout, Void, LocalShout> {
 
 	private Context context;
+	private Me me;
 
 	public ReshoutTask(Context context) {
 		this.context = context;
+		try {
+			this.me = new IdManager(context).getMe();
+		} catch (UserNotInitiatedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -43,7 +53,7 @@ public class ReshoutTask extends AsyncTask<LocalShout, Void, LocalShout> {
 		}
 
 		ShoutCreator creator = new ShoutCreator(context);
-		return creator.createReshout(DateTime.now(), parent);
+		return creator.createReshout(DateTime.now(), parent, me);
 	}
 
 	@Override

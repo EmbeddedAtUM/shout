@@ -1,9 +1,7 @@
 package org.whispercomm.shout;
 
 import org.joda.time.DateTime;
-import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.id.SignatureUtility;
-import org.whispercomm.shout.id.UserNotInitiatedException;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 
 import android.content.Context;
@@ -14,11 +12,9 @@ public class ShoutCreator {
 	static final String TAG = ShoutCreator.class.getSimpleName();
 
 	private Context context;
-	private IdManager idManager;
 
 	public ShoutCreator(Context context) {
 		this.context = context;
-		idManager = new IdManager(context);
 	}
 
 	/**
@@ -28,22 +24,16 @@ public class ShoutCreator {
 	 *            the timestamp field of the shout
 	 * @param message
 	 *            the message field of the shout
+	 * @param sender
+	 *            the identity for the sender field of the shout
 	 * @return the saved shout
 	 */
-	public LocalShout createShout(DateTime timestamp, String message) {
-		Me me;
-		try {
-			me = idManager.getMe();
-		} catch (UserNotInitiatedException e1) {
-			// TODO
-			e1.printStackTrace();
-			return null;
-		}
-
-		UnsignedShout unsigned = new SimpleUnsignedShout(timestamp, me,
+	public LocalShout createShout(DateTime timestamp, String message, Me sender) {
+		UnsignedShout unsigned = new SimpleUnsignedShout(timestamp, sender,
 				message, null);
-		byte[] signature = SignatureUtility.generateSignature(unsigned, me);
-		Shout shout = new SimpleShout(timestamp, me, message, null, signature);
+		byte[] signature = SignatureUtility.generateSignature(unsigned, sender);
+		Shout shout = new SimpleShout(timestamp, sender, message, null,
+				signature);
 
 		return ShoutProviderContract.saveShout(context, shout);
 	}
@@ -57,23 +47,17 @@ public class ShoutCreator {
 	 *            the message field of the shout
 	 * @param parent
 	 *            the parent field of the shout
+	 * @param sender
+	 *            the identity for the sender field of the shout
 	 * @return the saved shout
 	 */
 	public LocalShout createComment(DateTime timestamp, String message,
-			Shout parent) {
-		Me me;
-		try {
-			me = idManager.getMe();
-		} catch (UserNotInitiatedException e1) {
-			// TODO
-			e1.printStackTrace();
-			return null;
-		}
-
-		UnsignedShout unsigned = new SimpleUnsignedShout(timestamp, me,
+			Shout parent, Me sender) {
+		UnsignedShout unsigned = new SimpleUnsignedShout(timestamp, sender,
 				message, null);
-		byte[] signature = SignatureUtility.generateSignature(unsigned, me);
-		Shout shout = new SimpleShout(timestamp, me, message, parent, signature);
+		byte[] signature = SignatureUtility.generateSignature(unsigned, sender);
+		Shout shout = new SimpleShout(timestamp, sender, message, parent,
+				signature);
 
 		return ShoutProviderContract.saveShout(context, shout);
 	}
@@ -85,22 +69,16 @@ public class ShoutCreator {
 	 *            the timestamp field of the shout
 	 * @param parent
 	 *            the parent field of the shout
+	 * @param sender
+	 *            the identity for the sender field of the shout
 	 * @return the saved shout
 	 */
-	public LocalShout createReshout(DateTime timestamp, Shout parent) {
-		Me me;
-		try {
-			me = idManager.getMe();
-		} catch (UserNotInitiatedException e1) {
-			// TODO
-			e1.printStackTrace();
-			return null;
-		}
-
-		UnsignedShout unsigned = new SimpleUnsignedShout(timestamp, me, null,
-				null);
-		byte[] signature = SignatureUtility.generateSignature(unsigned, me);
-		Shout shout = new SimpleShout(timestamp, me, null, parent, signature);
+	public LocalShout createReshout(DateTime timestamp, Shout parent, Me sender) {
+		UnsignedShout unsigned = new SimpleUnsignedShout(timestamp, sender,
+				null, null);
+		byte[] signature = SignatureUtility.generateSignature(unsigned, sender);
+		Shout shout = new SimpleShout(timestamp, sender, null, parent,
+				signature);
 
 		return ShoutProviderContract.saveShout(context, shout);
 	}
