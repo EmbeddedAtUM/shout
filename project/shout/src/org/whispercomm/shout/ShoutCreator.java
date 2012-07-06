@@ -40,6 +40,7 @@ public class ShoutCreator {
 		return sendShout(shoutId);
 	}
 
+	@Deprecated
 	public int saveShout(DateTime timestamp, String content, Shout parent) {
 		Me me;
 		try {
