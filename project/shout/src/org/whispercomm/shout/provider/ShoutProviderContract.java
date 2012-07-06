@@ -523,6 +523,20 @@ public class ShoutProviderContract {
 		return getCursorOverShoutComments(context, shout.getDatabaseId());
 	}
 
+	/**
+	 * Retrieves a cursor over the comments of the specified shout.
+	 * 
+	 * @param context
+	 *            the context used to access the content provider
+	 * @param shout
+	 *            the parent whose comments to retrieve
+	 * @return a cursor over the comments
+	 */
+	public static Cursor getComments(Context context, Shout shout) {
+		// TODO implement this
+		throw new RuntimeException("Method not yet implemented.");
+	}
+
 	@Deprecated
 	public static Cursor getCursorOverReshouts(Context context, int parentId) {
 		String sortOrder = Shouts.TIME_RECEIVED + " DESC";
@@ -535,8 +549,31 @@ public class ShoutProviderContract {
 		return result;
 	}
 
+	/**
+	 * Retrieves a cursor over the reshouts of the specified shout.
+	 * 
+	 * @param context
+	 *            the context used to access the content provider
+	 * @param shout
+	 *            the parent whose comments to retrieve
+	 * @return a cursor over the reshouts
+	 */
 	public static Cursor getReshouts(Context context, LocalShout shout) {
 		return getCursorOverReshouts(context, shout.getDatabaseId());
+	}
+
+	/**
+	 * Retrieves a cursor over the reshouts of the specified shout.
+	 * 
+	 * @param context
+	 *            the context used to access the content provider
+	 * @param shout
+	 *            the parent whose comments to retrieve
+	 * @return a cursor over the reshouts
+	 */
+	public static Cursor getReshouts(Context context, Shout shout) {
+		// TODO implement this
+		throw new RuntimeException("Method not yet implemented");
 	}
 
 	/**
