@@ -33,6 +33,7 @@ public class ShoutCreator {
 	 *            TODO
 	 * @return
 	 */
+	@Deprecated
 	public boolean createAndSendShout(DateTime timestamp, String content,
 			Shout shoutOri) {
 		int shoutId = saveShout(timestamp, content, shoutOri);
@@ -67,6 +68,7 @@ public class ShoutCreator {
 		}
 	}
 
+	@Deprecated
 	public boolean sendShout(Shout shout) {
 		int shoutId = ShoutProviderContract.storeShout(context, shout);
 		if (shoutId > 0) {
