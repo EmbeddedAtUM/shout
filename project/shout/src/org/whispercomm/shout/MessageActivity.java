@@ -1,4 +1,3 @@
-
 package org.whispercomm.shout;
 
 import org.whispercomm.shout.id.IdManager;
@@ -23,8 +22,7 @@ public class MessageActivity extends Activity {
 
 	private Toast noUserToast;
 	private IdManager idManager;
-	private Shout parent = null;
-	private int parentId = -1;
+	private LocalShout parent = null;
 
 	@SuppressLint("ShowToast")
 	@Override
@@ -32,30 +30,35 @@ public class MessageActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.message);
 		idManager = new IdManager(getApplicationContext());
-		noUserToast = Toast.makeText(getApplicationContext(), "Set up a user before you Shout!",
-				Toast.LENGTH_LONG);
+		noUserToast = Toast.makeText(getApplicationContext(),
+				"Set up a user before you Shout!", Toast.LENGTH_LONG);
 		Bundle extras = getIntent().getExtras();
 		if (extras == null) {
 			return;
 		}
-		parentId = extras.getInt(PARENT_ID, -1);
+		int parentId = extras.getInt(PARENT_ID, -1);
 		if (parentId > 0) {
-			parent = ShoutProviderContract.retrieveShoutById(getApplicationContext(), parentId);
+			parent = ShoutProviderContract.retrieveShoutById(
+					getApplicationContext(), parentId);
 			ShoutType type = ShoutMessageUtility.getShoutType(parent);
 			switch (type) {
-				case COMMENT:
-				case RESHOUT:
-					parent = parent.getParent();
-					parentId = ShoutProviderContract.storeShout(getApplicationContext(), parent);
-					Log.v(TAG, "Parent was a comment/reshout, resetting parent to grandparent");
-					break;
-				case RECOMMENT:
-					parent = parent.getParent().getParent();
-					parentId = ShoutProviderContract.storeShout(getApplicationContext(), parent);
-					Log.v(TAG, "Parent was a recomment, resetting parent to great grandparent");
-					break;
-				default:
-					break;
+			case COMMENT:
+			case RESHOUT:
+				parent = parent.getParent();
+				parentId = ShoutProviderContract.storeShout(
+						getApplicationContext(), parent);
+				Log.v(TAG,
+						"Parent was a comment/reshout, resetting parent to grandparent");
+				break;
+			case RECOMMENT:
+				parent = parent.getParent().getParent();
+				parentId = ShoutProviderContract.storeShout(
+						getApplicationContext(), parent);
+				Log.v(TAG,
+						"Parent was a recomment, resetting parent to great grandparent");
+				break;
+			default:
+				break;
 			}
 			Log.v(TAG, "Parent text received as: " + parent.getMessage());
 		}
@@ -82,7 +85,7 @@ public class MessageActivity extends Activity {
 			new ShoutTask(getApplicationContext()).execute(content);
 		} else {
 			Log.v(TAG, "Commenting on another shout...");
-			new CommentTask(getApplicationContext(), parentId).execute(content);
+			new CommentTask(getApplicationContext(), parent).execute(content);
 		}
 		Intent intent = new Intent();
 		setResult(RESULT_OK, intent);

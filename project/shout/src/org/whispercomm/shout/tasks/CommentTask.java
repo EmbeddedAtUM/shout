@@ -1,11 +1,10 @@
-
 package org.whispercomm.shout.tasks;
 
 import org.joda.time.DateTime;
+import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.R;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.ShoutCreator;
-import org.whispercomm.shout.provider.ShoutProviderContract;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -13,25 +12,27 @@ import android.os.AsyncTask;
 public class CommentTask extends AsyncTask<String, Void, Integer> {
 
 	private Context context;
-	private int parentId;
+	private Shout parent;
 
-	public CommentTask(Context context, int parentId) {
+	public CommentTask(Context context, Shout parent) {
 		this.context = context;
-		this.parentId = parentId;
+		this.parent = parent;
 	}
 
 	@Override
 	protected Integer doInBackground(String... params) {
+		String message = params[0];
+
 		ShoutCreator creator = new ShoutCreator(context);
-		Shout parent = ShoutProviderContract.retrieveShoutById(context, parentId);
-		int id = creator.saveShout(DateTime.now(), params[0], parent);
-		return id;
+		LocalShout comment = creator.createComment(DateTime.now(), message,
+				parent);
+		return comment.getDatabaseId();
 	}
 
 	@Override
 	protected void onPostExecute(Integer result) {
-		OutgoingShoutTask sendTask = new OutgoingShoutTask(context, R.string.commentSuccess,
-				R.string.commentFail);
+		OutgoingShoutTask sendTask = new OutgoingShoutTask(context,
+				R.string.commentSuccess, R.string.commentFail);
 		sendTask.execute(result);
 	}
 
