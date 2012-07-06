@@ -132,11 +132,8 @@ public class ShoutActivity extends ListActivity {
 			ShoutListViewRow row = (ShoutListViewRow) view;
 
 			// Get the shout
-			int idIndex = cursor
-					.getColumnIndex(ShoutProviderContract.Shouts._ID);
-			int id = cursor.getInt(idIndex);
-			LocalShout shout = ShoutProviderContract.retrieveShoutById(context,
-					id);
+			LocalShout shout = ShoutProviderContract.retrieveShoutFromCursor(
+					context, cursor);
 
 			row.bindShout(shout);
 		}

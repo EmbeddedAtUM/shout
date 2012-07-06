@@ -1,4 +1,3 @@
-
 package org.whispercomm.shout;
 
 import org.whispercomm.shout.provider.ShoutProviderContract;
@@ -33,19 +32,20 @@ public class DetailsActivity extends ListActivity {
 		setContentView(R.layout.details);
 		Bundle extras = getIntent().getExtras();
 		shoutId = extras.getInt(SHOUT_ID);
-		shout = ShoutProviderContract.retrieveShoutById(getApplicationContext(), shoutId);
+		shout = ShoutProviderContract.retrieveShoutById(
+				getApplicationContext(), shoutId);
 		ShoutType type = ShoutMessageUtility.getShoutType(shout);
 		switch (type) {
-			case RESHOUT:
-				int parentId = ShoutProviderContract.storeShout(getApplicationContext(),
-						shout.getParent());
-				cursor = ShoutProviderContract.getCursorOverShoutComments(getApplicationContext(),
-						parentId);
-				break;
-			default:
-				cursor = ShoutProviderContract.getCursorOverShoutComments(getApplicationContext(),
-						shoutId);
-				break;
+		case RESHOUT:
+			int parentId = ShoutProviderContract.storeShout(
+					getApplicationContext(), shout.getParent());
+			cursor = ShoutProviderContract.getCursorOverShoutComments(
+					getApplicationContext(), parentId);
+			break;
+		default:
+			cursor = ShoutProviderContract.getCursorOverShoutComments(
+					getApplicationContext(), shoutId);
+			break;
 		}
 		setListAdapter(new CommentsAdapter(this, cursor));
 	}
@@ -53,8 +53,9 @@ public class DetailsActivity extends ListActivity {
 	@Override
 	public void onResume() {
 		super.onResume();
-		shout = ShoutProviderContract.retrieveShoutById(getApplicationContext(), shoutId);
-		//Set message details
+		shout = ShoutProviderContract.retrieveShoutById(
+				getApplicationContext(), shoutId);
+		// Set message details
 		TextView username = (TextView) findViewById(R.id.origsender);
 		username.setText(shout.getSender().getUsername());
 		TextView age = (TextView) findViewById(R.id.age);
@@ -62,7 +63,8 @@ public class DetailsActivity extends ListActivity {
 		TextView message = (TextView) findViewById(R.id.message);
 		message.setText(shout.getMessage());
 		TextView signature = (TextView) findViewById(R.id.signature);
-		signature.setText(Base64.encodeToString(shout.getSignature(), Base64.DEFAULT));
+		signature.setText(Base64.encodeToString(shout.getSignature(),
+				Base64.DEFAULT));
 		TextView hash = (TextView) findViewById(R.id.hash);
 		hash.setText(Base64.encodeToString(shout.getHash(), Base64.DEFAULT));
 		/*
@@ -96,14 +98,14 @@ public class DetailsActivity extends ListActivity {
 		@Override
 		public void bindView(View view, Context context, Cursor cursor) {
 			// Get the shout
-			int idIndex = cursor.getColumnIndex(ShoutProviderContract.Shouts._ID);
-			int id = cursor.getInt(idIndex);
-			Shout comment = ShoutProviderContract.retrieveShoutById(getApplicationContext(), id);
+			LocalShout comment = ShoutProviderContract.retrieveShoutFromCursor(
+					getApplicationContext(), cursor);
 
 			// Set the view content
 			DetailsViewHolder holder = (DetailsViewHolder) view.getTag();
-			holder.id = id;
-			holder.age.setText(ShoutMessageUtility.getDateTimeAge(comment.getTimestamp()));
+			holder.id = comment.getDatabaseId();
+			holder.age.setText(ShoutMessageUtility.getDateTimeAge(comment
+					.getTimestamp()));
 			holder.message.setText(comment.getMessage());
 			holder.origSender.setText(comment.getSender().getUsername());
 		}
@@ -117,7 +119,8 @@ public class DetailsActivity extends ListActivity {
 			LayoutInflater inflater = LayoutInflater.from(context);
 			View rowView = inflater.inflate(R.layout.comment, parent, false);
 			DetailsViewHolder holder = new DetailsViewHolder();
-			holder.origSender = (TextView) rowView.findViewById(R.id.commentingUser);
+			holder.origSender = (TextView) rowView
+					.findViewById(R.id.commentingUser);
 			holder.age = (TextView) rowView.findViewById(R.id.age);
 			holder.message = (TextView) rowView.findViewById(R.id.commentText);
 			rowView.setTag(holder);

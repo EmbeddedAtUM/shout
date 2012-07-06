@@ -41,13 +41,10 @@ public class ShoutChainView extends LinearLayout {
 		Cursor cursor = ShoutProviderContract.getCursorOverShoutComments(
 				getContext(), parentId);
 
-		final int idIndex = cursor
-				.getColumnIndex(ShoutProviderContract.Shouts._ID);
 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {
-			int id = cursor.getInt(idIndex);
-			LocalShout comment = ShoutProviderContract.retrieveShoutById(
-					getContext(), id);
+			LocalShout comment = ShoutProviderContract.retrieveShoutFromCursor(
+					getContext(), cursor);
 			this.addView(createChild(comment));
 			cursor.moveToNext();
 		}
