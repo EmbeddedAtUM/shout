@@ -1,7 +1,5 @@
 package org.whispercomm.shout;
 
-import java.io.UnsupportedEncodingException;
-
 import org.joda.time.DateTime;
 import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.id.SignatureUtility;
@@ -10,7 +8,6 @@ import org.whispercomm.shout.network.NetworkInterface;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 
 import android.content.Context;
-import android.util.Log;
 
 // TODO Switch to static after sig utility is static
 public class ShoutCreator {
@@ -51,18 +48,13 @@ public class ShoutCreator {
 			e1.printStackTrace();
 			return -1;
 		}
-		try {
-			UnsignedShout unsigned = new SimpleUnsignedShout(timestamp, me,
-					content, parent);
-			byte[] signature = SignatureUtility.generateSignature(unsigned, me);
-			Shout shout = new SimpleShout(timestamp, me, content, parent,
-					signature);
-			int shoutId = ShoutProviderContract.storeShout(context, shout);
-			return shoutId;
-		} catch (UnsupportedEncodingException e) {
-			Log.e(TAG, e.getMessage());
-			return -1;
-		}
+
+		UnsignedShout unsigned = new SimpleUnsignedShout(timestamp, me,
+				content, parent);
+		byte[] signature = SignatureUtility.generateSignature(unsigned, me);
+		Shout shout = new SimpleShout(timestamp, me, content, parent, signature);
+		int shoutId = ShoutProviderContract.storeShout(context, shout);
+		return shoutId;
 	}
 
 	@Deprecated

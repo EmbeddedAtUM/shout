@@ -1,7 +1,5 @@
-
 package org.whispercomm.shout.id;
 
-import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -50,7 +48,8 @@ public class SignatureUtility {
 	 */
 	public static ECPublicKey getPublicKeyFromBytes(byte[] publicKeyBytes) {
 		try {
-			KeyFactory kf = KeyFactory.getInstance(CRYPTO_ALGO, CRYPTO_PROVIDER);
+			KeyFactory kf = KeyFactory
+					.getInstance(CRYPTO_ALGO, CRYPTO_PROVIDER);
 			X509EncodedKeySpec x509ks = new X509EncodedKeySpec(publicKeyBytes);
 			ECPublicKey pubKey = (ECPublicKey) kf.generatePublic(x509ks);
 			return pubKey;
@@ -72,7 +71,8 @@ public class SignatureUtility {
 	 */
 	public static ECPrivateKey getPrivateKeyFromBytes(byte[] privateKeyBytes) {
 		try {
-			KeyFactory kf = KeyFactory.getInstance(CRYPTO_ALGO, CRYPTO_PROVIDER);
+			KeyFactory kf = KeyFactory
+					.getInstance(CRYPTO_ALGO, CRYPTO_PROVIDER);
 			PKCS8EncodedKeySpec p8ks = new PKCS8EncodedKeySpec(privateKeyBytes);
 			ECPrivateKey privateKey = (ECPrivateKey) kf.generatePrivate(p8ks);
 			return privateKey;
@@ -89,7 +89,8 @@ public class SignatureUtility {
 	/**
 	 * Verify the signature of data using pubKey.
 	 * 
-	 * @param data in ByteBuffer
+	 * @param data
+	 *            in ByteBuffer
 	 * @param pubKey
 	 * @param signature
 	 * @return
@@ -97,10 +98,11 @@ public class SignatureUtility {
 	 * @throws InvalidKeyException
 	 * @throws SignatureException
 	 */
-	public static boolean verifySignature(byte[] data,
-			byte[] dataSignature, ECPublicKey pubKey) {
+	public static boolean verifySignature(byte[] data, byte[] dataSignature,
+			ECPublicKey pubKey) {
 		try {
-			Signature signature = Signature.getInstance(SIGN_ALGORITHM, CRYPTO_PROVIDER);
+			Signature signature = Signature.getInstance(SIGN_ALGORITHM,
+					CRYPTO_PROVIDER);
 			signature.initVerify(pubKey);
 			signature.update(data);
 			return signature.verify(dataSignature);
@@ -120,7 +122,8 @@ public class SignatureUtility {
 	public static byte[] generateSignature(byte[] dataBytes, Me me) {
 		ECPrivateKey privateKey = (ECPrivateKey) me.getKeyPair().getPrivate();
 		try {
-			Signature signature = Signature.getInstance(SIGN_ALGORITHM, CRYPTO_PROVIDER);
+			Signature signature = Signature.getInstance(SIGN_ALGORITHM,
+					CRYPTO_PROVIDER);
 			signature.initSign(privateKey);
 			signature.update(dataBytes);
 			byte[] dataSignature = signature.sign();
@@ -138,8 +141,7 @@ public class SignatureUtility {
 		return null;
 	}
 
-	public static byte[] generateSignature(UnsignedShout shout, Me me)
-			throws UnsupportedEncodingException {
+	public static byte[] generateSignature(UnsignedShout shout, Me me) {
 		byte[] dataBytes = SerializeUtility.serializeShoutData(shout);
 		return generateSignature(dataBytes, me);
 	}
