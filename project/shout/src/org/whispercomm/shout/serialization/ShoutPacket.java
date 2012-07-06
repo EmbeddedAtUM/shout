@@ -204,6 +204,9 @@ public class ShoutPacket {
 			};
 		}
 
+		/**
+		 * Build the packet body
+		 */
 		private byte[] buildBody() {
 			ByteBuffer buffer = ByteBuffer.allocate(MAX_PACKET_SIZE - HEADER_SIZE);
 			int size = 0;

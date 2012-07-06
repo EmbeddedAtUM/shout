@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout.provider;
 
 import org.joda.time.DateTime;
@@ -19,18 +20,20 @@ public class LocalShoutImpl implements LocalShout {
 	private byte[] hashBytes;
 	private DateTime sentTime;
 	private DateTime receivedTime;
-	
+
 	private int parentId = -1;
 	private LocalShout parent = null;
 	private LocalShout myReshout = null;
-	
+
 	private int commentCount;
 	private int reshoutCount;
-	
+
 	private Context context;
-	
-	public LocalShoutImpl(Context context, int id, LocalUser sender, String message, String encodedSig,
-			String encodedHash, Long sentTime, Long receivedTime, int commentCount, int reshoutCount, int parentId) {
+
+	public LocalShoutImpl(Context context, int id, LocalUser sender, String message,
+			String encodedSig,
+			String encodedHash, Long sentTime, Long receivedTime, int commentCount,
+			int reshoutCount, int parentId) {
 		this.context = context;
 		this.id = id;
 		this.sender = sender;
