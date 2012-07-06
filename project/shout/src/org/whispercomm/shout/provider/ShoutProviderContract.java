@@ -316,6 +316,7 @@ public class ShoutProviderContract {
 	 * @param id
 	 * @return {@code null} if the shout is not in the database
 	 */
+	@Deprecated
 	public static LocalShout retrieveShoutById(Context context, int id) {
 		Uri uri = ContentUris.withAppendedId(Shouts.CONTENT_URI, id);
 		Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
@@ -424,7 +425,8 @@ public class ShoutProviderContract {
 	 * @param id
 	 * @return {@code null} if User is not present in the database
 	 */
-	public static LocalUser retrieveUserById(Context context, int id) {
+@Deprecated
+public static LocalUser retrieveUserById(Context context, int id) {
 		Uri uri = ContentUris.withAppendedId(Users.CONTENT_URI, id);
 		Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
 		if (cursor == null) {
@@ -492,7 +494,8 @@ public class ShoutProviderContract {
 	 * @param shoutId
 	 * @return
 	 */
-	public static Cursor getCursorOverShoutComments(Context context, int shoutId) {
+@Deprecated
+public static Cursor getCursorOverShoutComments(Context context, int shoutId) {
 		String sortOrder = Shouts.TIME_RECEIVED + " DESC";
 		String selection = Shouts.PARENT + " = ? AND " + Shouts.MESSAGE + " IS NOT NULL";
 		String[] selectionArgs = {
@@ -503,7 +506,8 @@ public class ShoutProviderContract {
 		return result;
 	}
 
-	public static Cursor getCursorOverReshouts(Context context, int parentId) {
+@Deprecated
+public static Cursor getCursorOverReshouts(Context context, int parentId) {
 		String sortOrder = Shouts.TIME_RECEIVED + " DESC";
 		String selection = Shouts.PARENT + " = ? AND " + Shouts.MESSAGE + " IS NULL";
 		String[] selectionArgs = {

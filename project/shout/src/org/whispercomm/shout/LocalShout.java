@@ -18,6 +18,7 @@ public interface LocalShout extends Shout {
 	
 	public LocalShout getReshout(Me me);
 
+	@Deprecated
 	public int getDatabaseId();
 	
 	public List<LocalUser> getReshouters();
