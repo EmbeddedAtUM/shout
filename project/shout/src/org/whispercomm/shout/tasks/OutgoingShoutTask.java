@@ -2,7 +2,7 @@ package org.whispercomm.shout.tasks;
 
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.Shout;
-import org.whispercomm.shout.ShoutCreator;
+import org.whispercomm.shout.network.NetworkInterface;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -14,6 +14,8 @@ import android.widget.Toast;
  * @author David Adrian
  */
 public class OutgoingShoutTask extends AsyncTask<LocalShout, Void, Boolean> {
+
+	private NetworkInterface network;
 
 	private Context context;
 	private int successResId;
@@ -32,6 +34,7 @@ public class OutgoingShoutTask extends AsyncTask<LocalShout, Void, Boolean> {
 		this.context = context;
 		this.successResId = successStringId;
 		this.failResId = failureStringId;
+		this.network = NetworkInterface.getInstance(context);
 	}
 
 	@Override
@@ -39,8 +42,8 @@ public class OutgoingShoutTask extends AsyncTask<LocalShout, Void, Boolean> {
 		if (shouts.length < 1) {
 			return false;
 		}
-		ShoutCreator creator = new ShoutCreator(context);
-		return creator.sendShout(shouts[0]);
+		LocalShout shout = shouts[0];
+		return network.send(shout);
 	}
 
 	@Override
