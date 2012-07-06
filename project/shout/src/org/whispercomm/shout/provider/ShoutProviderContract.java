@@ -331,6 +331,14 @@ public class ShoutProviderContract {
 		return shout;
 	}
 
+	/**
+	 * When given a cursor at a position pointing to a Shout with all available
+	 * fields, construct a Shout object using the data in that row.
+	 * 
+	 * @param context
+	 * @param cursor
+	 * @return {@code null} on failure
+	 */
 	public static LocalShout retrieveShoutFromCursor(Context context, Cursor cursor) {
 		int idIndex = cursor.getColumnIndex(Shouts._ID);
 		int authorIndex = cursor.getColumnIndex(Shouts.AUTHOR);
@@ -383,6 +391,15 @@ public class ShoutProviderContract {
 		return id;
 	}
 
+	/**
+	 * Find a reshout of {@code parent} by {@code reshouter} in the database, if
+	 * it exists.
+	 * 
+	 * @param context
+	 * @param parent
+	 * @param reshouter
+	 * @return {@code null} if no such Shout exists
+	 */
 	public static LocalShout getReshoutIfExists(Context context, LocalShout parent,
 			LocalUser reshouter) {
 		String selection = Shouts.PARENT + " = ? AND " + Shouts.AUTHOR + " = ? AND "
@@ -423,9 +440,12 @@ public class ShoutProviderContract {
 	}
 
 	/**
+	 * Build an {@link LocalUser} object using the data in the current cursor
+	 * row.
+	 * 
 	 * @param context
 	 * @param cursor
-	 * @return
+	 * @return {@code LocalUser} represented by the current row.
 	 */
 	public static LocalUser retrieveUserFromCursor(Context context, Cursor cursor) {
 		int idIndex = cursor.getColumnIndex(Users._ID);
@@ -451,6 +471,12 @@ public class ShoutProviderContract {
 		return id;
 	}
 
+	/**
+	 * Get a cursor over all original Shouts (i.e. not reshouts or comments).
+	 * 
+	 * @param context
+	 * @return
+	 */
 	public static Cursor getCursorOverAllShouts(Context context) {
 		Uri uri = Shouts.CONTENT_URI;
 		String selection = Shouts.PARENT + " IS NULL";
@@ -459,6 +485,13 @@ public class ShoutProviderContract {
 		return result;
 	}
 
+	/**
+	 * Get a cursor over comments on the Shout with the given identifier.
+	 * 
+	 * @param context
+	 * @param shoutId
+	 * @return
+	 */
 	public static Cursor getCursorOverShoutComments(Context context, int shoutId) {
 		String[] projection = {
 				Shouts._ID
@@ -473,8 +506,11 @@ public class ShoutProviderContract {
 		return result;
 	}
 
+	/**
+	 * Private default constructor
+	 */
 	private ShoutProviderContract() {
-		// Don't allow this class to be instantiated
+		throw new IllegalStateException("Cannot instantiate ShoutProviderContract");
 	}
 
 	/**

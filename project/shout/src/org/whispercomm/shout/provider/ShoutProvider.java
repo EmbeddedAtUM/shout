@@ -14,6 +14,12 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 
+/**
+ * Content provider to store Shouts and Users seen by this device.
+ * 
+ * @author David Adrian
+ *
+ */
 public class ShoutProvider extends ContentProvider {
 
 	private static final String AUTHORITY = ShoutProviderContract.AUTHORITY;
