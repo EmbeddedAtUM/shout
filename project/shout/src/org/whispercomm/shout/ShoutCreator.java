@@ -8,8 +8,8 @@ import android.content.Context;
 
 // TODO Switch to static after sig utility is static
 public class ShoutCreator {
-
-	static final String TAG = ShoutCreator.class.getSimpleName();
+	@SuppressWarnings("unused")
+	private static final String TAG = ShoutCreator.class.getSimpleName();
 
 	private Context context;
 
