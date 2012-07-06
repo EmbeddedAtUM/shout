@@ -23,6 +23,90 @@ public class ShoutCreator {
 	}
 
 	/**
+	 * Creates a new shout, storing it in the content provider.
+	 * 
+	 * @param timestamp
+	 *            the timestamp field of the shout
+	 * @param message
+	 *            the message field of the shout
+	 * @return the saved shout
+	 */
+	public LocalShout createShout(DateTime timestamp, String message) {
+		Me me;
+		try {
+			me = idManager.getMe();
+		} catch (UserNotInitiatedException e1) {
+			// TODO
+			e1.printStackTrace();
+			return null;
+		}
+
+		UnsignedShout unsigned = new SimpleUnsignedShout(timestamp, me,
+				message, null);
+		byte[] signature = SignatureUtility.generateSignature(unsigned, me);
+		Shout shout = new SimpleShout(timestamp, me, message, null, signature);
+
+		return ShoutProviderContract.saveShout(context, shout);
+	}
+
+	/**
+	 * Creates a new comment shout, storing it in the content provider.
+	 * 
+	 * @param timestamp
+	 *            the timestamp field of the shout
+	 * @param message
+	 *            the message field of the shout
+	 * @param parent
+	 *            the parent field of the shout
+	 * @return the saved shout
+	 */
+	public LocalShout createComment(DateTime timestamp, String message,
+			Shout parent) {
+		Me me;
+		try {
+			me = idManager.getMe();
+		} catch (UserNotInitiatedException e1) {
+			// TODO
+			e1.printStackTrace();
+			return null;
+		}
+
+		UnsignedShout unsigned = new SimpleUnsignedShout(timestamp, me,
+				message, null);
+		byte[] signature = SignatureUtility.generateSignature(unsigned, me);
+		Shout shout = new SimpleShout(timestamp, me, message, parent, signature);
+
+		return ShoutProviderContract.saveShout(context, shout);
+	}
+
+	/**
+	 * Creates a new reshout, storing it in the content provider.
+	 * 
+	 * @param timestamp
+	 *            the timestamp field of the shout
+	 * @param parent
+	 *            the parent field of the shout
+	 * @return the saved shout
+	 */
+	public LocalShout createReshout(DateTime timestamp, Shout parent) {
+		Me me;
+		try {
+			me = idManager.getMe();
+		} catch (UserNotInitiatedException e1) {
+			// TODO
+			e1.printStackTrace();
+			return null;
+		}
+
+		UnsignedShout unsigned = new SimpleUnsignedShout(timestamp, me, null,
+				null);
+		byte[] signature = SignatureUtility.generateSignature(unsigned, me);
+		Shout shout = new SimpleShout(timestamp, me, null, parent, signature);
+
+		return ShoutProviderContract.saveShout(context, shout);
+	}
+
+	/**
 	 * Create a new shout given user-generated message. Store the Shout in the
 	 * database and send it out over the network.
 	 * 
@@ -57,6 +141,7 @@ public class ShoutCreator {
 		Shout shout = new SimpleShout(timestamp, me, content, parent, signature);
 		int shoutId = ShoutProviderContract.storeShout(context, shout);
 		return shoutId;
+
 	}
 
 	@Deprecated
