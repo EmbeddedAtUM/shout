@@ -85,7 +85,7 @@ public class ShoutListViewRow extends LinearLayout {
 		setExpanded(false);
 
 		actionShoutView.bindShout(shout);
-		commentsView.bindShouts(shout.getDatabaseId());
+		commentsView.bindShouts(shout);
 	}
 
 	private void setMargins(boolean expanded) {

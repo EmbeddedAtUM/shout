@@ -12,7 +12,7 @@ import android.widget.LinearLayout;
 public class ShoutChainView extends LinearLayout {
 
 	private boolean loaded;
-	private int parentId;
+	private LocalShout parent;
 
 	public ShoutChainView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -30,16 +30,15 @@ public class ShoutChainView extends LinearLayout {
 		super.setVisibility(visibility);
 	}
 
-	public void bindShouts(int parentId) {
+	public void bindShouts(LocalShout parent) {
 		this.removeAllViews();
 		this.loaded = false;
-		this.parentId = parentId;
-
+		this.parent = parent;
 	}
 
 	private void loadShouts() {
 		Cursor cursor = ShoutProviderContract.getCursorOverShoutComments(
-				getContext(), parentId);
+				getContext(), parent.getDatabaseId());
 
 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {
