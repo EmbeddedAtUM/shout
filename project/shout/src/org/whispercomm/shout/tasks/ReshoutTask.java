@@ -2,9 +2,9 @@
 package org.whispercomm.shout.tasks;
 
 import org.joda.time.DateTime;
+import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.Me;
 import org.whispercomm.shout.R;
-import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.ShoutCreator;
 import org.whispercomm.shout.ShoutType;
 import org.whispercomm.shout.id.IdManager;
@@ -20,7 +20,7 @@ import android.widget.Toast;
  * Asynchronously construct the reshout, and then start an
  * {@link OutgoingShoutTask} to send the reshout.
  * 
- * @author David Adrian 
+ * @author David Adrian
  */
 public class ReshoutTask extends AsyncTask<Integer, Void, Integer> {
 
@@ -32,7 +32,7 @@ public class ReshoutTask extends AsyncTask<Integer, Void, Integer> {
 
 	@Override
 	protected Integer doInBackground(Integer... params) {
-		Shout parent = ShoutProviderContract.retrieveShoutById(context, params[0]);
+		LocalShout parent = ShoutProviderContract.retrieveShoutById(context, params[0]);
 		ShoutType type = ShoutMessageUtility.getShoutType(parent);
 		switch (type) {
 			case RESHOUT:
@@ -42,9 +42,6 @@ public class ReshoutTask extends AsyncTask<Integer, Void, Integer> {
 				break;
 		}
 		IdManager idManager = new IdManager(context);
-		if (idManager.userIsNotSet()) {
-			return null;
-		}
 		Me me;
 		try {
 			me = idManager.getMe();
@@ -56,8 +53,14 @@ public class ReshoutTask extends AsyncTask<Integer, Void, Integer> {
 		if (parent.getSender().getPublicKey().equals(me.getPublicKey())) {
 			return params[0];
 		} else {
-			ShoutCreator creator = new ShoutCreator(context);
-			int reshoutId = creator.saveShout(DateTime.now(), null, parent);
+			LocalShout reshout = parent.getReshout(me);
+			int reshoutId;
+			if (reshout == null) {
+				ShoutCreator creator = new ShoutCreator(context);
+				reshoutId = creator.saveShout(DateTime.now(), null, parent);
+			} else {
+				reshoutId = reshout.getDatabaseId();
+			}
 			return reshoutId;
 		}
 	}
