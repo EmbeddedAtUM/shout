@@ -380,6 +380,7 @@ public class ShoutProviderContract {
 	 *            The shout to be stored
 	 * @return The ID of the Shout in the database, -1 on failure
 	 */
+	@Deprecated
 	public static int storeShout(Context context, Shout shout) {
 		int id = ContractHelper.queryForShout(context, new DatabaseShout(shout,
 				-1, -1, context));
