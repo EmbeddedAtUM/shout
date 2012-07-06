@@ -493,16 +493,25 @@ public class ShoutProviderContract {
 	 * @return
 	 */
 	public static Cursor getCursorOverShoutComments(Context context, int shoutId) {
-		String[] projection = {
-				Shouts._ID
-		};
-		String sortOrder = Shouts.TIME_SENT + " DESC";
+		String sortOrder = Shouts.TIME_RECEIVED + " DESC";
 		String selection = Shouts.PARENT + " = ? AND " + Shouts.MESSAGE + " IS NOT NULL";
 		String[] selectionArgs = {
 				Integer.toString(shoutId)
 		};
-		Cursor result = context.getContentResolver().query(Shouts.CONTENT_URI, projection,
+		Cursor result = context.getContentResolver().query(Shouts.CONTENT_URI, null,
 				selection, selectionArgs, sortOrder);
+		return result;
+	}
+
+	public static Cursor getCursorOverReshouts(Context context, int parentId) {
+		String sortOrder = Shouts.TIME_RECEIVED + " DESC";
+		String selection = Shouts.PARENT + " = ? AND " + Shouts.MESSAGE + " IS NULL";
+		String[] selectionArgs = {
+				Integer.toString(parentId)
+		};
+
+		Cursor result = context.getContentResolver().query(Shouts.CONTENT_URI, null, selection,
+				selectionArgs, sortOrder);
 		return result;
 	}
 

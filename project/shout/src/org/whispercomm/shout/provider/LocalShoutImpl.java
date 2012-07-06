@@ -1,6 +1,9 @@
 
 package org.whispercomm.shout.provider;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.joda.time.DateTime;
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.LocalUser;
@@ -9,6 +12,7 @@ import org.whispercomm.shout.ShoutType;
 import org.whispercomm.shout.util.ShoutMessageUtility;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.util.Base64;
 
 public class LocalShoutImpl implements LocalShout {
@@ -115,6 +119,24 @@ public class LocalShoutImpl implements LocalShout {
 	@Override
 	public LocalUser getSender() {
 		return this.sender;
+	}
+
+	@Override
+	public List<LocalUser> getReshouters() {
+		Cursor cursor = ShoutProviderContract.getCursorOverReshouts(context, id);
+		List<LocalUser> users = new ArrayList<LocalUser>();
+		int authorIndex = cursor.getColumnIndex(ShoutProviderContract.Shouts.AUTHOR);
+		while(cursor.moveToNext()) {
+			int author = cursor.getInt(authorIndex);
+			users.add(new LazyLocalUserImpl(context, author));
+		}
+		return users;
+	}
+
+	@Override
+	public List<LocalShout> getComments() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

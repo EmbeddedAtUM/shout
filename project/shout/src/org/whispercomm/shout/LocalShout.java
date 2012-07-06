@@ -1,5 +1,7 @@
 package org.whispercomm.shout;
 
+import java.util.List;
+
 import org.joda.time.DateTime;
 
 public interface LocalShout extends Shout {
@@ -17,5 +19,9 @@ public interface LocalShout extends Shout {
 	public LocalShout getReshout(Me me);
 
 	public int getDatabaseId();
+	
+	public List<LocalUser> getReshouters();
+	
+	public List<LocalShout> getComments();
 	
 }
