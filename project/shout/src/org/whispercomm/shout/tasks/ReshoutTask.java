@@ -9,6 +9,7 @@ import org.whispercomm.shout.ShoutCreator;
 import org.whispercomm.shout.ShoutType;
 import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.id.UserNotInitiatedException;
+import org.whispercomm.shout.network.NetworkInterface;
 import org.whispercomm.shout.util.ShoutMessageUtility;
 
 import android.content.Context;
@@ -16,12 +17,12 @@ import android.os.AsyncTask;
 import android.widget.Toast;
 
 /**
- * Asynchronously construct the reshout, and then start an
- * {@link OutgoingShoutTask} to send the reshout.
+ * Asynchronously construct and broadcast the reshout, informing the user of
+ * success or failure via a Toast.
  * 
  * @author David Adrian
  */
-public class ReshoutTask extends AsyncTask<LocalShout, Void, LocalShout> {
+public class ReshoutTask extends AsyncTask<LocalShout, Void, Boolean> {
 
 	private Context context;
 	private Me me;
@@ -37,7 +38,7 @@ public class ReshoutTask extends AsyncTask<LocalShout, Void, LocalShout> {
 	}
 
 	@Override
-	protected LocalShout doInBackground(LocalShout... shouts) {
+	protected Boolean doInBackground(LocalShout... shouts) {
 		Shout shout = shouts[0];
 
 		Shout parent;
@@ -53,19 +54,19 @@ public class ReshoutTask extends AsyncTask<LocalShout, Void, LocalShout> {
 		}
 
 		ShoutCreator creator = new ShoutCreator(context);
-		return creator.createReshout(DateTime.now(), parent, me);
+		LocalShout reshout = creator.createReshout(DateTime.now(), parent, me);
+
+		return NetworkInterface.getInstance(context).send(reshout);
 	}
 
 	@Override
-	protected void onPostExecute(LocalShout reshout) {
-		if (reshout == null) {
-			// TODO Make this situation not happen
-			Toast.makeText(context, "Make a user before you Shout!",
-					Toast.LENGTH_LONG).show();
+	protected void onPostExecute(Boolean success) {
+		if (success) {
+			Toast.makeText(context, R.string.reshoutSuccess, Toast.LENGTH_SHORT)
+					.show();
 		} else {
-			OutgoingShoutTask sendTask = new OutgoingShoutTask(context,
-					R.string.reshoutSuccess, R.string.reshoutFail);
-			sendTask.execute(reshout);
+			Toast.makeText(context, R.string.reshoutFail, Toast.LENGTH_LONG)
+					.show();
 		}
 	}
 
