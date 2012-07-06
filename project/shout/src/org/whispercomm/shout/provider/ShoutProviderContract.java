@@ -33,12 +33,12 @@ public class ShoutProviderContract {
 	/**
 	 * The authority for the Shout content provider
 	 */
-	public static final String AUTHORITY = "org.whispercomm.shout.provider";
+	static final String AUTHORITY = "org.whispercomm.shout.provider";
 
 	/**
 	 * The content:// style URI for the Shout provider
 	 */
-	public static final Uri CONTENT_URI_BASE = Uri.parse("content://"
+	static final Uri CONTENT_URI_BASE = Uri.parse("content://"
 			+ AUTHORITY);
 
 	/**
@@ -47,7 +47,7 @@ public class ShoutProviderContract {
 	 * 
 	 * @author David Adrian
 	 */
-	public static class Shouts implements BaseColumns {
+	static class Shouts implements BaseColumns {
 		/**
 		 * SQLite table name. Not needed for managed queries, and can be ignored
 		 * in most use cases
@@ -116,7 +116,7 @@ public class ShoutProviderContract {
 
 	}
 
-	public static class Users implements BaseColumns {
+	static class Users implements BaseColumns {
 		/**
 		 * The SQLite table name for the Users table. Not needed for managed
 		 * queries, and can be ignored in most use cases.
