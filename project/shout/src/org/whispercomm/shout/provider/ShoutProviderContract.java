@@ -398,6 +398,21 @@ public class ShoutProviderContract {
 	}
 
 	/**
+	 * Stores the given Shout and its sender and parent, if not already present
+	 * in the database.
+	 * 
+	 * @param context
+	 *            The context the content resolver is found in
+	 * @param shout
+	 *            The shout to be stored
+	 * @return the stored shout or {@code null} on failure.
+	 */
+	public static LocalShout saveShout(Context context, Shout shout) {
+		int id = storeShout(context, shout);
+		return ShoutProviderContract.retrieveShoutById(context, id);
+	}
+
+	/**
 	 * Find a reshout of {@code parent} by {@code reshouter} in the database, if
 	 * it exists.
 	 * 
