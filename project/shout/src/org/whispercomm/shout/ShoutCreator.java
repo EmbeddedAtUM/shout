@@ -4,7 +4,6 @@ import org.joda.time.DateTime;
 import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.id.SignatureUtility;
 import org.whispercomm.shout.id.UserNotInitiatedException;
-import org.whispercomm.shout.network.NetworkInterface;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 
 import android.content.Context;
@@ -106,24 +105,4 @@ public class ShoutCreator {
 		return ShoutProviderContract.saveShout(context, shout);
 	}
 
-	@Deprecated
-	public boolean sendShout(int shoutId) {
-		if (shoutId > 0) {
-			NetworkInterface networkIf = NetworkInterface.getInstance(context);
-			return networkIf.send(shoutId);
-		} else {
-			return false;
-		}
-	}
-
-	@Deprecated
-	public boolean sendShout(Shout shout) {
-		int shoutId = ShoutProviderContract.storeShout(context, shout);
-		if (shoutId > 0) {
-			NetworkInterface networkIf = NetworkInterface.getInstance(context);
-			return networkIf.send(shoutId);
-		} else {
-			return false;
-		}
-	}
 }
