@@ -102,7 +102,7 @@ public class ShoutActivity extends ListActivity {
 		Log.v(TAG, "Reshout button clicked");
 
 		ReshoutTask task = new ReshoutTask(getApplicationContext());
-		task.execute(shout.getDatabaseId());
+		task.execute(shout);
 	}
 
 	public void onClickComment(LocalShout shout) {

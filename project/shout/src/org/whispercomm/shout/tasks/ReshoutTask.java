@@ -1,15 +1,14 @@
-
 package org.whispercomm.shout.tasks;
 
 import org.joda.time.DateTime;
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.Me;
 import org.whispercomm.shout.R;
+import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.ShoutCreator;
 import org.whispercomm.shout.ShoutType;
 import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.id.UserNotInitiatedException;
-import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.util.ShoutMessageUtility;
 
 import android.content.Context;
@@ -22,7 +21,7 @@ import android.widget.Toast;
  * 
  * @author David Adrian
  */
-public class ReshoutTask extends AsyncTask<Integer, Void, Integer> {
+public class ReshoutTask extends AsyncTask<LocalShout, Void, Integer> {
 
 	private Context context;
 
@@ -31,48 +30,36 @@ public class ReshoutTask extends AsyncTask<Integer, Void, Integer> {
 	}
 
 	@Override
-	protected Integer doInBackground(Integer... params) {
-		LocalShout parent = ShoutProviderContract.retrieveShoutById(context, params[0]);
-		ShoutType type = ShoutMessageUtility.getShoutType(parent);
+	protected Integer doInBackground(LocalShout... shouts) {
+		Shout shout = shouts[0];
+
+		Shout parent;
+		ShoutType type = ShoutMessageUtility.getShoutType(shout);
 		switch (type) {
-			case RESHOUT:
-			case RECOMMENT:
-				parent = parent.getParent();
-			default:
-				break;
+		case RESHOUT:
+		case RECOMMENT:
+			parent = shout.getParent();
+			break;
+		default:
+			parent = shout;
+			break;
 		}
-		IdManager idManager = new IdManager(context);
-		Me me;
-		try {
-			me = idManager.getMe();
-		} catch (UserNotInitiatedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-		if (parent.getSender().getPublicKey().equals(me.getPublicKey())) {
-			return params[0];
-		} else {
-			LocalShout reshout = parent.getReshout(me);
-			int reshoutId;
-			if (reshout == null) {
-				ShoutCreator creator = new ShoutCreator(context);
-				reshoutId = creator.saveShout(DateTime.now(), null, parent);
-			} else {
-				reshoutId = reshout.getDatabaseId();
-			}
-			return reshoutId;
-		}
+
+		ShoutCreator creator = new ShoutCreator(context);
+		LocalShout reshout = creator.createReshout(DateTime.now(), parent);
+
+		return reshout.getDatabaseId();
 	}
 
 	@Override
 	protected void onPostExecute(Integer result) {
 		if (result == null) {
 			// TODO Make this situation not happen
-			Toast.makeText(context, "Make a user before you Shout!", Toast.LENGTH_LONG).show();
+			Toast.makeText(context, "Make a user before you Shout!",
+					Toast.LENGTH_LONG).show();
 		} else {
-			OutgoingShoutTask sendTask = new OutgoingShoutTask(context, R.string.reshoutSuccess,
-					R.string.reshoutFail);
+			OutgoingShoutTask sendTask = new OutgoingShoutTask(context,
+					R.string.reshoutSuccess, R.string.reshoutFail);
 			sendTask.execute(result);
 		}
 	}
