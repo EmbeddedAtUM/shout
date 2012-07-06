@@ -6,7 +6,13 @@ import org.whispercomm.shout.provider.ShoutProviderContract;
 
 import android.content.Context;
 
-// TODO Switch to static after sig utility is static
+/**
+ * Helper class with methods for creating new shouts, reshouts, and comments.
+ * The newly-created shouts are stored in the Shout content provider.
+ * 
+ * @author David R. Bild
+ * 
+ */
 public class ShoutCreator {
 	@SuppressWarnings("unused")
 	private static final String TAG = ShoutCreator.class.getSimpleName();
