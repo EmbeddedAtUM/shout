@@ -1,4 +1,3 @@
-
 package org.whispercomm.shout.provider;
 
 import org.whispercomm.shout.LocalShout;
@@ -38,8 +37,7 @@ public class ShoutProviderContract {
 	/**
 	 * The content:// style URI for the Shout provider
 	 */
-	static final Uri CONTENT_URI_BASE = Uri.parse("content://"
-			+ AUTHORITY);
+	static final Uri CONTENT_URI_BASE = Uri.parse("content://" + AUTHORITY);
 
 	/**
 	 * Helper class for managing static variables associated with the Shout
@@ -319,7 +317,8 @@ public class ShoutProviderContract {
 	@Deprecated
 	public static LocalShout retrieveShoutById(Context context, int id) {
 		Uri uri = ContentUris.withAppendedId(Shouts.CONTENT_URI, id);
-		Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
+		Cursor cursor = context.getContentResolver().query(uri, null, null,
+				null, null);
 		if (cursor == null) {
 			Log.e(TAG, "Null cursor returned on Shout lookup by ID");
 			return null;
@@ -340,7 +339,8 @@ public class ShoutProviderContract {
 	 * @param cursor
 	 * @return {@code null} on failure
 	 */
-	public static LocalShout retrieveShoutFromCursor(Context context, Cursor cursor) {
+	public static LocalShout retrieveShoutFromCursor(Context context,
+			Cursor cursor) {
 		int idIndex = cursor.getColumnIndex(Shouts._ID);
 		int authorIndex = cursor.getColumnIndex(Shouts.AUTHOR);
 		int parentIndex = cursor.getColumnIndex(Shouts.PARENT);
@@ -354,7 +354,8 @@ public class ShoutProviderContract {
 
 		int id = cursor.getInt(idIndex);
 		int authorId = cursor.getInt(authorIndex);
-		int parentId = cursor.isNull(parentIndex) ? -1 : cursor.getInt(parentIndex);
+		int parentId = cursor.isNull(parentIndex) ? -1 : cursor
+				.getInt(parentIndex);
 		String message = cursor.getString(messageIndex);
 		String encodedSig = cursor.getString(sigIndex);
 		String encodedHash = cursor.getString(hashIndex);
@@ -363,8 +364,9 @@ public class ShoutProviderContract {
 		int numComments = cursor.getInt(commentIndex);
 		int numReshouts = cursor.getInt(reshoutIndex);
 		LocalUser sender = retrieveUserById(context, authorId);
-		LocalShout shout = new LocalShoutImpl(context, id, sender, message, encodedSig,
-				encodedHash, sentTime, receivedTime, numComments, numReshouts, parentId);
+		LocalShout shout = new LocalShoutImpl(context, id, sender, message,
+				encodedSig, encodedHash, sentTime, receivedTime, numComments,
+				numReshouts, parentId);
 		return shout;
 	}
 
@@ -372,8 +374,10 @@ public class ShoutProviderContract {
 	 * Stores the given Shout and its sender and parent, if not already present
 	 * in the database.
 	 * 
-	 * @param context The context the content resolver is found in
-	 * @param shout The shout to be stored
+	 * @param context
+	 *            The context the content resolver is found in
+	 * @param shout
+	 *            The shout to be stored
 	 * @return The ID of the Shout in the database, -1 on failure
 	 */
 	public static int storeShout(Context context, Shout shout) {
@@ -401,19 +405,18 @@ public class ShoutProviderContract {
 	 * @param reshouter
 	 * @return {@code null} if no such Shout exists
 	 */
-	public static LocalShout getReshoutIfExists(Context context, LocalShout parent,
-			LocalUser reshouter) {
-		String selection = Shouts.PARENT + " = ? AND " + Shouts.AUTHOR + " = ? AND "
-				+ Shouts.MESSAGE + " IS NULL";
-		String[] selectionArgs = {
-				Integer.toString(parent.getDatabaseId()),
-				Integer.toString(reshouter.getDatabaseId())
-		};
-		Cursor cursor = context.getContentResolver().query(Shouts.CONTENT_URI, null, selection,
-				selectionArgs, null);
+	public static LocalShout getReshoutIfExists(Context context,
+			LocalShout parent, LocalUser reshouter) {
+		String selection = Shouts.PARENT + " = ? AND " + Shouts.AUTHOR
+				+ " = ? AND " + Shouts.MESSAGE + " IS NULL";
+		String[] selectionArgs = { Integer.toString(parent.getDatabaseId()),
+				Integer.toString(reshouter.getDatabaseId()) };
+		Cursor cursor = context.getContentResolver().query(Shouts.CONTENT_URI,
+				null, selection, selectionArgs, null);
 		LocalShout reshout = null;
 		if (cursor.moveToFirst()) {
-			reshout = ShoutProviderContract.retrieveShoutFromCursor(context, cursor);
+			reshout = ShoutProviderContract.retrieveShoutFromCursor(context,
+					cursor);
 		}
 		return reshout;
 	}
@@ -425,10 +428,11 @@ public class ShoutProviderContract {
 	 * @param id
 	 * @return {@code null} if User is not present in the database
 	 */
-@Deprecated
-public static LocalUser retrieveUserById(Context context, int id) {
+	@Deprecated
+	public static LocalUser retrieveUserById(Context context, int id) {
 		Uri uri = ContentUris.withAppendedId(Users.CONTENT_URI, id);
-		Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
+		Cursor cursor = context.getContentResolver().query(uri, null, null,
+				null, null);
 		if (cursor == null) {
 			Log.e(TAG, "Null cursor returned on User lookup by ID");
 			return null;
@@ -449,7 +453,8 @@ public static LocalUser retrieveUserById(Context context, int id) {
 	 * @param cursor
 	 * @return {@code LocalUser} represented by the current row.
 	 */
-	public static LocalUser retrieveUserFromCursor(Context context, Cursor cursor) {
+	public static LocalUser retrieveUserFromCursor(Context context,
+			Cursor cursor) {
 		int idIndex = cursor.getColumnIndex(Users._ID);
 		int keyIndex = cursor.getColumnIndex(Users.PUB_KEY);
 		int nameIndex = cursor.getColumnIndex(Users.USERNAME);
@@ -482,8 +487,8 @@ public static LocalUser retrieveUserById(Context context, int id) {
 	public static Cursor getCursorOverAllShouts(Context context) {
 		Uri uri = Shouts.CONTENT_URI;
 		String selection = Shouts.PARENT + " IS NULL";
-		Cursor result = context.getContentResolver().query(uri,
-				null, selection, null, null);
+		Cursor result = context.getContentResolver().query(uri, null,
+				selection, null, null);
 		return result;
 	}
 
@@ -494,28 +499,26 @@ public static LocalUser retrieveUserById(Context context, int id) {
 	 * @param shoutId
 	 * @return
 	 */
-@Deprecated
-public static Cursor getCursorOverShoutComments(Context context, int shoutId) {
+	@Deprecated
+	public static Cursor getCursorOverShoutComments(Context context, int shoutId) {
 		String sortOrder = Shouts.TIME_RECEIVED + " DESC";
-		String selection = Shouts.PARENT + " = ? AND " + Shouts.MESSAGE + " IS NOT NULL";
-		String[] selectionArgs = {
-				Integer.toString(shoutId)
-		};
-		Cursor result = context.getContentResolver().query(Shouts.CONTENT_URI, null,
-				selection, selectionArgs, sortOrder);
+		String selection = Shouts.PARENT + " = ? AND " + Shouts.MESSAGE
+				+ " IS NOT NULL";
+		String[] selectionArgs = { Integer.toString(shoutId) };
+		Cursor result = context.getContentResolver().query(Shouts.CONTENT_URI,
+				null, selection, selectionArgs, sortOrder);
 		return result;
 	}
 
-@Deprecated
-public static Cursor getCursorOverReshouts(Context context, int parentId) {
+	@Deprecated
+	public static Cursor getCursorOverReshouts(Context context, int parentId) {
 		String sortOrder = Shouts.TIME_RECEIVED + " DESC";
-		String selection = Shouts.PARENT + " = ? AND " + Shouts.MESSAGE + " IS NULL";
-		String[] selectionArgs = {
-				Integer.toString(parentId)
-		};
+		String selection = Shouts.PARENT + " = ? AND " + Shouts.MESSAGE
+				+ " IS NULL";
+		String[] selectionArgs = { Integer.toString(parentId) };
 
-		Cursor result = context.getContentResolver().query(Shouts.CONTENT_URI, null, selection,
-				selectionArgs, sortOrder);
+		Cursor result = context.getContentResolver().query(Shouts.CONTENT_URI,
+				null, selection, selectionArgs, sortOrder);
 		return result;
 	}
 
@@ -523,7 +526,8 @@ public static Cursor getCursorOverReshouts(Context context, int parentId) {
 	 * Private default constructor
 	 */
 	private ShoutProviderContract() {
-		throw new IllegalStateException("Cannot instantiate ShoutProviderContract");
+		throw new IllegalStateException(
+				"Cannot instantiate ShoutProviderContract");
 	}
 
 	/**
@@ -557,14 +561,10 @@ public static Cursor getCursorOverReshouts(Context context, int parentId) {
 		 * @return -1 if not in the database
 		 */
 		public static int queryForUser(Context context, DatabaseUser user) {
-			String[] projection = {
-					Users._ID
-			};
+			String[] projection = { Users._ID };
 			String selection = Users.PUB_KEY + " = ? AND " + Users.USERNAME
 					+ " = ?";
-			String[] selectionArgs = {
-					user.key, user.username
-			};
+			String[] selectionArgs = { user.key, user.username };
 			Cursor cursor = context.getContentResolver().query(
 					Users.CONTENT_URI, projection, selection, selectionArgs,
 					null);
@@ -590,14 +590,10 @@ public static Cursor getCursorOverReshouts(Context context, int parentId) {
 		 * @return -1 on failure
 		 */
 		public static int queryForShout(Context context, DatabaseShout dbShout) {
-			String[] projection = {
-					Shouts._ID
-			};
+			String[] projection = { Shouts._ID };
 			String selection = Shouts.HASH + " = ? AND " + Shouts.SIGNATURE
 					+ " = ?";
-			String[] selectionArgs = {
-					dbShout.hash, dbShout.signature
-			};
+			String[] selectionArgs = { dbShout.hash, dbShout.signature };
 
 			Cursor cursor = context.getContentResolver().query(
 					Shouts.CONTENT_URI, projection, selection, selectionArgs,
