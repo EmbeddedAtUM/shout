@@ -9,7 +9,7 @@ import org.whispercomm.shout.ShoutCreator;
 import android.content.Context;
 import android.os.AsyncTask;
 
-public class CommentTask extends AsyncTask<String, Void, Integer> {
+public class CommentTask extends AsyncTask<String, Void, LocalShout> {
 
 	private Context context;
 	private Shout parent;
@@ -20,20 +20,18 @@ public class CommentTask extends AsyncTask<String, Void, Integer> {
 	}
 
 	@Override
-	protected Integer doInBackground(String... params) {
+	protected LocalShout doInBackground(String... params) {
 		String message = params[0];
 
 		ShoutCreator creator = new ShoutCreator(context);
-		LocalShout comment = creator.createComment(DateTime.now(), message,
-				parent);
-		return comment.getDatabaseId();
+		return creator.createComment(DateTime.now(), message, parent);
 	}
 
 	@Override
-	protected void onPostExecute(Integer result) {
+	protected void onPostExecute(LocalShout comment) {
 		OutgoingShoutTask sendTask = new OutgoingShoutTask(context,
 				R.string.commentSuccess, R.string.commentFail);
-		sendTask.execute(result);
+		sendTask.execute(comment);
 	}
 
 }

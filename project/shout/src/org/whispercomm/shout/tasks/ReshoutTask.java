@@ -2,13 +2,10 @@ package org.whispercomm.shout.tasks;
 
 import org.joda.time.DateTime;
 import org.whispercomm.shout.LocalShout;
-import org.whispercomm.shout.Me;
 import org.whispercomm.shout.R;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.ShoutCreator;
 import org.whispercomm.shout.ShoutType;
-import org.whispercomm.shout.id.IdManager;
-import org.whispercomm.shout.id.UserNotInitiatedException;
 import org.whispercomm.shout.util.ShoutMessageUtility;
 
 import android.content.Context;
@@ -21,7 +18,7 @@ import android.widget.Toast;
  * 
  * @author David Adrian
  */
-public class ReshoutTask extends AsyncTask<LocalShout, Void, Integer> {
+public class ReshoutTask extends AsyncTask<LocalShout, Void, LocalShout> {
 
 	private Context context;
 
@@ -30,7 +27,7 @@ public class ReshoutTask extends AsyncTask<LocalShout, Void, Integer> {
 	}
 
 	@Override
-	protected Integer doInBackground(LocalShout... shouts) {
+	protected LocalShout doInBackground(LocalShout... shouts) {
 		Shout shout = shouts[0];
 
 		Shout parent;
@@ -46,21 +43,19 @@ public class ReshoutTask extends AsyncTask<LocalShout, Void, Integer> {
 		}
 
 		ShoutCreator creator = new ShoutCreator(context);
-		LocalShout reshout = creator.createReshout(DateTime.now(), parent);
-
-		return reshout.getDatabaseId();
+		return creator.createReshout(DateTime.now(), parent);
 	}
 
 	@Override
-	protected void onPostExecute(Integer result) {
-		if (result == null) {
+	protected void onPostExecute(LocalShout reshout) {
+		if (reshout == null) {
 			// TODO Make this situation not happen
 			Toast.makeText(context, "Make a user before you Shout!",
 					Toast.LENGTH_LONG).show();
 		} else {
 			OutgoingShoutTask sendTask = new OutgoingShoutTask(context,
 					R.string.reshoutSuccess, R.string.reshoutFail);
-			sendTask.execute(result);
+			sendTask.execute(reshout);
 		}
 	}
 

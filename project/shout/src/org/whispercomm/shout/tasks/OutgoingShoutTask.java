@@ -1,6 +1,6 @@
-
 package org.whispercomm.shout.tasks;
 
+import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.ShoutCreator;
 
@@ -13,27 +13,29 @@ import android.widget.Toast;
  * 
  * @author David Adrian
  */
-public class OutgoingShoutTask extends AsyncTask<Integer, Void, Boolean> {
+public class OutgoingShoutTask extends AsyncTask<LocalShout, Void, Boolean> {
 
 	private Context context;
 	private int successResId;
 	private int failResId;
 
 	/**
-	 * @param context Application context
-	 * @param successStringId Resource ID of a string to show in a Toast upon
-	 *            success
-	 * @param failureStringId Resource ID of a string to show in a Toast upon
-	 *            failure
+	 * @param context
+	 *            Application context
+	 * @param successStringId
+	 *            Resource ID of a string to show in a Toast upon success
+	 * @param failureStringId
+	 *            Resource ID of a string to show in a Toast upon failure
 	 */
-	public OutgoingShoutTask(Context context, int successStringId, int failureStringId) {
+	public OutgoingShoutTask(Context context, int successStringId,
+			int failureStringId) {
 		this.context = context;
 		this.successResId = successStringId;
 		this.failResId = failureStringId;
 	}
 
 	@Override
-	protected Boolean doInBackground(Integer... shouts) {
+	protected Boolean doInBackground(LocalShout... shouts) {
 		if (shouts.length < 1) {
 			return false;
 		}

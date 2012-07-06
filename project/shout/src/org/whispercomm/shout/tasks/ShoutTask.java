@@ -8,7 +8,7 @@ import org.whispercomm.shout.ShoutCreator;
 import android.content.Context;
 import android.os.AsyncTask;
 
-public class ShoutTask extends AsyncTask<String, Void, Integer> {
+public class ShoutTask extends AsyncTask<String, Void, LocalShout> {
 
 	private Context context;
 
@@ -17,19 +17,18 @@ public class ShoutTask extends AsyncTask<String, Void, Integer> {
 	}
 
 	@Override
-	protected Integer doInBackground(String... params) {
+	protected LocalShout doInBackground(String... params) {
 		String message = params[0];
 
 		ShoutCreator creator = new ShoutCreator(context);
-		LocalShout shout = creator.createShout(DateTime.now(), message);
-		return shout.getDatabaseId();
+		return creator.createShout(DateTime.now(), message);
 	}
 
 	@Override
-	protected void onPostExecute(Integer result) {
+	protected void onPostExecute(LocalShout shout) {
 		OutgoingShoutTask sendTask = new OutgoingShoutTask(context,
 				R.string.shoutSuccess, R.string.shoutFail);
-		sendTask.execute(result);
+		sendTask.execute(shout);
 	}
 
 }
