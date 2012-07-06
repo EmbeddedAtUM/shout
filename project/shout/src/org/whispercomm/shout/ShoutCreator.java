@@ -106,44 +106,6 @@ public class ShoutCreator {
 		return ShoutProviderContract.saveShout(context, shout);
 	}
 
-	/**
-	 * Create a new shout given user-generated message. Store the Shout in the
-	 * database and send it out over the network.
-	 * 
-	 * @param timestamp
-	 * @param content
-	 * @param shoutOri
-	 * @param context
-	 *            TODO
-	 * @return
-	 */
-	@Deprecated
-	public boolean createAndSendShout(DateTime timestamp, String content,
-			Shout shoutOri) {
-		int shoutId = saveShout(timestamp, content, shoutOri);
-		return sendShout(shoutId);
-	}
-
-	@Deprecated
-	public int saveShout(DateTime timestamp, String content, Shout parent) {
-		Me me;
-		try {
-			me = idManager.getMe();
-		} catch (UserNotInitiatedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			return -1;
-		}
-
-		UnsignedShout unsigned = new SimpleUnsignedShout(timestamp, me,
-				content, parent);
-		byte[] signature = SignatureUtility.generateSignature(unsigned, me);
-		Shout shout = new SimpleShout(timestamp, me, content, parent, signature);
-		int shoutId = ShoutProviderContract.storeShout(context, shout);
-		return shoutId;
-
-	}
-
 	@Deprecated
 	public boolean sendShout(int shoutId) {
 		if (shoutId > 0) {
