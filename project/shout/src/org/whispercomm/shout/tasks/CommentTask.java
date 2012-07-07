@@ -10,12 +10,32 @@ import org.whispercomm.shout.id.UserNotInitiatedException;
 
 import android.content.Context;
 
+/**
+ * Creates a new comment shout and saves it to the content provider.
+ * 
+ * @author David R. Bild
+ * 
+ */
 public class CommentTask extends AsyncTaskCallback<String, Void, LocalShout> {
 
 	private Context context;
 	private Shout parent;
 	private Me me;
 
+	/**
+	 * Create a new {@code CommentTask}.
+	 * <p>
+	 * If the comment creation succeeds, the created {@link LocalShout} is
+	 * passed to the specified callback. If creation fails, {@code null} is
+	 * passed instead.
+	 * 
+	 * @param context
+	 *            the context used to connect to the content provider
+	 * @param completeListener
+	 *            the callback to invoke when the creation is complete.
+	 * @param parent
+	 *            the shout being commented on
+	 */
 	public CommentTask(Context context,
 			AsyncTaskCompleteListener<LocalShout> completeListener, Shout parent) {
 		super(completeListener);

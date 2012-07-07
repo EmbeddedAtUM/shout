@@ -9,11 +9,29 @@ import org.whispercomm.shout.id.UserNotInitiatedException;
 
 import android.content.Context;
 
+/**
+ * Creates a new root shout and saves it to the content provider.
+ * 
+ * @author David R. Bild
+ * 
+ */
 public class ShoutTask extends AsyncTaskCallback<String, Void, LocalShout> {
 
 	private Context context;
 	private Me me;
 
+	/**
+	 * Create a new {@code ShoutTask}.
+	 * <p>
+	 * If the shout creation succeeds, the created {@link LocalShout} is passed
+	 * to the specified callback. If creation fails, {@code null} is passed
+	 * instead.
+	 * 
+	 * @param context
+	 *            the context used to connect to the content provider
+	 * @param completeListener
+	 *            the callback to invoke when the creation is complete.
+	 */
 	public ShoutTask(Context context,
 			AsyncTaskCompleteListener<LocalShout> completeListener) {
 		super(completeListener);
