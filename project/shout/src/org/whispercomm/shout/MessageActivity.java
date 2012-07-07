@@ -15,7 +15,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 public class MessageActivity extends Activity {
@@ -25,6 +28,12 @@ public class MessageActivity extends Activity {
 
 	private Toast noUserToast;
 	private IdManager idManager;
+
+	private CheckBox chkTweet;
+	private Button btnSend;
+	private EditText edtMessage;
+	private FrameLayout frmProgressBar;
+
 	private LocalShout parent = null;
 
 	@SuppressLint("ShowToast")
@@ -33,6 +42,11 @@ public class MessageActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.message);
 		idManager = new IdManager(getApplicationContext());
+
+		chkTweet = (CheckBox) findViewById(R.id.tweet);
+		btnSend = (Button) findViewById(R.id.send);
+		edtMessage = (EditText) findViewById(R.id.compose);
+		frmProgressBar = (FrameLayout) findViewById(R.id.frmProgressBar);
 
 		noUserToast = Toast.makeText(getApplicationContext(),
 				"Set up a user before you Shout!", Toast.LENGTH_LONG);
@@ -82,10 +96,18 @@ public class MessageActivity extends Activity {
 		startActivity(new Intent(this, SettingsActivity.class));
 	}
 
+	private void showProgressBar() {
+		frmProgressBar.setVisibility(FrameLayout.VISIBLE);
+	}
+
+	private void hideProgressBar() {
+		frmProgressBar.setVisibility(FrameLayout.GONE);
+	}
+
 	public void onClickSend(View v) {
 		Log.v(TAG, "Send button clicked");
-		EditText editor = (EditText) findViewById(R.id.compose);
-		String content = editor.getText().toString();
+		showProgressBar();
+		String content = edtMessage.getText().toString();
 		Log.v(TAG, "Shout text received as: " + content);
 		try {
 			if (parent == null) {
@@ -101,11 +123,12 @@ public class MessageActivity extends Activity {
 			}
 		} catch (UserNotInitiatedException e) {
 			promptForUsername();
+			hideProgressBar();
 		}
 	}
 
 	private void shoutCreated(LocalShout result) {
-		if (result != null) {
+		if (result == null) {
 			new SendShoutTask(this, new ShoutSendCompleteListener())
 					.execute(result);
 			finish();
@@ -113,6 +136,7 @@ public class MessageActivity extends Activity {
 			Toast.makeText(this,
 					"Unable to save your shout.  Please try again.",
 					Toast.LENGTH_LONG).show();
+			hideProgressBar();
 		}
 	}
 
