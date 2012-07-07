@@ -48,7 +48,7 @@ public class MessageActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.message);
 
-		network = NetworkInterface.getInstance(this);
+		network = new NetworkInterface(this);
 		idManager = new IdManager(getApplicationContext());
 
 		chkTweet = (CheckBox) findViewById(R.id.tweet);
@@ -100,6 +100,12 @@ public class MessageActivity extends Activity {
 			promptForUsername();
 			finish();
 		}
+	}
+
+	@Override
+	public void onDestroy() {
+		network.unbind();
+		super.onDestroy();
 	}
 
 	private void promptForUsername() {

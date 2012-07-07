@@ -41,7 +41,7 @@ public class ShoutActivity extends ListActivity {
 
 		startBackgroundService();
 
-		this.network = NetworkInterface.getInstance(this);
+		this.network = new NetworkInterface(this);
 		this.idManager = new IdManager(this);
 		this.cursor = ShoutProviderContract
 				.getCursorOverAllShouts(getApplicationContext());
@@ -67,6 +67,7 @@ public class ShoutActivity extends ListActivity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		network.unbind();
 		cursor.close();
 		Log.v(TAG, "Finished onDestroy");
 	}

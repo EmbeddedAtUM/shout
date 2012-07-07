@@ -19,28 +19,18 @@ import android.util.Log;
  * the network protocol.
  * 
  * @author Yue Liu
+ * @author David R. Bild
  */
 public class NetworkInterface {
 	public static final String TAG = NetworkInterface.class.getSimpleName();
 
-	private static NetworkInterface instance = null;
 	private Context context;
 
 	private Messenger shoutService;
 	private ServiceConnection connection;
 	private Boolean isBinded;
 
-	public static NetworkInterface getInstance(Context context) {
-		// TODO Move into context / shared state Android thang
-		// TODO Multi-context support with Map context->instance
-		// TODO Remove this Singleton while still keeping it a singleton
-		if (instance == null) {
-			instance = new NetworkInterface(context);
-		}
-		return instance;
-	}
-
-	private NetworkInterface(Context context) {
+	public NetworkInterface(Context context) {
 		this.context = context;
 		this.isBinded = false;
 		this.connection = new ServiceConnection() {
