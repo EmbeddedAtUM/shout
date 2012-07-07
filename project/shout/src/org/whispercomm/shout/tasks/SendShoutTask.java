@@ -13,7 +13,7 @@ import android.widget.Toast;
  * 
  * @author David Adrian
  */
-public class OutgoingShoutTask extends AsyncTask<LocalShout, Void, Boolean> {
+public class SendShoutTask extends AsyncTask<LocalShout, Void, Boolean> {
 
 	private NetworkInterface network;
 
@@ -29,7 +29,7 @@ public class OutgoingShoutTask extends AsyncTask<LocalShout, Void, Boolean> {
 	 * @param failureStringId
 	 *            Resource ID of a string to show in a Toast upon failure
 	 */
-	public OutgoingShoutTask(Context context, int successStringId,
+	public SendShoutTask(Context context, int successStringId,
 			int failureStringId) {
 		this.context = context;
 		this.successResId = successStringId;

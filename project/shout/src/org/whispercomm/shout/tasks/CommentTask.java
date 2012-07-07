@@ -39,7 +39,7 @@ public class CommentTask extends AsyncTask<String, Void, LocalShout> {
 
 	@Override
 	protected void onPostExecute(LocalShout comment) {
-		OutgoingShoutTask sendTask = new OutgoingShoutTask(context,
+		SendShoutTask sendTask = new SendShoutTask(context,
 				R.string.commentSuccess, R.string.commentFail);
 		sendTask.execute(comment);
 	}

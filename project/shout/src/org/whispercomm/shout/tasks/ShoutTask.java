@@ -36,7 +36,7 @@ public class ShoutTask extends AsyncTask<String, Void, LocalShout> {
 
 	@Override
 	protected void onPostExecute(LocalShout shout) {
-		OutgoingShoutTask sendTask = new OutgoingShoutTask(context,
+		SendShoutTask sendTask = new SendShoutTask(context,
 				R.string.shoutSuccess, R.string.shoutFail);
 		sendTask.execute(shout);
 	}
