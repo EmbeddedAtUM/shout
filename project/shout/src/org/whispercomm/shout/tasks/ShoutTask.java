@@ -4,8 +4,6 @@ import org.joda.time.DateTime;
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.Me;
 import org.whispercomm.shout.ShoutCreator;
-import org.whispercomm.shout.id.IdManager;
-import org.whispercomm.shout.id.UserNotInitiatedException;
 
 import android.content.Context;
 
@@ -30,18 +28,15 @@ public class ShoutTask extends AsyncTaskCallback<String, Void, LocalShout> {
 	 * @param context
 	 *            the context used to connect to the content provider
 	 * @param completeListener
-	 *            the callback to invoke when the creation is complete.
+	 *            the callback to invoke when the creation is complete
+	 * @param me
+	 *            the user for the sender field of the shout
 	 */
 	public ShoutTask(Context context,
-			AsyncTaskCompleteListener<LocalShout> completeListener) {
+			AsyncTaskCompleteListener<LocalShout> completeListener, Me me) {
 		super(completeListener);
 		this.context = context;
-		try {
-			this.me = new IdManager(context).getMe();
-		} catch (UserNotInitiatedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		this.me = me;
 	}
 
 	@Override

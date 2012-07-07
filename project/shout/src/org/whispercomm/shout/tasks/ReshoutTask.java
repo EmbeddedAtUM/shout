@@ -7,8 +7,6 @@ import org.whispercomm.shout.R;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.ShoutCreator;
 import org.whispercomm.shout.ShoutType;
-import org.whispercomm.shout.id.IdManager;
-import org.whispercomm.shout.id.UserNotInitiatedException;
 import org.whispercomm.shout.network.NetworkInterface;
 import org.whispercomm.shout.util.ShoutMessageUtility;
 
@@ -27,14 +25,9 @@ public class ReshoutTask extends AsyncTask<LocalShout, Void, Boolean> {
 	private Context context;
 	private Me me;
 
-	public ReshoutTask(Context context) {
+	public ReshoutTask(Context context, Me me) {
 		this.context = context;
-		try {
-			this.me = new IdManager(context).getMe();
-		} catch (UserNotInitiatedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		this.me = me;
 	}
 
 	@Override

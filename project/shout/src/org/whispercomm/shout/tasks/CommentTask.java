@@ -5,8 +5,6 @@ import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.Me;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.ShoutCreator;
-import org.whispercomm.shout.id.IdManager;
-import org.whispercomm.shout.id.UserNotInitiatedException;
 
 import android.content.Context;
 
@@ -33,20 +31,18 @@ public class CommentTask extends AsyncTaskCallback<String, Void, LocalShout> {
 	 *            the context used to connect to the content provider
 	 * @param completeListener
 	 *            the callback to invoke when the creation is complete.
+	 * @param me
+	 *            the user for the sender field of the shout.
 	 * @param parent
 	 *            the shout being commented on
 	 */
 	public CommentTask(Context context,
-			AsyncTaskCompleteListener<LocalShout> completeListener, Shout parent) {
+			AsyncTaskCompleteListener<LocalShout> completeListener, Me me,
+			Shout parent) {
 		super(completeListener);
 		this.context = context;
 		this.parent = parent;
-		try {
-			this.me = new IdManager(context).getMe();
-		} catch (UserNotInitiatedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		this.me = me;
 	}
 
 	@Override

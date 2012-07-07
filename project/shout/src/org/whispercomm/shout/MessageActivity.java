@@ -1,6 +1,7 @@
 package org.whispercomm.shout;
 
 import org.whispercomm.shout.id.IdManager;
+import org.whispercomm.shout.id.UserNotInitiatedException;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.tasks.AsyncTaskCallback.AsyncTaskCompleteListener;
 import org.whispercomm.shout.tasks.CommentTask;
@@ -32,6 +33,7 @@ public class MessageActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.message);
 		idManager = new IdManager(getApplicationContext());
+
 		noUserToast = Toast.makeText(getApplicationContext(),
 				"Set up a user before you Shout!", Toast.LENGTH_LONG);
 		Bundle extras = getIntent().getExtras();
@@ -70,11 +72,14 @@ public class MessageActivity extends Activity {
 	public void onResume() {
 		super.onResume();
 		if (idManager.userIsNotSet()) {
+			promptForUsername();
 			finish();
-			noUserToast.show();
-			Intent intent = new Intent(this, SettingsActivity.class);
-			startActivity(intent);
 		}
+	}
+
+	private void promptForUsername() {
+		noUserToast.show();
+		startActivity(new Intent(this, SettingsActivity.class));
 	}
 
 	public void onClickSend(View v) {
@@ -82,15 +87,20 @@ public class MessageActivity extends Activity {
 		EditText editor = (EditText) findViewById(R.id.compose);
 		String content = editor.getText().toString();
 		Log.v(TAG, "Shout text received as: " + content);
-		if (parent == null) {
-			Log.v(TAG, "Creating a new shout...");
-			new ShoutTask(getApplicationContext(),
-					new ShoutCreationCompleteListener()).execute(content);
-		} else {
-			Log.v(TAG, "Commenting on another shout...");
-			new CommentTask(getApplicationContext(),
-					new ShoutCreationCompleteListener(), parent)
-					.execute(content);
+		try {
+			if (parent == null) {
+				Log.v(TAG, "Creating a new shout...");
+				new ShoutTask(getApplicationContext(),
+						new ShoutCreationCompleteListener(), idManager.getMe())
+						.execute(content);
+			} else {
+				Log.v(TAG, "Commenting on another shout...");
+				new CommentTask(getApplicationContext(),
+						new ShoutCreationCompleteListener(), idManager.getMe(),
+						parent).execute(content);
+			}
+		} catch (UserNotInitiatedException e) {
+			promptForUsername();
 		}
 	}
 

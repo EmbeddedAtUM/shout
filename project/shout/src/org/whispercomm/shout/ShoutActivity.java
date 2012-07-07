@@ -1,6 +1,8 @@
 package org.whispercomm.shout;
 
 import org.whispercomm.shout.customwidgets.ShoutListViewRow;
+import org.whispercomm.shout.id.IdManager;
+import org.whispercomm.shout.id.UserNotInitiatedException;
 import org.whispercomm.shout.network.BootReceiver;
 import org.whispercomm.shout.network.NetworkService;
 import org.whispercomm.shout.provider.ShoutProviderContract;
@@ -20,11 +22,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
+import android.widget.Toast;
 
 public class ShoutActivity extends ListActivity {
 
 	private static final String TAG = "ShoutActivity";
 
+	private IdManager idManager;
 	private Cursor cursor;
 
 	/** Called when the activity is first created. */
@@ -35,6 +39,7 @@ public class ShoutActivity extends ListActivity {
 
 		startBackgroundService();
 
+		this.idManager = new IdManager(this);
 		this.cursor = ShoutProviderContract
 				.getCursorOverAllShouts(getApplicationContext());
 		setListAdapter(new TimelineAdapter(this, cursor));
@@ -95,14 +100,26 @@ public class ShoutActivity extends ListActivity {
 
 	public void onClickSettings(View v) {
 		Log.v(TAG, "Settings button clicked");
-		startActivity(new Intent(this, SettingsActivity.class));
+		displaySettings();
 	}
 
 	public void onClickReshout(LocalShout shout) {
 		Log.v(TAG, "Reshout button clicked");
 
-		ReshoutTask task = new ReshoutTask(getApplicationContext());
-		task.execute(shout);
+		ReshoutTask task;
+		try {
+			task = new ReshoutTask(getApplicationContext(), idManager.getMe());
+			task.execute(shout);
+		} catch (UserNotInitiatedException e) {
+			Toast.makeText(this, "Please set a username before shouting.",
+					Toast.LENGTH_LONG).show();
+			displaySettings();
+		}
+
+	}
+
+	private void displaySettings() {
+		startActivity(new Intent(this, SettingsActivity.class));
 	}
 
 	public void onClickComment(LocalShout shout) {
