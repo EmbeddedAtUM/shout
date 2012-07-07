@@ -11,7 +11,6 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
-import android.widget.Toast;
 
 /**
  * UI side interface for establishing channels to notify new shouts to send out.
@@ -48,7 +47,7 @@ public class NetworkInterface {
 
 			@Override
 			public void onServiceConnected(ComponentName name, IBinder service) {
-				Log.v(TAG, "Bound to Network utility");
+				Log.i(TAG, "Connected to service.");
 				shoutService = new Messenger(service);
 				isBinded = true;
 			}
@@ -56,10 +55,7 @@ public class NetworkInterface {
 			@Override
 			public void onServiceDisconnected(ComponentName name) {
 				shoutService = null;
-				// TODO dump to SD card
-				Log.d(TAG, "Network service unbound");
-				Toast.makeText(NetworkInterface.this.context,
-						"Network service unbound...", Toast.LENGTH_LONG);
+				Log.i(TAG, "Disconnected from service unexpectedly.");
 				isBinded = false;
 			}
 
