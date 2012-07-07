@@ -96,7 +96,7 @@ public class NetworkInterface {
 	 * Unbind to ShoutService, must be called in the calling activity's
 	 * onDestroy() method
 	 */
-	public void unBind() {
+	public void unbind() {
 		if (isBinded == true) {
 			context.unbindService(connection);
 			isBinded = false;
