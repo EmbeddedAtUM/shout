@@ -501,10 +501,11 @@ public class ShoutProviderContract {
 	 * @return
 	 */
 	public static Cursor getCursorOverAllShouts(Context context) {
+		String sortOrder = Shouts.TIME_RECEIVED + " DESC";
 		Uri uri = Shouts.CONTENT_URI;
 		String selection = Shouts.PARENT + " IS NULL";
 		Cursor result = context.getContentResolver().query(uri, null,
-				selection, null, null);
+				selection, null, sortOrder);
 		return result;
 	}
 
