@@ -76,40 +76,24 @@ public class NetworkInterface {
 	 * notification is successful. If not, the caller should either wait and try
 	 * later, or give up.
 	 * 
-	 * @param shoutId
-	 *            id of the shout to be sent out
-	 * @return whether the notification is successful
-	 */
-	@Deprecated
-	public boolean send(int shoutId) {
-		if (isBinded) {
-			Message msg = Message.obtain(null, NetworkService.NEW_SHOUT);
-			msg.obj = shoutId;
-			try {
-				// ???Does this block???
-				shoutService.send(msg);
-			} catch (RemoteException e) {
-				Log.i(TAG, e.getMessage());
-				return false;
-			}
-			return true;
-		} else
-			return false;
-	}
-
-	/**
-	 * Notifies ShoutService to send the given shout.
-	 * <p>
-	 * The method returns immediately, with indications of whether the
-	 * notification is successful. If not, the caller should either wait and try
-	 * later, or give up.
-	 * 
 	 * @param shout
 	 *            the shout to be sent out
 	 * @return whether the notification is successful
 	 */
 	public boolean send(LocalShout shout) {
-		return send(shout.getDatabaseId());
+		if (isBinded) {
+			Message msg = Message.obtain(null, NetworkService.NEW_SHOUT);
+			msg.obj = shout.getDatabaseId();
+			try {
+				shoutService.send(msg);
+				return true;
+			} catch (RemoteException e) {
+				Log.e(TAG, "error sending shout to NetworkService.", e);
+				return false;
+			}
+		} else {
+			return false;
+		}
 	}
 
 	/**
