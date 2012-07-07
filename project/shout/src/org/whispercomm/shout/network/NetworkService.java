@@ -72,12 +72,11 @@ public class NetworkService extends Service {
 		@Override
 		public void handleMessage(Message msg) {
 			if (msg.what == NEW_SHOUT) {
-				long shoutId = (Long) msg.obj; // FIXME
-				int shoutIdInt = (int) shoutId;
+				int shoutId = (Integer) msg.obj;
 				Shout shout = ShoutProviderContract
 						.retrieveShoutById(
 								NetworkService.this.getApplicationContext(),
-								shoutIdInt);
+								shoutId);
 				// TODO Find out why networkProtocol gets nulled
 				networkProtocol.sendShout(shout);
 			}

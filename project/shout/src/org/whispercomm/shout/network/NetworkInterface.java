@@ -81,7 +81,7 @@ public class NetworkInterface {
 	 * @return whether the notification is successful
 	 */
 	@Deprecated
-	public boolean send(long shoutId) {
+	public boolean send(int shoutId) {
 		if (isBinded) {
 			Message msg = Message.obtain(null, NetworkService.NEW_SHOUT);
 			msg.obj = shoutId;
