@@ -98,10 +98,16 @@ public class MessageActivity extends Activity {
 
 	private void showProgressBar() {
 		frmProgressBar.setVisibility(FrameLayout.VISIBLE);
+
+		chkTweet.setEnabled(false);
+		btnSend.setEnabled(false);
 	}
 
 	private void hideProgressBar() {
 		frmProgressBar.setVisibility(FrameLayout.GONE);
+
+		chkTweet.setEnabled(true);
+		btnSend.setEnabled(true);
 	}
 
 	public void onClickSend(View v) {
@@ -128,7 +134,7 @@ public class MessageActivity extends Activity {
 	}
 
 	private void shoutCreated(LocalShout result) {
-		if (result == null) {
+		if (result != null) {
 			new SendShoutTask(this, new ShoutSendCompleteListener())
 					.execute(result);
 			finish();
