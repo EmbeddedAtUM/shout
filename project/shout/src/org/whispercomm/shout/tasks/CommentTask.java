@@ -10,15 +10,23 @@ import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.id.UserNotInitiatedException;
 
 import android.content.Context;
-import android.os.AsyncTask;
 
-public class CommentTask extends AsyncTask<String, Void, LocalShout> {
+public class CommentTask extends AsyncTaskCallback<String, Void, LocalShout> {
 
 	private Context context;
 	private Shout parent;
 	private Me me;
 
-	public CommentTask(Context context, Shout parent) {
+	public CommentTask(final Context context, Shout parent) {
+		super(new AsyncTaskCompleteListener<LocalShout>() {
+			@Override
+			public void onComplete(LocalShout result) {
+
+				SendShoutTask sendTask = new SendShoutTask(context,
+						R.string.commentSuccess, R.string.commentFail);
+				sendTask.execute(result);
+			}
+		});
 		this.context = context;
 		this.parent = parent;
 		try {
@@ -37,10 +45,4 @@ public class CommentTask extends AsyncTask<String, Void, LocalShout> {
 		return creator.createComment(DateTime.now(), message, parent, me);
 	}
 
-	@Override
-	protected void onPostExecute(LocalShout comment) {
-		SendShoutTask sendTask = new SendShoutTask(context,
-				R.string.commentSuccess, R.string.commentFail);
-		sendTask.execute(comment);
-	}
 }

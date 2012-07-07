@@ -9,14 +9,21 @@ import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.id.UserNotInitiatedException;
 
 import android.content.Context;
-import android.os.AsyncTask;
 
-public class ShoutTask extends AsyncTask<String, Void, LocalShout> {
+public class ShoutTask extends AsyncTaskCallback<String, Void, LocalShout> {
 
 	private Context context;
 	private Me me;
 
-	public ShoutTask(Context context) {
+	public ShoutTask(final Context context) {
+		super(new AsyncTaskCompleteListener<LocalShout>() {
+			@Override
+			public void onComplete(LocalShout result) {
+				SendShoutTask sendTask = new SendShoutTask(context,
+						R.string.shoutSuccess, R.string.shoutFail);
+				sendTask.execute(result);
+			}
+		});
 		this.context = context;
 		try {
 			this.me = new IdManager(context).getMe();
@@ -34,10 +41,4 @@ public class ShoutTask extends AsyncTask<String, Void, LocalShout> {
 		return creator.createShout(DateTime.now(), message, me);
 	}
 
-	@Override
-	protected void onPostExecute(LocalShout shout) {
-		SendShoutTask sendTask = new SendShoutTask(context,
-				R.string.shoutSuccess, R.string.shoutFail);
-		sendTask.execute(shout);
-	}
 }
