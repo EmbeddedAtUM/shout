@@ -40,5 +40,4 @@ public class ShoutTask extends AsyncTask<String, Void, LocalShout> {
 				R.string.shoutSuccess, R.string.shoutFail);
 		sendTask.execute(shout);
 	}
-
 }

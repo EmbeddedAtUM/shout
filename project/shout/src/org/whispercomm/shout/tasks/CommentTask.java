@@ -43,5 +43,4 @@ public class CommentTask extends AsyncTask<String, Void, LocalShout> {
 				R.string.commentSuccess, R.string.commentFail);
 		sendTask.execute(comment);
 	}
-
 }

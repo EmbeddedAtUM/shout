@@ -5,7 +5,6 @@ import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.network.NetworkInterface;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.widget.Toast;
 
 /**
@@ -13,13 +12,9 @@ import android.widget.Toast;
  * 
  * @author David Adrian
  */
-public class SendShoutTask extends AsyncTask<LocalShout, Void, Boolean> {
+public class SendShoutTask extends AsyncTaskCallback<LocalShout, Void, Boolean> {
 
 	private NetworkInterface network;
-
-	private Context context;
-	private int successResId;
-	private int failResId;
 
 	/**
 	 * @param context
@@ -29,11 +24,20 @@ public class SendShoutTask extends AsyncTask<LocalShout, Void, Boolean> {
 	 * @param failureStringId
 	 *            Resource ID of a string to show in a Toast upon failure
 	 */
-	public SendShoutTask(Context context, int successStringId,
-			int failureStringId) {
-		this.context = context;
-		this.successResId = successStringId;
-		this.failResId = failureStringId;
+	public SendShoutTask(final Context context, final int successStringId,
+			final int failureStringId) {
+		super(new AsyncTaskCompleteListener<Boolean>() {
+			@Override
+			public void onComplete(Boolean result) {
+				if (result) {
+					Toast.makeText(context, successStringId, Toast.LENGTH_SHORT)
+							.show();
+				} else {
+					Toast.makeText(context, failureStringId, Toast.LENGTH_LONG)
+							.show();
+				}
+			}
+		});
 		this.network = NetworkInterface.getInstance(context);
 	}
 
@@ -44,15 +48,6 @@ public class SendShoutTask extends AsyncTask<LocalShout, Void, Boolean> {
 		}
 		LocalShout shout = shouts[0];
 		return network.send(shout);
-	}
-
-	@Override
-	protected void onPostExecute(Boolean result) {
-		if (result.booleanValue()) {
-			Toast.makeText(context, successResId, Toast.LENGTH_SHORT).show();
-		} else {
-			Toast.makeText(context, failResId, Toast.LENGTH_LONG).show();
-		}
 	}
 
 }
