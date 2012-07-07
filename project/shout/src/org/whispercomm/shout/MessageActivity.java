@@ -3,16 +3,19 @@ package org.whispercomm.shout;
 import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.id.UserNotInitiatedException;
 import org.whispercomm.shout.provider.ShoutProviderContract;
+import org.whispercomm.shout.serialization.SerializeUtility;
 import org.whispercomm.shout.tasks.AsyncTaskCallback.AsyncTaskCompleteListener;
 import org.whispercomm.shout.tasks.CommentTask;
 import org.whispercomm.shout.tasks.SendShoutTask;
 import org.whispercomm.shout.tasks.ShoutTask;
+import org.whispercomm.shout.thirdparty.Utf8ByteLengthFilter;
 import org.whispercomm.shout.util.ShoutMessageUtility;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputFilter;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -47,6 +50,9 @@ public class MessageActivity extends Activity {
 		btnSend = (Button) findViewById(R.id.send);
 		edtMessage = (EditText) findViewById(R.id.compose);
 		frmProgressBar = (FrameLayout) findViewById(R.id.frmProgressBar);
+
+		edtMessage.setFilters(new InputFilter[] { new Utf8ByteLengthFilter(
+				SerializeUtility.MAX_MESSAGE_SIZE) });
 
 		noUserToast = Toast.makeText(getApplicationContext(),
 				"Set up a user before you Shout!", Toast.LENGTH_LONG);
