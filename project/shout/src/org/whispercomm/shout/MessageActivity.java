@@ -2,7 +2,9 @@ package org.whispercomm.shout;
 
 import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.provider.ShoutProviderContract;
+import org.whispercomm.shout.tasks.AsyncTaskCallback.AsyncTaskCompleteListener;
 import org.whispercomm.shout.tasks.CommentTask;
+import org.whispercomm.shout.tasks.SendShoutTask;
 import org.whispercomm.shout.tasks.ShoutTask;
 import org.whispercomm.shout.util.ShoutMessageUtility;
 
@@ -82,13 +84,35 @@ public class MessageActivity extends Activity {
 		Log.v(TAG, "Shout text received as: " + content);
 		if (parent == null) {
 			Log.v(TAG, "Creating a new shout...");
-			new ShoutTask(getApplicationContext()).execute(content);
+			new ShoutTask(getApplicationContext(),
+					new ShoutCreationCompleteListener()).execute(content);
 		} else {
 			Log.v(TAG, "Commenting on another shout...");
-			new CommentTask(getApplicationContext(), parent).execute(content);
+			new CommentTask(getApplicationContext(),
+					new ShoutCreationCompleteListener(), parent)
+					.execute(content);
 		}
-		Intent intent = new Intent();
-		setResult(RESULT_OK, intent);
-		finish();
+	}
+
+	private void shoutCreated(LocalShout result) {
+		if (result != null) {
+			SendShoutTask sendTask = new SendShoutTask(this,
+					R.string.shoutSuccess, R.string.shoutFail);
+			sendTask.execute(result);
+			finish();
+		} else {
+			Toast.makeText(this,
+					"Unable to save your shout.  Please try again.",
+					Toast.LENGTH_LONG).show();
+		}
+	}
+
+	private class ShoutCreationCompleteListener implements
+			AsyncTaskCompleteListener<LocalShout> {
+		@Override
+		public void onComplete(LocalShout result) {
+			shoutCreated(result);
+		}
+
 	}
 }
