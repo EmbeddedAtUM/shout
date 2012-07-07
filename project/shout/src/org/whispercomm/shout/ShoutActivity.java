@@ -4,6 +4,7 @@ import org.whispercomm.shout.customwidgets.ShoutListViewRow;
 import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.id.UserNotInitiatedException;
 import org.whispercomm.shout.network.BootReceiver;
+import org.whispercomm.shout.network.NetworkInterface;
 import org.whispercomm.shout.network.NetworkService;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.tasks.ReshoutTask;
@@ -28,6 +29,7 @@ public class ShoutActivity extends ListActivity {
 
 	private static final String TAG = "ShoutActivity";
 
+	private NetworkInterface network;
 	private IdManager idManager;
 	private Cursor cursor;
 
@@ -39,6 +41,7 @@ public class ShoutActivity extends ListActivity {
 
 		startBackgroundService();
 
+		this.network = NetworkInterface.getInstance(this);
 		this.idManager = new IdManager(this);
 		this.cursor = ShoutProviderContract
 				.getCursorOverAllShouts(getApplicationContext());
@@ -108,7 +111,8 @@ public class ShoutActivity extends ListActivity {
 
 		ReshoutTask task;
 		try {
-			task = new ReshoutTask(getApplicationContext(), idManager.getMe());
+			task = new ReshoutTask(getApplicationContext(), network,
+					idManager.getMe());
 			task.execute(shout);
 		} catch (UserNotInitiatedException e) {
 			Toast.makeText(this, "Please set a username before shouting.",

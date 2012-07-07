@@ -2,6 +2,7 @@ package org.whispercomm.shout;
 
 import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.id.UserNotInitiatedException;
+import org.whispercomm.shout.network.NetworkInterface;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.serialization.SerializeUtility;
 import org.whispercomm.shout.tasks.AsyncTaskCallback.AsyncTaskCompleteListener;
@@ -29,6 +30,8 @@ public class MessageActivity extends Activity {
 	public static final String TAG = "MessageActivity";
 	public static final String PARENT_ID = "parent";
 
+	private NetworkInterface network;
+
 	private Toast noUserToast;
 	private IdManager idManager;
 
@@ -44,6 +47,8 @@ public class MessageActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.message);
+
+		network = NetworkInterface.getInstance(this);
 		idManager = new IdManager(getApplicationContext());
 
 		chkTweet = (CheckBox) findViewById(R.id.tweet);
@@ -141,7 +146,7 @@ public class MessageActivity extends Activity {
 
 	private void shoutCreated(LocalShout result) {
 		if (result != null) {
-			new SendShoutTask(this, new ShoutSendCompleteListener())
+			new SendShoutTask(network, new ShoutSendCompleteListener())
 					.execute(result);
 			finish();
 		} else {

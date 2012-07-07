@@ -23,10 +23,12 @@ import android.widget.Toast;
 public class ReshoutTask extends AsyncTask<LocalShout, Void, Boolean> {
 
 	private Context context;
+	private NetworkInterface network;
 	private Me me;
 
-	public ReshoutTask(Context context, Me me) {
+	public ReshoutTask(Context context, NetworkInterface network, Me me) {
 		this.context = context;
+		this.network = network;
 		this.me = me;
 	}
 
@@ -49,7 +51,7 @@ public class ReshoutTask extends AsyncTask<LocalShout, Void, Boolean> {
 		ShoutCreator creator = new ShoutCreator(context);
 		LocalShout reshout = creator.createReshout(DateTime.now(), parent, me);
 
-		return NetworkInterface.getInstance(context).send(reshout);
+		return network.send(reshout);
 	}
 
 	@Override
