@@ -139,8 +139,7 @@ public class MessageActivity extends Activity {
 					.execute(result);
 			finish();
 		} else {
-			Toast.makeText(this,
-					"Unable to save your shout.  Please try again.",
+			Toast.makeText(this, R.string.create_shout_failure,
 					Toast.LENGTH_LONG).show();
 			hideProgressBar();
 		}
@@ -148,10 +147,11 @@ public class MessageActivity extends Activity {
 
 	private void shoutSent(boolean success) {
 		if (success) {
-			Toast.makeText(this, R.string.shoutSuccess, Toast.LENGTH_SHORT)
-					.show();
+			Toast.makeText(this, R.string.send_shout_success,
+					Toast.LENGTH_SHORT).show();
 		} else {
-			Toast.makeText(this, R.string.shoutFail, Toast.LENGTH_LONG).show();
+			Toast.makeText(this, R.string.send_shout_failure, Toast.LENGTH_LONG)
+					.show();
 		}
 		finish();
 	}

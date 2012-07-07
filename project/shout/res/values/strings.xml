@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="app_name">Shout</string>
     <string name="no_shouts">You haven\'t received any Shouts.</string>
     <string name="separatorDesc">Separator</string>
@@ -21,15 +22,15 @@
     <string name="reshoutDescription">Reshout</string>
     <string name="commentDescription">Comment</string>
     <string name="detailsDescription">Details</string>
-    <string name="defaultUsername" >ShoutUser</string>
+    <string name="defaultUsername">ShoutUser</string>
     <string name="reshoutSuccess">Reshout successful!</string>
     <string name="reshoutFail">Reshout unsuccessful…</string>
-    <string name="shoutSuccess">Shout successfully sent!</string>
-    <string name="shoutFail">Shout unsuccessful…</string>
-    <string name="commentSuccess">Comment successfully sent!</string>
-    <string name="commentFail">Comment unsuccessful…</string>
+    <string name="create_shout_failure">Unable to save your shout. Please try again.</string>
+    <string name="send_shout_failure">Unable to send your shout. Please reshout later.</string>
+    <string name="send_shout_success">Shout sent.</string>
     <string name="serviceTickerText">Starting Shout listener service</string>
     <string name="serviceTitleText">Shout Service</string>
     <string name="serviceDescriptionText">Currently listening for nearby Shouts</string>
     <string name="splashDesc">Splash screen logo</string>
+
 </resources>
