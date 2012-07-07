@@ -5,7 +5,6 @@ import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.network.NetworkInterface;
 
 import android.content.Context;
-import android.widget.Toast;
 
 /**
  * Asynchronously send a {@link Shout} over the network
@@ -19,25 +18,10 @@ public class SendShoutTask extends AsyncTaskCallback<LocalShout, Void, Boolean> 
 	/**
 	 * @param context
 	 *            Application context
-	 * @param successStringId
-	 *            Resource ID of a string to show in a Toast upon success
-	 * @param failureStringId
-	 *            Resource ID of a string to show in a Toast upon failure
 	 */
-	public SendShoutTask(final Context context, final int successStringId,
-			final int failureStringId) {
-		super(new AsyncTaskCompleteListener<Boolean>() {
-			@Override
-			public void onComplete(Boolean result) {
-				if (result) {
-					Toast.makeText(context, successStringId, Toast.LENGTH_SHORT)
-							.show();
-				} else {
-					Toast.makeText(context, failureStringId, Toast.LENGTH_LONG)
-							.show();
-				}
-			}
-		});
+	public SendShoutTask(Context context,
+			AsyncTaskCompleteListener<Boolean> completeListener) {
+		super(completeListener);
 		this.network = NetworkInterface.getInstance(context);
 	}
 

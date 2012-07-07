@@ -96,9 +96,8 @@ public class MessageActivity extends Activity {
 
 	private void shoutCreated(LocalShout result) {
 		if (result != null) {
-			SendShoutTask sendTask = new SendShoutTask(this,
-					R.string.shoutSuccess, R.string.shoutFail);
-			sendTask.execute(result);
+			new SendShoutTask(this, new ShoutSendCompleteListener())
+					.execute(result);
 			finish();
 		} else {
 			Toast.makeText(this,
@@ -107,12 +106,29 @@ public class MessageActivity extends Activity {
 		}
 	}
 
+	private void shoutSent(boolean success) {
+		if (success) {
+			Toast.makeText(this, R.string.shoutSuccess, Toast.LENGTH_SHORT)
+					.show();
+		} else {
+			Toast.makeText(this, R.string.shoutFail, Toast.LENGTH_LONG).show();
+		}
+		finish();
+	}
+
 	private class ShoutCreationCompleteListener implements
 			AsyncTaskCompleteListener<LocalShout> {
 		@Override
 		public void onComplete(LocalShout result) {
 			shoutCreated(result);
 		}
+	}
 
+	private class ShoutSendCompleteListener implements
+			AsyncTaskCompleteListener<Boolean> {
+		@Override
+		public void onComplete(Boolean result) {
+			shoutSent(result);
+		}
 	}
 }
