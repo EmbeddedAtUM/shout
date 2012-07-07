@@ -8,4 +8,5 @@
     <color name="BackgroundGray">#D6D2CB</color>
     <color name="SeparatorGray">#EEEEEE</color>
     <color name="ButtonBarGray">#B3B3B3</color>
+    <color name="progress_bar_background">#CCC9C9C9</color>
 </resources>
