@@ -23,7 +23,7 @@ public class SerializeUtilityTest {
 
 	private static final String VERSION_EXCEPTION_FAIL = "BadShoutVersionException thrown";
 	private static final String PACKET_EXCEPTION_FAIL = "ShoutPacketException thrown";
-	
+
 	private static final String MESSAGE = "My shout message!";
 	private static final DateTime TIMESTAMP = new DateTime(8675309L);
 	private static final byte[] SIGNATURE = TestFactory
@@ -102,6 +102,6 @@ public class SerializeUtilityTest {
 		assertNotNull(fromBytes);
 		TestUtility.testEqualShoutFields(reshout, fromBytes);
 	}
-	
+
 	// TODO Test serializing a comment
 }

@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout.provider;
 
 import org.whispercomm.shout.LocalShout;
@@ -369,10 +370,8 @@ public class ShoutProviderContract {
 	 * Stores the given Shout and its sender and parent, if not already present
 	 * in the database.
 	 * 
-	 * @param context
-	 *            The context the content resolver is found in
-	 * @param shout
-	 *            The shout to be stored
+	 * @param context The context the content resolver is found in
+	 * @param shout The shout to be stored
 	 * @return The ID of the Shout in the database, -1 on failure
 	 */
 	@Deprecated
@@ -396,10 +395,8 @@ public class ShoutProviderContract {
 	 * Stores the given Shout and its sender and parent, if not already present
 	 * in the database.
 	 * 
-	 * @param context
-	 *            The context the content resolver is found in
-	 * @param shout
-	 *            The shout to be stored
+	 * @param context The context the content resolver is found in
+	 * @param shout The shout to be stored
 	 * @return the stored shout or {@code null} on failure.
 	 */
 	public static LocalShout saveShout(Context context, Shout shout) {
@@ -491,7 +488,9 @@ public class ShoutProviderContract {
 		String sortOrder = Shouts.TIME_RECEIVED + " DESC";
 		String selection = Shouts.PARENT + " = ? AND " + Shouts.MESSAGE
 				+ " IS NOT NULL";
-		String[] selectionArgs = { Integer.toString(shoutId) };
+		String[] selectionArgs = {
+			Integer.toString(shoutId)
+		};
 		Cursor result = context.getContentResolver().query(Shouts.CONTENT_URI,
 				null, selection, selectionArgs, sortOrder);
 		return result;
@@ -500,10 +499,8 @@ public class ShoutProviderContract {
 	/**
 	 * Retrieves a cursor over the comments of the specified shout.
 	 * 
-	 * @param context
-	 *            the context used to access the content provider
-	 * @param shout
-	 *            the parent whose comments to retrieve
+	 * @param context the context used to access the content provider
+	 * @param shout the parent whose comments to retrieve
 	 * @return a cursor over the comments
 	 */
 	public static Cursor getComments(Context context, LocalShout shout) {
@@ -513,10 +510,8 @@ public class ShoutProviderContract {
 	/**
 	 * Retrieves a cursor over the comments of the specified shout.
 	 * 
-	 * @param context
-	 *            the context used to access the content provider
-	 * @param shout
-	 *            the parent whose comments to retrieve
+	 * @param context the context used to access the content provider
+	 * @param shout the parent whose comments to retrieve
 	 * @return a cursor over the comments
 	 */
 	public static Cursor getComments(Context context, Shout shout) {
@@ -529,7 +524,9 @@ public class ShoutProviderContract {
 		String sortOrder = Shouts.TIME_RECEIVED + " DESC";
 		String selection = Shouts.PARENT + " = ? AND " + Shouts.MESSAGE
 				+ " IS NULL";
-		String[] selectionArgs = { Integer.toString(parentId) };
+		String[] selectionArgs = {
+			Integer.toString(parentId)
+		};
 
 		Cursor result = context.getContentResolver().query(Shouts.CONTENT_URI,
 				null, selection, selectionArgs, sortOrder);
@@ -539,10 +536,8 @@ public class ShoutProviderContract {
 	/**
 	 * Retrieves a cursor over the reshouts of the specified shout.
 	 * 
-	 * @param context
-	 *            the context used to access the content provider
-	 * @param shout
-	 *            the parent whose comments to retrieve
+	 * @param context the context used to access the content provider
+	 * @param shout the parent whose comments to retrieve
 	 * @return a cursor over the reshouts
 	 */
 	public static Cursor getReshouts(Context context, LocalShout shout) {
@@ -552,10 +547,8 @@ public class ShoutProviderContract {
 	/**
 	 * Retrieves a cursor over the reshouts of the specified shout.
 	 * 
-	 * @param context
-	 *            the context used to access the content provider
-	 * @param shout
-	 *            the parent whose comments to retrieve
+	 * @param context the context used to access the content provider
+	 * @param shout the parent whose comments to retrieve
 	 * @return a cursor over the reshouts
 	 */
 	public static Cursor getReshouts(Context context, Shout shout) {
@@ -602,10 +595,14 @@ public class ShoutProviderContract {
 		 * @return -1 if not in the database
 		 */
 		public static int queryForUser(Context context, DatabaseUser user) {
-			String[] projection = { Users._ID };
+			String[] projection = {
+				Users._ID
+			};
 			String selection = Users.PUB_KEY + " = ? AND " + Users.USERNAME
 					+ " = ?";
-			String[] selectionArgs = { user.key, user.username };
+			String[] selectionArgs = {
+					user.key, user.username
+			};
 			Cursor cursor = context.getContentResolver().query(
 					Users.CONTENT_URI, projection, selection, selectionArgs,
 					null);
@@ -631,10 +628,14 @@ public class ShoutProviderContract {
 		 * @return -1 on failure
 		 */
 		public static int queryForShout(Context context, DatabaseShout dbShout) {
-			String[] projection = { Shouts._ID };
+			String[] projection = {
+				Shouts._ID
+			};
 			String selection = Shouts.HASH + " = ? AND " + Shouts.SIGNATURE
 					+ " = ?";
-			String[] selectionArgs = { dbShout.hash, dbShout.signature };
+			String[] selectionArgs = {
+					dbShout.hash, dbShout.signature
+			};
 
 			Cursor cursor = context.getContentResolver().query(
 					Shouts.CONTENT_URI, projection, selection, selectionArgs,

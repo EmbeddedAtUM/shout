@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout.customwidgets;
 
 import org.whispercomm.shout.R;
@@ -49,13 +50,11 @@ public class ShoutChainViewRow extends LinearLayout {
 	}
 
 	/**
-	 * Expands the display of the shout.
+	 * Expands the display of the shout. The shout is offset by margins in the
+	 * listview.
 	 * 
-	 * The shout is offset by margins in the listview.
-	 * 
-	 * @param expanded
-	 *            {@code true} if the view should be expanded; {@code false}
-	 *            otherwise.
+	 * @param expanded {@code true} if the view should be expanded;
+	 *            {@code false} otherwise.
 	 */
 	public void setExpanded(boolean expanded) {
 		this.expanded = expanded;
@@ -78,8 +77,7 @@ public class ShoutChainViewRow extends LinearLayout {
 	/**
 	 * Sets the Shout to be displayed by the view.
 	 * 
-	 * @param shout
-	 *            the Shout to be displayed
+	 * @param shout the Shout to be displayed
 	 */
 	public void bindShout(LocalShout shout) {
 		actionShoutView.bindShout(shout);

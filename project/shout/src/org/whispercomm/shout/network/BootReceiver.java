@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout.network;
 
 import android.content.BroadcastReceiver;
@@ -11,7 +12,6 @@ import android.util.Log;
  * Starts the Shout network service on system boot, if the user has enabled it.
  * 
  * @author David R. Bild
- * 
  */
 public class BootReceiver extends BroadcastReceiver {
 	private static final String TAG = BootReceiver.class.getSimpleName();

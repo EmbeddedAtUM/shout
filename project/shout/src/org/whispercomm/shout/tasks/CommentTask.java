@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout.tasks;
 
 import org.joda.time.DateTime;
@@ -12,7 +13,6 @@ import android.content.Context;
  * Creates a new comment shout and saves it to the content provider.
  * 
  * @author David R. Bild
- * 
  */
 public class CommentTask extends AsyncTaskCallback<String, Void, LocalShout> {
 
@@ -27,14 +27,11 @@ public class CommentTask extends AsyncTaskCallback<String, Void, LocalShout> {
 	 * passed to the specified callback. If creation fails, {@code null} is
 	 * passed instead.
 	 * 
-	 * @param context
-	 *            the context used to connect to the content provider
-	 * @param completeListener
-	 *            the callback to invoke when the creation is complete.
-	 * @param me
-	 *            the user for the sender field of the shout.
-	 * @param parent
-	 *            the shout being commented on
+	 * @param context the context used to connect to the content provider
+	 * @param completeListener the callback to invoke when the creation is
+	 *            complete.
+	 * @param me the user for the sender field of the shout.
+	 * @param parent the shout being commented on
 	 */
 	public CommentTask(Context context,
 			AsyncTaskCompleteListener<LocalShout> completeListener, Me me,

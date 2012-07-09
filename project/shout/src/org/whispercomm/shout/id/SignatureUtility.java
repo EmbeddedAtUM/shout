@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout.id;
 
 import java.security.InvalidKeyException;
@@ -89,8 +90,7 @@ public class SignatureUtility {
 	/**
 	 * Verify the signature of data using pubKey.
 	 * 
-	 * @param data
-	 *            in ByteBuffer
+	 * @param data in ByteBuffer
 	 * @param pubKey
 	 * @param signature
 	 * @return

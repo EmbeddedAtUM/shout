@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout.network;
 
 import org.whispercomm.shout.Shout;
@@ -8,7 +9,6 @@ import org.whispercomm.shout.Shout;
  * 
  * @author Yue Liu
  * @author David R. Bild
- * 
  */
 public interface NetworkProtocol {
 

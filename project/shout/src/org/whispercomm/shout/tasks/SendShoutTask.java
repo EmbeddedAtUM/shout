@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout.tasks;
 
 import org.whispercomm.shout.LocalShout;
@@ -14,8 +15,7 @@ public class SendShoutTask extends AsyncTaskCallback<LocalShout, Void, Boolean> 
 	private NetworkInterface network;
 
 	/**
-	 * @param context
-	 *            Application context
+	 * @param context Application context
 	 */
 	public SendShoutTask(NetworkInterface network,
 			AsyncTaskCompleteListener<Boolean> completeListener) {

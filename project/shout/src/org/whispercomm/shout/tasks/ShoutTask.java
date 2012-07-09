@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout.tasks;
 
 import org.joda.time.DateTime;
@@ -11,7 +12,6 @@ import android.content.Context;
  * Creates a new root shout and saves it to the content provider.
  * 
  * @author David R. Bild
- * 
  */
 public class ShoutTask extends AsyncTaskCallback<String, Void, LocalShout> {
 
@@ -25,12 +25,10 @@ public class ShoutTask extends AsyncTaskCallback<String, Void, LocalShout> {
 	 * to the specified callback. If creation fails, {@code null} is passed
 	 * instead.
 	 * 
-	 * @param context
-	 *            the context used to connect to the content provider
-	 * @param completeListener
-	 *            the callback to invoke when the creation is complete
-	 * @param me
-	 *            the user for the sender field of the shout
+	 * @param context the context used to connect to the content provider
+	 * @param completeListener the callback to invoke when the creation is
+	 *            complete
+	 * @param me the user for the sender field of the shout
 	 */
 	public ShoutTask(Context context,
 			AsyncTaskCompleteListener<LocalShout> completeListener, Me me) {

@@ -251,7 +251,7 @@ public class ShoutProviderTest {
 			fail("Inserting a duplicate should not throw an exception");
 		}
 	}
-	
+
 	@Test
 	public void testInsertDuplicateUserDoesNothing() {
 		try {

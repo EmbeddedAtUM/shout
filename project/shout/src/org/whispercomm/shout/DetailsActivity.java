@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout;
 
 import org.whispercomm.shout.provider.ShoutProviderContract;
@@ -36,16 +37,16 @@ public class DetailsActivity extends ListActivity {
 				getApplicationContext(), shoutId);
 		ShoutType type = ShoutMessageUtility.getShoutType(shout);
 		switch (type) {
-		case RESHOUT:
-			int parentId = ShoutProviderContract.storeShout(
-					getApplicationContext(), shout.getParent());
-			cursor = ShoutProviderContract.getCursorOverShoutComments(
-					getApplicationContext(), parentId);
-			break;
-		default:
-			cursor = ShoutProviderContract.getCursorOverShoutComments(
-					getApplicationContext(), shoutId);
-			break;
+			case RESHOUT:
+				int parentId = ShoutProviderContract.storeShout(
+						getApplicationContext(), shout.getParent());
+				cursor = ShoutProviderContract.getCursorOverShoutComments(
+						getApplicationContext(), parentId);
+				break;
+			default:
+				cursor = ShoutProviderContract.getCursorOverShoutComments(
+						getApplicationContext(), shoutId);
+				break;
 		}
 		setListAdapter(new CommentsAdapter(this, cursor));
 	}

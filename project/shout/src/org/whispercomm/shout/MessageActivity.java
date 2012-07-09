@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout;
 
 import org.whispercomm.shout.id.IdManager;
@@ -55,8 +56,10 @@ public class MessageActivity extends Activity {
 		frmProgressBar = (FrameLayout) findViewById(R.id.frmProgressBar);
 		edtMessage = (EditText) findViewById(R.id.compose);
 
-		edtMessage.setFilters(new InputFilter[] { new Utf8ByteLengthFilter(
-				SerializeUtility.MAX_MESSAGE_SIZE) });
+		edtMessage.setFilters(new InputFilter[] {
+			new Utf8ByteLengthFilter(
+					SerializeUtility.MAX_MESSAGE_SIZE)
+		});
 	}
 
 	private LocalShout getParent(Bundle extras) {
@@ -72,13 +75,13 @@ public class MessageActivity extends Activity {
 		parent = ShoutProviderContract.retrieveShoutById(
 				getApplicationContext(), parentId);
 		switch (parent.getType()) {
-		case COMMENT:
-		case RESHOUT:
-			return parent.getParent();
-		case RECOMMENT:
-			return parent.getParent().getParent();
-		default:
-			return parent;
+			case COMMENT:
+			case RESHOUT:
+				return parent.getParent();
+			case RECOMMENT:
+				return parent.getParent().getParent();
+			default:
+				return parent;
 		}
 	}
 

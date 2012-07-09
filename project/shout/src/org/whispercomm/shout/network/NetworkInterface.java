@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout.network;
 
 import org.whispercomm.shout.LocalShout;
@@ -62,8 +63,7 @@ public class NetworkInterface {
 	 * notification is successful. If not, the caller should either wait and try
 	 * later, or give up.
 	 * 
-	 * @param shout
-	 *            the shout to be sent out
+	 * @param shout the shout to be sent out
 	 * @return whether the notification is successful
 	 */
 	public boolean send(LocalShout shout) {

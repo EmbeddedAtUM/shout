@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout.customwidgets;
 
 import android.content.Context;
@@ -23,7 +24,7 @@ public class ShoutEditTextPreference extends EditTextPreference {
 		super(context, attrs, defstyle);
 
 	}
-	
+
 	@Override
 	public void onClick() {
 		super.onClick();

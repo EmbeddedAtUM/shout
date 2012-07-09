@@ -74,7 +74,7 @@ public class ShoutPacket {
 	 * 
 	 * @return The Shout stored in this packet.
 	 * @throws BadShoutVersionException
-	 * @throws ShoutPacketException 
+	 * @throws ShoutPacketException
 	 */
 	public Shout decodeShout() throws BadShoutVersionException, ShoutPacketException {
 		return SerializeUtility.deserializeShout(count, body);

@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout.serialization;
 
 public class ShoutPacketException extends Exception {

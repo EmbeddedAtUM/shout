@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout.tasks;
 
 import android.os.AsyncTask;
@@ -15,16 +16,11 @@ import android.os.AsyncTask;
  * supported as well, but we haven't needed them yet.
  * 
  * @see AsyncTask
- * 
  * @author David R. Bild
- * 
- * @param <Params>
- *            the type of the parameters sent to the task upon execution
- * @param <Progress>
- *            the type of the progress units published during the background
- *            computation
- * @param <Result>
- *            the type of the result of the background computation
+ * @param <Params> the type of the parameters sent to the task upon execution
+ * @param <Progress> the type of the progress units published during the
+ *            background computation
+ * @param <Result> the type of the result of the background computation
  */
 public abstract class AsyncTaskCallback<Params, Progress, Result> extends
 		AsyncTask<Params, Progress, Result> {
@@ -50,7 +46,6 @@ public abstract class AsyncTaskCallback<Params, Progress, Result> extends
 	 * {@link AsyncTask#onPostExecute(Result)} method.
 	 * 
 	 * @author David R. Bild
-	 * 
 	 */
 	public interface AsyncTaskCompleteListener<Result> {
 		/**
@@ -58,8 +53,8 @@ public abstract class AsyncTaskCallback<Params, Progress, Result> extends
 		 * <p>
 		 * This method will be invoked on the main application thread.
 		 * 
-		 * @param result
-		 *            the result of {@link AsyncTask#doInBackground(Object...)}.
+		 * @param result the result of
+		 *            {@link AsyncTask#doInBackground(Object...)}.
 		 */
 		public void onComplete(Result result);
 	}

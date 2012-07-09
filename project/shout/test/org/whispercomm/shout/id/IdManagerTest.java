@@ -71,7 +71,7 @@ public class IdManagerTest {
 			fail(INIT_EXCEPTION_FAIL);
 		}
 	}
-	
+
 	@Test
 	public void testThrowExceptionOnGetUnsetUser() {
 		try {

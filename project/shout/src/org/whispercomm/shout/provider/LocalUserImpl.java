@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout.provider;
 
 import java.security.interfaces.ECPublicKey;
@@ -9,15 +10,14 @@ import android.content.Context;
 import android.util.Base64;
 
 public class LocalUserImpl implements LocalUser {
-	
-	
+
 	@SuppressWarnings("unused")
 	private Context context;
-	
+
 	private int id;
 	private String username;
 	private byte[] keyBytes;
-	
+
 	public LocalUserImpl(Context context, int id, String username, String encodedKey) {
 		this.id = id;
 		this.username = username;

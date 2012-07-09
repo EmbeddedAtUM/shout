@@ -24,7 +24,7 @@ public class ShoutPacketTest {
 	private static final String VERSION_EXCEPTION_FAIL = "Shout version is not bad";
 	private static final String PACKET_EXCEPTION_FAIL = "ShoutPacketException thrown";
 	private static final String SHOUT_CHAIN_FAIL = "ShoutChainTooLongException thrown";
-	
+
 	private static final int SIGNATURE_SIZE = 71;
 
 	private TestShout shout;

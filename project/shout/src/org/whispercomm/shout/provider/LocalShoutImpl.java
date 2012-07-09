@@ -117,7 +117,7 @@ public class LocalShoutImpl implements LocalShout {
 		Cursor cursor = ShoutProviderContract.getCursorOverReshouts(context, id);
 		List<LocalUser> users = new ArrayList<LocalUser>();
 		int authorIndex = cursor.getColumnIndex(ShoutProviderContract.Shouts.AUTHOR);
-		while(cursor.moveToNext()) {
+		while (cursor.moveToNext()) {
 			int author = cursor.getInt(authorIndex);
 			users.add(new LazyLocalUserImpl(context, author));
 		}

@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout;
 
 import java.security.interfaces.ECPublicKey;
@@ -7,7 +8,6 @@ import java.security.interfaces.ECPublicKey;
  * 
  * @author David Adrian
  * @author David R. Bild
- * 
  */
 public interface User {
 

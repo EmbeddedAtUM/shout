@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout;
 
 import org.joda.time.DateTime;
@@ -11,7 +12,6 @@ import android.content.Context;
  * The newly-created shouts are stored in the Shout content provider.
  * 
  * @author David R. Bild
- * 
  */
 public class ShoutCreator {
 	@SuppressWarnings("unused")
@@ -26,12 +26,9 @@ public class ShoutCreator {
 	/**
 	 * Creates a new shout, storing it in the content provider.
 	 * 
-	 * @param timestamp
-	 *            the timestamp field of the shout
-	 * @param message
-	 *            the message field of the shout
-	 * @param sender
-	 *            the identity for the sender field of the shout
+	 * @param timestamp the timestamp field of the shout
+	 * @param message the message field of the shout
+	 * @param sender the identity for the sender field of the shout
 	 * @return the saved shout
 	 */
 	public LocalShout createShout(DateTime timestamp, String message, Me sender) {
@@ -47,14 +44,10 @@ public class ShoutCreator {
 	/**
 	 * Creates a new comment shout, storing it in the content provider.
 	 * 
-	 * @param timestamp
-	 *            the timestamp field of the shout
-	 * @param message
-	 *            the message field of the shout
-	 * @param parent
-	 *            the parent field of the shout
-	 * @param sender
-	 *            the identity for the sender field of the shout
+	 * @param timestamp the timestamp field of the shout
+	 * @param message the message field of the shout
+	 * @param parent the parent field of the shout
+	 * @param sender the identity for the sender field of the shout
 	 * @return the saved shout
 	 */
 	public LocalShout createComment(DateTime timestamp, String message,
@@ -71,12 +64,9 @@ public class ShoutCreator {
 	/**
 	 * Creates a new reshout, storing it in the content provider.
 	 * 
-	 * @param timestamp
-	 *            the timestamp field of the shout
-	 * @param parent
-	 *            the parent field of the shout
-	 * @param sender
-	 *            the identity for the sender field of the shout
+	 * @param timestamp the timestamp field of the shout
+	 * @param parent the parent field of the shout
+	 * @param sender the identity for the sender field of the shout
 	 * @return the saved shout
 	 */
 	public LocalShout createReshout(DateTime timestamp, Shout parent, Me sender) {

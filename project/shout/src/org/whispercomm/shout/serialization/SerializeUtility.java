@@ -134,12 +134,14 @@ public class SerializeUtility {
 	 * @param body The serialized Shout chain.
 	 * @return The Java object representation of this serialized Shout chain.
 	 * @throws BadShoutVersionException If the version on the Shout is unknown
-	 * @throws ShoutPacketException If the serialization does not match any know Shout standard
+	 * @throws ShoutPacketException If the serialization does not match any know
+	 *             Shout standard
 	 */
-	public static Shout deserializeShout(int count, byte[] body) throws BadShoutVersionException, ShoutPacketException {
+	public static Shout deserializeShout(int count, byte[] body) throws BadShoutVersionException,
+			ShoutPacketException {
 		/*
-		 * TODO Make everything about this function not be awful
-		 * TODO Check that the hash is equivalent to the parent hash
+		 * TODO Make everything about this function not be awful TODO Check that
+		 * the hash is equivalent to the parent hash
 		 */
 		boolean hasNext = count > 0;
 		ByteBuffer buffer = ByteBuffer.wrap(body);
@@ -148,79 +150,79 @@ public class SerializeUtility {
 		int start = 0;
 		while (hasNext) {
 			try {
-			int size = 0;
-			byte versionFlag = buffer.get();
-			size += SINGLE_SHOUT_FLAG;
-			// Handle version
-			int version = (int) (versionFlag >>> HAS_PARENT_BITS);
-			if (version != 0) {
-				throw new BadShoutVersionException();
-			}
-			// Get the has_parent flag
-			int parentFlag = versionFlag & 0x01;
-			// Get the timestamp
-			long time = buffer.getLong();
-			size += TIMESTAMP_SIZE;
-			byte nameLengthByte = buffer.get();
-			size += USERNAME_LENGTH_SIZE;
-			int nameLength = (((int) nameLengthByte) & MASK);
-			byte[] nameBytes = new byte[nameLength];
-			buffer.get(nameBytes);
-			size += nameLength;
-			byte[] publicKeyBytes = new byte[PUBLIC_KEY_SIZE];
-			buffer.get(publicKeyBytes);
-			size += PUBLIC_KEY_SIZE;
-			String message = null;
-			byte messageLengthByte = buffer.get();
-			size += MESSAGE_LENGTH_SIZE;
-			int messageLength = (((int) messageLengthByte) & MASK);
-			if (messageLength > 0) {
-				byte[] messageBytes = new byte[messageLength];
-				buffer.get(messageBytes);
-				size += messageLength;
+				int size = 0;
+				byte versionFlag = buffer.get();
+				size += SINGLE_SHOUT_FLAG;
+				// Handle version
+				int version = (int) (versionFlag >>> HAS_PARENT_BITS);
+				if (version != 0) {
+					throw new BadShoutVersionException();
+				}
+				// Get the has_parent flag
+				int parentFlag = versionFlag & 0x01;
+				// Get the timestamp
+				long time = buffer.getLong();
+				size += TIMESTAMP_SIZE;
+				byte nameLengthByte = buffer.get();
+				size += USERNAME_LENGTH_SIZE;
+				int nameLength = (((int) nameLengthByte) & MASK);
+				byte[] nameBytes = new byte[nameLength];
+				buffer.get(nameBytes);
+				size += nameLength;
+				byte[] publicKeyBytes = new byte[PUBLIC_KEY_SIZE];
+				buffer.get(publicKeyBytes);
+				size += PUBLIC_KEY_SIZE;
+				String message = null;
+				byte messageLengthByte = buffer.get();
+				size += MESSAGE_LENGTH_SIZE;
+				int messageLength = (((int) messageLengthByte) & MASK);
+				if (messageLength > 0) {
+					byte[] messageBytes = new byte[messageLength];
+					buffer.get(messageBytes);
+					size += messageLength;
+					try {
+						message = new String(messageBytes, Shout.CHARSET_NAME);
+					} catch (UnsupportedEncodingException e) {
+						// Should never happen
+						Log.e(TAG, e.getMessage());
+						return null;
+					}
+				}
+				byte[] parentHash;
+				if (parentFlag == 1) {
+					parentHash = new byte[HASH_SIZE];
+					buffer.get(parentHash);
+					size += HASH_SIZE;
+					hasNext = true;
+				} else {
+					hasNext = false;
+				}
+				byte[] shoutData = Arrays.copyOfRange(buffer.array(), start, start + size);
+				byte signatureLengthByte = buffer.get();
+				size += SIGNATURE_LENGTH_SIZE;
+				int signatureLength = (((int) signatureLengthByte) & MASK);
+				byte[] signatureBytes = new byte[signatureLength];
+				buffer.get(signatureBytes);
+				size += signatureLength;
+				start += size;
+				BuildableUser user = new BuildableUser();
 				try {
-					message = new String(messageBytes, Shout.CHARSET_NAME);
+					user.username = new String(nameBytes, Shout.CHARSET_NAME);
+					user.publicKey = SignatureUtility.getPublicKeyFromBytes(publicKeyBytes);
 				} catch (UnsupportedEncodingException e) {
 					// Should never happen
 					Log.e(TAG, e.getMessage());
 					return null;
 				}
-			}
-			byte[] parentHash;
-			if (parentFlag == 1) {
-				parentHash = new byte[HASH_SIZE];
-				buffer.get(parentHash);
-				size += HASH_SIZE;
-				hasNext = true;
-			} else {
-				hasNext = false;
-			}
-			byte[] shoutData = Arrays.copyOfRange(buffer.array(), start, start + size);
-			byte signatureLengthByte = buffer.get();
-			size += SIGNATURE_LENGTH_SIZE;
-			int signatureLength = (((int) signatureLengthByte) & MASK);
-			byte[] signatureBytes = new byte[signatureLength];
-			buffer.get(signatureBytes);
-			size += signatureLength;
-			start += size;
-			BuildableUser user = new BuildableUser();
-			try {
-				user.username = new String(nameBytes, Shout.CHARSET_NAME);
-				user.publicKey = SignatureUtility.getPublicKeyFromBytes(publicKeyBytes);
-			} catch (UnsupportedEncodingException e) {
-				// Should never happen
-				Log.e(TAG, e.getMessage());
-				return null;
-			}
-			shout.timestamp = new DateTime(time);
-			shout.user = user;
-			shout.message = message;
-			shout.signature = signatureBytes;
-			shout.hash = SerializeUtility.generateHash(shoutData, signatureBytes);
-			if (hasNext) {
-				shout.parent = new BuildableShout();
-				shout = shout.parent;
-			}
+				shout.timestamp = new DateTime(time);
+				shout.user = user;
+				shout.message = message;
+				shout.signature = signatureBytes;
+				shout.hash = SerializeUtility.generateHash(shoutData, signatureBytes);
+				if (hasNext) {
+					shout.parent = new BuildableShout();
+					shout = shout.parent;
+				}
 			} catch (BufferUnderflowException e) {
 				throw new ShoutPacketException();
 			}

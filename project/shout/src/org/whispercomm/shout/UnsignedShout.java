@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout;
 
 import org.joda.time.DateTime;
@@ -5,8 +6,7 @@ import org.joda.time.DateTime;
 /**
  * An interface to represent a Shout with no signature
  * 
- * @author David Adrian 
- *
+ * @author David Adrian
  */
 public interface UnsignedShout {
 
@@ -14,7 +14,6 @@ public interface UnsignedShout {
 	 * String encode/decode character set
 	 */
 	public static final String CHARSET_NAME = "UTF-8";
-
 
 	/**
 	 * @return The sender of this Shout
@@ -38,7 +37,7 @@ public interface UnsignedShout {
 	 * @return {@code null} if no original shout
 	 */
 	public Shout getParent();
-	
+
 	/**
 	 * Returns the type of the shout (SHOUT, RESHOUT, COMMENT, RECOMMENT).
 	 * 

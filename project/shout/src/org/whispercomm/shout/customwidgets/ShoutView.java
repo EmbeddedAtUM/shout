@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout.customwidgets;
 
 import org.whispercomm.shout.R;
@@ -17,7 +18,6 @@ import android.widget.TextView;
  * A custom component for displaying a single Shout.
  * 
  * @author David R. Bild
- * 
  */
 public class ShoutView extends RelativeLayout {
 
@@ -66,8 +66,7 @@ public class ShoutView extends RelativeLayout {
 	/**
 	 * Sets the Shout to be displayed by the view.
 	 * 
-	 * @param shout
-	 *            the Shout to be displayed
+	 * @param shout the Shout to be displayed
 	 */
 	public void bindShout(LocalShout shout) {
 		this.shout = shout;

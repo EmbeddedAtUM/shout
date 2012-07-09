@@ -29,7 +29,7 @@ public class IdManager {
 
 	private KeyStorage keyStorage;
 	private Context context;
-	
+
 	static {
 		Security.addProvider(new BouncyCastleProvider());
 	}
@@ -73,7 +73,7 @@ public class IdManager {
 			Log.e(TAG, e.getMessage());
 		}
 		// Some sort of failure, reset to old state
-		if (! keyStorage.isEmpty()) {
+		if (!keyStorage.isEmpty()) {
 			keyStorage.writeKeyPair(oldId, oldKeyPair);
 		}
 		return;

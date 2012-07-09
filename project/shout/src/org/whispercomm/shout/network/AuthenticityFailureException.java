@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout.network;
 
 public class AuthenticityFailureException extends Exception {

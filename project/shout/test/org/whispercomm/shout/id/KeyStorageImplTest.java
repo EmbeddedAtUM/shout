@@ -59,7 +59,7 @@ public class KeyStorageImplTest {
 		int fromStore = keyStore.getId();
 		assertEquals(id, fromStore);
 	}
-	
+
 	@Test
 	public void testCannotStoreInvalidId() {
 		int id = 0;

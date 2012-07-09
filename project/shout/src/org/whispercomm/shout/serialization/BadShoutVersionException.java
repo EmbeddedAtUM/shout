@@ -1,10 +1,10 @@
+
 package org.whispercomm.shout.serialization;
 
 /**
  * Exception used to indicate a Shout with a bad version came over the network.
  * 
  * @author David Adrian
- *
  */
 public class BadShoutVersionException extends Exception {
 

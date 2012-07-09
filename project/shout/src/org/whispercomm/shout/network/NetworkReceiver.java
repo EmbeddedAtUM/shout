@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout.network;
 
 import org.whispercomm.manes.client.maclib.ManesInterface;
@@ -8,7 +9,6 @@ import org.whispercomm.manes.client.maclib.ManesInterface;
  * 
  * @author Yue Liu
  * @author David R. Bild
- * 
  */
 public class NetworkReceiver {
 	@SuppressWarnings("unused")

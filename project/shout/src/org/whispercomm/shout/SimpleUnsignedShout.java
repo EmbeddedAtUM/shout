@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout;
 
 import org.joda.time.DateTime;
@@ -15,9 +16,9 @@ public class SimpleUnsignedShout implements UnsignedShout {
 		this.timestamp = timestamp;
 		this.sender = sender;
 		this.message = message;
-		this.parent= parent;
+		this.parent = parent;
 	}
-	
+
 	@Override
 	public User getSender() {
 		return this.sender;

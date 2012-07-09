@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout;
 
 import org.whispercomm.shout.customwidgets.ShoutListViewRow;
@@ -83,14 +84,14 @@ public class ShoutActivity extends ListActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		Intent intent;
 		switch (item.getItemId()) {
-		case R.id.settings:
-			intent = new Intent(this, SettingsActivity.class);
-			break;
-		case R.id.compose:
-			intent = new Intent(this, MessageActivity.class);
-			break;
-		default:
-			return super.onOptionsItemSelected(item);
+			case R.id.settings:
+				intent = new Intent(this, SettingsActivity.class);
+				break;
+			case R.id.compose:
+				intent = new Intent(this, MessageActivity.class);
+				break;
+			default:
+				return super.onOptionsItemSelected(item);
 		}
 
 		startActivity(intent);

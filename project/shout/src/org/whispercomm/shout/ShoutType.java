@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout;
 
 public enum ShoutType {

@@ -15,7 +15,7 @@ public abstract class AbstractShout implements Shout {
 		}
 		return hashCode;
 	}
-	
+
 	@Override
 	public ShoutType getType() {
 		return ShoutMessageUtility.getShoutType(this);

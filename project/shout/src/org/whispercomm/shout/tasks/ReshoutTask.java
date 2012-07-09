@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout.tasks;
 
 import org.joda.time.DateTime;
@@ -39,13 +40,13 @@ public class ReshoutTask extends AsyncTask<LocalShout, Void, Boolean> {
 		Shout parent;
 		ShoutType type = ShoutMessageUtility.getShoutType(shout);
 		switch (type) {
-		case RESHOUT:
-		case RECOMMENT:
-			parent = shout.getParent();
-			break;
-		default:
-			parent = shout;
-			break;
+			case RESHOUT:
+			case RECOMMENT:
+				parent = shout.getParent();
+				break;
+			default:
+				parent = shout;
+				break;
 		}
 
 		ShoutCreator creator = new ShoutCreator(context);
