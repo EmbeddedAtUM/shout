@@ -10,17 +10,14 @@ import org.whispercomm.shout.tasks.CommentTask;
 import org.whispercomm.shout.tasks.SendShoutTask;
 import org.whispercomm.shout.tasks.ShoutTask;
 import org.whispercomm.shout.thirdparty.Utf8ByteLengthFilter;
-import org.whispercomm.shout.util.ShoutMessageUtility;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputFilter;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.Toast;
@@ -45,41 +42,43 @@ public class MessageActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.message);
+		initializeViews();
 
 		network = new NetworkInterface(this);
 		idManager = new IdManager(getApplicationContext());
 
+		parent = getParent(getIntent().getExtras());
+	}
+
+	private void initializeViews() {
 		btnSend = (Button) findViewById(R.id.send);
-		edtMessage = (EditText) findViewById(R.id.compose);
 		frmProgressBar = (FrameLayout) findViewById(R.id.frmProgressBar);
+		edtMessage = (EditText) findViewById(R.id.compose);
 
 		edtMessage.setFilters(new InputFilter[] { new Utf8ByteLengthFilter(
 				SerializeUtility.MAX_MESSAGE_SIZE) });
+	}
 
-		Bundle extras = getIntent().getExtras();
+	private LocalShout getParent(Bundle extras) {
 		if (extras == null) {
-			return;
+			return null;
 		}
+
 		int parentId = extras.getInt(PARENT_ID, -1);
-		if (parentId > 0) {
-			parent = ShoutProviderContract.retrieveShoutById(
-					getApplicationContext(), parentId);
-			ShoutType type = ShoutMessageUtility.getShoutType(parent);
-			switch (type) {
-			case COMMENT:
-			case RESHOUT:
-				parent = parent.getParent();
-				parentId = ShoutProviderContract.storeShout(
-						getApplicationContext(), parent);
-				break;
-			case RECOMMENT:
-				parent = parent.getParent().getParent();
-				parentId = ShoutProviderContract.storeShout(
-						getApplicationContext(), parent);
-				break;
-			default:
-				break;
-			}
+		if (parentId < 0) {
+			return null;
+		}
+
+		parent = ShoutProviderContract.retrieveShoutById(
+				getApplicationContext(), parentId);
+		switch (parent.getType()) {
+		case COMMENT:
+		case RESHOUT:
+			return parent.getParent();
+		case RECOMMENT:
+			return parent.getParent().getParent();
+		default:
+			return parent;
 		}
 	}
 
