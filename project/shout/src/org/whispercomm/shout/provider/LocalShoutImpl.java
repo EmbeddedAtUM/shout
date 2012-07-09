@@ -92,15 +92,6 @@ public class LocalShoutImpl implements LocalShout {
 	}
 
 	@Override
-	public LocalShout getReshout(Me me) {
-		// TODO Make a reshout if it doesn't exist
-		if (myReshout == null) {
-			myReshout = ShoutProviderContract.getReshoutIfExists(context, this, me);
-		}
-		return myReshout;
-	}
-
-	@Override
 	public int getDatabaseId() {
 		return this.id;
 	}

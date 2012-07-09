@@ -413,31 +413,6 @@ public class ShoutProviderContract {
 	}
 
 	/**
-	 * Find a reshout of {@code parent} by {@code reshouter} in the database, if
-	 * it exists.
-	 * 
-	 * @param context
-	 * @param parent
-	 * @param reshouter
-	 * @return {@code null} if no such Shout exists
-	 */
-	public static LocalShout getReshoutIfExists(Context context,
-			LocalShout parent, LocalUser reshouter) {
-		String selection = Shouts.PARENT + " = ? AND " + Shouts.AUTHOR
-				+ " = ? AND " + Shouts.MESSAGE + " IS NULL";
-		String[] selectionArgs = { Integer.toString(parent.getDatabaseId()),
-				Integer.toString(reshouter.getDatabaseId()) };
-		Cursor cursor = context.getContentResolver().query(Shouts.CONTENT_URI,
-				null, selection, selectionArgs, null);
-		LocalShout reshout = null;
-		if (cursor.moveToFirst()) {
-			reshout = ShoutProviderContract.retrieveShoutFromCursor(context,
-					cursor);
-		}
-		return reshout;
-	}
-
-	/**
 	 * Retrieve the User with the given database ID
 	 * 
 	 * @param context
