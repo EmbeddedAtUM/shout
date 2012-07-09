@@ -35,7 +35,6 @@ public class MessageActivity extends Activity {
 	private Toast noUserToast;
 	private IdManager idManager;
 
-	private CheckBox chkTweet;
 	private Button btnSend;
 	private EditText edtMessage;
 	private FrameLayout frmProgressBar;
@@ -51,7 +50,6 @@ public class MessageActivity extends Activity {
 		network = new NetworkInterface(this);
 		idManager = new IdManager(getApplicationContext());
 
-		chkTweet = (CheckBox) findViewById(R.id.tweet);
 		btnSend = (Button) findViewById(R.id.send);
 		edtMessage = (EditText) findViewById(R.id.compose);
 		frmProgressBar = (FrameLayout) findViewById(R.id.frmProgressBar);
@@ -115,15 +113,11 @@ public class MessageActivity extends Activity {
 
 	private void showProgressBar() {
 		frmProgressBar.setVisibility(FrameLayout.VISIBLE);
-
-		chkTweet.setEnabled(false);
 		btnSend.setEnabled(false);
 	}
 
 	private void hideProgressBar() {
 		frmProgressBar.setVisibility(FrameLayout.GONE);
-
-		chkTweet.setEnabled(true);
 		btnSend.setEnabled(true);
 	}
 

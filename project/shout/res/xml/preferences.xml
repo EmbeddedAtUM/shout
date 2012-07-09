@@ -25,11 +25,4 @@
             android:title="Run in Background" />
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Twitter Account" >
-        <org.whispercomm.shout.customwidgets.TwitterPreference
-            android:key="twitterLoginPref"
-            android:summary="Login to Twitter to tweet your Shouts."
-            android:title="Login to Twitter" />
-    </PreferenceCategory>
-
 </PreferenceScreen>

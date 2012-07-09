@@ -9,14 +9,12 @@
     <string name="settings">Settings</string>
     <string name="avatarDesc">Avatar</string>
     <string name="compose">Compose Message</string>
-    <string name="postToTwitter">Post to twitter?</string>
     <string name="shout">Shout!</string>
     <string name="logoDesc">Logo</string>
     <string name="providerAuthority">org.whispercomm.shout.provider</string>
     <string name="timelineTitle">All Shouts</string>
     <string name="splashText">I am a Splash screen, look at me load!</string>
     <string name="username_change_warning">Hey, you! Changing your username is a big deal! Changing it will generate a new authentication key, which means none of your previous Shouts wil be linked to this new username.\n\nRemember, once you change your username, there is no going back.</string>
-    <string name="login_stub">lol jk.\n\n\nCan you imagine how ridiculous &quot;Twouting&quot; could end up sounding? Besides, I don\'t like implementing OAuth, anyway.</string>
     <string name="reshoutDesc">reshoutIcon</string>
     <string name="comment">Comments</string>
     <string name="reshoutDescription">Reshout</string>
