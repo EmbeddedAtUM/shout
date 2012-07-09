@@ -1,4 +1,3 @@
-
 package org.whispercomm.shout.network;
 
 import java.util.Timer;
@@ -100,7 +99,7 @@ public class NaiveNetworkProtocol implements NetworkProtocol {
 		try {
 			ShoutPacket packet = ShoutPacket.wrap(data);
 			Shout shout = packet.decodeShout();
-			ShoutProviderContract.storeShout(context, shout);
+			ShoutProviderContract.saveShout(context, shout);
 		} catch (BadShoutVersionException e) {
 			Log.v(TAG, e.getMessage());
 		} catch (ShoutPacketException e) {
