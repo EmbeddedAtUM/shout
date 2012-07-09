@@ -262,11 +262,6 @@ public class ShoutProviderContract {
 				this.id = ContractHelper.queryForShout(context, this);
 				if (this.id < 0) {
 					this.id = ContractHelper.storeInDatabase(context, this);
-					if (this.message != null) {
-						ShoutMessage text = new ShoutMessage(this.id,
-								this.message);
-						text.saveInDatabase();
-					}
 				}
 			}
 			return this.id;

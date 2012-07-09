@@ -1,3 +1,4 @@
+
 package org.whispercomm.shout.provider;
 
 import android.content.ContentProvider;
@@ -18,7 +19,6 @@ import android.util.Log;
  * Content provider to store Shouts and Users seen by this device.
  * 
  * @author David Adrian
- *
  */
 public class ShoutProvider extends ContentProvider {
 
@@ -67,42 +67,42 @@ public class ShoutProvider extends ContentProvider {
 		String id, table, whereClause = null;
 		String[] whereArgs = null;
 		switch (match) {
-		case SHOUTS:
-			table = ShoutProviderContract.Shouts.TABLE_NAME;
-			whereClause = selection;
-			whereArgs = selectionArgs;
-			break;
-		case SHOUT_ID:
-			table = ShoutProviderContract.Shouts.TABLE_NAME;
-			id = uri.getLastPathSegment();
-			if (TextUtils.isEmpty(selection)) {
-				whereClause = ShoutProviderContract.Shouts._ID + "=" + id;
-				whereArgs = null;
-			} else {
-				whereClause = selection + " and "
-						+ ShoutProviderContract.Shouts._ID + "=" + id;
+			case SHOUTS:
+				table = ShoutProviderContract.Shouts.TABLE_NAME;
+				whereClause = selection;
 				whereArgs = selectionArgs;
-			}
-			break;
-		case USERS:
-			table = ShoutProviderContract.Users.TABLE_NAME;
-			whereClause = selection;
-			whereArgs = selectionArgs;
-			break;
-		case USER_ID:
-			table = ShoutProviderContract.Users.TABLE_NAME;
-			id = uri.getLastPathSegment();
-			if (TextUtils.isEmpty(selection)) {
-				whereClause = ShoutProviderContract.Users._ID + "=" + id;
-				whereArgs = null;
-			} else {
-				whereClause = selection + " and "
-						+ ShoutProviderContract.Users._ID + "=" + id;
+				break;
+			case SHOUT_ID:
+				table = ShoutProviderContract.Shouts.TABLE_NAME;
+				id = uri.getLastPathSegment();
+				if (TextUtils.isEmpty(selection)) {
+					whereClause = ShoutProviderContract.Shouts._ID + "=" + id;
+					whereArgs = null;
+				} else {
+					whereClause = selection + " and "
+							+ ShoutProviderContract.Shouts._ID + "=" + id;
+					whereArgs = selectionArgs;
+				}
+				break;
+			case USERS:
+				table = ShoutProviderContract.Users.TABLE_NAME;
+				whereClause = selection;
 				whereArgs = selectionArgs;
-			}
-			break;
-		default:
-			throw new IllegalArgumentException("Invalid or unknown URI " + uri);
+				break;
+			case USER_ID:
+				table = ShoutProviderContract.Users.TABLE_NAME;
+				id = uri.getLastPathSegment();
+				if (TextUtils.isEmpty(selection)) {
+					whereClause = ShoutProviderContract.Users._ID + "=" + id;
+					whereArgs = null;
+				} else {
+					whereClause = selection + " and "
+							+ ShoutProviderContract.Users._ID + "=" + id;
+					whereArgs = selectionArgs;
+				}
+				break;
+			default:
+				throw new IllegalArgumentException("Invalid or unknown URI " + uri);
 		}
 		int rowsAffected = mDB.delete(table, whereClause, whereArgs);
 		this.getContext().getContentResolver().notifyChange(uri, null);
@@ -113,17 +113,17 @@ public class ShoutProvider extends ContentProvider {
 	public String getType(Uri uri) {
 		int match = sUriMatcher.match(uri);
 		switch (match) {
-		case SHOUTS:
-		case SHOUTS_USER_ID:
-			return MIME_SHOUT_MANY;
-		case SHOUT_ID:
-			return MIME_SHOUT;
-		case USERS:
-			return MIME_USER_MANY;
-		case USER_ID:
-			return MIME_USER;
-		default:
-			throw new IllegalArgumentException("Unknown or invalid URI " + uri);
+			case SHOUTS:
+			case SHOUTS_USER_ID:
+				return MIME_SHOUT_MANY;
+			case SHOUT_ID:
+				return MIME_SHOUT;
+			case USERS:
+				return MIME_USER_MANY;
+			case USER_ID:
+				return MIME_USER;
+			default:
+				throw new IllegalArgumentException("Unknown or invalid URI " + uri);
 		}
 	}
 
@@ -134,17 +134,17 @@ public class ShoutProvider extends ContentProvider {
 		int match = sUriMatcher.match(uri);
 		String table = null;
 		switch (match) {
-		case SHOUTS:
-			table = ShoutProviderContract.Shouts.TABLE_NAME;
-			break;
-		case USERS:
-			table = ShoutProviderContract.Users.TABLE_NAME;
-			break;
-		case MESSAGES:
-			table = ShoutSearchContract.Messages.TABLE_NAME;
-			break;
-		default:
-			throw new IllegalArgumentException("Unknown or invalid URI " + uri);
+			case SHOUTS:
+				table = ShoutProviderContract.Shouts.TABLE_NAME;
+				break;
+			case USERS:
+				table = ShoutProviderContract.Users.TABLE_NAME;
+				break;
+			case MESSAGES:
+				table = ShoutSearchContract.Messages.TABLE_NAME;
+				break;
+			default:
+				throw new IllegalArgumentException("Unknown or invalid URI " + uri);
 		}
 
 		long rowId = mDB.insert(table, null, values);
@@ -170,42 +170,42 @@ public class ShoutProvider extends ContentProvider {
 		SQLiteQueryBuilder qBuilder = new SQLiteQueryBuilder();
 		int match = sUriMatcher.match(uri);
 		switch (match) {
-		case SHOUTS:
-			qBuilder.setTables(ShoutProviderContract.Shouts.TABLE_NAME);
-			break;
-		case SHOUT_ID:
-			qBuilder.setTables(ShoutProviderContract.Shouts.TABLE_NAME);
-			qBuilder.appendWhere(ShoutProviderContract.Shouts._ID + "="
-					+ uri.getLastPathSegment());
-			break;
-		case SHOUTS_USER_ID:
-			qBuilder.setTables(ShoutProviderContract.Shouts.TABLE_NAME);
-			qBuilder.appendWhere(ShoutProviderContract.Shouts.AUTHOR + "="
-					+ uri.getLastPathSegment());
-			break;
-		case USERS:
-			qBuilder.setTables(ShoutProviderContract.Users.TABLE_NAME);
-			break;
-		case USER_ID:
-			qBuilder.setTables(ShoutProviderContract.Users.TABLE_NAME);
-			qBuilder.appendWhere(ShoutProviderContract.Shouts._ID + "="
-					+ uri.getLastPathSegment());
-			break;
-		case MESSAGES:
-			qBuilder.setTables(ShoutSearchContract.Messages.TABLE_NAME);
-			break;
-		case MESSAGE_ID:
-			qBuilder.setTables(ShoutSearchContract.Messages.TABLE_NAME);
-			qBuilder.appendWhere(ShoutSearchContract.Messages._ID + "="
-					+ uri.getLastPathSegment());
-			break;
-		case MESSAGES_SHOUT_ID:
-			qBuilder.setTables(ShoutSearchContract.Messages.TABLE_NAME);
-			qBuilder.appendWhere(ShoutSearchContract.Messages.SHOUT + " MATCH "
-					+ uri.getLastPathSegment());
-			break;
-		default:
-			throw new IllegalArgumentException("Unknown or invalid URI " + uri);
+			case SHOUTS:
+				qBuilder.setTables(ShoutProviderContract.Shouts.TABLE_NAME);
+				break;
+			case SHOUT_ID:
+				qBuilder.setTables(ShoutProviderContract.Shouts.TABLE_NAME);
+				qBuilder.appendWhere(ShoutProviderContract.Shouts._ID + "="
+						+ uri.getLastPathSegment());
+				break;
+			case SHOUTS_USER_ID:
+				qBuilder.setTables(ShoutProviderContract.Shouts.TABLE_NAME);
+				qBuilder.appendWhere(ShoutProviderContract.Shouts.AUTHOR + "="
+						+ uri.getLastPathSegment());
+				break;
+			case USERS:
+				qBuilder.setTables(ShoutProviderContract.Users.TABLE_NAME);
+				break;
+			case USER_ID:
+				qBuilder.setTables(ShoutProviderContract.Users.TABLE_NAME);
+				qBuilder.appendWhere(ShoutProviderContract.Shouts._ID + "="
+						+ uri.getLastPathSegment());
+				break;
+			case MESSAGES:
+				qBuilder.setTables(ShoutSearchContract.Messages.TABLE_NAME);
+				break;
+			case MESSAGE_ID:
+				qBuilder.setTables(ShoutSearchContract.Messages.TABLE_NAME);
+				qBuilder.appendWhere(ShoutSearchContract.Messages._ID + "="
+						+ uri.getLastPathSegment());
+				break;
+			case MESSAGES_SHOUT_ID:
+				qBuilder.setTables(ShoutSearchContract.Messages.TABLE_NAME);
+				qBuilder.appendWhere(ShoutSearchContract.Messages.SHOUT + " MATCH "
+						+ uri.getLastPathSegment());
+				break;
+			default:
+				throw new IllegalArgumentException("Unknown or invalid URI " + uri);
 		}
 
 		Cursor resultCursor = qBuilder.query(mDB, projection, selection,
@@ -226,54 +226,54 @@ public class ShoutProvider extends ContentProvider {
 
 		int match = sUriMatcher.match(uri);
 		switch (match) {
-		case SHOUTS:
-			table = ShoutProviderContract.Shouts.TABLE_NAME;
-			whereClause = selection;
-			whereArgs = selectionArgs;
-			break;
-		case SHOUT_ID:
-			id = uri.getLastPathSegment();
-			table = ShoutProviderContract.Shouts.TABLE_NAME;
-			if (TextUtils.isEmpty(selection)) {
-				whereClause = ShoutProviderContract.Shouts._ID + "=" + id;
-				whereArgs = null;
-			} else {
-				whereClause = selection + " and "
-						+ ShoutProviderContract.Shouts._ID + "=" + id;
+			case SHOUTS:
+				table = ShoutProviderContract.Shouts.TABLE_NAME;
+				whereClause = selection;
 				whereArgs = selectionArgs;
-			}
-			break;
-		case SHOUTS_USER_ID:
-			id = uri.getLastPathSegment();
-			table = ShoutProviderContract.Shouts.TABLE_NAME;
-			if (TextUtils.isEmpty(selection)) {
-				whereClause = ShoutProviderContract.Shouts.AUTHOR + "=" + id;
-				whereArgs = null;
-			} else {
-				whereClause = selection + " and "
-						+ ShoutProviderContract.Shouts.AUTHOR + "=" + id;
+				break;
+			case SHOUT_ID:
+				id = uri.getLastPathSegment();
+				table = ShoutProviderContract.Shouts.TABLE_NAME;
+				if (TextUtils.isEmpty(selection)) {
+					whereClause = ShoutProviderContract.Shouts._ID + "=" + id;
+					whereArgs = null;
+				} else {
+					whereClause = selection + " and "
+							+ ShoutProviderContract.Shouts._ID + "=" + id;
+					whereArgs = selectionArgs;
+				}
+				break;
+			case SHOUTS_USER_ID:
+				id = uri.getLastPathSegment();
+				table = ShoutProviderContract.Shouts.TABLE_NAME;
+				if (TextUtils.isEmpty(selection)) {
+					whereClause = ShoutProviderContract.Shouts.AUTHOR + "=" + id;
+					whereArgs = null;
+				} else {
+					whereClause = selection + " and "
+							+ ShoutProviderContract.Shouts.AUTHOR + "=" + id;
+					whereArgs = selectionArgs;
+				}
+				break;
+			case USERS:
+				table = ShoutProviderContract.Users.TABLE_NAME;
+				whereClause = selection;
 				whereArgs = selectionArgs;
-			}
-			break;
-		case USERS:
-			table = ShoutProviderContract.Users.TABLE_NAME;
-			whereClause = selection;
-			whereArgs = selectionArgs;
-			break;
-		case USER_ID:
-			id = uri.getLastPathSegment();
-			table = ShoutProviderContract.Users.TABLE_NAME;
-			if (TextUtils.isEmpty(selection)) {
-				whereClause = ShoutProviderContract.Users._ID + "=" + id;
-				whereArgs = null;
-			} else {
-				whereClause = selection + " and "
-						+ ShoutProviderContract.Users._ID + "=" + id;
-				whereArgs = selectionArgs;
-			}
-			break;
-		default:
-			throw new IllegalArgumentException("Unknown or invalid URI " + uri);
+				break;
+			case USER_ID:
+				id = uri.getLastPathSegment();
+				table = ShoutProviderContract.Users.TABLE_NAME;
+				if (TextUtils.isEmpty(selection)) {
+					whereClause = ShoutProviderContract.Users._ID + "=" + id;
+					whereArgs = null;
+				} else {
+					whereClause = selection + " and "
+							+ ShoutProviderContract.Users._ID + "=" + id;
+					whereArgs = selectionArgs;
+				}
+				break;
+			default:
+				throw new IllegalArgumentException("Unknown or invalid URI " + uri);
 		}
 		int rowsAffected = mDB.update(table, values, whereClause, whereArgs);
 		this.getContext().getContentResolver().notifyChange(uri, null);
@@ -304,13 +304,14 @@ public class ShoutProvider extends ContentProvider {
 				+ ShoutProviderContract.Shouts.MESSAGE + " TEXT, "
 				+ ShoutProviderContract.Shouts.TIME_SENT + " LONG, "
 				+ ShoutProviderContract.Shouts.TIME_RECEIVED + " LONG, "
-				+ ShoutProviderContract.Shouts.HASH + " TEXT UNIQUE, "
-				+ ShoutProviderContract.Shouts.SIGNATURE + " TEXT UNIQUE, "
+				+ ShoutProviderContract.Shouts.HASH + " TEXT, "
+				+ ShoutProviderContract.Shouts.SIGNATURE + " TEXT, "
 				+ ShoutProviderContract.Shouts.COMMENT_COUNT + " INTEGER DEFAULT 0, "
 				+ ShoutProviderContract.Shouts.RESHOUT_COUNT + " INTEGER DEFAULT 0, "
+				+ "UNIQUE (" + ShoutProviderContract.Shouts.HASH + ") ON CONFLICT ROLLBACK, "
 				+ "FOREIGN KEY(" + ShoutProviderContract.Shouts.AUTHOR
 				+ ") REFERENCES " + ShoutProviderContract.Users.TABLE_NAME
-				+ "(" + ShoutProviderContract.Users._ID + ") " + "FOREIGN KEY("
+				+ "(" + ShoutProviderContract.Users._ID + "), " + "FOREIGN KEY("
 				+ ShoutProviderContract.Shouts.PARENT + ") REFERENCES "
 				+ ShoutProviderContract.Shouts.TABLE_NAME + "("
 				+ ShoutProviderContract.Shouts._ID + ") " + ");";
@@ -321,26 +322,39 @@ public class ShoutProvider extends ContentProvider {
 				+ ShoutSearchContract.Messages.SHOUT
 				+ ", "
 				+ ShoutSearchContract.Messages.MESSAGE + ");";
-		
+
 		private static final String SQL_CREATE_TRIGGER_COMMENT = "CREATE TRIGGER "
 				+ "Update_Comment_Count AFTER INSERT ON "
-				+ ShoutProviderContract.Shouts.TABLE_NAME + "\nBEGIN\n" + "UPDATE "
-				+ ShoutProviderContract.Shouts.TABLE_NAME + " SET " 
+				+ ShoutProviderContract.Shouts.TABLE_NAME + " WHEN new."
+				+ ShoutProviderContract.Shouts.MESSAGE + " IS NOT NULL AND new."
+				+ ShoutProviderContract.Shouts.PARENT + " IS NOT NULL "
+				+ "\nBEGIN\n" + "UPDATE "
+				+ ShoutProviderContract.Shouts.TABLE_NAME + " SET "
 				+ ShoutProviderContract.Shouts.COMMENT_COUNT + " = "
 				+ ShoutProviderContract.Shouts.COMMENT_COUNT + " + 1 WHERE "
-				+ ShoutProviderContract.Shouts._ID + " = new." 
-				+ ShoutProviderContract.Shouts.PARENT + " AND new."
-				+ ShoutProviderContract.Shouts.MESSAGE + " IS NOT NULL;\nEND;";
-		
+				+ ShoutProviderContract.Shouts._ID + " = new."
+				+ ShoutProviderContract.Shouts.PARENT + ";\nEND;";
+
 		private static final String SQL_CREATE_TRIGGER_RESHOUT = "CREATE TRIGGER "
 				+ "Update_Reshout_Count AFTER INSERT ON "
-				+ ShoutProviderContract.Shouts.TABLE_NAME + "\nBEGIN\n" + "UPDATE "
+				+ ShoutProviderContract.Shouts.TABLE_NAME + " WHEN new."
+				+ ShoutProviderContract.Shouts.MESSAGE + " IS NULL AND new."
+				+ ShoutProviderContract.Shouts.PARENT + " IS NOT NULL "
+				+ "\nBEGIN\n" + "UPDATE "
 				+ ShoutProviderContract.Shouts.TABLE_NAME + " SET "
 				+ ShoutProviderContract.Shouts.RESHOUT_COUNT + " = "
 				+ ShoutProviderContract.Shouts.RESHOUT_COUNT + " + 1 WHERE "
 				+ ShoutProviderContract.Shouts._ID + " = new."
-				+ ShoutProviderContract.Shouts.PARENT + " AND new."
-				+ ShoutProviderContract.Shouts.MESSAGE + " IS NULL;\nEND;";
+				+ ShoutProviderContract.Shouts.PARENT + ";\nEND;";
+
+		private static final String SQL_CREATE_TRIGGER_MESSAGE = "CREATE TRIGGER "
+				+ "Update_FTS3_Message AFTER INSERT ON "
+				+ ShoutProviderContract.Shouts.TABLE_NAME + " WHEN new."
+				+ ShoutProviderContract.Shouts.MESSAGE + " IS NOT NULL "
+				+ "\nBEGIN\n" + "INSERT INTO " + ShoutSearchContract.Messages.TABLE_NAME + "( "
+				+ ShoutSearchContract.Messages.SHOUT + ", " + ShoutSearchContract.Messages.MESSAGE
+				+ " ) VALUES ( new." + ShoutProviderContract.Shouts._ID + ", new."
+				+ ShoutProviderContract.Shouts.MESSAGE + " );\nEND;";
 
 		public ShoutDatabaseHelper(Context context) {
 			super(context, DBNAME, null, VERSION);
@@ -353,6 +367,7 @@ public class ShoutProvider extends ContentProvider {
 			db.execSQL(SQL_CREATE_VIRTUAL_MESSAGE);
 			db.execSQL(SQL_CREATE_TRIGGER_COMMENT);
 			db.execSQL(SQL_CREATE_TRIGGER_RESHOUT);
+			db.execSQL(SQL_CREATE_TRIGGER_MESSAGE);
 		}
 
 		@Override
