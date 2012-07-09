@@ -293,7 +293,8 @@ public class ShoutProvider extends ContentProvider {
 				+ ShoutProviderContract.Users._ID
 				+ " INTEGER PRIMARY KEY ASC AUTOINCREMENT, "
 				+ ShoutProviderContract.Users.USERNAME + " TEXT, "
-				+ ShoutProviderContract.Users.PUB_KEY + " TEXT UNIQUE" + ");";
+				+ ShoutProviderContract.Users.PUB_KEY + " TEXT, " 
+				+ "UNIQUE (" + ShoutProviderContract.Users.PUB_KEY + ") ON CONFLICT IGNORE" + ");";
 
 		private static final String SQL_CREATE_SHOUT = "CREATE TABLE "
 				+ ShoutProviderContract.Shouts.TABLE_NAME + "("
@@ -308,7 +309,7 @@ public class ShoutProvider extends ContentProvider {
 				+ ShoutProviderContract.Shouts.SIGNATURE + " TEXT, "
 				+ ShoutProviderContract.Shouts.COMMENT_COUNT + " INTEGER DEFAULT 0, "
 				+ ShoutProviderContract.Shouts.RESHOUT_COUNT + " INTEGER DEFAULT 0, "
-				+ "UNIQUE (" + ShoutProviderContract.Shouts.HASH + ") ON CONFLICT ROLLBACK, "
+				+ "UNIQUE (" + ShoutProviderContract.Shouts.HASH + ") ON CONFLICT IGNORE, "
 				+ "FOREIGN KEY(" + ShoutProviderContract.Shouts.AUTHOR
 				+ ") REFERENCES " + ShoutProviderContract.Users.TABLE_NAME
 				+ "(" + ShoutProviderContract.Users._ID + "), " + "FOREIGN KEY("

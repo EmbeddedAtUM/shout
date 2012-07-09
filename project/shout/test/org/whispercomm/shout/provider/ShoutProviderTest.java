@@ -241,4 +241,23 @@ public class ShoutProviderTest {
 			assertEquals(otherUser, cursor.getInt(authorIndex));
 		}
 	}
+
+	@Test
+	public void testInsertDuplicateShoutDoesNothing() {
+		try {
+			ProviderTestUtility.insertIntoShoutTable(cr, userId, -1, MESSAGE,
+					TIME, sig, hash);
+		} catch (SQLException e) {
+			fail("Inserting a duplicate should not throw an exception");
+		}
+	}
+	
+	@Test
+	public void testInsertDuplicateUserDoesNothing() {
+		try {
+			ProviderTestUtility.insertIntoUserTable(cr, NAME, userKey);
+		} catch (SQLException e) {
+			fail("Inserting a duplicate should not throw an exception");
+		}
+	}
 }
