@@ -22,13 +22,14 @@ public class ProviderTestUtility {
 		return location;
 	}
 
-	public static Uri insertIntoShoutTable(ContentResolver cr, int author, int parent,
-			String message, long time,
-			byte[] signature, byte[] hash) {
+	public static Uri insertIntoShoutTable(ContentResolver cr, byte[] author, byte[] parentHash,
+			String message, long time, byte[] signature, byte[] hash) {
 		ContentValues values = new ContentValues();
-		values.put(ShoutProviderContract.Shouts.AUTHOR, author);
-		if (parent > 0) {
-			values.put(ShoutProviderContract.Shouts.PARENT, parent);
+		values.put(ShoutProviderContract.Shouts.AUTHOR,
+				Base64.encodeToString(author, Base64.DEFAULT));
+		if (parentHash != null) {
+			values.put(ShoutProviderContract.Shouts.PARENT,
+					Base64.encodeToString(parentHash, Base64.DEFAULT));
 		}
 		values.put(ShoutProviderContract.Shouts.MESSAGE, message);
 		values.put(ShoutProviderContract.Shouts.TIME_SENT, time);
@@ -39,30 +40,24 @@ public class ProviderTestUtility {
 		return location;
 	}
 
-	public static void insertFourUsers(ContentResolver cr, String[] usernames) {
-		byte[][] keys = new byte[usernames.length][];
+	public static void insertFourUsers(ContentResolver cr, String[] usernames, byte[][] keys) {
 		for (int i = 0; i < usernames.length; i++) {
-			keys[i] = TestFactory.genByteArray(32);
 			Uri at = ProviderTestUtility.insertIntoUserTable(cr, usernames[i], keys[i]);
 			assertNotNull(at);
 			assertTrue(Integer.valueOf(at.getLastPathSegment()) > 0);
 		}
 	}
 
-	public static void insertFourShouts(ContentResolver cr, String[] messages, int[] parents) {
-		int[] authors = {
-				1, 1, 2, 2
-		};
+	public static void insertFourShouts(ContentResolver cr, String[] messages, byte[][] authors,
+			byte[][] parents) {
 		long[] times = {
 				100, 200, 300, 400
 		};
-		byte[][] hashes = new byte[messages.length][];
-		byte[][] sigs = new byte[messages.length][];
 		for (int i = 0; i < messages.length; i++) {
-			hashes[i] = TestFactory.genByteArray(10);
-			sigs[i] = TestFactory.genByteArray(32);
+			byte[] hash = TestFactory.genByteArray(10);
+			byte[] sig = TestFactory.genByteArray(32);
 			Uri at = ProviderTestUtility.insertIntoShoutTable(cr, authors[i], parents[i],
-					messages[i], times[i], sigs[i], hashes[i]);
+					messages[i], times[i], sig, hash);
 			assertNotNull(at);
 			assertTrue(Integer.valueOf(at.getLastPathSegment()) > 0);
 		}

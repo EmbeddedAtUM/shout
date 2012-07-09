@@ -37,8 +37,8 @@ public class ShoutProviderContractTest {
 	@Before
 	public void setUp() {
 		this.context = new Activity();
-		testUser = new TestUser(NAME);
-		testShout = new TestShout(testUser, null, MESSAGE, new DateTime(TIME), SIGNATURE, HASH);
+		this.testUser = new TestUser(NAME);
+		this.testShout = new TestShout(testUser, null, MESSAGE, new DateTime(TIME), SIGNATURE, HASH);
 	}
 
 	@After

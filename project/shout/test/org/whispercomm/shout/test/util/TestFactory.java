@@ -16,6 +16,8 @@ import java.security.spec.ECGenParameterSpec;
 import org.spongycastle.jce.provider.BouncyCastleProvider;
 import org.whispercomm.shout.id.SignatureUtility;
 
+import android.util.Base64;
+
 /**
  * Factory class to be used when generating objects for testing
  * 
@@ -82,6 +84,14 @@ public class TestFactory {
 			arr[i] = value;
 		}
 		return arr;
+	}
+	
+	public static String generateRandomBase64String(int approxLength) {
+		byte[] arr = new byte[approxLength * 6 / 8];
+		SecureRandom rand = new SecureRandom();
+		rand.nextBytes(arr);
+		String encoded = Base64.encodeToString(arr, Base64.DEFAULT);
+		return encoded;
 	}
 
 }

@@ -68,7 +68,7 @@ public class ShoutProviderContract {
 
 		/**
 		 * Column name for the author of a Shout. Stored as a reference to a
-		 * user.
+		 * user public key, Base64 encoded.
 		 */
 		public static final String AUTHOR = "Author";
 
@@ -79,7 +79,7 @@ public class ShoutProviderContract {
 
 		/**
 		 * Column name for the parent Shout. Stored as a reference to another
-		 * Shout in the database.
+		 * Shout hash, Base64 encoded.
 		 */
 		public static final String PARENT = "Parent";
 
@@ -139,168 +139,6 @@ public class ShoutProviderContract {
 		 * encoding of the key represented as a byte array.
 		 */
 		public static final String PUB_KEY = "Key";
-	}
-
-	/**
-	 * Private interface to make inserting objects into the database easier
-	 * 
-	 * @author David Adrian
-	 */
-	private interface DatabaseObject {
-		/**
-		 * Construct a representation of the DatabaseObject as a ContentValues
-		 * object with the necessary key/value pairs.
-		 * 
-		 * @return ContentValues representation of {@code this}
-		 */
-		ContentValues makeContentValues();
-
-		/**
-		 * @return The URI where this object should be inserted
-		 */
-		Uri getInsertLocation();
-
-		/**
-		 * Save self in database, if not already in the database.
-		 * 
-		 * @return id of {@code this} in the database.
-		 */
-		int saveInDatabase();
-	}
-
-	private static class DatabaseUser implements DatabaseObject {
-		private int id;
-		private String username;
-		private String key;
-
-		private Context context;
-
-		public DatabaseUser(User user, Context context) {
-			username = user.getUsername();
-			key = Base64.encodeToString(user.getPublicKey().getEncoded(),
-					Base64.DEFAULT);
-			id = -1;
-			this.context = context;
-		}
-
-		@Override
-		public ContentValues makeContentValues() {
-			ContentValues values = new ContentValues();
-			values.put(Users.USERNAME, username);
-			values.put(Users.PUB_KEY, key);
-			return values;
-		}
-
-		@Override
-		public Uri getInsertLocation() {
-			return Users.CONTENT_URI;
-		}
-
-		@Override
-		public int saveInDatabase() {
-			if (this.id > 0) {
-				return this.id;
-			} else {
-				this.id = ContractHelper.queryForUser(context, this);
-				if (this.id < 1) {
-					this.id = ContractHelper.storeInDatabase(context, this);
-				}
-				return this.id;
-			}
-		}
-
-	}
-
-	private static class DatabaseShout implements DatabaseObject {
-		private int id = -1;
-		private int author;
-		private int parent;
-		private String message;
-		private long time;
-		private String signature;
-		private String hash;
-		private Context context;
-
-		public DatabaseShout(Shout shout, int author, int parent,
-				Context context) {
-			this.message = shout.getMessage();
-			this.time = shout.getTimestamp().getMillis();
-			this.signature = Base64.encodeToString(shout.getSignature(),
-					Base64.DEFAULT);
-			this.hash = Base64.encodeToString(shout.getHash(), Base64.DEFAULT);
-
-			this.author = author;
-			this.parent = parent;
-
-			this.context = context;
-		}
-
-		@Override
-		public ContentValues makeContentValues() {
-			ContentValues values = new ContentValues();
-			values.put(Shouts.AUTHOR, this.author);
-			if (this.parent > 0) {
-				values.put(Shouts.PARENT, this.parent);
-			}
-			values.put(Shouts.MESSAGE, this.message);
-			values.put(Shouts.TIME_SENT, this.time);
-			values.put(Shouts.TIME_RECEIVED, System.currentTimeMillis());
-			values.put(Shouts.SIGNATURE, this.signature);
-			values.put(Shouts.HASH, this.hash);
-			return values;
-		}
-
-		@Override
-		public Uri getInsertLocation() {
-			return Shouts.CONTENT_URI;
-		}
-
-		@Override
-		public int saveInDatabase() {
-			if (this.id > 0) {
-				return this.id;
-			} else {
-				this.id = ContractHelper.queryForShout(context, this);
-				if (this.id < 0) {
-					this.id = ContractHelper.storeInDatabase(context, this);
-				}
-			}
-			return this.id;
-		}
-
-		private class ShoutMessage implements DatabaseObject {
-
-			private int rowId = -1;
-			private int shoutId;
-			private String message;
-
-			public ShoutMessage(int shoutId, String message) {
-				this.shoutId = shoutId;
-				this.message = message;
-			}
-
-			@Override
-			public ContentValues makeContentValues() {
-				ContentValues values = new ContentValues();
-				values.put(ShoutSearchContract.Messages.SHOUT, shoutId);
-				values.put(ShoutSearchContract.Messages.MESSAGE, message);
-				return values;
-			}
-
-			@Override
-			public Uri getInsertLocation() {
-				return ShoutSearchContract.Messages.CONTENT_URI;
-			}
-
-			@Override
-			public int saveInDatabase() {
-				if (this.rowId < 0) {
-					this.rowId = ContractHelper.storeInDatabase(context, this);
-				}
-				return this.rowId;
-			}
-
-		}
 	}
 
 	/**
@@ -376,19 +214,7 @@ public class ShoutProviderContract {
 	 */
 	@Deprecated
 	public static int storeShout(Context context, Shout shout) {
-		int id = ContractHelper.queryForShout(context, new DatabaseShout(shout,
-				-1, -1, context));
-		if (id < 0) {
-			int parent = -1;
-			if (shout.getParent() != null) {
-				parent = storeShout(context, shout.getParent());
-			}
-			int author = storeUser(context, shout.getSender());
-			DatabaseShout dbShout = new DatabaseShout(shout, author, parent,
-					context);
-			id = dbShout.saveInDatabase();
-		}
-		return id;
+		return -1;
 	}
 
 	/**
@@ -400,8 +226,14 @@ public class ShoutProviderContract {
 	 * @return the stored shout or {@code null} on failure.
 	 */
 	public static LocalShout saveShout(Context context, Shout shout) {
-		int id = storeShout(context, shout);
-		return ShoutProviderContract.retrieveShoutById(context, id);
+		if (shout.getParent() != null) {
+			saveShout(context, shout.getParent());
+		}
+		ContentValues values = ContractHelper.buildContentValues(shout);
+		Uri location = context.getContentResolver().insert(Shouts.CONTENT_URI, values);
+		Cursor cursor = context.getContentResolver().query(location, null, null, null, null);
+		cursor.moveToFirst();
+		return retrieveShoutFromCursor(context, cursor);
 	}
 
 	/**
@@ -456,8 +288,9 @@ public class ShoutProviderContract {
 	 * @return The ID of the User in the database or -1 on failure
 	 */
 	public static int storeUser(Context context, User user) {
-		DatabaseUser dbUser = new DatabaseUser(user, context);
-		int id = dbUser.saveInDatabase();
+		ContentValues values = ContractHelper.buildContentValues(user);
+		Uri location = context.getContentResolver().insert(Users.CONTENT_URI, values);
+		int id = Integer.valueOf(location.getLastPathSegment());
 		return id;
 	}
 
@@ -489,7 +322,7 @@ public class ShoutProviderContract {
 		String selection = Shouts.PARENT + " = ? AND " + Shouts.MESSAGE
 				+ " IS NOT NULL";
 		String[] selectionArgs = {
-			Integer.toString(shoutId)
+				Integer.toString(shoutId)
 		};
 		Cursor result = context.getContentResolver().query(Shouts.CONTENT_URI,
 				null, selection, selectionArgs, sortOrder);
@@ -525,7 +358,7 @@ public class ShoutProviderContract {
 		String selection = Shouts.PARENT + " = ? AND " + Shouts.MESSAGE
 				+ " IS NULL";
 		String[] selectionArgs = {
-			Integer.toString(parentId)
+				Integer.toString(parentId)
 		};
 
 		Cursor result = context.getContentResolver().query(Shouts.CONTENT_URI,
@@ -566,93 +399,39 @@ public class ShoutProviderContract {
 
 	/**
 	 * Helper class for storing and retrieving both Shout and User objects
-	 * (specifically the DatabaseObject representations of)
 	 * 
 	 * @author David Adrian
 	 */
 	private static class ContractHelper {
-		/**
-		 * Store a DatabaseObject in the database.
-		 * 
-		 * @param context
-		 * @param dbObject
-		 * @return id of the DatabaseObject in the database
-		 */
-		public static int storeInDatabase(Context context,
-				DatabaseObject dbObject) {
-			ContentValues values = dbObject.makeContentValues();
-			Uri table = dbObject.getInsertLocation();
-			Uri location = context.getContentResolver().insert(table, values);
-			int id = Integer.valueOf(location.getLastPathSegment());
-			return id;
+
+		public static ContentValues buildContentValues(User user) {
+			ContentValues values = new ContentValues();
+			String encodedKey = Base64.encodeToString(user.getPublicKey().getEncoded(),
+					Base64.DEFAULT);
+			values.put(Users.USERNAME, user.getUsername());
+			values.put(Users.PUB_KEY, encodedKey);
+			return values;
 		}
 
-		/**
-		 * Return the ID of a given DatabaseUser
-		 * 
-		 * @param context
-		 * @param user
-		 * @return -1 if not in the database
-		 */
-		public static int queryForUser(Context context, DatabaseUser user) {
-			String[] projection = {
-				Users._ID
-			};
-			String selection = Users.PUB_KEY + " = ? AND " + Users.USERNAME
-					+ " = ?";
-			String[] selectionArgs = {
-					user.key, user.username
-			};
-			Cursor cursor = context.getContentResolver().query(
-					Users.CONTENT_URI, projection, selection, selectionArgs,
-					null);
-			if (cursor == null) {
-				Log.e(TAG, "Null cursor returned on URI " + Users.CONTENT_URI);
-				return -1;
-			} else if (cursor.moveToNext()) {
-				int index = cursor.getColumnIndex(projection[0]);
-				int id = cursor.getInt(index);
-				cursor.close();
-				return id;
-			} else {
-				cursor.close();
-				return -1;
+		public static ContentValues buildContentValues(Shout shout) {
+			String encodedHash = Base64.encodeToString(shout.getHash(), Base64.DEFAULT);
+			String encodedSig = Base64.encodeToString(shout.getSignature(), Base64.DEFAULT);
+			String encodedSender = Base64.encodeToString(shout.getSender().getPublicKey()
+					.getEncoded(), Base64.DEFAULT);
+			ContentValues values = new ContentValues();
+			values.put(Shouts.AUTHOR, encodedSender);
+			values.put(Shouts.MESSAGE, shout.getMessage());
+			values.put(Shouts.HASH, encodedHash);
+			values.put(Shouts.SIGNATURE, encodedSig);
+			values.put(Shouts.TIME_SENT, shout.getTimestamp().getMillis());
+			values.put(Shouts.TIME_RECEIVED, System.currentTimeMillis());
+			if (shout.getParent() != null) {
+				String encodedParentHash = Base64.encodeToString(shout.getParent().getHash(),
+						Base64.DEFAULT);
+				values.put(Shouts.PARENT, encodedParentHash);
 			}
+			return values;
 		}
-
-		/**
-		 * Return the ID of a given DatabaseShout
-		 * 
-		 * @param context
-		 * @param dbShout
-		 * @return -1 on failure
-		 */
-		public static int queryForShout(Context context, DatabaseShout dbShout) {
-			String[] projection = {
-				Shouts._ID
-			};
-			String selection = Shouts.HASH + " = ? AND " + Shouts.SIGNATURE
-					+ " = ?";
-			String[] selectionArgs = {
-					dbShout.hash, dbShout.signature
-			};
-
-			Cursor cursor = context.getContentResolver().query(
-					Shouts.CONTENT_URI, projection, selection, selectionArgs,
-					null);
-			if (cursor == null) {
-				Log.e(TAG, "Null cursor returned on Shout query");
-				return -1;
-			} else if (cursor.moveToNext()) {
-				int idIndex = cursor.getColumnIndex(Shouts._ID);
-				int id = cursor.getInt(idIndex); // Only one column
-				cursor.close();
-				return id;
-			} else {
-				cursor.close();
-				return -1;
-			}
-		}
-
+		
 	}
 }

@@ -300,8 +300,8 @@ public class ShoutProvider extends ContentProvider {
 				+ ShoutProviderContract.Shouts.TABLE_NAME + "("
 				+ ShoutProviderContract.Shouts._ID
 				+ " INTEGER PRIMARY KEY ASC AUTOINCREMENT, "
-				+ ShoutProviderContract.Shouts.AUTHOR + " INTEGER, "
-				+ ShoutProviderContract.Shouts.PARENT + " INTEGER, "
+				+ ShoutProviderContract.Shouts.AUTHOR + " TEXT, "
+				+ ShoutProviderContract.Shouts.PARENT + " TEXT, "
 				+ ShoutProviderContract.Shouts.MESSAGE + " TEXT, "
 				+ ShoutProviderContract.Shouts.TIME_SENT + " LONG, "
 				+ ShoutProviderContract.Shouts.TIME_RECEIVED + " LONG, "
@@ -312,10 +312,10 @@ public class ShoutProvider extends ContentProvider {
 				+ "UNIQUE (" + ShoutProviderContract.Shouts.HASH + ") ON CONFLICT IGNORE, "
 				+ "FOREIGN KEY(" + ShoutProviderContract.Shouts.AUTHOR
 				+ ") REFERENCES " + ShoutProviderContract.Users.TABLE_NAME
-				+ "(" + ShoutProviderContract.Users._ID + "), " + "FOREIGN KEY("
-				+ ShoutProviderContract.Shouts.PARENT + ") REFERENCES "
-				+ ShoutProviderContract.Shouts.TABLE_NAME + "("
-				+ ShoutProviderContract.Shouts._ID + ") " + ");";
+				+ "(" + ShoutProviderContract.Users.PUB_KEY + "), "
+				+ "FOREIGN KEY(" + ShoutProviderContract.Shouts.PARENT
+				+ ") REFERENCES " + ShoutProviderContract.Shouts.TABLE_NAME + 
+				"(" + ShoutProviderContract.Shouts.HASH + ")" + ");";
 
 		private static final String SQL_CREATE_VIRTUAL_MESSAGE = "CREATE VIRTUAL TABLE "
 				+ ShoutSearchContract.Messages.TABLE_NAME

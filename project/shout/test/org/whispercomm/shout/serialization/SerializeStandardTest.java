@@ -11,7 +11,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.test.ShoutTestRunner;
-import org.whispercomm.shout.test.util.SerialShouts;
 import org.whispercomm.shout.test.util.TestUtility;
 
 @RunWith(ShoutTestRunner.class)

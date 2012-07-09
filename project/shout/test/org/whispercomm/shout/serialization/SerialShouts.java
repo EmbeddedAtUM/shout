@@ -1,5 +1,5 @@
 
-package org.whispercomm.shout.test.util;
+package org.whispercomm.shout.serialization;
 
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -12,6 +12,8 @@ import org.joda.time.DateTimeZone;
 import org.spongycastle.util.encoders.Hex;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.User;
+import org.whispercomm.shout.test.util.TestShout;
+import org.whispercomm.shout.test.util.TestUser;
 
 public class SerialShouts {
 

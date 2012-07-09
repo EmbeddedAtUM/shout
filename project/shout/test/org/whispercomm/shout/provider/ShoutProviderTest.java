@@ -8,16 +8,20 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.whispercomm.shout.test.ShoutTestRunner;
 import org.whispercomm.shout.test.util.TestFactory;
+import org.whispercomm.shout.test.util.TestShout;
+import org.whispercomm.shout.test.util.TestUser;
 
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.net.Uri;
@@ -26,58 +30,44 @@ import android.util.Base64;
 @RunWith(ShoutTestRunner.class)
 public class ShoutProviderTest {
 
-	private static final String NAME = "duiu";
-
-	private static final String MESSAGE = "And then I was like, oh no you didn't! And she was like mmmmhmmm and I was like aw hell no";
-	private static final long TIME = 100L;
-
-	private ContentResolver cr = new Activity().getContentResolver();
-
-	private byte[] userKey;
+	private Context context;
+	private ContentResolver cr;
+	private TestUser user;
+	private String base64Key;
+	private TestShout shout;
+	private String base64Hash;
 	private Uri userLocation;
-	private int userId;
-
-	private byte[] hash;
-	private byte[] sig;
 	private Uri shoutLocation;
 	private int shoutId;
-
-	private static final String USERNAME_DUPE = "David";
-	private static final String[] USERNAMES = {
-			USERNAME_DUPE, USERNAME_DUPE, "Yue is not " + USERNAME_DUPE, "Prof Dick"
-	};
-	private static final int NUM_USER_SAME_NAME = 2;
-
-	private static final String[] MESSAGES = {
-			"Herp", "Derp", "Narwal", "Bacon"
-	};
+	private int userId;
 
 	@Before
 	public void setUp() {
-		userKey = TestFactory.genByteArray(16);
-		userLocation = ProviderTestUtility.insertIntoUserTable(cr, NAME, userKey);
-		assertNotNull(userLocation);
-		userId = Integer.valueOf(userLocation.getLastPathSegment());
-		assertTrue(userId > 0);
-
-		hash = TestFactory.genByteArray(16);
-		sig = TestFactory.genByteArray(16);
-		shoutLocation = ProviderTestUtility.insertIntoShoutTable(cr, userId, -1, MESSAGE,
-				TIME, sig, hash);
-		assertNotNull(shoutLocation);
-		shoutId = Integer.valueOf(shoutLocation.getLastPathSegment());
-		assertTrue(shoutId > 0);
+		this.context = new Activity();
+		this.cr = context.getContentResolver();
+		this.user = new TestUser("dadrian");
+		this.base64Key = Base64.encodeToString(user.getPublicKey().getEncoded(), Base64.DEFAULT);
+		this.shout = new TestShout(user, null, "Hello Database", DateTime.now(),
+				TestFactory.genByteArray(71), TestFactory.genByteArray(32));
+		this.base64Hash = Base64.encodeToString(shout.hash, Base64.DEFAULT);
+		this.userLocation = ProviderTestUtility.insertIntoUserTable(cr, user.username,
+				user.ecPubKey.getEncoded());
+		this.shoutLocation = ProviderTestUtility.insertIntoShoutTable(cr, shout.sender
+				.getPublicKey().getEncoded(), null, shout.message, shout.timestamp.getMillis(),
+				shout.signature, shout.hash);
+		this.userId = Integer.valueOf(userLocation.getLastPathSegment());
+		this.shoutId = Integer.valueOf(shoutLocation.getLastPathSegment());
 	}
 
 	@After
 	public void tearDown() {
-		cr = new Activity().getContentResolver();
+		this.context = null;
+		this.cr = null;
 	}
 
 	@Test
 	public void testUserInsert() {
 		assertTrue(userId > 0);
-
 		Cursor cursor = cr.query(userLocation, null, null, null, null);
 		assertTrue(cursor.moveToNext());
 
@@ -89,10 +79,10 @@ public class ShoutProviderTest {
 		assertEquals(userId, newId);
 
 		String encodedKey = cursor.getString(keyIndex);
-		assertArrayEquals(userKey, Base64.decode(encodedKey, Base64.DEFAULT));
+		assertArrayEquals(user.ecPubKey.getEncoded(), Base64.decode(encodedKey, Base64.DEFAULT));
 
 		String username = cursor.getString(nameIndex);
-		assertEquals(NAME, username);
+		assertEquals(user.username, username);
 
 		assertFalse(cursor.moveToNext());
 	}
@@ -112,83 +102,28 @@ public class ShoutProviderTest {
 		int newId = cursor.getInt(idIndex);
 		assertEquals(shoutId, newId);
 
-		int author = cursor.getInt(authorIndex);
-		assertEquals(1, author);
+		String author = cursor.getString(authorIndex);
+		assertEquals(base64Key, author);
 
 		String content = cursor.getString(messageIndex);
-		assertEquals(MESSAGE, content);
+		assertEquals(shout.message, content);
 
 		long time = cursor.getLong(timeIndex);
-		assertEquals(TIME, time);
+		assertEquals(shout.getTimestamp().getMillis(), time);
 
 		String encodedHash = cursor.getString(hashIndex);
-		assertArrayEquals(hash, Base64.decode(encodedHash, Base64.DEFAULT));
+		assertEquals(base64Hash, encodedHash);
 
 		String encodedSig = cursor.getString(sigIndex);
-		assertArrayEquals(sig, Base64.decode(encodedSig, Base64.DEFAULT));
+		assertArrayEquals(shout.signature, Base64.decode(encodedSig, Base64.DEFAULT));
 
-		assertFalse(cursor.moveToNext());
-	}
-
-	@Test
-	public void testSelectManyUser() {
-		ProviderTestUtility.insertFourUsers(cr, USERNAMES);
-		String[] projection = {
-				ShoutProviderContract.Users._ID,
-				ShoutProviderContract.Users.USERNAME
-		};
-		String selection = ShoutProviderContract.Users.USERNAME + " = ?";
-		String[] selectionArgs = {
-				USERNAME_DUPE
-		};
-		Cursor cursor = cr.query(ShoutProviderContract.Users.CONTENT_URI, projection, selection,
-				selectionArgs, null);
-		assertNotNull(cursor);
-		assertTrue(cursor.getCount() == NUM_USER_SAME_NAME);
-		int idIndex = cursor.getColumnIndex(ShoutProviderContract.Users._ID);
-		int nameIndex = cursor.getColumnIndex(ShoutProviderContract.Users.USERNAME);
-		int lastId = -1;
-		while (cursor.moveToNext()) {
-			int id = cursor.getInt(idIndex);
-			assertFalse(id == lastId);
-			String name = cursor.getString(nameIndex);
-			assertEquals(name, USERNAME_DUPE);
-			lastId = id;
-		}
-	}
-
-	@Test
-	public void testSelectShoutsWithParameters() {
-		ProviderTestUtility.insertFourUsers(cr, USERNAMES);
-		int[] parents = TestFactory.genArrayWithSingleValue(4, userId);
-		ProviderTestUtility.insertFourShouts(cr, MESSAGES, parents);
-		String[] projection = {
-				ShoutProviderContract.Shouts.AUTHOR,
-				ShoutProviderContract.Shouts.MESSAGE
-		};
-		String selection = ShoutProviderContract.Shouts.AUTHOR + " = ? AND "
-				+ ShoutProviderContract.Shouts.MESSAGE + " = ?";
-		String[] selectionArgs = {
-				Integer.toString(userId),
-				MESSAGES[1]
-		};
-		Cursor cursor = cr.query(ShoutProviderContract.Shouts.CONTENT_URI, projection, selection,
-				selectionArgs, null);
-		assertNotNull(cursor);
-		assertTrue(cursor.moveToNext());
-		int authorIndex = cursor.getColumnIndex(ShoutProviderContract.Shouts.AUTHOR);
-		int messageIndex = cursor.getColumnIndex(ShoutProviderContract.Shouts.MESSAGE);
-		int author = cursor.getInt(authorIndex);
-		String message = cursor.getString(messageIndex);
-		assertEquals(userId, author);
-		assertEquals(MESSAGES[1], message);
 		assertFalse(cursor.moveToNext());
 	}
 
 	@Test
 	public void testShoutForeignKeyUser() {
 		ContentValues values = new ContentValues();
-		values.put(ShoutProviderContract.Shouts.AUTHOR, 9001);
+		values.put(ShoutProviderContract.Shouts.AUTHOR, TestFactory.generateRandomBase64String(32));
 		values.put(ShoutProviderContract.Shouts.HASH,
 				Base64.encodeToString(TestFactory.genByteArray(4), Base64.DEFAULT));
 		values.put(ShoutProviderContract.Shouts.MESSAGE, "oh noes i dont have an author");
@@ -206,10 +141,10 @@ public class ShoutProviderTest {
 	@Test
 	public void testShoutForeignKeyParent() {
 		ContentValues values = new ContentValues();
-		values.put(ShoutProviderContract.Shouts.AUTHOR, 1);
+		values.put(ShoutProviderContract.Shouts.AUTHOR, base64Key);
 		values.put(ShoutProviderContract.Shouts.HASH,
 				Base64.encodeToString(TestFactory.genByteArray(4), Base64.DEFAULT));
-		values.put(ShoutProviderContract.Shouts.MESSAGE, "oh noes i dont have an author");
+		values.put(ShoutProviderContract.Shouts.MESSAGE, "oh noes i dont have a parent");
 		values.put(ShoutProviderContract.Shouts.SIGNATURE,
 				Base64.encodeToString(TestFactory.genByteArray(4), Base64.DEFAULT));
 		values.put(ShoutProviderContract.Shouts.TIME_SENT, 101L);
@@ -223,30 +158,10 @@ public class ShoutProviderTest {
 	}
 
 	@Test
-	public void testSelectShoutByUserURI() {
-		ProviderTestUtility.insertFourUsers(cr, USERNAMES);
-		int otherUser = userId + 1;
-		int[] parents = {
-				userId, userId, otherUser, otherUser
-		};
-		int numOtherUser = 2;
-		ProviderTestUtility.insertFourShouts(cr, MESSAGES, parents);
-		Uri uri = Uri.withAppendedPath(ShoutProviderContract.Shouts.CONTENT_URI,
-				"user/" + Integer.toString(otherUser));
-		Cursor cursor = cr.query(uri, null, null, null, null);
-		assertNotNull(cursor);
-		assertTrue(cursor.getCount() == numOtherUser);
-		int authorIndex = cursor.getColumnIndex(ShoutProviderContract.Shouts.AUTHOR);
-		while (cursor.moveToNext()) {
-			assertEquals(otherUser, cursor.getInt(authorIndex));
-		}
-	}
-
-	@Test
 	public void testInsertDuplicateShoutDoesNothing() {
 		try {
-			ProviderTestUtility.insertIntoShoutTable(cr, userId, -1, MESSAGE,
-					TIME, sig, hash);
+			ProviderTestUtility.insertIntoShoutTable(cr, user.getPublicKey().getEncoded(), null,
+					shout.message, shout.timestamp.getMillis(), shout.signature, shout.hash);
 		} catch (SQLException e) {
 			fail("Inserting a duplicate should not throw an exception");
 		}
@@ -255,7 +170,7 @@ public class ShoutProviderTest {
 	@Test
 	public void testInsertDuplicateUserDoesNothing() {
 		try {
-			ProviderTestUtility.insertIntoUserTable(cr, NAME, userKey);
+			ProviderTestUtility.insertIntoUserTable(cr, user.username, user.ecPubKey.getEncoded());
 		} catch (SQLException e) {
 			fail("Inserting a duplicate should not throw an exception");
 		}
