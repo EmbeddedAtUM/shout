@@ -32,7 +32,6 @@ public class MessageActivity extends Activity {
 
 	private NetworkInterface network;
 
-	private Toast noUserToast;
 	private IdManager idManager;
 
 	private Button btnSend;
@@ -57,8 +56,6 @@ public class MessageActivity extends Activity {
 		edtMessage.setFilters(new InputFilter[] { new Utf8ByteLengthFilter(
 				SerializeUtility.MAX_MESSAGE_SIZE) });
 
-		noUserToast = Toast.makeText(getApplicationContext(),
-				"Set up a user before you Shout!", Toast.LENGTH_LONG);
 		Bundle extras = getIntent().getExtras();
 		if (extras == null) {
 			return;
@@ -102,7 +99,8 @@ public class MessageActivity extends Activity {
 	}
 
 	private void promptForUsername() {
-		noUserToast.show();
+		Toast.makeText(getApplicationContext(),
+				"Set up a user before you Shout!", Toast.LENGTH_LONG).show();
 		startActivity(new Intent(this, SettingsActivity.class));
 	}
 
