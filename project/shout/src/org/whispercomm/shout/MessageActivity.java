@@ -74,20 +74,15 @@ public class MessageActivity extends Activity {
 				parent = parent.getParent();
 				parentId = ShoutProviderContract.storeShout(
 						getApplicationContext(), parent);
-				Log.v(TAG,
-						"Parent was a comment/reshout, resetting parent to grandparent");
 				break;
 			case RECOMMENT:
 				parent = parent.getParent().getParent();
 				parentId = ShoutProviderContract.storeShout(
 						getApplicationContext(), parent);
-				Log.v(TAG,
-						"Parent was a recomment, resetting parent to great grandparent");
 				break;
 			default:
 				break;
 			}
-			Log.v(TAG, "Parent text received as: " + parent.getMessage());
 		}
 	}
 
@@ -122,18 +117,14 @@ public class MessageActivity extends Activity {
 	}
 
 	public void onClickSend(View v) {
-		Log.v(TAG, "Send button clicked");
 		showProgressBar();
 		String content = edtMessage.getText().toString();
-		Log.v(TAG, "Shout text received as: " + content);
 		try {
 			if (parent == null) {
-				Log.v(TAG, "Creating a new shout...");
 				new ShoutTask(getApplicationContext(),
 						new ShoutCreationCompleteListener(), idManager.getMe())
 						.execute(content);
 			} else {
-				Log.v(TAG, "Commenting on another shout...");
 				new CommentTask(getApplicationContext(),
 						new ShoutCreationCompleteListener(), idManager.getMe(),
 						parent).execute(content);
