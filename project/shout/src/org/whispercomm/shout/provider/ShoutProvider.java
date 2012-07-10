@@ -147,7 +147,7 @@ public class ShoutProvider extends ContentProvider {
 				throw new IllegalArgumentException("Unknown or invalid URI " + uri);
 		}
 
-		long rowId = mDB.insert(table, null, values);
+		long rowId = mDB.insertWithOnConflict(table, null, values, SQLiteDatabase.CONFLICT_IGNORE);
 		if (rowId < 0) { // An error occurred
 			throw new SQLException("Failed to insert row into " + uri);
 		}
@@ -294,7 +294,7 @@ public class ShoutProvider extends ContentProvider {
 				+ " INTEGER PRIMARY KEY ASC AUTOINCREMENT, "
 				+ ShoutProviderContract.Users.USERNAME + " TEXT, "
 				+ ShoutProviderContract.Users.PUB_KEY + " TEXT, "
-				+ "UNIQUE (" + ShoutProviderContract.Users.PUB_KEY + ") ON CONFLICT IGNORE" + ");";
+				+ "UNIQUE (" + ShoutProviderContract.Users.PUB_KEY + ") " + ");";
 
 		private static final String SQL_CREATE_SHOUT = "CREATE TABLE "
 				+ ShoutProviderContract.Shouts.TABLE_NAME + "("
@@ -309,12 +309,12 @@ public class ShoutProvider extends ContentProvider {
 				+ ShoutProviderContract.Shouts.SIGNATURE + " TEXT, "
 				+ ShoutProviderContract.Shouts.COMMENT_COUNT + " INTEGER DEFAULT 0, "
 				+ ShoutProviderContract.Shouts.RESHOUT_COUNT + " INTEGER DEFAULT 0, "
-				+ "UNIQUE (" + ShoutProviderContract.Shouts.HASH + ") ON CONFLICT IGNORE, "
+				+ "UNIQUE (" + ShoutProviderContract.Shouts.HASH + "), "
 				+ "FOREIGN KEY(" + ShoutProviderContract.Shouts.AUTHOR
 				+ ") REFERENCES " + ShoutProviderContract.Users.TABLE_NAME
 				+ "(" + ShoutProviderContract.Users.PUB_KEY + "), "
 				+ "FOREIGN KEY(" + ShoutProviderContract.Shouts.PARENT
-				+ ") REFERENCES " + ShoutProviderContract.Shouts.TABLE_NAME + 
+				+ ") REFERENCES " + ShoutProviderContract.Shouts.TABLE_NAME +
 				"(" + ShoutProviderContract.Shouts.HASH + ")" + ");";
 
 		private static final String SQL_CREATE_VIRTUAL_MESSAGE = "CREATE VIRTUAL TABLE "

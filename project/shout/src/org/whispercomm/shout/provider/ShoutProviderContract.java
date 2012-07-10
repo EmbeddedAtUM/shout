@@ -265,7 +265,9 @@ public class ShoutProviderContract {
 		Uri location = context.getContentResolver().insert(Shouts.CONTENT_URI, values);
 		Cursor cursor = context.getContentResolver().query(location, null, null, null, null);
 		cursor.moveToFirst();
-		return retrieveShoutFromCursor(context, cursor);
+		LocalShout result = retrieveShoutFromCursor(context, cursor);
+		cursor.close();
+		return result;
 	}
 
 	/**

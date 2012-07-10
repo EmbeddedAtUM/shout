@@ -132,7 +132,7 @@ public class ShoutActivity extends ListActivity {
 		Log.v(TAG, "Comment button clicked");
 
 		Intent intent = new Intent(this, MessageActivity.class);
-		intent.putExtra(MessageActivity.PARENT_ID, shout.getDatabaseId());
+		intent.putExtra(MessageActivity.PARENT_ID, shout.getHash());
 		startActivity(intent);
 	}
 

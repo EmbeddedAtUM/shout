@@ -57,8 +57,8 @@ public class MessageActivity extends Activity {
 		edtMessage = (EditText) findViewById(R.id.compose);
 
 		edtMessage.setFilters(new InputFilter[] {
-			new Utf8ByteLengthFilter(
-					SerializeUtility.MAX_MESSAGE_SIZE)
+				new Utf8ByteLengthFilter(
+						SerializeUtility.MAX_MESSAGE_SIZE)
 		});
 	}
 
@@ -67,13 +67,12 @@ public class MessageActivity extends Activity {
 			return null;
 		}
 
-		int parentId = extras.getInt(PARENT_ID, -1);
-		if (parentId < 0) {
+		byte[] parentHash = extras.getByteArray(PARENT_ID);
+		if (parentHash == null) {
 			return null;
 		}
 
-		parent = ShoutProviderContract.retrieveShoutById(
-				getApplicationContext(), parentId);
+		parent = ShoutProviderContract.retrieveShoutByHash(getApplicationContext(), parentHash);
 		switch (parent.getType()) {
 			case COMMENT:
 			case RESHOUT:
