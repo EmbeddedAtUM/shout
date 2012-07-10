@@ -1,6 +1,8 @@
 
 package org.whispercomm.shout.provider;
 
+import java.security.interfaces.ECPublicKey;
+
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.LocalUser;
 import org.whispercomm.shout.Shout;
@@ -166,6 +168,29 @@ public class ShoutProviderContract {
 	}
 
 	/**
+	 * Retrieve a {@link LocalShout} from the database with the given hash.
+	 * 
+	 * @param context The context of the content resolver
+	 * @param hash The hash of the Shout
+	 * @return The LocalShout with the given hash
+	 */
+	public static LocalShout retrieveShoutByHash(Context context, byte[] hash) {
+		String encodedHash = Base64.encodeToString(hash, Base64.DEFAULT);
+		String selection = Shouts.HASH + " = ?";
+		String[] selectionArgs = {
+				encodedHash
+		};
+		Cursor cursor = context.getContentResolver().query(Shouts.CONTENT_URI, null, selection,
+				selectionArgs, null);
+		LocalShout shout = null;
+		if (cursor.moveToFirst()) {
+			shout = retrieveShoutFromCursor(context, cursor);
+		}
+		cursor.close();
+		return shout;
+	}
+
+	/**
 	 * When given a cursor at a position pointing to a Shout with all available
 	 * fields, construct a Shout object using the data in that row.
 	 * 
@@ -187,9 +212,9 @@ public class ShoutProviderContract {
 		int reshoutIndex = cursor.getColumnIndex(Shouts.RESHOUT_COUNT);
 
 		int id = cursor.getInt(idIndex);
-		int authorId = cursor.getInt(authorIndex);
-		int parentId = cursor.isNull(parentIndex) ? -1 : cursor
-				.getInt(parentIndex);
+		String encodedAuthor = cursor.getString(authorIndex);
+		String encodedParentHash = cursor.isNull(parentIndex) ? null : cursor
+				.getString(parentIndex);
 		String message = cursor.getString(messageIndex);
 		String encodedSig = cursor.getString(sigIndex);
 		String encodedHash = cursor.getString(hashIndex);
@@ -197,10 +222,10 @@ public class ShoutProviderContract {
 		Long receivedTime = cursor.getLong(revcIndex);
 		int numComments = cursor.getInt(commentIndex);
 		int numReshouts = cursor.getInt(reshoutIndex);
-		LocalUser sender = retrieveUserById(context, authorId);
+		LocalUser sender = retrieveUserByEncodedKey(context, encodedAuthor);
 		LocalShout shout = new LocalShoutImpl(context, id, sender, message,
 				encodedSig, encodedHash, sentTime, receivedTime, numComments,
-				numReshouts, parentId);
+				numReshouts, encodedParentHash);
 		return shout;
 	}
 
@@ -214,7 +239,13 @@ public class ShoutProviderContract {
 	 */
 	@Deprecated
 	public static int storeShout(Context context, Shout shout) {
-		return -1;
+		if (shout.getParent() != null) {
+			saveShout(context, shout.getParent());
+		}
+		saveUser(context, shout.getSender());
+		ContentValues values = ContractHelper.buildContentValues(shout);
+		Uri location = context.getContentResolver().insert(Shouts.CONTENT_URI, values);
+		return Integer.valueOf(location.getLastPathSegment());
 	}
 
 	/**
@@ -229,6 +260,7 @@ public class ShoutProviderContract {
 		if (shout.getParent() != null) {
 			saveShout(context, shout.getParent());
 		}
+		saveUser(context, shout.getSender());
 		ContentValues values = ContractHelper.buildContentValues(shout);
 		Uri location = context.getContentResolver().insert(Shouts.CONTENT_URI, values);
 		Cursor cursor = context.getContentResolver().query(location, null, null, null, null);
@@ -261,6 +293,20 @@ public class ShoutProviderContract {
 	}
 
 	/**
+	 * Retrieve a {@link LocalUser} from the database with the given public key.
+	 * 
+	 * @param context The context the content resolver is found in
+	 * @param key {@link ECPublicKey} of the user
+	 * @return The LocalUser with the given key, {@code null} if the user does
+	 *         not exist
+	 */
+	public static LocalUser retrieveUserByKey(Context context, ECPublicKey key) {
+		byte[] keyBytes = key.getEncoded();
+		String encodedKey = Base64.encodeToString(keyBytes, Base64.DEFAULT);
+		return retrieveUserByEncodedKey(context, encodedKey);
+	}
+
+	/**
 	 * Build an {@link LocalUser} object using the data in the current cursor
 	 * row.
 	 * 
@@ -287,11 +333,18 @@ public class ShoutProviderContract {
 	 * @param user
 	 * @return The ID of the User in the database or -1 on failure
 	 */
+	@Deprecated
 	public static int storeUser(Context context, User user) {
 		ContentValues values = ContractHelper.buildContentValues(user);
 		Uri location = context.getContentResolver().insert(Users.CONTENT_URI, values);
 		int id = Integer.valueOf(location.getLastPathSegment());
 		return id;
+	}
+	
+	public static LocalUser saveUser(Context context, User user) {
+		ContentValues values = ContractHelper.buildContentValues(user);
+		context.getContentResolver().insert(Users.CONTENT_URI, values);
+		return retrieveUserByKey(context, user.getPublicKey());
 	}
 
 	/**
@@ -396,6 +449,21 @@ public class ShoutProviderContract {
 		throw new IllegalStateException(
 				"Cannot instantiate ShoutProviderContract");
 	}
+	
+	private static LocalUser retrieveUserByEncodedKey(Context context, String encodedKey) {
+		String selection = Users.PUB_KEY + " = ?";
+		String selectionArgs[] = {
+				encodedKey
+		};
+		Cursor cursor = context.getContentResolver().query(Users.CONTENT_URI, null, selection,
+				selectionArgs, null);
+		LocalUser user = null;
+		if (cursor.moveToFirst()) {
+			user = retrieveUserFromCursor(context, cursor);
+		}
+		cursor.close();
+		return user;
+	}
 
 	/**
 	 * Helper class for storing and retrieving both Shout and User objects
@@ -432,6 +500,6 @@ public class ShoutProviderContract {
 			}
 			return values;
 		}
-		
+
 	}
 }

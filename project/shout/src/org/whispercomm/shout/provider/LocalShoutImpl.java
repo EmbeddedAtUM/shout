@@ -7,7 +7,6 @@ import java.util.List;
 import org.joda.time.DateTime;
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.LocalUser;
-import org.whispercomm.shout.Me;
 import org.whispercomm.shout.ShoutType;
 import org.whispercomm.shout.util.ShoutMessageUtility;
 
@@ -25,9 +24,8 @@ public class LocalShoutImpl implements LocalShout {
 	private DateTime sentTime;
 	private DateTime receivedTime;
 
-	private int parentId = -1;
+	private byte[] parentHash = null;
 	private LocalShout parent = null;
-	private LocalShout myReshout = null;
 
 	private int commentCount;
 	private int reshoutCount;
@@ -35,9 +33,8 @@ public class LocalShoutImpl implements LocalShout {
 	private Context context;
 
 	public LocalShoutImpl(Context context, int id, LocalUser sender, String message,
-			String encodedSig,
-			String encodedHash, Long sentTime, Long receivedTime, int commentCount,
-			int reshoutCount, int parentId) {
+			String encodedSig, String encodedHash, Long sentTime, Long receivedTime,
+			int commentCount, int reshoutCount, String encodedParentHash) {
 		this.context = context;
 		this.id = id;
 		this.sender = sender;
@@ -46,9 +43,11 @@ public class LocalShoutImpl implements LocalShout {
 		this.hashBytes = Base64.decode(encodedHash, Base64.DEFAULT);
 		this.sentTime = new DateTime(sentTime);
 		this.receivedTime = new DateTime(receivedTime);
-		this.parentId = parentId;
 		this.commentCount = commentCount;
 		this.reshoutCount = reshoutCount;
+		if (encodedParentHash != null) {
+			this.parentHash = Base64.decode(encodedParentHash, Base64.DEFAULT);
+		}
 	}
 
 	@Override
@@ -98,11 +97,11 @@ public class LocalShoutImpl implements LocalShout {
 
 	@Override
 	public LocalShout getParent() {
-		if (parent != null || parentId == -1) {
+		if (parent != null || parentHash == null) {
 			return parent;
 		}
 		else {
-			parent = ShoutProviderContract.retrieveShoutById(context, parentId);
+			parent = ShoutProviderContract.retrieveShoutByHash(context, parentHash);
 			return parent;
 		}
 	}

@@ -17,13 +17,15 @@ public class TestUtility {
 		return (lhs.getName().equals(rhs.getName()));
 	}
 
-	public static boolean testEqualUserFields(User lhs, User rhs) {
-		boolean result = false;
-		if (lhs == null || rhs == null)
-			return false;
-		result = (lhs.getUsername().equals(rhs.getUsername()) && lhs.getPublicKey().equals(
-				rhs.getPublicKey()));
-		return result;
+	public static void testEqualUserFields(User lhs, User rhs) {
+		if (lhs == null) {
+			assertNull(rhs);
+		}
+		if (rhs == null) {
+			assertNull(lhs);
+		}
+		assertEquals(lhs.getUsername(), rhs.getUsername());
+		assertEquals(lhs.getPublicKey(), rhs.getPublicKey());
 	}
 
 	public static void testEqualShoutFields(Shout lhs, Shout rhs) {

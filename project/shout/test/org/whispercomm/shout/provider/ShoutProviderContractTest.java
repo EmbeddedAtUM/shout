@@ -1,15 +1,15 @@
 
 package org.whispercomm.shout.provider;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.whispercomm.shout.LocalShout;
+import org.whispercomm.shout.LocalUser;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.User;
 import org.whispercomm.shout.test.ShoutTestRunner;
@@ -50,19 +50,25 @@ public class ShoutProviderContractTest {
 
 	@Test
 	public void testRetrieveUser() {
-		int id = ShoutProviderContract.storeUser(context, testUser);
-		User fromDb = ShoutProviderContract.retrieveUserById(context, id);
+		LocalUser localUser = ShoutProviderContract.saveUser(context, testUser);
+		assertNotNull(localUser);
+		TestUtility.testEqualUserFields(testUser, localUser);
+		LocalUser fromDb = ShoutProviderContract
+				.retrieveUserByKey(context, testUser.getPublicKey());
 		assertNotNull(fromDb);
-		assertTrue(TestUtility.testEqualUserFields(testUser, fromDb));
+		TestUtility.testEqualUserFields(testUser, fromDb);
+		TestUtility.testEqualUserFields(localUser, fromDb);
 	}
 
 	@Test
 	public void testRetrieveShout() {
-		ShoutProviderContract.storeUser(context, testUser);
-		int shoutId = ShoutProviderContract.storeShout(context, testShout);
-		Shout fromDb = ShoutProviderContract.retrieveShoutById(context, shoutId);
+		LocalShout localShout = ShoutProviderContract.saveShout(context, testShout);
+		assertNotNull(localShout);
+		TestUtility.testEqualShoutFields(testShout, localShout);
+		LocalShout fromDb = ShoutProviderContract.retrieveShoutByHash(context, testShout.getHash());
 		assertNotNull(fromDb);
 		TestUtility.testEqualShoutFields(testShout, fromDb);
+		TestUtility.testEqualShoutFields(localShout, fromDb);
 	}
 
 	@Test
@@ -71,57 +77,57 @@ public class ShoutProviderContractTest {
 		Shout withParent = new TestShout(sender, testShout,
 				"This is what happens when you Google people you work with", new DateTime(),
 				TestFactory.genByteArray(10), TestFactory.genByteArray(10));
-		int commentId = ShoutProviderContract.storeShout(context, withParent);
-		assertTrue(commentId > 0);
-		Shout fromDbWithParent = ShoutProviderContract.retrieveShoutById(context, commentId);
-		TestUtility.testEqualShoutFields(withParent, fromDbWithParent);
+		LocalShout comment = ShoutProviderContract.saveShout(context, withParent);
+		assertNotNull(comment);
+		LocalShout parentFromDb = comment.getParent();
+		assertNotNull(parentFromDb);
+		TestUtility.testEqualShoutFields(withParent, comment);
 
 		Shout withGrandparent = new TestShout(testUser, withParent, null, new DateTime(),
 				TestFactory.genByteArray(4), TestFactory.genByteArray(8));
-		int commentReshoutId = ShoutProviderContract.storeShout(context, withGrandparent);
-		assertTrue(commentReshoutId > 0);
-		Shout fromDbWithGrandParent = ShoutProviderContract.retrieveShoutById(context,
-				commentReshoutId);
-		TestUtility.testEqualShoutFields(withGrandparent, fromDbWithGrandParent);
+		LocalShout localWithGrandparent = ShoutProviderContract.saveShout(context, withGrandparent);
+		assertNotNull(localWithGrandparent);
+		TestUtility.testEqualShoutFields(withGrandparent, localWithGrandparent);
 	}
 
 	@Test
 	public void testStoreUser() {
-		int id = ShoutProviderContract.storeUser(context, testUser);
-		assertTrue(id > 0);
+		LocalUser fromDb = ShoutProviderContract.saveUser(context, testUser);
+		assertNotNull(fromDb);
+		TestUtility.testEqualUserFields(testUser, fromDb);
 	}
 
 	@Test
 	public void testStoreShout() {
-		int userId = ShoutProviderContract.storeUser(context, testUser);
-		assertTrue(userId > 0);
-		int shoutId = ShoutProviderContract.storeShout(context, testShout);
-		assertTrue(shoutId > 0);
+		ShoutProviderContract.saveUser(context, testUser);
+		LocalShout fromDb = ShoutProviderContract.saveShout(context, testShout);
+		assertNotNull(fromDb);
+		TestUtility.testEqualShoutFields(testShout, fromDb);
 	}
 
 	@Test
 	public void testStoreShoutWithoutUserInDatabase() {
-		int id = ShoutProviderContract.storeShout(context, testShout);
-		assertTrue(id > 0);
-		Shout fromDb = ShoutProviderContract.retrieveShoutById(context, id);
+		LocalShout fromDb = ShoutProviderContract.saveShout(context, testShout);
+		assertNotNull(fromDb);
 		TestUtility.testEqualShoutFields(testShout, fromDb);
 	}
 
 	@Test
 	public void testStoreUserAlreadyInDatabase() {
-		int id = ShoutProviderContract.storeUser(context, testUser);
-		User fromDb = ShoutProviderContract.retrieveUserById(context, id);
-		assertNotNull(fromDb);
-		int newId = ShoutProviderContract.storeUser(context, fromDb);
-		assertEquals(id, newId);
+		LocalUser first = ShoutProviderContract.saveUser(context, testUser);
+		LocalUser second = ShoutProviderContract.saveUser(context, testUser);
+		TestUtility.testEqualUserFields(first, second);
+		LocalUser search = ShoutProviderContract
+				.retrieveUserByKey(context, testUser.getPublicKey());
+		TestUtility.testEqualUserFields(testUser, search);
 	}
 
 	@Test
 	public void testStoreShoutAlreadyInDatabase() {
-		int id = ShoutProviderContract.storeShout(context, testShout);
-		Shout fromDb = ShoutProviderContract.retrieveShoutById(context, id);
-		assertNotNull(fromDb);
-		int newId = ShoutProviderContract.storeShout(context, fromDb);
-		assertEquals(id, newId);
+		LocalShout first = ShoutProviderContract.saveShout(context, testShout);
+		LocalShout second = ShoutProviderContract.saveShout(context, testShout);
+		TestUtility.testEqualShoutFields(first, second);
+		LocalShout search = ShoutProviderContract.retrieveShoutByHash(context, testShout.getHash());
+		TestUtility.testEqualShoutFields(testShout, search);
 	}
 }
