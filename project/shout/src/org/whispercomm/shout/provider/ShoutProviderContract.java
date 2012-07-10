@@ -405,13 +405,12 @@ public class ShoutProviderContract {
 		throw new RuntimeException("Method not yet implemented.");
 	}
 
-	@Deprecated
-	public static Cursor getCursorOverReshouts(Context context, int parentId) {
+	public static Cursor getCursorOverReshouts(Context context, byte[] parentHash) {
 		String sortOrder = Shouts.TIME_RECEIVED + " DESC";
 		String selection = Shouts.PARENT + " = ? AND " + Shouts.MESSAGE
 				+ " IS NULL";
 		String[] selectionArgs = {
-				Integer.toString(parentId)
+				Base64.encodeToString(parentHash, Base64.DEFAULT)
 		};
 
 		Cursor result = context.getContentResolver().query(Shouts.CONTENT_URI,
@@ -427,7 +426,7 @@ public class ShoutProviderContract {
 	 * @return a cursor over the reshouts
 	 */
 	public static Cursor getReshouts(Context context, LocalShout shout) {
-		return getCursorOverReshouts(context, shout.getDatabaseId());
+		return getCursorOverReshouts(context, shout.getHash());
 	}
 
 	/**

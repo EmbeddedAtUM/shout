@@ -4,21 +4,24 @@ package org.whispercomm.shout.provider;
 import java.security.interfaces.ECPublicKey;
 
 import org.whispercomm.shout.LocalUser;
+import org.whispercomm.shout.id.SignatureUtility;
 
 import android.content.Context;
+import android.util.Base64;
 
 public class LazyLocalUserImpl implements LocalUser {
 
 	private boolean loaded = false;
 
 	private Context context;
-	private int id;
+	private int id = -1;
 	private String username = null;
 	private ECPublicKey key = null;
 
-	public LazyLocalUserImpl(Context context, int databaseId) {
+	public LazyLocalUserImpl(Context context, String encodedAuthor) {
 		this.context = context;
-		this.id = databaseId;
+		byte[] keyBytes = Base64.decode(encodedAuthor, Base64.DEFAULT);
+		this.key = SignatureUtility.getPublicKeyFromBytes(keyBytes);
 	}
 
 	@Override
@@ -31,21 +34,21 @@ public class LazyLocalUserImpl implements LocalUser {
 
 	@Override
 	public ECPublicKey getPublicKey() {
-		if (!loaded) {
-			loadSelf();
-		}
 		return key;
 	}
 
 	@Override
 	public int getDatabaseId() {
+		if (!loaded) {
+			loadSelf();
+		}
 		return id;
 	}
 
 	private void loadSelf() {
-		LocalUser self = ShoutProviderContract.retrieveUserById(context, id);
+		LocalUser self = ShoutProviderContract.retrieveUserByKey(context, key);
 		username = self.getUsername();
-		key = self.getPublicKey();
+		id = self.getDatabaseId();
 		loaded = true;
 	}
 
