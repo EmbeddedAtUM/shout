@@ -5,4 +5,4 @@ target
 *.swp
 tmp
 hs_err*
-.settings
+
