@@ -150,8 +150,7 @@ public class ShoutProviderContract {
 	 * @param id
 	 * @return {@code null} if the shout is not in the database
 	 */
-	@Deprecated
-	public static LocalShout retrieveShoutById(Context context, int id) {
+	static LocalShout retrieveShoutById(Context context, int id) {
 		Uri uri = ContentUris.withAppendedId(Shouts.CONTENT_URI, id);
 		Cursor cursor = context.getContentResolver().query(uri, null, null,
 				null, null);
