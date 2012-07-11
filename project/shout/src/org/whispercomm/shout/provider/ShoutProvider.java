@@ -381,7 +381,7 @@ public class ShoutProvider extends ContentProvider {
 				+ ShoutProviderContract.Shouts.TABLE_NAME + " SET "
 				+ ShoutProviderContract.Shouts.COMMENT_COUNT + " = "
 				+ ShoutProviderContract.Shouts.COMMENT_COUNT + " + 1 WHERE "
-				+ ShoutProviderContract.Shouts._ID + " = new."
+				+ ShoutProviderContract.Shouts.HASH + " = new."
 				+ ShoutProviderContract.Shouts.PARENT + ";\nEND;";
 
 		private static final String SQL_CREATE_TRIGGER_RESHOUT = "CREATE TRIGGER "
@@ -393,7 +393,7 @@ public class ShoutProvider extends ContentProvider {
 				+ ShoutProviderContract.Shouts.TABLE_NAME + " SET "
 				+ ShoutProviderContract.Shouts.RESHOUT_COUNT + " = "
 				+ ShoutProviderContract.Shouts.RESHOUT_COUNT + " + 1 WHERE "
-				+ ShoutProviderContract.Shouts._ID + " = new."
+				+ ShoutProviderContract.Shouts.HASH + " = new."
 				+ ShoutProviderContract.Shouts.PARENT + ";\nEND;";
 
 		private static final String SQL_CREATE_TRIGGER_MESSAGE = "CREATE TRIGGER "
