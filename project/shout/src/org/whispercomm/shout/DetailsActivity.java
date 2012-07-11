@@ -89,7 +89,7 @@ public class DetailsActivity extends ListActivity {
 		TextView origSender;
 		TextView message;
 		TextView age;
-		int id = -1;
+		byte[] hash;
 	}
 
 	private class CommentsAdapter extends CursorAdapter {
@@ -106,7 +106,7 @@ public class DetailsActivity extends ListActivity {
 
 			// Set the view content
 			DetailsViewHolder holder = (DetailsViewHolder) view.getTag();
-			holder.id = comment.getDatabaseId();
+			holder.hash = comment.getHash();
 			holder.age.setText(ShoutMessageUtility.getDateTimeAge(comment
 					.getTimestamp()));
 			holder.message.setText(comment.getMessage());
