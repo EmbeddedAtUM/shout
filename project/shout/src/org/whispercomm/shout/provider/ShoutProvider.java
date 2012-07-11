@@ -129,8 +129,6 @@ public class ShoutProvider extends ContentProvider {
 
 	@Override
 	public Uri insert(Uri uri, ContentValues values) {
-		mDB = mOpenHelper.getWritableDatabase();
-		mDB.execSQL(ENABLE_FK);
 		int match = sUriMatcher.match(uri);
 		String table = null;
 		switch (match) {
@@ -146,15 +144,65 @@ public class ShoutProvider extends ContentProvider {
 			default:
 				throw new IllegalArgumentException("Unknown or invalid URI " + uri);
 		}
-
-		long rowId = mDB.insertWithOnConflict(table, null, values, SQLiteDatabase.CONFLICT_IGNORE);
-		if (rowId < 0) { // An error occurred
-			throw new SQLException("Failed to insert row into " + uri);
-		}
+		long rowId = queryForPrexistingThenInsert(match, values, table);
 		Uri insertLocation = ContentUris.withAppendedId(uri, rowId);
 		this.getContext().getContentResolver()
 				.notifyChange(insertLocation, null);
 		return insertLocation;
+	}
+
+	private long queryForPrexistingThenInsert(int match, ContentValues values, String table) {
+		String selection;
+		String[] selectionArgs, projection;
+		Cursor cursor;
+		long id = -1;
+		boolean exists = false;
+		switch (match) {
+			case SHOUTS:
+				projection = new String[] {
+						ShoutProviderContract.Shouts._ID
+				};
+				selection = ShoutProviderContract.Shouts.HASH + " = ?";
+				selectionArgs = new String[] {
+						values.getAsString(ShoutProviderContract.Shouts.HASH)
+				};
+				cursor = query(ShoutProviderContract.Shouts.CONTENT_URI, projection,
+						selection, selectionArgs, null);
+				if (cursor.moveToFirst()) {
+					int idIndex = cursor.getColumnIndex(ShoutProviderContract.Shouts._ID);
+					id = cursor.getInt(idIndex);
+					exists = true;
+				}
+				cursor.close();
+				break;
+			case USERS:
+				projection = new String[] {
+						ShoutProviderContract.Users._ID
+				};
+				selection = ShoutProviderContract.Users.PUB_KEY + " = ?";
+				selectionArgs = new String[] {
+						values.getAsString(ShoutProviderContract.Users.PUB_KEY)
+				};
+				cursor = query(ShoutProviderContract.Users.CONTENT_URI, projection, selection,
+						selectionArgs, null);
+				if (cursor.moveToFirst()) {
+					int idIndex = cursor.getColumnIndex(ShoutProviderContract.Users._ID);
+					id = cursor.getInt(idIndex);
+					exists = true;
+				}
+				cursor.close();
+				break;
+			default:
+				throw new IllegalArgumentException("Invalid or unknown URI");
+		}
+		if (!exists) {
+			mDB = mOpenHelper.getWritableDatabase();
+			id = mDB.insert(table, null, values);
+		}
+		if (id == -1) {
+			throw new SQLException("Unable to insert into table " + table);
+		}
+		return id;
 	}
 
 	@Override
