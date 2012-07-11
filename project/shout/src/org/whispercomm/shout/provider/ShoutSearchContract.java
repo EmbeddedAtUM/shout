@@ -22,9 +22,20 @@ public class ShoutSearchContract {
 		public static final Uri CONTENT_URI = Uri.withAppendedPath(
 				ShoutProviderContract.CONTENT_URI_BASE, TABLE_NAME);
 
+		/**
+		 * The primary key column. It is automatically maintained by the FTS3
+		 * table.
+		 */
 		public static final String _ID = "rowid";
 
+		/**
+		 * A reference to a Shout primary key (ID)
+		 */
 		public static final String SHOUT = "Shout";
+
+		/**
+		 * The shout message for the shout with the given ID.
+		 */
 		public static final String MESSAGE = "Content";
 	}
 
@@ -33,7 +44,8 @@ public class ShoutSearchContract {
 	 * 
 	 * @param context
 	 * @param searchString
-	 * @return List of Shouts matching the query, empty list if no Shouts matched
+	 * @return List of Shouts matching the query, empty list if no Shouts
+	 *         matched
 	 */
 	public static List<Shout> searchShoutMessage(Context context, String searchString) {
 		String[] projection = {
