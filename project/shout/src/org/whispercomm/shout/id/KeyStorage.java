@@ -13,27 +13,28 @@ import java.security.KeyPair;
 interface KeyStorage {
 
 	/**
-	 * Write a key-pair, user ID tuple representing the user of this
+	 * Write a username, key-pair tuple representing the user of this
 	 * application.
 	 * 
 	 * @param userId
 	 * @param keyPair
+	 * @return {@code true} if write was successful
 	 */
-	public void writeKeyPair(int userId, KeyPair keyPair);
+	public boolean writeMe(String username, KeyPair keyPair);
 
 	/**
 	 * Read the key pair
 	 * 
 	 * @return {@code null} on failure
 	 */
-	public KeyPair readKeyPair();
+	public KeyPair readKeyPair() throws UserNotInitiatedException;
 
 	/**
-	 * Read the user ID
+	 * Read the username from storage.
 	 * 
-	 * @return {@code -1} on failure
+	 * @return {@code null} on failure
 	 */
-	public int getId();
+	public String readUsername() throws UserNotInitiatedException;
 
 	/**
 	 * Check whether any values are stored in this key storage.

@@ -28,10 +28,10 @@ public class Validators {
 		return true;
 	}
 
-	public static String removeTrailingSpaces() {
+	public static String removeTrailingSpaces(String string) {
 		/*
-		 * TODO 1) Determine if this is needed 2) Write this
+		 * TODO Implement
 		 */
-		return null;
+		return string;
 	}
 }

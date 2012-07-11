@@ -6,7 +6,6 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.junit.After;
@@ -22,6 +21,7 @@ import android.content.Context;
 @RunWith(ShoutTestRunner.class)
 public class IdManagerTest {
 
+	private static final String USERNAME_EXCEPTION_FAIL = "Username is valid";
 	private static final String INIT_EXCEPTION_FAIL = "UserNotInitiated exception thrown incorrectly";
 	private static final String USERNAME = "catherine";
 	private Context context;
@@ -49,9 +49,10 @@ public class IdManagerTest {
 			assertNotNull(me.getPublicKey());
 			assertEquals(me.getPublicKey(), me.getKeyPair().getPublic());
 			assertEquals(USERNAME, me.getUsername());
-			assertTrue(me.getDatabaseId() > 0);
 		} catch (UserNotInitiatedException e) {
 			fail(INIT_EXCEPTION_FAIL);
+		} catch (UserNameInvalidException e) {
+			fail(USERNAME_EXCEPTION_FAIL);
 		}
 	}
 
@@ -64,11 +65,14 @@ public class IdManagerTest {
 			idManager.resetUser(newUsername);
 			Me second = idManager.getMe();
 			assertThat(first.getUsername(), is(not(second.getUsername())));
-			assertThat(first.getDatabaseId(), is(not(second.getDatabaseId())));
 			assertThat(first.getKeyPair(), is(not(second.getKeyPair())));
 			assertThat(first.getPublicKey(), is(not(second.getPublicKey())));
 		} catch (UserNotInitiatedException e) {
+			e.printStackTrace();
 			fail(INIT_EXCEPTION_FAIL);
+		} catch (UserNameInvalidException e) {
+			e.printStackTrace();
+			fail(USERNAME_EXCEPTION_FAIL);
 		}
 	}
 

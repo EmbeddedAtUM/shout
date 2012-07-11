@@ -1,24 +1,12 @@
 
 package org.whispercomm.shout.id;
 
-import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.Security;
-import java.security.interfaces.ECPublicKey;
-import java.security.spec.ECGenParameterSpec;
 
-import org.spongycastle.jce.provider.BouncyCastleProvider;
-import org.whispercomm.shout.LocalUser;
 import org.whispercomm.shout.Me;
-import org.whispercomm.shout.SimpleUser;
-import org.whispercomm.shout.User;
-import org.whispercomm.shout.provider.ShoutProviderContract;
+import org.whispercomm.shout.util.Validators;
 
 import android.content.Context;
-import android.util.Log;
 
 public class IdManager {
 
@@ -28,65 +16,33 @@ public class IdManager {
 	public static final String CRYPTO_PROVIDER = "SC";
 
 	private KeyStorage keyStorage;
-	private Context context;
-
-	static {
-		Security.addProvider(new BouncyCastleProvider());
-	}
 
 	public IdManager(Context context) {
 		this.keyStorage = new KeyStorageSharedPrefs(context);
-		this.context = context;
 	}
 
-	public IdManager(Context context, KeyStorage keyStorage) {
+	public IdManager(KeyStorage keyStorage) {
 		this.keyStorage = keyStorage;
-		this.context = context;
 	}
 
-	public void resetUser(String newUsername) {
-		KeyPair oldKeyPair = keyStorage.readKeyPair();
-		int oldId = keyStorage.getId();
-		try {
-			// Generate a new key pair
-			ECGenParameterSpec ecParamSpec = new ECGenParameterSpec(ECC_PARAMS);
-			KeyPairGenerator kpg;
-			kpg = KeyPairGenerator.getInstance(CRYPTO_ALGO,
-					CRYPTO_PROVIDER);
-			kpg.initialize(ecParamSpec);
-			KeyPair newKeyPair = kpg.generateKeyPair();
-			ECPublicKey publicKey = (ECPublicKey) newKeyPair.getPublic();
-			// Make a new user with the new public key and username
-			User newUser = new SimpleUser(newUsername, publicKey);
-			int id = ShoutProviderContract.storeUser(context, newUser);
-			// Write the new one
-			if (id > 0) {
-				// Successful
-				keyStorage.writeKeyPair(id, newKeyPair);
-				return;
-			}
-		} catch (NoSuchAlgorithmException e) {
-			Log.e(TAG, e.getMessage());
-		} catch (NoSuchProviderException e) {
-			Log.e(TAG, e.getMessage());
-		} catch (InvalidAlgorithmParameterException e) {
-			Log.e(TAG, e.getMessage());
+	public void resetUser(String newUsername) throws UserNameInvalidException {
+		// Validate the new username
+		boolean isValid = Validators.validateUsername(newUsername);
+		if (!isValid) {
+			throw new UserNameInvalidException();
 		}
-		// Some sort of failure, reset to old state
-		if (!keyStorage.isEmpty()) {
-			keyStorage.writeKeyPair(oldId, oldKeyPair);
-		}
+		newUsername = Validators.removeTrailingSpaces(newUsername);
+		// Generate a new key pair
+		KeyPair newKeyPair = SignatureUtility.generateECKeyPair();
+		// Write the username, key pair tuple
+		keyStorage.writeMe(newUsername, newKeyPair);
 		return;
 	}
 
 	public Me getMe() throws UserNotInitiatedException {
-		if (keyStorage.isEmpty()) {
-			throw new UserNotInitiatedException();
-		}
-		int id = keyStorage.getId();
-		LocalUser user = ShoutProviderContract.retrieveUserById(context, id);
+		String username = keyStorage.readUsername();
 		KeyPair keyPair = keyStorage.readKeyPair();
-		return new MeImpl(user, keyPair);
+		return new MeImpl(-1, username, keyPair);
 	}
 
 	public boolean userIsNotSet() {

@@ -2,6 +2,7 @@
 package org.whispercomm.shout.customwidgets;
 
 import org.whispercomm.shout.id.IdManager;
+import org.whispercomm.shout.id.UserNameInvalidException;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -75,7 +76,11 @@ public class ShoutUsernamePreference extends ShoutEditTextPreference {
 		@Override
 		public boolean onPreferenceChange(Preference preference, Object newValue) {
 			String newUsername = (String) newValue;
-			idManager.resetUser(newUsername);
+			try {
+				idManager.resetUser(newUsername);
+			} catch (UserNameInvalidException e) {
+				return false;
+			}
 			return true;
 		}
 	};

@@ -1,8 +1,11 @@
 
 package org.whispercomm.shout.id;
 
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.Security;
@@ -10,6 +13,7 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
+import java.security.spec.ECGenParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -39,6 +43,26 @@ public class SignatureUtility {
 	 */
 	private SignatureUtility() {
 		throw new IllegalStateException("Cannot instantiate SignatureUtility!");
+	}
+
+	public static KeyPair generateECKeyPair() {
+		try {
+			ECGenParameterSpec ecParamSpec = new ECGenParameterSpec(ECC_PARAMS);
+			KeyPairGenerator kpg;
+			kpg = KeyPairGenerator.getInstance(CRYPTO_ALGO,
+					CRYPTO_PROVIDER);
+			kpg.initialize(ecParamSpec);
+			KeyPair keyPair = kpg.generateKeyPair();
+			return keyPair;
+		} catch (InvalidAlgorithmParameterException e) {
+			Log.e(TAG, e.getMessage());
+		} catch (NoSuchAlgorithmException e) {
+			Log.e(TAG, e.getMessage());
+		} catch (NoSuchProviderException e) {
+			Log.e(TAG, e.getMessage());
+		}
+		// Should never happen
+		return null;
 	}
 
 	/**
