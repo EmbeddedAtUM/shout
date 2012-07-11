@@ -383,7 +383,14 @@ public class ShoutProviderContract {
 				null, selection, selectionArgs, sortOrder);
 		return result;
 	}
-
+	
+	/**
+	 * Retrieves a cursor over the comments of the specified shout.
+	 * 
+	 * @param context the context used to access the content provider
+	 * @param hash the hash of the parent whose comments to retrieve
+	 * @return a cursor over the comments
+	 */
 	public static Cursor getComments(Context context, byte[] hash) {
 		String sortOrder = Shouts.TIME_RECEIVED + " DESC";
 		String selection = Shouts.PARENT + " = ? AND " + Shouts.MESSAGE + " IS NOT NULL";
