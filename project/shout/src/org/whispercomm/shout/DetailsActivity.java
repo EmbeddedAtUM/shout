@@ -36,6 +36,7 @@ public class DetailsActivity extends ListActivity {
 		shout = ShoutProviderContract.retrieveShoutById(
 				getApplicationContext(), shoutId);
 		ShoutType type = ShoutMessageUtility.getShoutType(shout);
+		/*
 		switch (type) {
 			case RESHOUT:
 				int parentId = ShoutProviderContract.storeShout(
@@ -48,6 +49,9 @@ public class DetailsActivity extends ListActivity {
 						getApplicationContext(), shoutId);
 				break;
 		}
+		*/
+		// TODO
+		cursor = ShoutProviderContract.getComments(getApplicationContext(), shout.getHash());
 		setListAdapter(new CommentsAdapter(this, cursor));
 	}
 

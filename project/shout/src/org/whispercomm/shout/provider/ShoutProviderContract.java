@@ -363,26 +363,6 @@ public class ShoutProviderContract {
 				selection, null, sortOrder);
 		return result;
 	}
-
-	/**
-	 * Get a cursor over comments on the Shout with the given identifier.
-	 * 
-	 * @param context
-	 * @param shoutId
-	 * @return
-	 */
-	@Deprecated
-	public static Cursor getCursorOverShoutComments(Context context, int shoutId) {
-		String sortOrder = Shouts.TIME_RECEIVED + " DESC";
-		String selection = Shouts.PARENT + " = ? AND " + Shouts.MESSAGE
-				+ " IS NOT NULL";
-		String[] selectionArgs = {
-				Integer.toString(shoutId)
-		};
-		Cursor result = context.getContentResolver().query(Shouts.CONTENT_URI,
-				null, selection, selectionArgs, sortOrder);
-		return result;
-	}
 	
 	/**
 	 * Retrieves a cursor over the comments of the specified shout.
