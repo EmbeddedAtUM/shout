@@ -69,7 +69,7 @@ public class NetworkInterface {
 	public boolean send(LocalShout shout) {
 		if (isBinded) {
 			Message msg = Message.obtain(null, NetworkService.NEW_SHOUT);
-			msg.obj = shout.getDatabaseId();
+			msg.obj = shout.getHash();
 			try {
 				shoutService.send(msg);
 				return true;

@@ -7,6 +7,7 @@ import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
@@ -35,9 +36,10 @@ public class NetworkService extends Service {
 			throw new RuntimeException(e);
 		}
 
-		this.appMessenger = new Messenger(new AppShoutHandler());
 		this.networkProtocol = new NaiveNetworkProtocol(manes,
 				getApplicationContext());
+		this.appMessenger = new Messenger(new AppShoutHandler(getApplicationContext(),
+				networkProtocol));
 		this.networkReceiver = new NetworkReceiver(this.manes,
 				this.networkProtocol);
 
@@ -69,15 +71,23 @@ public class NetworkService extends Service {
 	 * Handler wrapper for processing incoming shouts from application (e.g.,
 	 * UI)
 	 */
-	class AppShoutHandler extends Handler {
+	private static class AppShoutHandler extends Handler {
+
+		private Context context;
+		private NetworkProtocol networkProtocol;
+
+		public AppShoutHandler(Context context, NetworkProtocol networkProtocol) {
+			super();
+			this.context = context;
+			this.networkProtocol = networkProtocol;
+		}
+
 		@Override
 		public void handleMessage(Message msg) {
 			if (msg.what == NEW_SHOUT) {
-				int shoutId = (Integer) msg.obj;
-				Shout shout = ShoutProviderContract
-						.retrieveShoutById(
-								NetworkService.this.getApplicationContext(),
-								shoutId);
+				byte[] shoutHash = (byte[]) msg.obj;
+				Shout shout = ShoutProviderContract.retrieveShoutByHash(context,
+						shoutHash);
 				// TODO Find out why networkProtocol gets nulled
 				networkProtocol.sendShout(shout);
 			}

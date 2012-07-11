@@ -363,7 +363,7 @@ public class ShoutProviderContract {
 				selection, null, sortOrder);
 		return result;
 	}
-	
+
 	/**
 	 * Retrieves a cursor over the comments of the specified shout.
 	 * 
