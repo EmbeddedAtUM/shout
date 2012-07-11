@@ -1,6 +1,8 @@
 
 package org.whispercomm.shout;
 
+import org.whispercomm.shout.customwidgets.DialogFactory;
+import org.whispercomm.shout.customwidgets.ShoutAgreementView;
 import org.whispercomm.shout.customwidgets.ShoutListViewRow;
 import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.id.UserNotInitiatedException;
@@ -10,8 +12,11 @@ import org.whispercomm.shout.network.NetworkService;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.tasks.ReshoutTask;
 
+import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -71,6 +76,23 @@ public class ShoutActivity extends ListActivity {
 		network.unbind();
 		cursor.close();
 		Log.v(TAG, "Finished onDestroy");
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
+		DialogInterface.OnClickListener positive = new OnClickListener() {
+
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				Log.v(TAG, Integer.toString(which));
+			}
+
+		};
+		DialogInterface.OnClickListener negative = positive;
+		AlertDialog agreement = DialogFactory.buildUserAgreementDialog(this,
+				new ShoutAgreementView(this), positive, negative);
+		agreement.show();
 	}
 
 	@Override

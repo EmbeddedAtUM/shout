@@ -18,4 +18,13 @@ public class DialogFactory {
 		return builder.create();
 	}
 
+	public static AlertDialog buildUserAgreementDialog(Context context, ShoutAgreementView view,
+			DialogInterface.OnClickListener positive, DialogInterface.OnClickListener negative) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);
+		builder.setCancelable(false).setView(view)
+				.setPositiveButton("I agree", positive)
+				.setNegativeButton("Get me out of here!", negative)
+				.setTitle("Shout User Agreement");
+		return builder.create();
+	}
 }

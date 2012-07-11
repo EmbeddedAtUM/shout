@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">Shout</string>
     <string name="no_shouts">You haven\'t received any Shouts.</string>
     <string name="separatorDesc">Separator</string>
@@ -30,5 +28,5 @@
     <string name="serviceTitleText">Shout Service</string>
     <string name="serviceDescriptionText">Currently listening for nearby Shouts</string>
     <string name="splashDesc">Splash screen logo</string>
-
+    <string name="shoutAgreement">As part of research into censorship-resistant communication, all Shouts sent over MANES are recorded  and associated with the sender\'s Shout username and location. No Shout data is directly associated with MANES data. The data collection is only a temporary measure; once Shout is based on a true ad hoc network (rather than MANES), absolutely no data will be logged. We hope to reach this point as soon as possible, which is why we are requesting to store the data.\n\n If you do not agree to these terms, please uninstall Shout. For more information, <a href='http://whispercomm.org/shout'>click here</a>.</string>
 </resources>
