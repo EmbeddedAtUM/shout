@@ -21,8 +21,7 @@ public class DetailsActivity extends ListActivity {
 
 	private static final String TAG = "DetailsActivity";
 	public static final String SHOUT_ID = "shout_id";
-	private Shout shout;
-	private int shoutId;
+	private LocalShout shout;
 
 	private Cursor cursor;
 
@@ -32,35 +31,39 @@ public class DetailsActivity extends ListActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.details);
 		Bundle extras = getIntent().getExtras();
-		shoutId = extras.getInt(SHOUT_ID);
-		shout = ShoutProviderContract.retrieveShoutById(
-				getApplicationContext(), shoutId);
-		ShoutType type = ShoutMessageUtility.getShoutType(shout);
-		/*
-		switch (type) {
+		shout = getShoutFromBundle(extras);
+		byte[] parentHash;
+		switch (shout.getType()) {
 			case RESHOUT:
-				int parentId = ShoutProviderContract.storeShout(
-						getApplicationContext(), shout.getParent());
-				cursor = ShoutProviderContract.getCursorOverShoutComments(
-						getApplicationContext(), parentId);
+			case COMMENT:
+				parentHash = shout.getParent().getHash();
+				break;
+			case RECOMMENT:
+				parentHash = shout.getParent().getParent().getHash();
 				break;
 			default:
-				cursor = ShoutProviderContract.getCursorOverShoutComments(
-						getApplicationContext(), shoutId);
+				parentHash = shout.getHash();
 				break;
 		}
-		*/
-		// TODO
-		cursor = ShoutProviderContract.getComments(getApplicationContext(), shout.getHash());
+		cursor = ShoutProviderContract.getComments(getApplicationContext(), parentHash);
 		setListAdapter(new CommentsAdapter(this, cursor));
+	}
+
+	private LocalShout getShoutFromBundle(Bundle bundle) {
+		if (bundle == null) {
+			return null;
+		}
+		byte[] hash = bundle.getByteArray(SHOUT_ID);
+		if (hash == null) {
+			return null;
+		}
+		LocalShout shout = ShoutProviderContract.retrieveShoutByHash(getApplicationContext(), hash);
+		return shout;
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		shout = ShoutProviderContract.retrieveShoutById(
-				getApplicationContext(), shoutId);
-		// Set message details
 		TextView username = (TextView) findViewById(R.id.origsender);
 		username.setText(shout.getSender().getUsername());
 		TextView age = (TextView) findViewById(R.id.age);
@@ -72,11 +75,6 @@ public class DetailsActivity extends ListActivity {
 				Base64.DEFAULT));
 		TextView hash = (TextView) findViewById(R.id.hash);
 		hash.setText(Base64.encodeToString(shout.getHash(), Base64.DEFAULT));
-		/*
-		 * TODO 1) Figure out how to get access to the views that show the
-		 * information about the Shout we're viewing the details of. 2) Populate
-		 * those fields with content from this.shout
-		 */
 		Log.v(TAG, "Finished onResume");
 	}
 

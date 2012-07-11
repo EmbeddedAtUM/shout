@@ -140,7 +140,7 @@ public class ShoutActivity extends ListActivity {
 		Log.v(TAG, "Details buttons clicked");
 
 		Intent intent = new Intent(this, DetailsActivity.class);
-		intent.putExtra(DetailsActivity.SHOUT_ID, shout.getDatabaseId());
+		intent.putExtra(DetailsActivity.SHOUT_ID, shout.getHash());
 		startActivity(intent);
 	}
 
