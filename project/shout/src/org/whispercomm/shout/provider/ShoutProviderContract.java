@@ -342,7 +342,7 @@ public class ShoutProviderContract {
 		int id = Integer.valueOf(location.getLastPathSegment());
 		return id;
 	}
-	
+
 	public static LocalUser saveUser(Context context, User user) {
 		ContentValues values = ContractHelper.buildContentValues(user);
 		context.getContentResolver().insert(Users.CONTENT_URI, values);
@@ -384,6 +384,17 @@ public class ShoutProviderContract {
 		return result;
 	}
 
+	public static Cursor getComments(Context context, byte[] hash) {
+		String sortOrder = Shouts.TIME_RECEIVED + " DESC";
+		String selection = Shouts.PARENT + " = ? AND " + Shouts.MESSAGE + " IS NOT NULL";
+		String[] selectionArgs = {
+				Base64.encodeToString(hash, Base64.DEFAULT)
+		};
+		Cursor cursor = context.getContentResolver().query(Shouts.CONTENT_URI, null, selection,
+				selectionArgs, sortOrder);
+		return cursor;
+	}
+
 	/**
 	 * Retrieves a cursor over the comments of the specified shout.
 	 * 
@@ -392,7 +403,7 @@ public class ShoutProviderContract {
 	 * @return a cursor over the comments
 	 */
 	public static Cursor getComments(Context context, LocalShout shout) {
-		return getCursorOverShoutComments(context, shout.getDatabaseId());
+		return getComments(context, shout.getHash());
 	}
 
 	/**
@@ -450,7 +461,7 @@ public class ShoutProviderContract {
 		throw new IllegalStateException(
 				"Cannot instantiate ShoutProviderContract");
 	}
-	
+
 	private static LocalUser retrieveUserByEncodedKey(Context context, String encodedKey) {
 		String selection = Users.PUB_KEY + " = ?";
 		String selectionArgs[] = {
