@@ -1,24 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:custom="http://schemas.android.com/apk/res/org.whispercomm.shout"
-    android:id="@+id/detailsView"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:layout_height="match_parent" >
 
-    <org.whispercomm.shout.customwidgets.ShoutView
-        android:id="@+id/shoutview"
-        android:layout_marginLeft="10dip"
-        android:layout_marginRight="10dip"
+    <LinearLayout
+        android:id="@+id/detailsView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:background="@color/white"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:orientation="vertical" >
 
-    <org.whispercomm.shout.customwidgets.ShoutChainView
-        android:id="@+id/commentsview"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="15dip"
-        android:orientation="vertical" />
+        <org.whispercomm.shout.customwidgets.ShoutDetailsView
+            android:id="@+id/shoutview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
-</LinearLayout>
+        <org.whispercomm.shout.customwidgets.ShoutChainView
+            android:id="@+id/commentsview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dip"
+            android:orientation="vertical" />
+    </LinearLayout>
+
+</ScrollView>
