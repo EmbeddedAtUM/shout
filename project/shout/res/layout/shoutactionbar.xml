@@ -30,6 +30,6 @@
         android:layout_gravity="center"
         android:contentDescription="@string/detailsDescription"
         android:padding="5dip"
-        android:src="@drawable/gear" />
+        android:src="@drawable/details" />
 
 </LinearLayout>
