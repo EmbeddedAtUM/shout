@@ -8,19 +8,12 @@ import org.whispercomm.shout.Me;
 
 public class MeImpl implements Me {
 
-	private int id;
 	private KeyPair keyPair;
 	private String username;
 
-	public MeImpl(int id, String username, KeyPair keyPair) {
-		this.id = id;
+	public MeImpl(String username, KeyPair keyPair) {
 		this.username = username;
 		this.keyPair = keyPair;
-	}
-
-	@Override
-	public int getDatabaseId() {
-		return id;
 	}
 
 	@Override

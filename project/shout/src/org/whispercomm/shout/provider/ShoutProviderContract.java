@@ -317,14 +317,12 @@ public class ShoutProviderContract {
 	 */
 	public static LocalUser retrieveUserFromCursor(Context context,
 			Cursor cursor) {
-		int idIndex = cursor.getColumnIndex(Users._ID);
 		int keyIndex = cursor.getColumnIndex(Users.PUB_KEY);
 		int nameIndex = cursor.getColumnIndex(Users.USERNAME);
-		int id = cursor.getInt(idIndex);
 		String encodedKey = cursor.getString(keyIndex);
 		String name = cursor.getString(nameIndex);
 
-		return new LocalUserImpl(context, id, name, encodedKey);
+		return new LocalUserImpl(context, name, encodedKey);
 	}
 
 	/**

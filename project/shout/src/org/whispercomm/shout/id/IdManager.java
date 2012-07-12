@@ -42,7 +42,7 @@ public class IdManager {
 	public Me getMe() throws UserNotInitiatedException {
 		String username = keyStorage.readUsername();
 		KeyPair keyPair = keyStorage.readKeyPair();
-		return new MeImpl(-1, username, keyPair);
+		return new MeImpl(username, keyPair);
 	}
 
 	public boolean userIsNotSet() {

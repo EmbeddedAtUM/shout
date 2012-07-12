@@ -14,12 +14,10 @@ public class LocalUserImpl implements LocalUser {
 	@SuppressWarnings("unused")
 	private Context context;
 
-	private int id;
 	private String username;
 	private byte[] keyBytes;
 
-	public LocalUserImpl(Context context, int id, String username, String encodedKey) {
-		this.id = id;
+	public LocalUserImpl(Context context, String username, String encodedKey) {
 		this.username = username;
 		this.keyBytes = Base64.decode(encodedKey, Base64.DEFAULT);
 		this.context = context;
@@ -33,11 +31,6 @@ public class LocalUserImpl implements LocalUser {
 	@Override
 	public ECPublicKey getPublicKey() {
 		return SignatureUtility.getPublicKeyFromBytes(keyBytes);
-	}
-
-	@Override
-	public int getDatabaseId() {
-		return this.id;
 	}
 
 }

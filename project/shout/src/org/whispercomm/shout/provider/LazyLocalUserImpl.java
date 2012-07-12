@@ -14,7 +14,6 @@ public class LazyLocalUserImpl implements LocalUser {
 	private boolean loaded = false;
 
 	private Context context;
-	private int id = -1;
 	private String username = null;
 	private ECPublicKey key = null;
 
@@ -37,18 +36,9 @@ public class LazyLocalUserImpl implements LocalUser {
 		return key;
 	}
 
-	@Override
-	public int getDatabaseId() {
-		if (!loaded) {
-			loadSelf();
-		}
-		return id;
-	}
-
 	private void loadSelf() {
 		LocalUser self = ShoutProviderContract.retrieveUserByKey(context, key);
 		username = self.getUsername();
-		id = self.getDatabaseId();
 		loaded = true;
 	}
 

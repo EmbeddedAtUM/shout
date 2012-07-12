@@ -10,15 +10,9 @@ public class TestMe implements Me {
 
 	public String username;
 	public KeyPair keyPair;
-	public int id = 1;
 
 	public TestMe(String username) {
 		this.keyPair = TestFactory.genKeyPair();
-	}
-
-	@Override
-	public int getDatabaseId() {
-		return id;
 	}
 
 	@Override
