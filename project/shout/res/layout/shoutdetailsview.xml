@@ -4,18 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content" >
 
-    <TextView
-        android:id="@+id/signature"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/commentCount"
-        android:text="signature" />
 
-    <TextView
-        android:id="@+id/hash"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/signature"
-        android:text="hash" />
 
 </merge>

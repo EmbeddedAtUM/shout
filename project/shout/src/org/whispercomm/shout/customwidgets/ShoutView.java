@@ -1,17 +1,19 @@
 
 package org.whispercomm.shout.customwidgets;
 
-import org.whispercomm.shout.R;
 import org.whispercomm.shout.LocalShout;
+import org.whispercomm.shout.R;
 import org.whispercomm.shout.ShoutType;
 import org.whispercomm.shout.util.ShoutMessageUtility;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TableLayout;
 import android.widget.TextView;
 
 /**
@@ -31,6 +33,8 @@ public class ShoutView extends RelativeLayout {
 
 	private TextView commentCount;
 	private TextView age;
+
+	private TableLayout detailsTable;
 
 	/**
 	 * The shout current bound to this view
@@ -61,6 +65,7 @@ public class ShoutView extends RelativeLayout {
 		message = (TextView) findViewById(R.id.message);
 		reshoutIcon = (ImageView) findViewById(R.id.reshoutIcon);
 		commentCount = (TextView) findViewById(R.id.commentCount);
+		detailsTable = (TableLayout) findViewById(R.id.shoutDetails);
 	}
 
 	/**
@@ -94,6 +99,9 @@ public class ShoutView extends RelativeLayout {
 			reshoutIcon.setVisibility(View.GONE);
 			reshouters.setVisibility(View.GONE);
 		}
+
+		detailsTable.setVisibility(GONE);
+
 	}
 
 	/**
@@ -103,6 +111,35 @@ public class ShoutView extends RelativeLayout {
 	 */
 	public LocalShout getBoundShout() {
 		return this.shout;
+	}
+
+	public void showDetails() {
+		detailsTable.setVisibility(VISIBLE);
+		// Add the time sent
+		ShoutDetailRow timeSent = new ShoutDetailRow(getContext());
+		timeSent.setTitleText("Time Sent");
+		timeSent.setEntryText(shout.getTimestamp().toString());
+		detailsTable.addView(timeSent);
+		// Add the time received
+		ShoutDetailRow timeReceived = new ShoutDetailRow(getContext());
+		timeReceived.setTitleText("Time Received");
+		timeReceived.setEntryText(shout.getReceivedTime().toString());
+		detailsTable.addView(timeReceived);
+		// Add the signature
+		ShoutDetailRow signature = new ShoutDetailRow(getContext());
+		signature.setTitleText("Signature");
+		signature.setEntryText(Base64.encodeToString(shout.getSignature(), Base64.NO_WRAP));
+		detailsTable.addView(signature);
+		// Add the hash
+		ShoutDetailRow hash = new ShoutDetailRow(getContext());
+		hash.setTitleText("Hash");
+		hash.setEntryText(Base64.encodeToString(shout.getHash(), Base64.NO_WRAP));
+		detailsTable.addView(hash);
+	}
+
+	public void hideDetails() {
+		detailsTable.setVisibility(GONE);
+		detailsTable.removeAllViews();
 	}
 
 }

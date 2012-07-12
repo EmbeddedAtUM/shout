@@ -41,6 +41,7 @@ public class DetailsActivity extends Activity {
 				parentHash);
 		ShoutView shoutView = (ShoutView) findViewById(R.id.shoutview);
 		shoutView.bindShout(shout);
+		shoutView.showDetails();
 		ShoutChainView view = (ShoutChainView) findViewById(R.id.commentsview);
 		view.bindShouts(parent);
 		view.setVisibility(View.VISIBLE);
