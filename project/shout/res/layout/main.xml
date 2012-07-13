@@ -19,7 +19,7 @@
             android:layout_alignParentRight="true"
             android:contentDescription="@string/settingsDesc"
             android:onClick="onClickSettings"
-            android:src="@drawable/details" />
+            android:src="@drawable/gear" />
 
         <ImageButton
             android:id="@+id/composeButton"
