@@ -48,4 +48,5 @@ public class IdManager {
 	public boolean userIsNotSet() {
 		return keyStorage.isEmpty();
 	}
+
 }

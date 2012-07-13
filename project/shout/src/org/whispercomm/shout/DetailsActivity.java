@@ -34,7 +34,6 @@ public class DetailsActivity extends Activity {
 				break;
 
 		}
-
 		ShoutView shoutView = (ShoutView) findViewById(R.id.shoutview);
 		shoutView.bindShout(shout);
 		shoutView.showDetails();
