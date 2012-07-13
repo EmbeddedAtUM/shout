@@ -23,7 +23,7 @@ public class DialogFactory {
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		builder.setCancelable(false).setView(view)
 				.setPositiveButton("I agree", positive)
-				.setNegativeButton("I do not agree and I will uninstall Shout", negative)
+				.setNegativeButton("Get me out of here!", negative)
 				.setTitle("Shout User Agreement");
 		return builder.create();
 	}
