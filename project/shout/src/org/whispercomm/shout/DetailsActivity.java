@@ -24,7 +24,6 @@ public class DetailsActivity extends Activity {
 		setContentView(R.layout.details);
 		Bundle extras = getIntent().getExtras();
 		shout = getShoutFromBundle(extras);
-		byte[] parentHash;
 		switch (shout.getType()) {
 			case SHOUT:
 				ShoutChainView view = (ShoutChainView) findViewById(R.id.commentsview);
