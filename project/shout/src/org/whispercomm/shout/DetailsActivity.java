@@ -26,25 +26,20 @@ public class DetailsActivity extends Activity {
 		shout = getShoutFromBundle(extras);
 		byte[] parentHash;
 		switch (shout.getType()) {
-			case RESHOUT:
-			case COMMENT:
-				parentHash = shout.getParent().getHash();
-				break;
-			case RECOMMENT:
-				parentHash = shout.getParent().getParent().getHash();
+			case SHOUT:
+				ShoutChainView view = (ShoutChainView) findViewById(R.id.commentsview);
+				view.bindShouts(shout);
+				view.setVisibility(View.VISIBLE);
 				break;
 			default:
-				parentHash = shout.getHash();
 				break;
+
 		}
-		LocalShout parent = ShoutProviderContract.retrieveShoutByHash(getApplicationContext(),
-				parentHash);
+
 		ShoutView shoutView = (ShoutView) findViewById(R.id.shoutview);
 		shoutView.bindShout(shout);
 		shoutView.showDetails();
-		ShoutChainView view = (ShoutChainView) findViewById(R.id.commentsview);
-		view.bindShouts(parent);
-		view.setVisibility(View.VISIBLE);
+
 	}
 
 	private LocalShout getShoutFromBundle(Bundle bundle) {
