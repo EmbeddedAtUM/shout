@@ -12,7 +12,6 @@ import org.whispercomm.shout.tasks.SendShoutTask;
 import org.whispercomm.shout.tasks.ShoutTask;
 import org.whispercomm.shout.thirdparty.Utf8ByteLengthFilter;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -38,7 +37,6 @@ public class MessageActivity extends Activity {
 
 	private LocalShout parent = null;
 
-	@SuppressLint("ShowToast")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
