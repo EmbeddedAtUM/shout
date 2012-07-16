@@ -43,6 +43,7 @@ public class TestUtility {
 		assertEquals(lhs.getSender().getPublicKey(), rhs.getSender().getPublicKey());
 		assertArrayEquals(lhs.getSignature(), rhs.getSignature());
 		assertArrayEquals(lhs.getHash(), rhs.getHash());
+		assertArrayEquals(lhs.getSender().getPublicKey().getEncoded(), rhs.getSender().getPublicKey().getEncoded());
 		testEqualShoutFields(lhs.getParent(), rhs.getParent());
 	}
 

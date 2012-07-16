@@ -9,13 +9,18 @@ import static org.junit.Assert.assertTrue;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 
+import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.whispercomm.shout.UnsignedShout;
+import org.whispercomm.shout.serialization.SerializeUtility;
 import org.whispercomm.shout.test.ShoutTestRunner;
 import org.whispercomm.shout.test.util.TestFactory;
 import org.whispercomm.shout.test.util.TestMe;
+import org.whispercomm.shout.test.util.TestUnsignedShout;
+import org.whispercomm.shout.test.util.TestUser;
 
 @RunWith(ShoutTestRunner.class)
 public class SignatureUtilityTest {
@@ -69,6 +74,14 @@ public class SignatureUtilityTest {
 		byte[] dataBytes = TestFactory.genByteArray(1000);
 		byte[] signature = TestFactory.genByteArray(71);
 		assertFalse(SignatureUtility.verifySignature(dataBytes, signature, me.getPublicKey()));
+	}
+
+	@Test
+	public void testValidSignatureFromShoutIsValid() {
+		UnsignedShout shout = new TestUnsignedShout(me, null, "message content", DateTime.now());
+		byte[] signature = SignatureUtility.generateSignature(shout, me);
+		boolean valid = SignatureUtility.verifySignature(SerializeUtility.serializeShoutData(shout), signature, me.getPublicKey());
+		assertTrue(valid);
 	}
 
 }

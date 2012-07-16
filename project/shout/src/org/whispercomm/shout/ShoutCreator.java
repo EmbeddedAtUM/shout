@@ -53,7 +53,7 @@ public class ShoutCreator {
 	public LocalShout createComment(DateTime timestamp, String message,
 			Shout parent, Me sender) {
 		UnsignedShout unsigned = new SimpleUnsignedShout(timestamp, sender,
-				message, null);
+				message, parent);
 		byte[] signature = SignatureUtility.generateSignature(unsigned, sender);
 		Shout shout = new SimpleShout(timestamp, sender, message, parent,
 				signature);
@@ -71,7 +71,7 @@ public class ShoutCreator {
 	 */
 	public LocalShout createReshout(DateTime timestamp, Shout parent, Me sender) {
 		UnsignedShout unsigned = new SimpleUnsignedShout(timestamp, sender,
-				null, null);
+				null, parent);
 		byte[] signature = SignatureUtility.generateSignature(unsigned, sender);
 		Shout shout = new SimpleShout(timestamp, sender, null, parent,
 				signature);

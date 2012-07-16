@@ -13,6 +13,7 @@ public class TestMe implements Me {
 
 	public TestMe(String username) {
 		this.keyPair = TestFactory.genKeyPair();
+		this.username = username;
 	}
 
 	@Override

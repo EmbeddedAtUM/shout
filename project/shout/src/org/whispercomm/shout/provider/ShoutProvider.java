@@ -198,6 +198,7 @@ public class ShoutProvider extends ContentProvider {
 		if (!exists) {
 			mDB = mOpenHelper.getWritableDatabase();
 			id = mDB.insert(table, null, values);
+
 		}
 		if (id == -1) {
 			throw new SQLException("Unable to insert into table " + table);

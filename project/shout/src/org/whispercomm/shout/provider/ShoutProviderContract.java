@@ -334,7 +334,7 @@ public class ShoutProviderContract {
 	 * @return a cursor over the comments
 	 */
 	public static Cursor getComments(Context context, byte[] hash) {
-		String sortOrder = Shouts.TIME_RECEIVED + " DESC";
+		String sortOrder = Shouts.TIME_RECEIVED + " ASC";
 		String selection = Shouts.PARENT + " = ? AND " + Shouts.MESSAGE + " IS NOT NULL";
 		String[] selectionArgs = {
 				Base64.encodeToString(hash, Base64.DEFAULT)

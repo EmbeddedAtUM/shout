@@ -46,6 +46,8 @@ public class SerializeStandardTest {
 			fail("Shout version is not bad!");
 		} catch (ShoutPacketException e) {
 			fail("Shout packet is valid!");
+		} catch (InvalidShoutSignatureException e) {
+			fail();
 		}
 	}
 

@@ -129,7 +129,8 @@ public class SignatureUtility {
 					CRYPTO_PROVIDER);
 			signature.initVerify(pubKey);
 			signature.update(data);
-			return signature.verify(dataSignature);
+			boolean result = signature.verify(dataSignature);
+			return result;
 		} catch (NoSuchAlgorithmException e) {
 			Log.e(TAG, e.getMessage());
 		} catch (InvalidKeyException e) {
@@ -139,7 +140,7 @@ public class SignatureUtility {
 		} catch (NoSuchProviderException e) {
 			Log.e(TAG, e.getMessage());
 		}
-		// Should never happen
+		Log.v(TAG, "Exception thrown");
 		return false;
 	}
 

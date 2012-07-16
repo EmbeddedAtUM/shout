@@ -74,6 +74,9 @@ public class SerializeUtilityTest {
 		} catch (ShoutPacketException e) {
 			fail(PACKET_EXCEPTION_FAIL);
 			return;
+		} catch (InvalidShoutSignatureException e) {
+			fail();
+			return;
 		}
 		assertNotNull(fromBytes);
 		TestUtility.testEqualShoutFields(shout, fromBytes);
@@ -97,6 +100,9 @@ public class SerializeUtilityTest {
 			return;
 		} catch (ShoutPacketException e) {
 			fail(PACKET_EXCEPTION_FAIL);
+			return;
+		} catch (InvalidShoutSignatureException e) {
+			fail();
 			return;
 		}
 		assertNotNull(fromBytes);

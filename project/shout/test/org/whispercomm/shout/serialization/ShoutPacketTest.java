@@ -84,6 +84,8 @@ public class ShoutPacketTest {
 		} catch (ShoutChainTooLongException e) {
 			e.printStackTrace();
 			fail(SHOUT_CHAIN_FAIL);
+		} catch (InvalidShoutSignatureException e) {
+			fail();
 		}
 
 	}
@@ -110,6 +112,9 @@ public class ShoutPacketTest {
 		} catch (ShoutChainTooLongException e) {
 			e.printStackTrace();
 			fail(SHOUT_CHAIN_FAIL);
+		} catch (InvalidShoutSignatureException e) {
+			e.printStackTrace();
+			fail();
 		}
 	}
 
@@ -136,6 +141,9 @@ public class ShoutPacketTest {
 		} catch (ShoutPacketException e) {
 			e.printStackTrace();
 			fail(PACKET_EXCEPTION_FAIL);
+		} catch (InvalidShoutSignatureException e) {
+			e.printStackTrace();
+			fail();
 		}
 	}
 
@@ -162,6 +170,9 @@ public class ShoutPacketTest {
 		} catch (ShoutPacketException e) {
 			e.printStackTrace();
 			fail(PACKET_EXCEPTION_FAIL);
+		} catch (InvalidShoutSignatureException e) {
+			e.printStackTrace();
+			fail();
 		}
 	}
 
@@ -187,6 +198,9 @@ public class ShoutPacketTest {
 		} catch (BadShoutVersionException e) {
 			e.printStackTrace();
 			fail(VERSION_EXCEPTION_FAIL);
+		} catch (InvalidShoutSignatureException e) {
+			e.printStackTrace();
+			fail();
 		}
 	}
 }

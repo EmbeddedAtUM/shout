@@ -82,7 +82,7 @@ public class SerializeUtility {
 
 			// Put the username length in the buffer
 			buffer.put(usernameLength);
-			size += 1;
+			size += USERNAME_LENGTH_SIZE;
 
 			// Put the username in the buffer
 			buffer.put(username);
@@ -136,9 +136,11 @@ public class SerializeUtility {
 	 * @throws BadShoutVersionException If the version on the Shout is unknown
 	 * @throws ShoutPacketException If the serialization does not match any know
 	 *             Shout standard
+	 * @throws InvalidShoutSignatureException If a Shout contained in
+	 *             {@code body} did not have a valid signature
 	 */
 	public static Shout deserializeShout(int count, byte[] body) throws BadShoutVersionException,
-			ShoutPacketException {
+			ShoutPacketException, InvalidShoutSignatureException {
 		/*
 		 * TODO Make everything about this function not be awful TODO Check that
 		 * the hash is equivalent to the parent hash
