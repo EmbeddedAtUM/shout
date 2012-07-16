@@ -14,7 +14,7 @@ public class DialogFactory {
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		builder.setMessage(R.string.username_change_warning)
 				.setCancelable(false)
-				.setPositiveButton("OK! OK! Now let me walk into Mordor...", positive);
+				.setPositiveButton("I understand the risks", positive);
 		return builder.create();
 	}
 
