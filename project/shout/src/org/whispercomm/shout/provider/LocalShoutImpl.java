@@ -114,7 +114,7 @@ public class LocalShoutImpl implements LocalShout {
 	@Override
 	public List<LocalUser> getReshouters() {
 		Cursor cursor = ShoutProviderContract.getCursorOverReshouts(context, parentHash);
-		List<LocalUser> users = new ArrayList<LocalUser>();
+		List<LocalUser> users = new ArrayList<LocalUser>(cursor.getCount());
 		int authorIndex = cursor.getColumnIndex(ShoutProviderContract.Shouts.AUTHOR);
 		while (cursor.moveToNext()) {
 			String author = cursor.getString(authorIndex);
@@ -126,8 +126,12 @@ public class LocalShoutImpl implements LocalShout {
 
 	@Override
 	public List<LocalShout> getComments() {
-		// TODO Auto-generated method stub
-		return null;
+		Cursor cursor = ShoutProviderContract.getComments(context, hashBytes);
+		List<LocalShout> comments = new ArrayList<LocalShout>(cursor.getCount());
+		while (cursor.moveToNext()) {
+			comments.add(ShoutProviderContract.retrieveShoutFromCursor(context, cursor));
+		}
+		return comments;
 	}
 
 }

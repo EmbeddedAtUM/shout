@@ -1,11 +1,11 @@
 
 package org.whispercomm.shout.customwidgets;
 
+import java.util.List;
+
 import org.whispercomm.shout.LocalShout;
-import org.whispercomm.shout.provider.ShoutProviderContract;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -38,16 +38,10 @@ public class ShoutChainView extends LinearLayout {
 	}
 
 	private void loadShouts() {
-		Cursor cursor = ShoutProviderContract.getComments(getContext(), parent);
-
-		cursor.moveToFirst();
-		while (!cursor.isAfterLast()) {
-			LocalShout comment = ShoutProviderContract.retrieveShoutFromCursor(
-					getContext(), cursor);
+		List<LocalShout> comments = parent.getComments();
+		for (LocalShout comment : comments) {
 			this.addView(createChild(comment));
-			cursor.moveToNext();
 		}
-		cursor.close();
 
 		this.loaded = true;
 
