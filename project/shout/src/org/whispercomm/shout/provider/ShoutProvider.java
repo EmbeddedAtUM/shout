@@ -152,11 +152,37 @@ public class ShoutProvider extends ContentProvider {
 	}
 
 	private long queryForPrexistingThenInsert(int match, ContentValues values, String table) {
+		long id = queryForPrexisting(match, values);
+		if (id == -1) {
+			// Not in the database, so insert
+			mDB = mOpenHelper.getWritableDatabase();
+			long error = mDB.insert(table, null, values);
+			/*
+			 * Triggers break the row returned here, so requery to get correct
+			 * row ID.
+			 */
+			if (error == -1) {
+				throw new SQLException("Unable to insert into table " + table);
+			} else {
+				id = queryForPrexisting(match, values);
+			}
+		}
+		return id;
+	}
+
+	/**
+	 * Query for a prexisting entry in the table, based on the UNIQUE
+	 * constrained columns. Return the prexisting row ID, if it exists.
+	 * 
+	 * @param match
+	 * @param values
+	 * @return Prexisting row ID, if present. Otherwise, return -1.
+	 */
+	private long queryForPrexisting(int match, ContentValues values) {
 		String selection;
 		String[] selectionArgs, projection;
 		Cursor cursor;
 		long id = -1;
-		boolean exists = false;
 		switch (match) {
 			case SHOUTS:
 				projection = new String[] {
@@ -171,7 +197,6 @@ public class ShoutProvider extends ContentProvider {
 				if (cursor.moveToFirst()) {
 					int idIndex = cursor.getColumnIndex(ShoutProviderContract.Shouts._ID);
 					id = cursor.getInt(idIndex);
-					exists = true;
 				}
 				cursor.close();
 				break;
@@ -188,20 +213,11 @@ public class ShoutProvider extends ContentProvider {
 				if (cursor.moveToFirst()) {
 					int idIndex = cursor.getColumnIndex(ShoutProviderContract.Users._ID);
 					id = cursor.getInt(idIndex);
-					exists = true;
 				}
 				cursor.close();
 				break;
 			default:
 				throw new IllegalArgumentException("Invalid or unknown URI");
-		}
-		if (!exists) {
-			mDB = mOpenHelper.getWritableDatabase();
-			id = mDB.insert(table, null, values);
-
-		}
-		if (id == -1) {
-			throw new SQLException("Unable to insert into table " + table);
 		}
 		return id;
 	}
