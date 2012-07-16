@@ -131,6 +131,7 @@ public class LocalShoutImpl implements LocalShout {
 		while (cursor.moveToNext()) {
 			comments.add(ShoutProviderContract.retrieveShoutFromCursor(context, cursor));
 		}
+		cursor.close();
 		return comments;
 	}
 
