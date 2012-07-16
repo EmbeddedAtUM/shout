@@ -20,7 +20,6 @@ import org.whispercomm.shout.test.ShoutTestRunner;
 import org.whispercomm.shout.test.util.TestFactory;
 import org.whispercomm.shout.test.util.TestMe;
 import org.whispercomm.shout.test.util.TestUnsignedShout;
-import org.whispercomm.shout.test.util.TestUser;
 
 @RunWith(ShoutTestRunner.class)
 public class SignatureUtilityTest {
