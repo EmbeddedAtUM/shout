@@ -351,20 +351,9 @@ public class ShoutProviderContract {
 	 * @param shout the parent whose comments to retrieve
 	 * @return a cursor over the comments
 	 */
-	public static Cursor getComments(Context context, LocalShout shout) {
-		return getComments(context, shout.getHash());
-	}
-
-	/**
-	 * Retrieves a cursor over the comments of the specified shout.
-	 * 
-	 * @param context the context used to access the content provider
-	 * @param shout the parent whose comments to retrieve
-	 * @return a cursor over the comments
-	 */
 	public static Cursor getComments(Context context, Shout shout) {
-		// TODO implement this
-		throw new RuntimeException("Method not yet implemented.");
+		return getComments(context, shout.getHash());
+
 	}
 
 	public static Cursor getCursorOverReshouts(Context context, byte[] parentHash) {
