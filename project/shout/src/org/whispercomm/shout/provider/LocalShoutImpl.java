@@ -17,7 +17,6 @@ import android.util.Base64;
 
 public class LocalShoutImpl implements LocalShout {
 
-	private int id;
 	private LocalUser sender;
 	private String message;
 	private byte[] signatureBytes;
@@ -33,11 +32,10 @@ public class LocalShoutImpl implements LocalShout {
 
 	private Context context;
 
-	public LocalShoutImpl(Context context, int id, LocalUser sender, String message,
+	public LocalShoutImpl(Context context, LocalUser sender, String message,
 			String encodedSig, String encodedHash, Long sentTime, Long receivedTime,
 			int commentCount, int reshoutCount, String encodedParentHash) {
 		this.context = context;
-		this.id = id;
 		this.sender = sender;
 		this.message = message;
 		this.signatureBytes = Base64.decode(encodedSig, Base64.DEFAULT);
@@ -89,11 +87,6 @@ public class LocalShoutImpl implements LocalShout {
 	@Override
 	public DateTime getReceivedTime() {
 		return this.receivedTime;
-	}
-
-	@Override
-	public int getDatabaseId() {
-		return this.id;
 	}
 
 	@Override

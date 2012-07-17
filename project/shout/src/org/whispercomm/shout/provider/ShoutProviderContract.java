@@ -199,7 +199,6 @@ public class ShoutProviderContract {
 	 */
 	public static LocalShout retrieveShoutFromCursor(Context context,
 			Cursor cursor) {
-		int idIndex = cursor.getColumnIndex(Shouts._ID);
 		int authorIndex = cursor.getColumnIndex(Shouts.AUTHOR);
 		int parentIndex = cursor.getColumnIndex(Shouts.PARENT);
 		int messageIndex = cursor.getColumnIndex(Shouts.MESSAGE);
@@ -210,7 +209,6 @@ public class ShoutProviderContract {
 		int commentIndex = cursor.getColumnIndex(Shouts.COMMENT_COUNT);
 		int reshoutIndex = cursor.getColumnIndex(Shouts.RESHOUT_COUNT);
 
-		int id = cursor.getInt(idIndex);
 		String encodedAuthor = cursor.getString(authorIndex);
 		String encodedParentHash = cursor.isNull(parentIndex) ? null : cursor
 				.getString(parentIndex);
@@ -222,7 +220,7 @@ public class ShoutProviderContract {
 		int numComments = cursor.getInt(commentIndex);
 		int numReshouts = cursor.getInt(reshoutIndex);
 		LocalUser sender = retrieveUserByEncodedKey(context, encodedAuthor);
-		LocalShout shout = new LocalShoutImpl(context, id, sender, message,
+		LocalShout shout = new LocalShoutImpl(context, sender, message,
 				encodedSig, encodedHash, sentTime, receivedTime, numComments,
 				numReshouts, encodedParentHash);
 		return shout;
