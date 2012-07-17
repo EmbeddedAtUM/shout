@@ -4,11 +4,11 @@ package org.whispercomm.shout.customwidgets;
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.R;
 import org.whispercomm.shout.ShoutType;
+import org.whispercomm.shout.util.Encoders;
 import org.whispercomm.shout.util.ShoutMessageUtility;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -128,12 +128,12 @@ public class ShoutView extends RelativeLayout {
 		// Add the signature
 		ShoutDetailRow signature = new ShoutDetailRow(getContext());
 		signature.setTitleText("Signature");
-		signature.setEntryText(Base64.encodeToString(shout.getSignature(), Base64.NO_WRAP));
+		signature.setEntryText(Encoders.toHexString(shout.getSignature()));
 		detailsTable.addView(signature);
 		// Add the hash
 		ShoutDetailRow hash = new ShoutDetailRow(getContext());
 		hash.setTitleText("Hash");
-		hash.setEntryText(Base64.encodeToString(shout.getHash(), Base64.NO_WRAP));
+		hash.setEntryText(Encoders.toHexString(shout.getHash()));
 		detailsTable.addView(hash);
 	}
 
