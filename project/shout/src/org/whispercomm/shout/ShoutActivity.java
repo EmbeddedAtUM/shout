@@ -174,7 +174,7 @@ public class ShoutActivity extends ListActivity {
 			LocalShout shout = ShoutProviderContract.retrieveShoutFromCursor(
 					context, cursor);
 
-			row.bindShout(shout);
+			row.bindShout(shout, false);
 		}
 
 		@Override

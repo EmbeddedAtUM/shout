@@ -224,10 +224,11 @@ public class ActionShoutView extends LinearLayout {
 	 * Sets the Shout to be displayed by the view.
 	 * 
 	 * @param shout the Shout to be displayed
+	 * @param visible {@code true} if the action bar should be visible
 	 */
-	public void bindShout(LocalShout shout) {
+	public void bindShout(LocalShout shout, boolean visible) {
 		shoutView.bindShout(shout);
-		setActionBarVisibility(false);
+		setActionBarVisibility(visible);
 
 		// Hide comment button when displaying a comment.
 		switch (shout.getType()) {

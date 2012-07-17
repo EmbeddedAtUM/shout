@@ -1,8 +1,8 @@
 
 package org.whispercomm.shout.customwidgets;
 
-import org.whispercomm.shout.R;
 import org.whispercomm.shout.LocalShout;
+import org.whispercomm.shout.R;
 import org.whispercomm.shout.util.Conversions;
 
 import android.content.Context;
@@ -80,6 +80,6 @@ public class ShoutChainViewRow extends LinearLayout {
 	 * @param shout the Shout to be displayed
 	 */
 	public void bindShout(LocalShout shout) {
-		actionShoutView.bindShout(shout);
+		actionShoutView.bindShout(shout, false);
 	}
 }

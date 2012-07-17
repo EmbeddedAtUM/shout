@@ -1,8 +1,8 @@
 
 package org.whispercomm.shout.customwidgets;
 
-import org.whispercomm.shout.R;
 import org.whispercomm.shout.LocalShout;
+import org.whispercomm.shout.R;
 import org.whispercomm.shout.util.Conversions;
 
 import android.content.Context;
@@ -78,12 +78,12 @@ public class ShoutListViewRow extends LinearLayout {
 	 * Sets the Shout to be displayed by the view.
 	 * 
 	 * @param shout the Shout to be displayed
+	 * @param expanded {@code true} if the view should be expanded.
 	 */
-	public void bindShout(LocalShout shout) {
-		setExpanded(false);
-
-		actionShoutView.bindShout(shout);
+	public void bindShout(LocalShout shout, boolean expanded) {
+		actionShoutView.bindShout(shout, expanded);
 		commentsView.bindShouts(shout);
+		setExpanded(expanded);
 	}
 
 	private void setMargins(boolean expanded) {
