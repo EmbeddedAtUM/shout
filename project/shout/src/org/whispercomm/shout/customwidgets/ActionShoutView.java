@@ -221,15 +221,9 @@ public class ActionShoutView extends LinearLayout {
 	}
 
 	/**
-	 * Sets the Shout to be displayed by the view. TODO: Ultimately this should
-	 * take one parameter, a LocalShout that has methods to return the comment
-	 * and reshout counts. <<<<<<< HEAD
+	 * Sets the Shout to be displayed by the view.
 	 * 
-	 * @param shout the Shout to be displayed =======
 	 * @param shout the Shout to be displayed
-	 * @param numComments the comment count for the shout to be displayed
-	 * @param numReshouts the reshout count for the shout to be displayed
-	 *            >>>>>>> dadrian-unsigned-shout
 	 */
 	public void bindShout(LocalShout shout) {
 		shoutView.bindShout(shout);
