@@ -37,7 +37,9 @@ public class SignatureUtilityTest {
 
 	@After
 	public void takeDown() {
-
+		privateKey = null;
+		publicKey = null;
+		me = null;
 	}
 
 	@Test
