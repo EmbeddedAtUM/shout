@@ -2,6 +2,7 @@
 package org.whispercomm.shout.provider;
 
 import java.security.interfaces.ECPublicKey;
+import java.util.Arrays;
 
 import org.whispercomm.shout.LocalUser;
 import org.whispercomm.shout.id.SignatureUtility;
@@ -31,6 +32,34 @@ public class LocalUserImpl implements LocalUser {
 	@Override
 	public ECPublicKey getPublicKey() {
 		return SignatureUtility.getPublicKeyFromBytes(keyBytes);
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Arrays.hashCode(keyBytes);
+		result = prime * result + ((username == null) ? 0 : username.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		LocalUserImpl other = (LocalUserImpl) obj;
+		if (!Arrays.equals(keyBytes, other.keyBytes))
+			return false;
+		if (username == null) {
+			if (other.username != null)
+				return false;
+		} else if (!username.equals(other.username))
+			return false;
+		return true;
 	}
 
 }
