@@ -1,6 +1,10 @@
 
 package org.whispercomm.shout.customwidgets;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.R;
 import org.whispercomm.shout.util.Conversions;
@@ -20,6 +24,9 @@ public class ShoutListViewRow extends LinearLayout {
 	private ActionShoutView actionShoutView;
 	private ShoutChainView commentsView;
 	private boolean expanded;
+
+	// Listeners called when the expabnded state is toggled
+	private List<ExpandedStateChangeListener> expandedStateChangeListeners;
 
 	public ShoutListViewRow(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -47,6 +54,9 @@ public class ShoutListViewRow extends LinearLayout {
 		border = (LinearLayout) findViewById(R.id.border);
 		commentsView = (ShoutChainView) findViewById(R.id.commentsview);
 
+		expandedStateChangeListeners = Collections
+				.synchronizedList(new ArrayList<ExpandedStateChangeListener>());
+
 		expanded = false;
 		actionShoutView
 				.registerActionBarStateChangeListener(new ActionShoutView.ActionBarStateChangeListener() {
@@ -68,6 +78,10 @@ public class ShoutListViewRow extends LinearLayout {
 		this.expanded = expanded;
 		setMargins(expanded);
 		commentsView.setVisibility(expanded ? VISIBLE : GONE);
+
+		for (ExpandedStateChangeListener l : expandedStateChangeListeners) {
+			l.stateChanged(this.expanded);
+		}
 	}
 
 	public void toggleExpanded() {
@@ -94,6 +108,52 @@ public class ShoutListViewRow extends LinearLayout {
 		params.bottomMargin = spacing;
 		params.topMargin = spacing;
 		border.setLayoutParams(params);
+	}
+
+	/**
+	 * Registers the listener to be called when the expanded state changes.
+	 * <p>
+	 * Each listener is called as many times as it was registered. But you
+	 * probably don't actually want to register a listener more than once.
+	 * 
+	 * @param l the listener to register
+	 */
+	public void registerExpandedStateChangeListener(
+			ExpandedStateChangeListener l) {
+		this.expandedStateChangeListeners.add(l);
+	}
+
+	/**
+	 * Unregisters the listener, if it was registered. If the listener was
+	 * registered more than once, only a single registration is removed.
+	 * 
+	 * @param l the listener to unregister
+	 * @return {@code true} if the listener was unregistered, {@code false} is
+	 *         the listener was not already registered.
+	 */
+	public boolean unregisterExpandedStateChangeListener(
+			ExpandedStateChangeListener l) {
+		return this.expandedStateChangeListeners.remove(l);
+	}
+
+	/**
+	 * Unregisters all the registered listeners.
+	 */
+	public void clearExpandedStateChangeListeners() {
+		this.expandedStateChangeListeners.clear();
+	}
+
+	/**
+	 * Callback class called when the expanded state changes.
+	 * 
+	 * @author David R. Bild
+	 */
+	public static interface ExpandedStateChangeListener {
+		/**
+		 * @param expanded {@code true} if the row is expanded, {@code false}
+		 *            otherwise.
+		 */
+		public void stateChanged(boolean expanded);
 	}
 
 }
