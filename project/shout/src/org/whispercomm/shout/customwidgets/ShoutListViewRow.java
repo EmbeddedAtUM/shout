@@ -95,8 +95,8 @@ public class ShoutListViewRow extends LinearLayout {
 	 * @param expanded {@code true} if the view should be expanded.
 	 */
 	public void bindShout(LocalShout shout, boolean expanded) {
-		actionShoutView.bindShout(shout, expanded);
 		commentsView.bindShouts(shout);
+		actionShoutView.bindShout(shout, expanded);
 		setExpanded(expanded);
 	}
 

@@ -1,12 +1,17 @@
 
 package org.whispercomm.shout;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.whispercomm.shout.customwidgets.ShoutListViewRow;
 import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.id.UserNotInitiatedException;
 import org.whispercomm.shout.network.BootReceiver;
 import org.whispercomm.shout.network.NetworkInterface;
 import org.whispercomm.shout.network.NetworkService;
+import org.whispercomm.shout.provider.ParcelableShout;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.tasks.ReshoutTask;
 import org.whispercomm.shout.terms.AgreementManager;
@@ -29,12 +34,15 @@ import android.widget.CursorAdapter;
 import android.widget.Toast;
 
 public class ShoutActivity extends ListActivity {
-
 	private static final String TAG = "ShoutActivity";
+
+	private static final String BUNDLE_KEY = "parceled_shouts";
 
 	private NetworkInterface network;
 	private IdManager idManager;
 	private Cursor cursor;
+
+	private Set<LocalShout> expandedShouts;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -48,8 +56,32 @@ public class ShoutActivity extends ListActivity {
 		this.idManager = new IdManager(this);
 		this.cursor = ShoutProviderContract
 				.getCursorOverAllShouts(getApplicationContext());
+		this.expandedShouts = new HashSet<LocalShout>();
+
 		setListAdapter(new TimelineAdapter(this, cursor));
+
 		Log.v(TAG, "Finished onCreate");
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+
+		ArrayList<ParcelableShout> parceled = new ArrayList<ParcelableShout>();
+		for (LocalShout shout : expandedShouts) {
+			parceled.add(new ParcelableShout(shout));
+		}
+		outState.putParcelableArrayList(BUNDLE_KEY, parceled);
+	}
+
+	@Override
+	public void onRestoreInstanceState(Bundle saveInstanceState) {
+		ArrayList<ParcelableShout> parceled = saveInstanceState.getParcelableArrayList(BUNDLE_KEY);
+		for (ParcelableShout parceledShout : parceled) {
+			expandedShouts.add(parceledShout.getShout(this));
+		}
+
+		super.onRestoreInstanceState(saveInstanceState);
 	}
 
 	/**
@@ -171,10 +203,24 @@ public class ShoutActivity extends ListActivity {
 			ShoutListViewRow row = (ShoutListViewRow) view;
 
 			// Get the shout
-			LocalShout shout = ShoutProviderContract.retrieveShoutFromCursor(
+			final LocalShout shout = ShoutProviderContract.retrieveShoutFromCursor(
 					context, cursor);
 
-			row.bindShout(shout, false);
+			row.clearExpandedStateChangeListeners();
+			row.registerExpandedStateChangeListener(new ShoutListViewRow.ExpandedStateChangeListener() {
+				@Override
+				public void stateChanged(boolean expanded) {
+					if (expanded) {
+						expandedShouts.add(shout);
+					} else {
+						expandedShouts.remove(shout);
+					}
+				}
+			});
+
+			Log.v(TAG, "Binding shout: " + shout);
+
+			row.bindShout(shout, expandedShouts.contains(shout));
 		}
 
 		@Override
