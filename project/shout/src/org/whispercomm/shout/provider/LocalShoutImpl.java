@@ -107,7 +107,7 @@ public class LocalShoutImpl implements LocalShout {
 
 	@Override
 	public List<LocalUser> getReshouters() {
-		Cursor cursor = ShoutProviderContract.getCursorOverReshouts(context, parentHash);
+		Cursor cursor = ShoutProviderContract.getCursorOverReshouts(context, hashBytes);
 		List<LocalUser> users = new ArrayList<LocalUser>(cursor.getCount());
 		int authorIndex = cursor.getColumnIndex(ShoutProviderContract.Shouts.AUTHOR);
 		while (cursor.moveToNext()) {
