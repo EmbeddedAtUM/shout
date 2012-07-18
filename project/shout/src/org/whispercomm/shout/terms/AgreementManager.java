@@ -18,9 +18,9 @@ public class AgreementManager {
 	private static final String KEY_AGREED = "has_agreed";
 	protected static final String TAG = AgreementManager.class.getSimpleName();
 
-	public static void showAgreementIfNotAccepted(Context context, AppKiller killer) {
+	public static void showAgreementIfNotAccepted(Context context, AgreementListener listener) {
 		if (!hasUserAgreedToTerms(context)) {
-			showAgreement(context, killer);
+			showAgreement(context, listener);
 		}
 	}
 
@@ -38,12 +38,13 @@ public class AgreementManager {
 		Log.v(TAG, "User agreed to terms");
 	}
 
-	private static void showAgreement(final Context context, final AppKiller killer) {
+	private static void showAgreement(final Context context, final AgreementListener listener) {
 		DialogInterface.OnClickListener positive = new OnClickListener() {
 
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				recordUserAgreement(context);
+				listener.accepted();
 			}
 
 		};
@@ -52,7 +53,7 @@ public class AgreementManager {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				Log.v(TAG, "User did not agree to the terms");
-				killer.killSelf();
+				listener.declined();
 			}
 
 		};

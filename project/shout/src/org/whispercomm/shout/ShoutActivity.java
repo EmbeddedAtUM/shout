@@ -14,8 +14,8 @@ import org.whispercomm.shout.network.NetworkService;
 import org.whispercomm.shout.provider.ParcelableShout;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.tasks.ReshoutTask;
+import org.whispercomm.shout.terms.AgreementListener;
 import org.whispercomm.shout.terms.AgreementManager;
-import org.whispercomm.shout.terms.AppKiller;
 
 import android.app.ListActivity;
 import android.content.Context;
@@ -110,15 +110,18 @@ public class ShoutActivity extends ListActivity {
 	@Override
 	protected void onStart() {
 		super.onStart();
-		AppKiller killer = new AppKiller() {
+		AgreementListener listener = new AgreementListener() {
 
 			@Override
-			public void killSelf() {
+			public void declined() {
 				finish();
 			}
 
+			@Override
+			public void accepted() {
+			}
 		};
-		AgreementManager.showAgreementIfNotAccepted(this, killer);
+		AgreementManager.showAgreementIfNotAccepted(this, listener);
 	}
 
 	@Override
