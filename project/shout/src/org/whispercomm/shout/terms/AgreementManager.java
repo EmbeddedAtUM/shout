@@ -24,7 +24,7 @@ public class AgreementManager {
 		}
 	}
 
-	private static boolean hasUserAgreedToTerms(Context context) {
+	public static boolean hasUserAgreedToTerms(Context context) {
 		SharedPreferences appSharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
 		boolean agreed = appSharedPrefs.getBoolean(KEY_AGREED, false);
 		return agreed;
