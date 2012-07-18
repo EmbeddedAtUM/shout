@@ -1,10 +1,11 @@
+
 package org.whispercomm.shout.network;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
 public enum ErrorCode implements Parcelable {
-	SUCCESS, MANES_NOT_INSTALLED;
+	SUCCESS, SHOUT_CHAIN_TOO_LONG, MANES_NOT_INSTALLED, MANES_NOT_REGISTERED;
 
 	@Override
 	public int describeContents() {

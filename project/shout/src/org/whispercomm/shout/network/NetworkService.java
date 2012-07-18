@@ -3,8 +3,10 @@ package org.whispercomm.shout.network;
 
 import org.whispercomm.manes.client.maclib.ManesInterface;
 import org.whispercomm.manes.client.maclib.ManesNotInstalledException;
+import org.whispercomm.manes.client.maclib.NotRegisteredException;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.provider.ShoutProviderContract;
+import org.whispercomm.shout.serialization.ShoutChainTooLongException;
 
 import android.app.Service;
 import android.content.Intent;
@@ -87,8 +89,14 @@ public class NetworkService extends Service {
 						Shout shout =
 								ShoutProviderContract.retrieveShoutByHash(NetworkService.this,
 										hash);
-						networkProtocol.sendShout(shout);
-						return ErrorCode.SUCCESS;
+						try {
+							networkProtocol.sendShout(shout);
+							return ErrorCode.SUCCESS;
+						} catch (ShoutChainTooLongException e) {
+							return ErrorCode.SHOUT_CHAIN_TOO_LONG;
+						} catch (NotRegisteredException e) {
+							return ErrorCode.MANES_NOT_REGISTERED;
+						}
 					}
 				}
 

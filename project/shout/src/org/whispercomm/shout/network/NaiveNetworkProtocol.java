@@ -69,21 +69,19 @@ public class NaiveNetworkProtocol implements NetworkProtocol {
 	}
 
 	@Override
-	public void sendShout(Shout shout) {
+	public void sendShout(Shout shout) throws ShoutChainTooLongException, NotRegisteredException {
 		final byte[] shoutBytes;
-		try {
-			PacketBuilder builder = new ShoutPacket.PacketBuilder();
-			builder.addShout(shout);
-			ShoutPacket packet = builder.build();
-			shoutBytes = packet.getPacketBytes();
-		} catch (ShoutChainTooLongException e) {
-			Log.e(TAG, e.getMessage());
-			return;
-		}
+		PacketBuilder builder = new ShoutPacket.PacketBuilder();
+		builder.addShout(shout);
+		ShoutPacket packet = builder.build();
+		shoutBytes = packet.getPacketBytes();
+
+		// Send once now, and then queue for further deliveries
+		manes.send(shoutBytes);
 
 		// schedule periodic re-broadcast up to RESEND_NUM times.
-		long delay = 0;
-		for (int i = 1; i <= RESEND_NUM; i++) {
+		long delay = PERIOD;
+		for (int i = 1; i < RESEND_NUM; i++) {
 			sendScheduler.schedule(new TimerTask() {
 				@Override
 				public void run() {
