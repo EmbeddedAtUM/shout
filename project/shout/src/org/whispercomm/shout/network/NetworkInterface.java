@@ -29,29 +29,24 @@ public class NetworkInterface {
 
 	private Messenger shoutService;
 	private ServiceConnection connection;
-	private Boolean isBinded;
 
 	public NetworkInterface(Context context) {
 		this.context = context;
-		this.isBinded = false;
 		this.connection = new ServiceConnection() {
 
 			@Override
 			public void onServiceConnected(ComponentName name, IBinder service) {
 				Log.i(TAG, "Connected to service.");
 				shoutService = new Messenger(service);
-				isBinded = true;
 			}
 
 			@Override
 			public void onServiceDisconnected(ComponentName name) {
-				shoutService = null;
 				Log.i(TAG, "Disconnected from service unexpectedly.");
-				isBinded = false;
 			}
 
 		};
-		// bind to ShoutService
+
 		context.bindService(new Intent(context, NetworkService.class),
 				connection, Context.BIND_AUTO_CREATE);
 	}
@@ -67,7 +62,7 @@ public class NetworkInterface {
 	 * @return whether the notification is successful
 	 */
 	public boolean send(LocalShout shout) {
-		if (isBinded) {
+		if (shoutService != null) {
 			Message msg = Message.obtain(null, NetworkService.NEW_SHOUT);
 			msg.obj = shout.getHash();
 			try {
@@ -87,9 +82,8 @@ public class NetworkInterface {
 	 * onDestroy() method
 	 */
 	public void unbind() {
-		if (isBinded == true) {
+		if (connection != null) {
 			context.unbindService(connection);
-			isBinded = false;
 		}
 	}
 
