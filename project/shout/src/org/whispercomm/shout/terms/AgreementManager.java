@@ -21,6 +21,8 @@ public class AgreementManager {
 	public static void getConsent(Context context, AgreementListener listener) {
 		if (!hasAgreed(context)) {
 			showAgreement(context, listener);
+		} else {
+			listener.accepted();
 		}
 	}
 
