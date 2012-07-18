@@ -29,41 +29,55 @@ public class NetworkService extends Service {
 	@Override
 	public final void onCreate() {
 		Log.i(TAG, "Starting service.");
-		try {
-			this.manes = new ManesInterface(APP_ID, getApplicationContext());
-		} catch (ManesNotInstalledException e) {
-			// TODO Handle this
-			throw new RuntimeException(e);
-		}
-
-		this.networkProtocol = new NaiveNetworkProtocol(manes,
-				getApplicationContext());
-		this.appMessenger = new Messenger(new AppShoutHandler(getApplicationContext(),
-				networkProtocol));
-		this.networkReceiver = new NetworkReceiver(this.manes,
-				this.networkProtocol);
-
-		this.networkProtocol.initialize();
-		this.networkReceiver.initialize();
-
+		initialize();
 		Log.i(TAG, "Service started.");
 	}
 
-	/**
-	 * Create the channel for accepting incoming shouts from applications, e.g.,
-	 * UI
-	 */
+	private synchronized void initialize() {
+		if (manes == null) {
+			Log.i(TAG, "Starting initialization.");
+			try {
+				this.manes = new ManesInterface(APP_ID, getApplicationContext());
+
+				this.networkProtocol = new NaiveNetworkProtocol(manes,
+						getApplicationContext());
+				this.appMessenger = new Messenger(new AppShoutHandler(getApplicationContext(),
+						networkProtocol));
+				this.networkReceiver = new NetworkReceiver(this.manes,
+						this.networkProtocol);
+
+				this.networkProtocol.initialize();
+				this.networkReceiver.initialize();
+
+				Log.i(TAG, "Finishing initialization.");
+			} catch (ManesNotInstalledException e) {
+				Log.w(TAG,
+						"MANES is not installed.  Service will not be fully functional until it is installed.");
+			}
+		}
+	}
+
 	@Override
 	public IBinder onBind(Intent arg0) {
-		return appMessenger.getBinder();
+		if (appMessenger != null) {
+			return appMessenger.getBinder();
+		} else {
+			return null;
+		}
 	}
 
 	@Override
 	public final void onDestroy() {
 		Log.i(TAG, "Stopping service.");
-		manes.disconnect();
-		networkProtocol.cleanup();
-		networkReceiver.cleanup();
+		if (manes != null) {
+			manes.disconnect();
+		}
+		if (networkProtocol != null) {
+			networkProtocol.cleanup();
+		}
+		if (networkReceiver != null) {
+			networkReceiver.cleanup();
+		}
 		Log.i(TAG, "Service stopped.");
 	}
 
@@ -88,7 +102,6 @@ public class NetworkService extends Service {
 				byte[] shoutHash = (byte[]) msg.obj;
 				Shout shout = ShoutProviderContract.retrieveShoutByHash(context,
 						shoutHash);
-				// TODO Find out why networkProtocol gets nulled
 				networkProtocol.sendShout(shout);
 			}
 		}
