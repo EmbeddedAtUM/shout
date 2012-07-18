@@ -7,22 +7,17 @@ import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
+import android.os.RemoteException;
 import android.util.Log;
 
 public class NetworkService extends Service {
 	public static final String TAG = NetworkService.class.getSimpleName();
 
-	public static final int NEW_SHOUT = 1;
 	public static final int APP_ID = 74688;// "shout" on a phone keyboard
 
 	private ManesInterface manes;
-	private Messenger appMessenger;
 	private NetworkProtocol networkProtocol;
 	private NetworkReceiver networkReceiver;
 
@@ -41,8 +36,6 @@ public class NetworkService extends Service {
 
 				this.networkProtocol = new NaiveNetworkProtocol(manes,
 						getApplicationContext());
-				this.appMessenger = new Messenger(new AppShoutHandler(getApplicationContext(),
-						networkProtocol));
 				this.networkReceiver = new NetworkReceiver(this.manes,
 						this.networkProtocol);
 
@@ -58,12 +51,8 @@ public class NetworkService extends Service {
 	}
 
 	@Override
-	public IBinder onBind(Intent arg0) {
-		if (appMessenger != null) {
-			return appMessenger.getBinder();
-		} else {
-			return null;
-		}
+	public IBinder onBind(Intent intent) {
+		return binder;
 	}
 
 	@Override
@@ -81,30 +70,28 @@ public class NetworkService extends Service {
 		Log.i(TAG, "Service stopped.");
 	}
 
-	/**
-	 * Handler wrapper for processing incoming shouts from application (e.g.,
-	 * UI)
-	 */
-	private static class AppShoutHandler extends Handler {
+	private final NetworkServiceBinder.Stub binder = new
+			NetworkServiceBinder.Stub() {
 
-		private Context context;
-		private NetworkProtocol networkProtocol;
+				@Override
+				public ErrorCode initialized() throws RemoteException {
+					// TODO Auto-generated method stub
+					return null;
+				}
 
-		public AppShoutHandler(Context context, NetworkProtocol networkProtocol) {
-			super();
-			this.context = context;
-			this.networkProtocol = networkProtocol;
-		}
+				@Override
+				public ErrorCode send(byte[] hash) throws RemoteException {
+					if (manes == null) {
+						return ErrorCode.MANES_NOT_INSTALLED;
+					} else {
+						Shout shout =
+								ShoutProviderContract.retrieveShoutByHash(NetworkService.this,
+										hash);
+						networkProtocol.sendShout(shout);
+						return ErrorCode.SUCCESS;
+					}
+				}
 
-		@Override
-		public void handleMessage(Message msg) {
-			if (msg.what == NEW_SHOUT) {
-				byte[] shoutHash = (byte[]) msg.obj;
-				Shout shout = ShoutProviderContract.retrieveShoutByHash(context,
-						shoutHash);
-				networkProtocol.sendShout(shout);
-			}
-		}
-	}
+			};
 
 }

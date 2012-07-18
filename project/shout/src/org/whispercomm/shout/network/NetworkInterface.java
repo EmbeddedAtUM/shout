@@ -8,8 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
 
@@ -27,7 +25,7 @@ public class NetworkInterface {
 
 	private Context context;
 
-	private Messenger shoutService;
+	private NetworkServiceBinder shoutService;
 	private ServiceConnection connection;
 
 	public NetworkInterface(Context context) {
@@ -37,7 +35,7 @@ public class NetworkInterface {
 			@Override
 			public void onServiceConnected(ComponentName name, IBinder service) {
 				Log.i(TAG, "Connected to service.");
-				shoutService = new Messenger(service);
+				shoutService = NetworkServiceBinder.Stub.asInterface(service);
 			}
 
 			@Override
@@ -63,10 +61,8 @@ public class NetworkInterface {
 	 */
 	public boolean send(LocalShout shout) {
 		if (shoutService != null) {
-			Message msg = Message.obtain(null, NetworkService.NEW_SHOUT);
-			msg.obj = shout.getHash();
 			try {
-				shoutService.send(msg);
+				shoutService.send(shout.getHash());
 				return true;
 			} catch (RemoteException e) {
 				Log.e(TAG, "error sending shout to NetworkService.", e);
