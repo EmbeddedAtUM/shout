@@ -60,15 +60,15 @@ public class NetworkInterface {
 	 * @return whether the notification is successful
 	 */
 	public boolean send(LocalShout shout) {
-		if (shoutService != null) {
-			try {
-				shoutService.send(shout.getHash());
-				return true;
-			} catch (RemoteException e) {
-				Log.e(TAG, "error sending shout to NetworkService.", e);
-				return false;
-			}
-		} else {
+		if (shoutService == null) {
+			return false;
+		}
+
+		try {
+			shoutService.send(shout.getHash());
+			return true;
+		} catch (RemoteException e) {
+			Log.e(TAG, "error sending shout to NetworkService.", e);
 			return false;
 		}
 	}

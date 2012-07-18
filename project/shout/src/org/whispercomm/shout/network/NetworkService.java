@@ -74,7 +74,6 @@ public class NetworkService extends Service {
 
 	private final NetworkServiceBinder.Stub binder = new
 			NetworkServiceBinder.Stub() {
-
 				@Override
 				public ErrorCode initialized() throws RemoteException {
 					// TODO Auto-generated method stub
@@ -85,21 +84,20 @@ public class NetworkService extends Service {
 				public ErrorCode send(byte[] hash) throws RemoteException {
 					if (manes == null) {
 						return ErrorCode.MANES_NOT_INSTALLED;
-					} else {
+					}
+
+					try {
 						Shout shout =
 								ShoutProviderContract.retrieveShoutByHash(NetworkService.this,
 										hash);
-						try {
-							networkProtocol.sendShout(shout);
-							return ErrorCode.SUCCESS;
-						} catch (ShoutChainTooLongException e) {
-							return ErrorCode.SHOUT_CHAIN_TOO_LONG;
-						} catch (NotRegisteredException e) {
-							return ErrorCode.MANES_NOT_REGISTERED;
-						}
+						networkProtocol.sendShout(shout);
+						return ErrorCode.SUCCESS;
+					} catch (ShoutChainTooLongException e) {
+						return ErrorCode.SHOUT_CHAIN_TOO_LONG;
+					} catch (NotRegisteredException e) {
+						return ErrorCode.MANES_NOT_REGISTERED;
 					}
 				}
-
 			};
 
 }
