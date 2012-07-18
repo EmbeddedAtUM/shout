@@ -23,6 +23,8 @@ public class NetworkService extends Service {
 	private NetworkProtocol networkProtocol;
 	private NetworkReceiver networkReceiver;
 
+	private ErrorCode initialized;
+
 	@Override
 	public final void onCreate() {
 		Log.i(TAG, "Starting service.");
@@ -44,8 +46,10 @@ public class NetworkService extends Service {
 				this.networkProtocol.initialize();
 				this.networkReceiver.initialize();
 
+				initialized = ErrorCode.SUCCESS;
 				Log.i(TAG, "Finishing initialization.");
 			} catch (ManesNotInstalledException e) {
+				initialized = ErrorCode.MANES_NOT_INSTALLED;
 				Log.w(TAG,
 						"MANES is not installed.  Service will not be fully functional until it is installed.");
 			}
@@ -76,8 +80,7 @@ public class NetworkService extends Service {
 			NetworkServiceBinder.Stub() {
 				@Override
 				public ErrorCode initialized() throws RemoteException {
-					// TODO Auto-generated method stub
-					return null;
+					return initialized;
 				}
 
 				@Override
