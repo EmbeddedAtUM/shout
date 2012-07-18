@@ -1,6 +1,8 @@
 
 package org.whispercomm.shout.network;
 
+import org.whispercomm.shout.terms.AgreementManager;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -26,7 +28,9 @@ public class BootReceiver extends BroadcastReceiver {
 				.getDefaultSharedPreferences(context);
 		boolean startOnBoot = settings.getBoolean(START_SERVICE_ON_BOOT, true);
 
-		if (startOnBoot) {
+		boolean hasAgreed = AgreementManager.hasAgreed(context);
+
+		if (startOnBoot && hasAgreed) {
 			Log.i(TAG, "Starting Shout network service.");
 			Intent service = new Intent(context, NetworkService.class);
 			context.startService(service);

@@ -10,6 +10,8 @@ import org.whispercomm.shout.tasks.AsyncTaskCallback.AsyncTaskCompleteListener;
 import org.whispercomm.shout.tasks.CommentTask;
 import org.whispercomm.shout.tasks.SendShoutTask;
 import org.whispercomm.shout.tasks.ShoutTask;
+import org.whispercomm.shout.terms.AgreementListener;
+import org.whispercomm.shout.terms.AgreementManager;
 import org.whispercomm.shout.thirdparty.Utf8ByteLengthFilter;
 
 import android.app.Activity;
@@ -41,12 +43,28 @@ public class MessageActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.message);
+
+		AgreementManager.getConsent(this, new AgreementListener() {
+
+			@Override
+			public void accepted() {
+				initialize();
+			}
+
+			@Override
+			public void declined() {
+				finish();
+			}
+
+		});
+
+	}
+
+	private void initialize() {
 		initializeViews();
-
-		network = new NetworkInterface(this);
-		idManager = new IdManager(getApplicationContext());
-
 		parent = getParent(getIntent().getExtras());
+		idManager = new IdManager(getApplicationContext());
+		network = new NetworkInterface(MessageActivity.this);
 	}
 
 	private void initializeViews() {
@@ -93,7 +111,9 @@ public class MessageActivity extends Activity {
 
 	@Override
 	public void onDestroy() {
-		network.unbind();
+		if (network != null) {
+			network.unbind();
+		}
 		super.onDestroy();
 	}
 

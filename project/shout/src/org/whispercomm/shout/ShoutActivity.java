@@ -49,17 +49,6 @@ public class ShoutActivity extends ListActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-
-		startBackgroundService();
-
-		this.network = new NetworkInterface(this);
-		this.idManager = new IdManager(this);
-		this.cursor = ShoutProviderContract
-				.getCursorOverAllShouts(getApplicationContext());
-		this.expandedShouts = new HashSet<LocalShout>();
-
-		setListAdapter(new TimelineAdapter(this, cursor));
-
 		Log.v(TAG, "Finished onCreate");
 	}
 
@@ -84,6 +73,18 @@ public class ShoutActivity extends ListActivity {
 		super.onRestoreInstanceState(saveInstanceState);
 	}
 
+	private void initialize() {
+		startBackgroundService();
+
+		this.network = new NetworkInterface(this);
+		this.idManager = new IdManager(this);
+		this.cursor = ShoutProviderContract
+				.getCursorOverAllShouts(getApplicationContext());
+		this.expandedShouts = new HashSet<LocalShout>();
+
+		setListAdapter(new TimelineAdapter(this, cursor));
+	}
+
 	/**
 	 * Ensures that the background Shout service is started, if the user has
 	 * that option enabled.
@@ -102,8 +103,12 @@ public class ShoutActivity extends ListActivity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		network.unbind();
-		cursor.close();
+		if (network != null) {
+			network.unbind();
+		}
+		if (cursor != null) {
+			cursor.close();
+		}
 		Log.v(TAG, "Finished onDestroy");
 	}
 
@@ -119,6 +124,7 @@ public class ShoutActivity extends ListActivity {
 
 			@Override
 			public void accepted() {
+				initialize();
 			}
 		};
 		AgreementManager.getConsent(this, listener);
