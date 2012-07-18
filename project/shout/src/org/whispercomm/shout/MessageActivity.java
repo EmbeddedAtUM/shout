@@ -3,6 +3,7 @@ package org.whispercomm.shout;
 
 import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.id.UserNotInitiatedException;
+import org.whispercomm.shout.network.ErrorCode;
 import org.whispercomm.shout.network.NetworkInterface;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.serialization.SerializeUtility;
@@ -18,6 +19,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputFilter;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -164,13 +166,31 @@ public class MessageActivity extends Activity {
 		}
 	}
 
-	private void shoutSent(boolean success) {
-		if (success) {
-			Toast.makeText(this, R.string.send_shout_success,
-					Toast.LENGTH_SHORT).show();
-		} else {
-			Toast.makeText(this, R.string.send_shout_failure, Toast.LENGTH_LONG)
-					.show();
+	private void shoutSent(ErrorCode result) {
+		switch (result) {
+			case SUCCESS:
+				Toast.makeText(this, R.string.send_shout_success, Toast.LENGTH_SHORT)
+						.show();
+				break;
+			case MANES_NOT_INSTALLED:
+				Toast.makeText(this, "Send failed.  Please install MANES client.",
+						Toast.LENGTH_LONG).show();
+				break;
+			case MANES_NOT_REGISTERED:
+				Toast.makeText(this, "Send failed.  Please register with MANES client.",
+						Toast.LENGTH_LONG).show();
+				break;
+			case IO_ERROR:
+				Toast.makeText(this, R.string.send_shout_failure, Toast.LENGTH_LONG)
+						.show();
+				break;
+			case SHOUT_CHAIN_TOO_LONG:
+				Toast.makeText(this, R.string.send_shout_failure, Toast.LENGTH_LONG)
+						.show();
+				Log.e(TAG, "SHOUT_CHAIN_TOO_LONG error.  Unable to send shout.");
+				break;
+			default:
+				break;
 		}
 		finish();
 	}
@@ -184,9 +204,9 @@ public class MessageActivity extends Activity {
 	}
 
 	private class ShoutSendCompleteListener implements
-			AsyncTaskCompleteListener<Boolean> {
+			AsyncTaskCompleteListener<ErrorCode> {
 		@Override
-		public void onComplete(Boolean result) {
+		public void onComplete(ErrorCode result) {
 			shoutSent(result);
 		}
 	}

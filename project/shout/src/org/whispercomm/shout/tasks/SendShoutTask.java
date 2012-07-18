@@ -3,6 +3,7 @@ package org.whispercomm.shout.tasks;
 
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.Shout;
+import org.whispercomm.shout.network.ErrorCode;
 import org.whispercomm.shout.network.NetworkInterface;
 
 /**
@@ -10,7 +11,7 @@ import org.whispercomm.shout.network.NetworkInterface;
  * 
  * @author David Adrian
  */
-public class SendShoutTask extends AsyncTaskCallback<LocalShout, Void, Boolean> {
+public class SendShoutTask extends AsyncTaskCallback<LocalShout, Void, ErrorCode> {
 
 	private NetworkInterface network;
 
@@ -18,15 +19,15 @@ public class SendShoutTask extends AsyncTaskCallback<LocalShout, Void, Boolean> 
 	 * @param context Application context
 	 */
 	public SendShoutTask(NetworkInterface network,
-			AsyncTaskCompleteListener<Boolean> completeListener) {
+			AsyncTaskCompleteListener<ErrorCode> completeListener) {
 		super(completeListener);
 		this.network = network;
 	}
 
 	@Override
-	protected Boolean doInBackground(LocalShout... shouts) {
+	protected ErrorCode doInBackground(LocalShout... shouts) {
 		if (shouts.length < 1) {
-			return false;
+			return ErrorCode.SUCCESS;
 		}
 		LocalShout shout = shouts[0];
 		return network.send(shout);

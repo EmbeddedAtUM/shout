@@ -5,7 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public enum ErrorCode implements Parcelable {
-	SUCCESS, SHOUT_CHAIN_TOO_LONG, MANES_NOT_INSTALLED, MANES_NOT_REGISTERED;
+	SUCCESS, SHOUT_CHAIN_TOO_LONG, MANES_NOT_INSTALLED, MANES_NOT_REGISTERED, IO_ERROR;
 
 	@Override
 	public int describeContents() {

@@ -57,19 +57,17 @@ public class NetworkInterface {
 	 * later, or give up.
 	 * 
 	 * @param shout the shout to be sent out
-	 * @return whether the notification is successful
+	 * @returns a status code indicating success or reason for failure
 	 */
-	public boolean send(LocalShout shout) {
+	public ErrorCode send(LocalShout shout) {
 		if (shoutService == null) {
-			return false;
+			return ErrorCode.IO_ERROR;
 		}
 
 		try {
-			shoutService.send(shout.getHash());
-			return true;
+			return shoutService.send(shout.getHash());
 		} catch (RemoteException e) {
-			Log.e(TAG, "error sending shout to NetworkService.", e);
-			return false;
+			return ErrorCode.IO_ERROR;
 		}
 	}
 
