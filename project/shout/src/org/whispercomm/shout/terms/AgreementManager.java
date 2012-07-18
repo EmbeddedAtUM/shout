@@ -18,13 +18,13 @@ public class AgreementManager {
 	private static final String KEY_AGREED = "has_agreed";
 	protected static final String TAG = AgreementManager.class.getSimpleName();
 
-	public static void showAgreementIfNotAccepted(Context context, AgreementListener listener) {
-		if (!hasUserAgreedToTerms(context)) {
+	public static void getConsent(Context context, AgreementListener listener) {
+		if (!hasAgreed(context)) {
 			showAgreement(context, listener);
 		}
 	}
 
-	public static boolean hasUserAgreedToTerms(Context context) {
+	public static boolean hasAgreed(Context context) {
 		SharedPreferences appSharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
 		boolean agreed = appSharedPrefs.getBoolean(KEY_AGREED, false);
 		return agreed;

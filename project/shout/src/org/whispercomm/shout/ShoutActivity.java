@@ -121,7 +121,7 @@ public class ShoutActivity extends ListActivity {
 			public void accepted() {
 			}
 		};
-		AgreementManager.showAgreementIfNotAccepted(this, listener);
+		AgreementManager.getConsent(this, listener);
 	}
 
 	@Override
