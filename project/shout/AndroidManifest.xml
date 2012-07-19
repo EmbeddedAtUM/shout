@@ -9,6 +9,8 @@
         android:targetSdkVersion="8" />
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Inherited from Manes Client MacLib -->
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:icon="@drawable/icon"
@@ -44,6 +46,12 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+
+        <!-- Inherited from Manes Client MacLib -->
+        <activity
+            android:name="org.whispercomm.manes.client.maclib.ui.ManesInstaller"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+        </activity>
     </application>
 
 </manifest>

@@ -27,4 +27,23 @@ public class DialogFactory {
 				.setTitle("Shout User Agreement");
 		return builder.create();
 	}
+
+	public static AlertDialog buildRegistrationPromptDialog(final Context context,
+			DialogInterface.OnClickListener neutral) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);
+		builder.setIcon(R.drawable.icon).setTitle(R.string.register_manes_dialog_title)
+				.setMessage(R.string.register_manes_dialog_message)
+				.setCancelable(false)
+				.setNeutralButton(R.string.register_manes_dialog_neutral, neutral);
+		return builder.create();
+	}
+
+	public static AlertDialog buildInstallationPromptDialog(final Context context,
+			DialogInterface.OnClickListener neutral) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);
+		builder.setIcon(R.drawable.icon).setTitle(R.string.install_manes_dialog_title)
+				.setMessage(R.string.install_manes_dialog_message).setCancelable(false)
+				.setNeutralButton(R.string.install_manes_dialog_neutral, neutral);
+		return builder.create();
+	}
 }

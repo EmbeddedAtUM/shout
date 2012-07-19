@@ -1,6 +1,8 @@
 
 package org.whispercomm.shout;
 
+import org.whispercomm.manes.client.maclib.ManesActivityHelper;
+import org.whispercomm.shout.customwidgets.DialogFactory;
 import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.id.UserNotInitiatedException;
 import org.whispercomm.shout.network.ErrorCode;
@@ -16,6 +18,7 @@ import org.whispercomm.shout.terms.AgreementManager;
 import org.whispercomm.shout.thirdparty.Utf8ByteLengthFilter;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputFilter;
@@ -158,7 +161,6 @@ public class MessageActivity extends Activity {
 		if (result != null) {
 			new SendShoutTask(network, new ShoutSendCompleteListener())
 					.execute(result);
-			finish();
 		} else {
 			Toast.makeText(this, R.string.create_shout_failure,
 					Toast.LENGTH_LONG).show();
@@ -171,28 +173,44 @@ public class MessageActivity extends Activity {
 			case SUCCESS:
 				Toast.makeText(this, R.string.send_shout_success, Toast.LENGTH_SHORT)
 						.show();
+				finish();
 				break;
 			case MANES_NOT_INSTALLED:
-				Toast.makeText(this, "Send failed.  Please install MANES client.",
-						Toast.LENGTH_LONG).show();
+				DialogFactory.buildInstallationPromptDialog(this,
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								ManesActivityHelper.launchManesInstallation(MessageActivity.this);
+								finish();
+							}
+						}).show();
 				break;
 			case MANES_NOT_REGISTERED:
-				Toast.makeText(this, "Send failed.  Please register with MANES client.",
-						Toast.LENGTH_LONG).show();
+				DialogFactory.buildRegistrationPromptDialog(this,
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								ManesActivityHelper
+										.launchRegistrationActivity(MessageActivity.this);
+								finish();
+							}
+						}).show();
 				break;
 			case IO_ERROR:
 				Toast.makeText(this, R.string.send_shout_failure, Toast.LENGTH_LONG)
 						.show();
+				finish();
 				break;
 			case SHOUT_CHAIN_TOO_LONG:
+				Log.e(TAG, "SHOUT_CHAIN_TOO_LONG error.  Unable to send shout.");
 				Toast.makeText(this, R.string.send_shout_failure, Toast.LENGTH_LONG)
 						.show();
-				Log.e(TAG, "SHOUT_CHAIN_TOO_LONG error.  Unable to send shout.");
+				finish();
 				break;
 			default:
+				finish();
 				break;
 		}
-		finish();
 	}
 
 	private class ShoutCreationCompleteListener implements

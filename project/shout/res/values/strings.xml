@@ -25,6 +25,12 @@
     <string name="create_shout_failure">Unable to save your shout. Please try again.</string>
     <string name="send_shout_failure">Unable to send your shout. Please reshout later.</string>
     <string name="send_shout_success">Shout sent.</string>
+    <string name="register_manes_dialog_title">Register with MANES</string>
+    <string name="register_manes_dialog_message">Please register with MANES, the network used by Shout to exchange messages.</string>
+    <string name="register_manes_dialog_neutral">Go to registration</string>
+    <string name="install_manes_dialog_title">Install MANES</string>
+    <string name="install_manes_dialog_message">Please install the client for MANES, the network used by Shout to exchange messages.</string>
+    <string name="install_manes_dialog_neutral">Go to installation</string>
     <string name="serviceTickerText">Starting Shout listener service</string>
     <string name="serviceTitleText">Shout Service</string>
     <string name="serviceDescriptionText">Currently listening for nearby Shouts</string>
