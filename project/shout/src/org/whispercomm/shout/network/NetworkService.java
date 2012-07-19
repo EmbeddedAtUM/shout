@@ -1,6 +1,8 @@
 
 package org.whispercomm.shout.network;
 
+import org.whispercomm.manes.client.maclib.ManesActivityHelper;
+import org.whispercomm.manes.client.maclib.ManesActivityHelper.ManesInstallationListener;
 import org.whispercomm.manes.client.maclib.ManesInterface;
 import org.whispercomm.manes.client.maclib.ManesNotInstalledException;
 import org.whispercomm.manes.client.maclib.NotRegisteredException;
@@ -9,6 +11,7 @@ import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.serialization.ShoutChainTooLongException;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -22,6 +25,8 @@ public class NetworkService extends Service {
 	private ManesInterface manes;
 	private NetworkProtocol networkProtocol;
 	private NetworkReceiver networkReceiver;
+
+	private BroadcastReceiver installationListener;
 
 	private ErrorCode initialized;
 
@@ -50,9 +55,26 @@ public class NetworkService extends Service {
 				Log.i(TAG, "Finishing initialization.");
 			} catch (ManesNotInstalledException e) {
 				initialized = ErrorCode.MANES_NOT_INSTALLED;
+				listenForManesInstallation();
 				Log.w(TAG,
 						"MANES is not installed.  Service will not be fully functional until it is installed.");
 			}
+		}
+	}
+
+	private void listenForManesInstallation() {
+		// Start listening if not already
+		if (installationListener == null) {
+			installationListener = ManesActivityHelper.registerForManesInstallation(this,
+					new ManesInstallationListener() {
+						@Override
+						public void installed() {
+							// Reinitialize when manes is installed
+							initialize();
+							unregisterReceiver(installationListener);
+							installationListener = null;
+						}
+					});
 		}
 	}
 
@@ -72,6 +94,9 @@ public class NetworkService extends Service {
 		}
 		if (networkReceiver != null) {
 			networkReceiver.cleanup();
+		}
+		if (installationListener != null) {
+			unregisterReceiver(installationListener);
 		}
 		Log.i(TAG, "Service stopped.");
 	}
