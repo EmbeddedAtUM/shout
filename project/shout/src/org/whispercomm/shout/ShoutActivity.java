@@ -1,23 +1,31 @@
 
 package org.whispercomm.shout;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.whispercomm.manes.client.maclib.ManesActivityHelper;
+import org.whispercomm.manes.client.maclib.ManesNotInstalledException;
+import org.whispercomm.manes.client.maclib.NotRegisteredException;
 import org.whispercomm.shout.customwidgets.DialogFactory;
 import org.whispercomm.shout.customwidgets.ShoutListViewRow;
 import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.id.UserNotInitiatedException;
 import org.whispercomm.shout.network.BootReceiver;
 import org.whispercomm.shout.network.NetworkInterface;
+import org.whispercomm.shout.network.NetworkInterface.NotConnectedException;
 import org.whispercomm.shout.network.NetworkInterface.ServiceConnectedListener;
 import org.whispercomm.shout.network.NetworkInterface.ServiceState;
 import org.whispercomm.shout.network.NetworkService;
 import org.whispercomm.shout.provider.ParcelableShout;
 import org.whispercomm.shout.provider.ShoutProviderContract;
+import org.whispercomm.shout.serialization.ShoutChainTooLongException;
+import org.whispercomm.shout.tasks.AsyncTaskCallback.AsyncTaskCompleteListener;
 import org.whispercomm.shout.tasks.ReshoutTask;
+import org.whispercomm.shout.tasks.SendResult;
+import org.whispercomm.shout.tasks.SendShoutTask;
 import org.whispercomm.shout.terms.AgreementListener;
 import org.whispercomm.shout.terms.AgreementManager;
 
@@ -201,17 +209,78 @@ public class ShoutActivity extends ListActivity {
 	public void onClickReshout(LocalShout shout) {
 		Log.v(TAG, "Reshout button clicked");
 
-		ReshoutTask task;
 		try {
-			task = new ReshoutTask(getApplicationContext(), network,
-					idManager.getMe());
-			task.execute(shout);
+			new ReshoutTask(getApplicationContext(),
+					new ShoutCreationCompleteListener(), idManager.getMe(),
+					shout).execute();
 		} catch (UserNotInitiatedException e) {
 			Toast.makeText(this, "Please set a username before shouting.",
 					Toast.LENGTH_LONG).show();
 			displaySettings();
 		}
+	}
 
+	private void shoutCreated(LocalShout result) {
+		if (result != null) {
+			new SendShoutTask(network, new ShoutSendCompleteListener())
+					.execute(result);
+		} else {
+			Toast.makeText(this, R.string.create_shout_failure,
+					Toast.LENGTH_LONG).show();
+		}
+	}
+
+	private void shoutSent(SendResult result) {
+		try {
+			result.getResultOrThrow();
+			Toast.makeText(this, R.string.send_shout_success, Toast.LENGTH_SHORT)
+					.show();
+		} catch (NotConnectedException e) {
+			Toast.makeText(this, R.string.send_shout_failure, Toast.LENGTH_LONG)
+					.show();
+		} catch (ShoutChainTooLongException e) {
+			Log.e(TAG, "SHOUT_CHAIN_TOO_LONG error.  Unable to send shout.");
+			Toast.makeText(this, R.string.send_shout_failure, Toast.LENGTH_LONG)
+					.show();
+		} catch (ManesNotInstalledException e) {
+			DialogFactory.buildInstallationPromptDialog(this,
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							ManesActivityHelper.launchManesInstallation(ShoutActivity.this);
+							finish();
+						}
+					}).show();
+		} catch (NotRegisteredException e) {
+			DialogFactory.buildRegistrationPromptDialog(this,
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							ManesActivityHelper
+									.launchRegistrationActivity(ShoutActivity.this);
+						}
+					}).show();
+		} catch (IOException e) {
+			Toast.makeText(this, R.string.send_shout_failure, Toast.LENGTH_LONG)
+					.show();
+		}
+
+	}
+
+	private class ShoutCreationCompleteListener implements
+			AsyncTaskCompleteListener<LocalShout> {
+		@Override
+		public void onComplete(LocalShout result) {
+			shoutCreated(result);
+		}
+	}
+
+	private class ShoutSendCompleteListener implements
+			AsyncTaskCompleteListener<SendResult> {
+		@Override
+		public void onComplete(SendResult result) {
+			shoutSent(result);
+		}
 	}
 
 	private void displaySettings() {
