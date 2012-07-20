@@ -69,11 +69,13 @@ public class ShoutActivity extends ListActivity {
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 
-		ArrayList<ParcelableShout> parceled = new ArrayList<ParcelableShout>();
-		for (LocalShout shout : expandedShouts) {
-			parceled.add(new ParcelableShout(shout));
+		if (expandedShouts != null) {
+			ArrayList<ParcelableShout> parceled = new ArrayList<ParcelableShout>();
+			for (LocalShout shout : expandedShouts) {
+				parceled.add(new ParcelableShout(shout));
+			}
+			outState.putParcelableArrayList(BUNDLE_KEY, parceled);
 		}
-		outState.putParcelableArrayList(BUNDLE_KEY, parceled);
 	}
 
 	@Override
