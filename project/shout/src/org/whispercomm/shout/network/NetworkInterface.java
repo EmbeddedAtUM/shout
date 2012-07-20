@@ -1,7 +1,12 @@
 
 package org.whispercomm.shout.network;
 
+import java.io.IOException;
+
+import org.whispercomm.manes.client.maclib.ManesNotInstalledException;
+import org.whispercomm.manes.client.maclib.NotRegisteredException;
 import org.whispercomm.shout.LocalShout;
+import org.whispercomm.shout.serialization.ShoutChainTooLongException;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -57,14 +62,34 @@ public class NetworkInterface {
 	 * later, or give up.
 	 * 
 	 * @param shout the shout to be sent out
-	 * @returns a status code indicating success or reason for failure
-	 * @throws NotConnectedException if not connected to the Shout service.
+	 * @throws NotConnectedException if not connected to the Shout service
+	 * @throws ShoutChainTooLongException if the provided shout has too many
+	 *             ancestors to be sent
+	 * @throws ManesNotInstalledException if the Manes client is not installed
+	 * @throws NotRegisteredException if the Manes client is not registered
+	 * @throws IOException if an network IO error prevented transmission
 	 */
-	public ErrorCode send(LocalShout shout) throws NotConnectedException {
+	public void send(LocalShout shout) throws NotConnectedException, ShoutChainTooLongException,
+			ManesNotInstalledException, NotRegisteredException, IOException {
 		checkBinderNotNull();
 
 		try {
-			return shoutService.send(shout.getHash());
+			ErrorCode rc = shoutService.send(shout.getHash());
+			switch (rc) {
+				case SUCCESS:
+					return;
+				case SHOUT_CHAIN_TOO_LONG:
+					throw new ShoutChainTooLongException();
+				case MANES_NOT_INSTALLED:
+					throw new ManesNotInstalledException();
+				case MANES_NOT_REGISTERED:
+					throw new NotRegisteredException();
+				case IO_ERROR:
+					throw new IOException();
+				default:
+					Log.w(TAG, "Unknown error code returned by send(): " + rc);
+					return;
+			}
 		} catch (RemoteException e) {
 			throw new NotConnectedException("Call to service method send() failed.", e);
 		}

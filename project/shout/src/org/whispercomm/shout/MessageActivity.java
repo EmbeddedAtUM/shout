@@ -1,16 +1,22 @@
 
 package org.whispercomm.shout;
 
+import java.io.IOException;
+
 import org.whispercomm.manes.client.maclib.ManesActivityHelper;
+import org.whispercomm.manes.client.maclib.ManesNotInstalledException;
+import org.whispercomm.manes.client.maclib.NotRegisteredException;
 import org.whispercomm.shout.customwidgets.DialogFactory;
 import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.id.UserNotInitiatedException;
-import org.whispercomm.shout.network.ErrorCode;
 import org.whispercomm.shout.network.NetworkInterface;
+import org.whispercomm.shout.network.NetworkInterface.NotConnectedException;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.serialization.SerializeUtility;
+import org.whispercomm.shout.serialization.ShoutChainTooLongException;
 import org.whispercomm.shout.tasks.AsyncTaskCallback.AsyncTaskCompleteListener;
 import org.whispercomm.shout.tasks.CommentTask;
+import org.whispercomm.shout.tasks.SendResult;
 import org.whispercomm.shout.tasks.SendShoutTask;
 import org.whispercomm.shout.tasks.ShoutTask;
 import org.whispercomm.shout.terms.AgreementListener;
@@ -168,49 +174,46 @@ public class MessageActivity extends Activity {
 		}
 	}
 
-	private void shoutSent(ErrorCode result) {
-		switch (result) {
-			case SUCCESS:
-				Toast.makeText(this, R.string.send_shout_success, Toast.LENGTH_SHORT)
-						.show();
-				finish();
-				break;
-			case MANES_NOT_INSTALLED:
-				DialogFactory.buildInstallationPromptDialog(this,
-						new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								ManesActivityHelper.launchManesInstallation(MessageActivity.this);
-								finish();
-							}
-						}).show();
-				break;
-			case MANES_NOT_REGISTERED:
-				DialogFactory.buildRegistrationPromptDialog(this,
-						new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								ManesActivityHelper
-										.launchRegistrationActivity(MessageActivity.this);
-								finish();
-							}
-						}).show();
-				break;
-			case IO_ERROR:
-				Toast.makeText(this, R.string.send_shout_failure, Toast.LENGTH_LONG)
-						.show();
-				finish();
-				break;
-			case SHOUT_CHAIN_TOO_LONG:
-				Log.e(TAG, "SHOUT_CHAIN_TOO_LONG error.  Unable to send shout.");
-				Toast.makeText(this, R.string.send_shout_failure, Toast.LENGTH_LONG)
-						.show();
-				finish();
-				break;
-			default:
-				finish();
-				break;
+	private void shoutSent(SendResult result) {
+		try {
+			result.getResultOrThrow();
+			Toast.makeText(this, R.string.send_shout_success, Toast.LENGTH_SHORT)
+					.show();
+			finish();
+		} catch (NotConnectedException e) {
+			Toast.makeText(this, R.string.send_shout_failure, Toast.LENGTH_LONG)
+					.show();
+			finish();
+		} catch (ShoutChainTooLongException e) {
+			Log.e(TAG, "SHOUT_CHAIN_TOO_LONG error.  Unable to send shout.");
+			Toast.makeText(this, R.string.send_shout_failure, Toast.LENGTH_LONG)
+					.show();
+			finish();
+		} catch (ManesNotInstalledException e) {
+			DialogFactory.buildInstallationPromptDialog(this,
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							ManesActivityHelper.launchManesInstallation(MessageActivity.this);
+							finish();
+						}
+					}).show();
+		} catch (NotRegisteredException e) {
+			DialogFactory.buildRegistrationPromptDialog(this,
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							ManesActivityHelper
+									.launchRegistrationActivity(MessageActivity.this);
+							finish();
+						}
+					}).show();
+		} catch (IOException e) {
+			Toast.makeText(this, R.string.send_shout_failure, Toast.LENGTH_LONG)
+					.show();
+			finish();
 		}
+
 	}
 
 	private class ShoutCreationCompleteListener implements
@@ -222,9 +225,9 @@ public class MessageActivity extends Activity {
 	}
 
 	private class ShoutSendCompleteListener implements
-			AsyncTaskCompleteListener<ErrorCode> {
+			AsyncTaskCompleteListener<SendResult> {
 		@Override
-		public void onComplete(ErrorCode result) {
+		public void onComplete(SendResult result) {
 			shoutSent(result);
 		}
 	}

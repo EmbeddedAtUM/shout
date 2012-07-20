@@ -4,7 +4,7 @@ package org.whispercomm.shout.network;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public enum ErrorCode implements Parcelable {
+enum ErrorCode implements Parcelable {
 	SUCCESS, SHOUT_CHAIN_TOO_LONG, MANES_NOT_INSTALLED, MANES_NOT_REGISTERED, IO_ERROR;
 
 	@Override
