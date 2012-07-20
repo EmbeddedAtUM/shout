@@ -29,18 +29,21 @@ public class NetworkInterface {
 	public static final String TAG = NetworkInterface.class.getSimpleName();
 
 	private Context context;
+	private ServiceConnectedListener listener;
 
 	private NetworkServiceBinder shoutService;
 	private ServiceConnection connection;
 
-	public NetworkInterface(Context context) {
+	public NetworkInterface(Context context, ServiceConnectedListener listener) {
 		this.context = context;
+		this.listener = listener;
 		this.connection = new ServiceConnection() {
 
 			@Override
 			public void onServiceConnected(ComponentName name, IBinder service) {
 				Log.i(TAG, "Connected to service.");
 				shoutService = NetworkServiceBinder.Stub.asInterface(service);
+				notifyListener();
 			}
 
 			@Override
@@ -52,6 +55,35 @@ public class NetworkInterface {
 
 		context.bindService(new Intent(context, NetworkService.class),
 				connection, Context.BIND_AUTO_CREATE);
+	}
+
+	private void notifyListener() {
+		if (listener == null) {
+			return;
+		}
+
+		ErrorCode rc;
+		try {
+			rc = shoutService.initialized();
+			ServiceState ret = null;
+			switch (rc) {
+				case SUCCESS:
+					ret = ServiceState.SUCCESS;
+					break;
+				case MANES_NOT_INSTALLED:
+					ret = ServiceState.MANES_NOT_INSTALLED;
+					break;
+				default:
+					throw new RuntimeException("Invalid error code received from initialized(): "
+							+ rc);
+			}
+			listener.connected(ret);
+			listener = null; // only notify the first time we connect
+		} catch (RemoteException e) {
+			Log.w(TAG,
+					"Error while checking initialization state.  Will try again when connect is restored.",
+					e);
+		}
 	}
 
 	/**
@@ -103,6 +135,21 @@ public class NetworkInterface {
 		if (connection != null) {
 			context.unbindService(connection);
 		}
+	}
+
+	/**
+	 * Callback when service is first connected. This provides a method for
+	 * users of NetworkInterface to determine if the service could not
+	 * initialize because Manes was not installed.
+	 * 
+	 * @author David R. Bild
+	 */
+	public static interface ServiceConnectedListener {
+		public void connected(ServiceState status);
+	}
+
+	public static enum ServiceState {
+		SUCCESS, MANES_NOT_INSTALLED;
 	}
 
 	/**

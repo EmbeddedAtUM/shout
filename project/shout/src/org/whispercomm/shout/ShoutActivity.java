@@ -5,11 +5,15 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.whispercomm.manes.client.maclib.ManesActivityHelper;
+import org.whispercomm.shout.customwidgets.DialogFactory;
 import org.whispercomm.shout.customwidgets.ShoutListViewRow;
 import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.id.UserNotInitiatedException;
 import org.whispercomm.shout.network.BootReceiver;
 import org.whispercomm.shout.network.NetworkInterface;
+import org.whispercomm.shout.network.NetworkInterface.ServiceConnectedListener;
+import org.whispercomm.shout.network.NetworkInterface.ServiceState;
 import org.whispercomm.shout.network.NetworkService;
 import org.whispercomm.shout.provider.ParcelableShout;
 import org.whispercomm.shout.provider.ShoutProviderContract;
@@ -19,6 +23,7 @@ import org.whispercomm.shout.terms.AgreementManager;
 
 import android.app.ListActivity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -76,7 +81,26 @@ public class ShoutActivity extends ListActivity {
 	private void initialize() {
 		startBackgroundService();
 
-		this.network = new NetworkInterface(this);
+		this.network = new NetworkInterface(this, new ServiceConnectedListener() {
+			@Override
+			public void connected(ServiceState status) {
+				switch (status) {
+					case MANES_NOT_INSTALLED:
+						DialogFactory.buildInstallationPromptDialog(ShoutActivity.this,
+								new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog, int which) {
+										ManesActivityHelper
+												.launchManesInstallation(ShoutActivity.this);
+									}
+								}).show();
+						break;
+					default:
+						break;
+				}
+
+			}
+		});
 		this.idManager = new IdManager(this);
 		this.cursor = ShoutProviderContract
 				.getCursorOverAllShouts(getApplicationContext());
