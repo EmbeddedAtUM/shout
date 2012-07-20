@@ -5,6 +5,7 @@ import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.network.ErrorCode;
 import org.whispercomm.shout.network.NetworkInterface;
+import org.whispercomm.shout.network.NetworkInterface.NotConnectedException;
 
 /**
  * Asynchronously send a {@link Shout} over the network
@@ -30,7 +31,11 @@ public class SendShoutTask extends AsyncTaskCallback<LocalShout, Void, ErrorCode
 			return ErrorCode.SUCCESS;
 		}
 		LocalShout shout = shouts[0];
-		return network.send(shout);
+		try {
+			return network.send(shout);
+		} catch (NotConnectedException e) {
+			return ErrorCode.IO_ERROR;
+		}
 	}
 
 }

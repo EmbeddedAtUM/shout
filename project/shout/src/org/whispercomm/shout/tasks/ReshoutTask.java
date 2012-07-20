@@ -10,6 +10,7 @@ import org.whispercomm.shout.ShoutCreator;
 import org.whispercomm.shout.ShoutType;
 import org.whispercomm.shout.network.ErrorCode;
 import org.whispercomm.shout.network.NetworkInterface;
+import org.whispercomm.shout.network.NetworkInterface.NotConnectedException;
 import org.whispercomm.shout.util.ShoutMessageUtility;
 
 import android.content.Context;
@@ -55,7 +56,11 @@ public class ReshoutTask extends AsyncTask<LocalShout, Void, ErrorCode> {
 		ShoutCreator creator = new ShoutCreator(context);
 		LocalShout reshout = creator.createReshout(DateTime.now(), parent, me);
 
-		return network.send(reshout);
+		try {
+			return network.send(reshout);
+		} catch (NotConnectedException e) {
+			return ErrorCode.IO_ERROR;
+		}
 	}
 
 	@Override

@@ -58,16 +58,15 @@ public class NetworkInterface {
 	 * 
 	 * @param shout the shout to be sent out
 	 * @returns a status code indicating success or reason for failure
+	 * @throws NotConnectedException if not connected to the Shout service.
 	 */
-	public ErrorCode send(LocalShout shout) {
-		if (shoutService == null) {
-			return ErrorCode.IO_ERROR;
-		}
+	public ErrorCode send(LocalShout shout) throws NotConnectedException {
+		checkBinderNotNull();
 
 		try {
 			return shoutService.send(shout.getHash());
 		} catch (RemoteException e) {
-			return ErrorCode.IO_ERROR;
+			throw new NotConnectedException("Call to service method send() failed.", e);
 		}
 	}
 
@@ -78,6 +77,45 @@ public class NetworkInterface {
 	public void unbind() {
 		if (connection != null) {
 			context.unbindService(connection);
+		}
+	}
+
+	/**
+	 * Thrown if a method that delegates to {@link NetworkService} is called,
+	 * but the service is not yet bound or if the service call throws a
+	 * {@link RemoteException}.
+	 * 
+	 * @author David R. Bild
+	 */
+	public static class NotConnectedException extends Exception {
+		private static final long serialVersionUID = 2245070951852759576L;
+
+		public NotConnectedException() {
+			super();
+		}
+
+		public NotConnectedException(String message) {
+			super(message);
+		}
+
+		public NotConnectedException(String message, Throwable cause) {
+			super(message, cause);
+		}
+
+		public NotConnectedException(Throwable cause) {
+			super(cause);
+		}
+	}
+
+	/**
+	 * Throws an exception if the Shout service binder reference is null.
+	 * 
+	 * @throws NotConnectedException if the Shout service binder reference is
+	 *             null.
+	 */
+	private void checkBinderNotNull() throws NotConnectedException {
+		if (shoutService == null) {
+			throw new NotConnectedException("Shout service binder is null.");
 		}
 	}
 
