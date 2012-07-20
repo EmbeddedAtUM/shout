@@ -109,6 +109,15 @@ public class ShoutActivity extends ListActivity {
 		setListAdapter(new TimelineAdapter(this, cursor));
 	}
 
+	private void uninitialize() {
+		if (this.network != null) {
+			this.network.unbind();
+		}
+		if (this.cursor != null) {
+			this.cursor.close();
+		}
+	}
+
 	/**
 	 * Ensures that the background Shout service is started, if the user has
 	 * that option enabled.
@@ -127,12 +136,6 @@ public class ShoutActivity extends ListActivity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		if (network != null) {
-			network.unbind();
-		}
-		if (cursor != null) {
-			cursor.close();
-		}
 		Log.v(TAG, "Finished onDestroy");
 	}
 
@@ -152,6 +155,12 @@ public class ShoutActivity extends ListActivity {
 			}
 		};
 		AgreementManager.getConsent(this, listener);
+	}
+
+	@Override
+	protected void onStop() {
+		uninitialize();
+		super.onStop();
 	}
 
 	@Override
