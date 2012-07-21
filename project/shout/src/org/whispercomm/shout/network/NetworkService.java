@@ -5,7 +5,7 @@ import org.whispercomm.manes.client.maclib.ManesActivityHelper;
 import org.whispercomm.manes.client.maclib.ManesActivityHelper.ManesInstallationListener;
 import org.whispercomm.manes.client.maclib.ManesInterface;
 import org.whispercomm.manes.client.maclib.ManesNotInstalledException;
-import org.whispercomm.manes.client.maclib.NotRegisteredException;
+import org.whispercomm.manes.client.maclib.ManesNotRegisteredException;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.serialization.ShoutChainTooLongException;
@@ -122,7 +122,7 @@ public class NetworkService extends Service {
 						return ErrorCode.SUCCESS;
 					} catch (ShoutChainTooLongException e) {
 						return ErrorCode.SHOUT_CHAIN_TOO_LONG;
-					} catch (NotRegisteredException e) {
+					} catch (ManesNotRegisteredException e) {
 						return ErrorCode.MANES_NOT_REGISTERED;
 					}
 				}

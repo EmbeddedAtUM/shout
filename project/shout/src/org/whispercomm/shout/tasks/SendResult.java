@@ -4,7 +4,7 @@ package org.whispercomm.shout.tasks;
 import java.io.IOException;
 
 import org.whispercomm.manes.client.maclib.ManesNotInstalledException;
-import org.whispercomm.manes.client.maclib.NotRegisteredException;
+import org.whispercomm.manes.client.maclib.ManesNotRegisteredException;
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.network.NetworkInterface;
 import org.whispercomm.shout.network.NetworkInterface.NotConnectedException;
@@ -44,7 +44,7 @@ public class SendResult extends MaybeResult<Void> {
 			return new SendResult(e);
 		} catch (ManesNotInstalledException e) {
 			return new SendResult(e);
-		} catch (NotRegisteredException e) {
+		} catch (ManesNotRegisteredException e) {
 			return new SendResult(e);
 		} catch (IOException e) {
 			return new SendResult(e);
@@ -67,7 +67,7 @@ public class SendResult extends MaybeResult<Void> {
 		super(e);
 	}
 
-	public SendResult(NotRegisteredException e) {
+	public SendResult(ManesNotRegisteredException e) {
 		super(e);
 	}
 
@@ -90,7 +90,7 @@ public class SendResult extends MaybeResult<Void> {
 	 * @throws IOException see {@link NetworkInterface#send(LocalShout)}
 	 */
 	public void getResultOrThrow() throws NotConnectedException, ShoutChainTooLongException,
-			ManesNotInstalledException, NotRegisteredException, IOException {
+			ManesNotInstalledException, ManesNotRegisteredException, IOException {
 		if (this.threwException()) {
 			try {
 				throw this.getThrowable();
@@ -100,7 +100,7 @@ public class SendResult extends MaybeResult<Void> {
 				throw e;
 			} catch (ManesNotInstalledException e) {
 				throw e;
-			} catch (NotRegisteredException e) {
+			} catch (ManesNotRegisteredException e) {
 				throw e;
 			} catch (IOException e) {
 				throw e;

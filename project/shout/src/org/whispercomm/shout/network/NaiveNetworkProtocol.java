@@ -5,7 +5,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.whispercomm.manes.client.maclib.ManesInterface;
-import org.whispercomm.manes.client.maclib.NotRegisteredException;
+import org.whispercomm.manes.client.maclib.ManesNotRegisteredException;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.id.SignatureUtility;
 import org.whispercomm.shout.provider.ShoutProviderContract;
@@ -69,7 +69,8 @@ public class NaiveNetworkProtocol implements NetworkProtocol {
 	}
 
 	@Override
-	public void sendShout(Shout shout) throws ShoutChainTooLongException, NotRegisteredException {
+	public void sendShout(Shout shout) throws ShoutChainTooLongException,
+			ManesNotRegisteredException {
 		final byte[] shoutBytes;
 		PacketBuilder builder = new ShoutPacket.PacketBuilder();
 		builder.addShout(shout);
@@ -87,7 +88,7 @@ public class NaiveNetworkProtocol implements NetworkProtocol {
 				public void run() {
 					try {
 						manes.send(shoutBytes);
-					} catch (NotRegisteredException e) {
+					} catch (ManesNotRegisteredException e) {
 						Log.e(TAG, "send() failed because not registered.", e);
 					}
 				}

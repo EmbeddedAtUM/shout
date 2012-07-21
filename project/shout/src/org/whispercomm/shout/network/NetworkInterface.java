@@ -4,7 +4,7 @@ package org.whispercomm.shout.network;
 import java.io.IOException;
 
 import org.whispercomm.manes.client.maclib.ManesNotInstalledException;
-import org.whispercomm.manes.client.maclib.NotRegisteredException;
+import org.whispercomm.manes.client.maclib.ManesNotRegisteredException;
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.serialization.ShoutChainTooLongException;
 
@@ -98,11 +98,11 @@ public class NetworkInterface {
 	 * @throws ShoutChainTooLongException if the provided shout has too many
 	 *             ancestors to be sent
 	 * @throws ManesNotInstalledException if the Manes client is not installed
-	 * @throws NotRegisteredException if the Manes client is not registered
+	 * @throws ManesNotRegisteredException if the Manes client is not registered
 	 * @throws IOException if an network IO error prevented transmission
 	 */
 	public void send(LocalShout shout) throws NotConnectedException, ShoutChainTooLongException,
-			ManesNotInstalledException, NotRegisteredException, IOException {
+			ManesNotInstalledException, ManesNotRegisteredException, IOException {
 		checkBinderNotNull();
 
 		try {
@@ -115,7 +115,7 @@ public class NetworkInterface {
 				case MANES_NOT_INSTALLED:
 					throw new ManesNotInstalledException();
 				case MANES_NOT_REGISTERED:
-					throw new NotRegisteredException();
+					throw new ManesNotRegisteredException();
 				case IO_ERROR:
 					throw new IOException();
 				default:

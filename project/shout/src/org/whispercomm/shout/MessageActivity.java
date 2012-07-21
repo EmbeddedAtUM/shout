@@ -5,7 +5,7 @@ import java.io.IOException;
 
 import org.whispercomm.manes.client.maclib.ManesActivityHelper;
 import org.whispercomm.manes.client.maclib.ManesNotInstalledException;
-import org.whispercomm.manes.client.maclib.NotRegisteredException;
+import org.whispercomm.manes.client.maclib.ManesNotRegisteredException;
 import org.whispercomm.shout.customwidgets.DialogFactory;
 import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.id.UserNotInitiatedException;
@@ -222,7 +222,7 @@ public class MessageActivity extends Activity {
 							finish();
 						}
 					}).show();
-		} catch (NotRegisteredException e) {
+		} catch (ManesNotRegisteredException e) {
 			DialogFactory.buildRegistrationPromptDialog(this,
 					new DialogInterface.OnClickListener() {
 						@Override
