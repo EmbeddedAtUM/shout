@@ -63,6 +63,18 @@ public class NetworkService extends Service implements ManesConnection {
 		}
 	}
 
+	private synchronized void uninitialize() {
+		if (manes != null) {
+			manes.disconnect();
+		}
+		if (networkProtocol != null) {
+			networkProtocol.cleanup();
+		}
+		if (networkReceiver != null) {
+			networkReceiver.cleanup();
+		}
+	}
+
 	@Override
 	public void onManesServiceConnected() {
 		Log.i(TAG, "Connection to Manes service established.");
@@ -97,18 +109,7 @@ public class NetworkService extends Service implements ManesConnection {
 	@Override
 	public final void onDestroy() {
 		Log.i(TAG, "Stopping service.");
-		if (manes != null) {
-			manes.disconnect();
-		}
-		if (networkProtocol != null) {
-			networkProtocol.cleanup();
-		}
-		if (networkReceiver != null) {
-			networkReceiver.cleanup();
-		}
-		if (installationListener != null) {
-			unregisterReceiver(installationListener);
-		}
+		uninitialize();
 		Log.i(TAG, "Service stopped.");
 	}
 
