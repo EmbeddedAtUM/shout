@@ -4,6 +4,7 @@ package org.whispercomm.shout.network;
 import org.whispercomm.manes.client.maclib.ManesActivityHelper;
 import org.whispercomm.manes.client.maclib.ManesActivityHelper.ManesInstallationListener;
 import org.whispercomm.manes.client.maclib.ManesInterface;
+import org.whispercomm.manes.client.maclib.ManesInterface.ManesConnection;
 import org.whispercomm.manes.client.maclib.ManesNotInstalledException;
 import org.whispercomm.manes.client.maclib.ManesNotRegisteredException;
 import org.whispercomm.shout.Shout;
@@ -17,7 +18,7 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 
-public class NetworkService extends Service {
+public class NetworkService extends Service implements ManesConnection {
 	public static final String TAG = NetworkService.class.getSimpleName();
 
 	public static final int APP_ID = 74688;// "shout" on a phone keyboard
@@ -41,7 +42,7 @@ public class NetworkService extends Service {
 		if (manes == null) {
 			Log.i(TAG, "Starting initialization.");
 			try {
-				this.manes = new ManesInterface(APP_ID, getApplicationContext());
+				this.manes = new ManesInterface(APP_ID, getApplicationContext(), this);
 
 				this.networkProtocol = new NaiveNetworkProtocol(manes,
 						getApplicationContext());
@@ -60,6 +61,16 @@ public class NetworkService extends Service {
 						"MANES is not installed.  Service will not be fully functional until it is installed.");
 			}
 		}
+	}
+
+	@Override
+	public void onManesServiceConnected() {
+		Log.i(TAG, "Connection to Manes service established.");
+	}
+
+	@Override
+	public void onManesServiceDisconnected() {
+		Log.i(TAG, "Connection to Manes service lost.");
 	}
 
 	private void listenForManesInstallation() {
