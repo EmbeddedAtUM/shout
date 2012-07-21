@@ -1,8 +1,8 @@
 
 package org.whispercomm.shout.network;
 
-import org.whispercomm.manes.client.maclib.ManesActivityHelper;
-import org.whispercomm.manes.client.maclib.ManesActivityHelper.ManesInstallationListener;
+import org.whispercomm.manes.client.maclib.ManesInstallationListener;
+import org.whispercomm.manes.client.maclib.ManesInstallationReceiver;
 import org.whispercomm.manes.client.maclib.ManesInterface;
 import org.whispercomm.manes.client.maclib.ManesInterface.ManesConnection;
 import org.whispercomm.manes.client.maclib.ManesNotInstalledException;
@@ -12,13 +12,12 @@ import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.serialization.ShoutChainTooLongException;
 
 import android.app.Service;
-import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 
-public class NetworkService extends Service implements ManesConnection {
+public class NetworkService extends Service implements ManesConnection, ManesInstallationListener {
 	public static final String TAG = NetworkService.class.getSimpleName();
 
 	public static final int APP_ID = 74688;// "shout" on a phone keyboard
@@ -27,13 +26,14 @@ public class NetworkService extends Service implements ManesConnection {
 	private NetworkProtocol networkProtocol;
 	private NetworkReceiver networkReceiver;
 
-	private BroadcastReceiver installationListener;
+	private ManesInstallationReceiver manesInstallReceiver;
 
 	private ErrorCode initialized;
 
 	@Override
 	public final void onCreate() {
 		Log.i(TAG, "Starting service.");
+		manesInstallReceiver = ManesInstallationReceiver.start(this, this);
 		initialize();
 		Log.i(TAG, "Service started.");
 	}
@@ -56,7 +56,6 @@ public class NetworkService extends Service implements ManesConnection {
 				Log.i(TAG, "Finishing initialization.");
 			} catch (ManesNotInstalledException e) {
 				initialized = ErrorCode.MANES_NOT_INSTALLED;
-				listenForManesInstallation();
 				Log.w(TAG,
 						"MANES is not installed.  Service will not be fully functional until it is installed.");
 			}
@@ -85,22 +84,6 @@ public class NetworkService extends Service implements ManesConnection {
 		Log.i(TAG, "Connection to Manes service lost.");
 	}
 
-	private void listenForManesInstallation() {
-		// Start listening if not already
-		if (installationListener == null) {
-			installationListener = ManesActivityHelper.registerForManesInstallation(this,
-					new ManesInstallationListener() {
-						@Override
-						public void installed() {
-							// Reinitialize when manes is installed
-							initialize();
-							unregisterReceiver(installationListener);
-							installationListener = null;
-						}
-					});
-		}
-	}
-
 	@Override
 	public IBinder onBind(Intent intent) {
 		return binder;
@@ -110,6 +93,7 @@ public class NetworkService extends Service implements ManesConnection {
 	public final void onDestroy() {
 		Log.i(TAG, "Stopping service.");
 		uninitialize();
+		manesInstallReceiver.stop();
 		Log.i(TAG, "Service stopped.");
 	}
 
@@ -139,5 +123,10 @@ public class NetworkService extends Service implements ManesConnection {
 					}
 				}
 			};
+
+	@Override
+	public void manesInstalled() {
+		initialize();
+	}
 
 }
