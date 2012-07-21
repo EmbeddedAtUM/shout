@@ -102,10 +102,13 @@ public class ShoutActivity extends ListActivity {
 									public void onClick(DialogInterface dialog, int which) {
 										ManesActivityHelper
 												.launchManesInstallation(ShoutActivity.this);
+										finish();
 									}
 								}).show();
 						break;
 					default:
+						ManesActivityHelper
+								.launchRegistrationActivity(ShoutActivity.this);
 						break;
 				}
 

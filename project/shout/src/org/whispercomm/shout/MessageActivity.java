@@ -93,6 +93,8 @@ public class MessageActivity extends Activity {
 								}).show();
 						break;
 					default:
+						ManesActivityHelper
+								.launchRegistrationActivity(MessageActivity.this);
 						break;
 				}
 
