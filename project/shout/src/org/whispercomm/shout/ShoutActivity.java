@@ -56,6 +56,30 @@ public class ShoutActivity extends ListActivity {
 
 	private Set<LocalShout> expandedShouts;
 
+	private final DialogInterface.OnClickListener installClickListener = new DialogInterface.OnClickListener() {
+		@Override
+		public void onClick(DialogInterface dialog, int which) {
+			ManesActivityHelper
+					.launchManesInstallation(ShoutActivity.this);
+			finish();
+		}
+	};
+
+	private final DialogInterface.OnClickListener registerClickListener = new DialogInterface.OnClickListener() {
+		@Override
+		public void onClick(DialogInterface dialog, int which) {
+			ManesActivityHelper
+					.launchRegistrationActivity(ShoutActivity.this);
+		}
+	};
+
+	private final DialogInterface.OnCancelListener cancelListener = new DialogInterface.OnCancelListener() {
+		@Override
+		public void onCancel(DialogInterface dialog) {
+			finish();
+		}
+	};
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -94,20 +118,13 @@ public class ShoutActivity extends ListActivity {
 			@Override
 			public void manesNotInstalled() {
 				DialogFactory.buildInstallationPromptDialog(ShoutActivity.this,
-						new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								ManesActivityHelper
-										.launchManesInstallation(ShoutActivity.this);
-								finish();
-							}
-						}).show();
+						installClickListener, cancelListener).show();
 			}
 
 			@Override
 			public void manesNotRegistered() {
-				ManesActivityHelper
-						.launchRegistrationActivity(ShoutActivity.this);
+				DialogFactory.buildRegistrationPromptDialog(ShoutActivity.this,
+						registerClickListener, cancelListener).show();
 			}
 		});
 
@@ -245,23 +262,12 @@ public class ShoutActivity extends ListActivity {
 			Toast.makeText(this, R.string.send_shout_failure, Toast.LENGTH_LONG)
 					.show();
 		} catch (ManesNotInstalledException e) {
-			DialogFactory.buildInstallationPromptDialog(this,
-					new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							ManesActivityHelper.launchManesInstallation(ShoutActivity.this);
-							finish();
-						}
-					}).show();
+			DialogFactory.buildInstallationPromptDialog(this, installClickListener, cancelListener)
+					.show();
 		} catch (ManesNotRegisteredException e) {
-			DialogFactory.buildRegistrationPromptDialog(this,
-					new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							ManesActivityHelper
-									.launchRegistrationActivity(ShoutActivity.this);
-						}
-					}).show();
+			DialogFactory
+					.buildRegistrationPromptDialog(this, registerClickListener, cancelListener)
+					.show();
 		} catch (IOException e) {
 			Toast.makeText(this, R.string.send_shout_failure, Toast.LENGTH_LONG)
 					.show();

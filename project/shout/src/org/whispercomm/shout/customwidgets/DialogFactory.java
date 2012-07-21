@@ -29,21 +29,23 @@ public class DialogFactory {
 	}
 
 	public static AlertDialog buildRegistrationPromptDialog(final Context context,
-			DialogInterface.OnClickListener neutral) {
+			DialogInterface.OnClickListener neutral, DialogInterface.OnCancelListener cancel) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		builder.setIcon(R.drawable.icon).setTitle(R.string.register_manes_dialog_title)
 				.setMessage(R.string.register_manes_dialog_message)
-				.setCancelable(false)
-				.setNeutralButton(R.string.register_manes_dialog_neutral, neutral);
+				.setCancelable(true)
+				.setNeutralButton(R.string.register_manes_dialog_neutral, neutral)
+				.setOnCancelListener(cancel);
 		return builder.create();
 	}
 
 	public static AlertDialog buildInstallationPromptDialog(final Context context,
-			DialogInterface.OnClickListener neutral) {
+			DialogInterface.OnClickListener neutral, DialogInterface.OnCancelListener cancel) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		builder.setIcon(R.drawable.icon).setTitle(R.string.install_manes_dialog_title)
-				.setMessage(R.string.install_manes_dialog_message).setCancelable(false)
-				.setNeutralButton(R.string.install_manes_dialog_neutral, neutral);
+				.setMessage(R.string.install_manes_dialog_message).setCancelable(true)
+				.setNeutralButton(R.string.install_manes_dialog_neutral, neutral)
+				.setOnCancelListener(cancel);
 		return builder.create();
 	}
 }
