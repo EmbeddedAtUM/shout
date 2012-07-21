@@ -11,8 +11,7 @@ import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.id.UserNotInitiatedException;
 import org.whispercomm.shout.network.NetworkInterface;
 import org.whispercomm.shout.network.NetworkInterface.NotConnectedException;
-import org.whispercomm.shout.network.NetworkInterface.ServiceConnectedListener;
-import org.whispercomm.shout.network.NetworkInterface.ServiceState;
+import org.whispercomm.shout.network.NetworkInterface.ShoutServiceConnection;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.serialization.SerializeUtility;
 import org.whispercomm.shout.serialization.ShoutChainTooLongException;
@@ -77,27 +76,24 @@ public class MessageActivity extends Activity {
 		initializeViews();
 		parent = getParent(getIntent().getExtras());
 		idManager = new IdManager(getApplicationContext());
-		network = new NetworkInterface(MessageActivity.this, new ServiceConnectedListener() {
+		network = new NetworkInterface(this, new ShoutServiceConnection() {
 			@Override
-			public void connected(ServiceState status) {
-				switch (status) {
-					case MANES_NOT_INSTALLED:
-						DialogFactory.buildInstallationPromptDialog(MessageActivity.this,
-								new DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialog, int which) {
-										ManesActivityHelper
-												.launchManesInstallation(MessageActivity.this);
-										finish();
-									}
-								}).show();
-						break;
-					default:
-						ManesActivityHelper
-								.launchRegistrationActivity(MessageActivity.this);
-						break;
-				}
+			public void manesNotInstalled() {
+				DialogFactory.buildInstallationPromptDialog(MessageActivity.this,
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								ManesActivityHelper
+										.launchManesInstallation(MessageActivity.this);
+								finish();
+							}
+						}).show();
+			}
 
+			@Override
+			public void manesNotRegistered() {
+				ManesActivityHelper
+						.launchRegistrationActivity(MessageActivity.this);
 			}
 		});
 	}

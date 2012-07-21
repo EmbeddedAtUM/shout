@@ -1,6 +1,8 @@
 
 package org.whispercomm.shout.network;
 
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import org.whispercomm.manes.client.maclib.ManesInstallationListener;
 import org.whispercomm.manes.client.maclib.ManesInstallationReceiver;
 import org.whispercomm.manes.client.maclib.ManesInterface;
@@ -28,11 +30,15 @@ public class NetworkService extends Service implements ManesConnection, ManesIns
 
 	private ManesInstallationReceiver manesInstallReceiver;
 
-	private ErrorCode initialized;
+	private CopyOnWriteArrayList<ManesStatusCallback> callbacks;
+
+	private boolean manesConnected;
 
 	@Override
 	public final void onCreate() {
 		Log.i(TAG, "Starting service.");
+		manesConnected = false;
+		callbacks = new CopyOnWriteArrayList<ManesStatusCallback>();
 		manesInstallReceiver = ManesInstallationReceiver.start(this, this);
 		initialize();
 		Log.i(TAG, "Service started.");
@@ -60,10 +66,10 @@ public class NetworkService extends Service implements ManesConnection, ManesIns
 				this.networkProtocol.initialize();
 				this.networkReceiver.initialize();
 
-				initialized = ErrorCode.SUCCESS;
+				notifyInstalled(true);
 				Log.i(TAG, "Finishing initialization.");
 			} catch (ManesNotInstalledException e) {
-				initialized = ErrorCode.MANES_NOT_INSTALLED;
+				notifyInstalled(false);
 				Log.w(TAG,
 						"MANES is not installed.  Service will not be fully functional until it is installed.");
 			}
@@ -95,20 +101,66 @@ public class NetworkService extends Service implements ManesConnection, ManesIns
 	@Override
 	public void onManesServiceConnected() {
 		Log.i(TAG, "Connection to Manes service established.");
+		manesConnected = true;
+		notifyRegistered(manes.registered());
 	}
 
 	@Override
 	public void onManesServiceDisconnected() {
+		manesConnected = false;
 		Log.i(TAG, "Connection to Manes service lost.");
+	}
+
+	private void addCallback(ManesStatusCallback callback) {
+		try {
+			if (manes == null) {
+				callback.installed(false);
+			} else {
+				callback.installed(true);
+			}
+
+			if (manesConnected) {
+				if (manes.registered()) {
+					callback.registered(true);
+				} else {
+					callback.registered(false);
+				}
+			}
+
+			callbacks.add(callback);
+		} catch (RemoteException e) {
+			Log.w(TAG, "callback invokation failed. Removing callback instance.", e);
+		}
+	}
+
+	private void removeCallback(ManesStatusCallback callback) {
+		callbacks.remove(callback);
+	}
+
+	private void notifyInstalled(boolean installed) {
+		for (ManesStatusCallback callback : callbacks) {
+			try {
+				callback.installed(installed);
+			} catch (RemoteException e) {
+				Log.w(TAG, "callback invokation failed.  Removing callback", e);
+				removeCallback(callback);
+			}
+		}
+	}
+
+	private void notifyRegistered(boolean registered) {
+		for (ManesStatusCallback callback : callbacks) {
+			try {
+				callback.registered(registered);
+			} catch (RemoteException e) {
+				Log.w(TAG, "callback invokation failed.  Removing callback", e);
+				removeCallback(callback);
+			}
+		}
 	}
 
 	private final NetworkServiceBinder.Stub binder = new
 			NetworkServiceBinder.Stub() {
-				@Override
-				public ErrorCode initialized() throws RemoteException {
-					return initialized;
-				}
-
 				@Override
 				public ErrorCode send(byte[] hash) throws RemoteException {
 					if (manes == null) {
@@ -126,6 +178,16 @@ public class NetworkService extends Service implements ManesConnection, ManesIns
 					} catch (ManesNotRegisteredException e) {
 						return ErrorCode.MANES_NOT_REGISTERED;
 					}
+				}
+
+				@Override
+				public void register(ManesStatusCallback callback) throws RemoteException {
+					addCallback(callback);
+				}
+
+				@Override
+				public void unregister(ManesStatusCallback callback) throws RemoteException {
+					removeCallback(callback);
 				}
 			};
 

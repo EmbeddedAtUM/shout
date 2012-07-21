@@ -16,8 +16,7 @@ import org.whispercomm.shout.id.UserNotInitiatedException;
 import org.whispercomm.shout.network.BootReceiver;
 import org.whispercomm.shout.network.NetworkInterface;
 import org.whispercomm.shout.network.NetworkInterface.NotConnectedException;
-import org.whispercomm.shout.network.NetworkInterface.ServiceConnectedListener;
-import org.whispercomm.shout.network.NetworkInterface.ServiceState;
+import org.whispercomm.shout.network.NetworkInterface.ShoutServiceConnection;
 import org.whispercomm.shout.network.NetworkService;
 import org.whispercomm.shout.provider.ParcelableShout;
 import org.whispercomm.shout.provider.ShoutProviderContract;
@@ -91,29 +90,27 @@ public class ShoutActivity extends ListActivity {
 	private void initialize() {
 		startBackgroundService();
 
-		this.network = new NetworkInterface(this, new ServiceConnectedListener() {
+		this.network = new NetworkInterface(this, new ShoutServiceConnection() {
 			@Override
-			public void connected(ServiceState status) {
-				switch (status) {
-					case MANES_NOT_INSTALLED:
-						DialogFactory.buildInstallationPromptDialog(ShoutActivity.this,
-								new DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialog, int which) {
-										ManesActivityHelper
-												.launchManesInstallation(ShoutActivity.this);
-										finish();
-									}
-								}).show();
-						break;
-					default:
-						ManesActivityHelper
-								.launchRegistrationActivity(ShoutActivity.this);
-						break;
-				}
+			public void manesNotInstalled() {
+				DialogFactory.buildInstallationPromptDialog(ShoutActivity.this,
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								ManesActivityHelper
+										.launchManesInstallation(ShoutActivity.this);
+								finish();
+							}
+						}).show();
+			}
 
+			@Override
+			public void manesNotRegistered() {
+				ManesActivityHelper
+						.launchRegistrationActivity(ShoutActivity.this);
 			}
 		});
+
 		this.idManager = new IdManager(this);
 		this.cursor = ShoutProviderContract
 				.getCursorOverAllShouts(getApplicationContext());
