@@ -38,6 +38,14 @@ public class NetworkService extends Service implements ManesConnection, ManesIns
 		Log.i(TAG, "Service started.");
 	}
 
+	@Override
+	public final void onDestroy() {
+		Log.i(TAG, "Stopping service.");
+		uninitialize();
+		manesInstallReceiver.stop();
+		Log.i(TAG, "Service stopped.");
+	}
+
 	private synchronized void initialize() {
 		if (manes == null) {
 			Log.i(TAG, "Starting initialization.");
@@ -75,6 +83,16 @@ public class NetworkService extends Service implements ManesConnection, ManesIns
 	}
 
 	@Override
+	public IBinder onBind(Intent intent) {
+		return binder;
+	}
+
+	@Override
+	public void manesInstalled() {
+		initialize();
+	}
+
+	@Override
 	public void onManesServiceConnected() {
 		Log.i(TAG, "Connection to Manes service established.");
 	}
@@ -82,19 +100,6 @@ public class NetworkService extends Service implements ManesConnection, ManesIns
 	@Override
 	public void onManesServiceDisconnected() {
 		Log.i(TAG, "Connection to Manes service lost.");
-	}
-
-	@Override
-	public IBinder onBind(Intent intent) {
-		return binder;
-	}
-
-	@Override
-	public final void onDestroy() {
-		Log.i(TAG, "Stopping service.");
-		uninitialize();
-		manesInstallReceiver.stop();
-		Log.i(TAG, "Service stopped.");
 	}
 
 	private final NetworkServiceBinder.Stub binder = new
@@ -123,10 +128,5 @@ public class NetworkService extends Service implements ManesConnection, ManesIns
 					}
 				}
 			};
-
-	@Override
-	public void manesInstalled() {
-		initialize();
-	}
 
 }
