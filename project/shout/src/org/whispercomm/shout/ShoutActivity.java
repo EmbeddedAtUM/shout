@@ -64,7 +64,7 @@ public class ShoutActivity extends AbstractShoutActivity {
 	protected void initialize() {
 		super.initialize();
 
-		setContentView(R.layout.main);
+		setContentView(R.layout.shout_activity);
 
 		this.idManager = new IdManager(this);
 		this.cursor = ShoutProviderContract
