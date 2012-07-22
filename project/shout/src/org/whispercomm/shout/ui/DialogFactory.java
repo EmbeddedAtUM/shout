@@ -23,9 +23,9 @@ public class DialogFactory {
 			DialogInterface.OnClickListener positive, DialogInterface.OnClickListener negative) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		builder.setCancelable(false).setView(view)
-				.setPositiveButton("I agree", positive)
-				.setNegativeButton("Get me out of here!", negative)
-				.setTitle("Shout User Agreement");
+				.setPositiveButton(R.string.user_agreement_dialog_postive, positive)
+				.setNegativeButton(R.string.user_agreement_dialog_negative, negative)
+				.setTitle(R.string.user_agreement_dialog_title);
 		return builder.create();
 	}
 
