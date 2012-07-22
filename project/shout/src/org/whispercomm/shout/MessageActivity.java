@@ -3,15 +3,11 @@ package org.whispercomm.shout;
 
 import java.io.IOException;
 
-import org.whispercomm.manes.client.maclib.ManesActivityHelper;
 import org.whispercomm.manes.client.maclib.ManesNotInstalledException;
 import org.whispercomm.manes.client.maclib.ManesNotRegisteredException;
-import org.whispercomm.shout.customwidgets.DialogFactory;
 import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.id.UserNotInitiatedException;
-import org.whispercomm.shout.network.NetworkInterface;
 import org.whispercomm.shout.network.NetworkInterface.NotConnectedException;
-import org.whispercomm.shout.network.NetworkInterface.ShoutServiceConnection;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.serialization.SerializeUtility;
 import org.whispercomm.shout.serialization.ShoutChainTooLongException;
@@ -20,12 +16,8 @@ import org.whispercomm.shout.tasks.CommentTask;
 import org.whispercomm.shout.tasks.SendResult;
 import org.whispercomm.shout.tasks.SendShoutTask;
 import org.whispercomm.shout.tasks.ShoutTask;
-import org.whispercomm.shout.terms.AgreementListener;
-import org.whispercomm.shout.terms.AgreementManager;
 import org.whispercomm.shout.thirdparty.Utf8ByteLengthFilter;
 
-import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputFilter;
@@ -36,12 +28,10 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-public class MessageActivity extends Activity {
+public class MessageActivity extends AbstractShoutActivity {
 
 	public static final String TAG = "MessageActivity";
 	public static final String PARENT_ID = "parent";
-
-	private NetworkInterface network;
 
 	private IdManager idManager;
 
@@ -51,71 +41,21 @@ public class MessageActivity extends Activity {
 
 	private LocalShout parent = null;
 
-	private final DialogInterface.OnClickListener installClickListener = new DialogInterface.OnClickListener() {
-		@Override
-		public void onClick(DialogInterface dialog, int which) {
-			ManesActivityHelper
-					.launchManesInstallation(MessageActivity.this);
-			finish();
-		}
-	};
-
-	private final DialogInterface.OnClickListener registerClickListener = new DialogInterface.OnClickListener() {
-		@Override
-		public void onClick(DialogInterface dialog, int which) {
-			ManesActivityHelper
-					.launchRegistrationActivity(MessageActivity.this);
-		}
-	};
-
-	private final DialogInterface.OnCancelListener cancelListener = new DialogInterface.OnCancelListener() {
-		@Override
-		public void onCancel(DialogInterface dialog) {
-			finish();
-		}
-	};
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.message);
-
-		AgreementManager.getConsent(this, new AgreementListener() {
-
-			@Override
-			public void accepted() {
-				initialize();
-			}
-
-			@Override
-			public void declined() {
-				finish();
-			}
-
-		});
-
 	}
 
-	private void initialize() {
+	protected void initialize() {
+		super.initialize();
 		initializeViews();
 		parent = getParent(getIntent().getExtras());
 		idManager = new IdManager(getApplicationContext());
-		network = new NetworkInterface(this, new ShoutServiceConnection() {
-			@Override
-			public void manesNotInstalled() {
-				DialogFactory.buildInstallationPromptDialog(MessageActivity.this,
-						installClickListener, cancelListener).show();
-			}
-
-			@Override
-			public void manesNotRegistered() {
-				DialogFactory.buildRegistrationPromptDialog(MessageActivity.this,
-						registerClickListener, cancelListener).show();
-			}
-		});
 	}
 
 	private void initializeViews() {
+		setContentView(R.layout.message);
+
 		btnSend = (Button) findViewById(R.id.send);
 		frmProgressBar = (FrameLayout) findViewById(R.id.frmProgressBar);
 		edtMessage = (EditText) findViewById(R.id.compose);
@@ -159,9 +99,6 @@ public class MessageActivity extends Activity {
 
 	@Override
 	public void onDestroy() {
-		if (network != null) {
-			network.unbind();
-		}
 		super.onDestroy();
 	}
 
@@ -227,11 +164,9 @@ public class MessageActivity extends Activity {
 					.show();
 			finish();
 		} catch (ManesNotInstalledException e) {
-			DialogFactory.buildInstallationPromptDialog(this,
-					installClickListener, cancelListener).show();
+			this.promptForInstallation(false);
 		} catch (ManesNotRegisteredException e) {
-			DialogFactory.buildRegistrationPromptDialog(this,
-					registerClickListener, cancelListener).show();
+			this.promptForRegistration(false);
 		} catch (IOException e) {
 			Toast.makeText(this, R.string.send_shout_failure, Toast.LENGTH_LONG)
 					.show();
