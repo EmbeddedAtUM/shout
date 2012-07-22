@@ -3,20 +3,26 @@ package org.whispercomm.shout;
 
 import org.whispercomm.manes.client.maclib.ManesActivityHelper;
 import org.whispercomm.shout.customwidgets.DialogFactory;
+import org.whispercomm.shout.network.BootReceiver;
 import org.whispercomm.shout.network.NetworkInterface;
 import org.whispercomm.shout.network.NetworkInterface.ShoutServiceConnection;
+import org.whispercomm.shout.network.NetworkService;
 import org.whispercomm.shout.terms.AgreementListener;
 import org.whispercomm.shout.terms.AgreementManager;
 
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 
 /**
  * Base class for Shout {@code Activity Activities} that takes care of:
  * <ul>
- * <li>ensuring the user agreement is accepted and prompting if not,</li>
  * <li>managing the {@link NetworkInterface} instance,</li>
+ * <li>starting the background Shout service,</li>
+ * <li>ensuring the user agreement is accepted and prompting if not,</li>
  * <li>prompting for Manes client installation, if needed, and</li>
  * <li>prompting for Manes client registration, if needed.</li>
  * </ul>
@@ -96,6 +102,7 @@ public class AbstractShoutActivity extends Activity {
 	 * Child classes must call through to the super class implementation.
 	 */
 	protected void initialize() {
+		startBackgroundService();
 		network = new NetworkInterface(this, new ShoutServiceConnection() {
 			@Override
 			public void manesNotInstalled() {
@@ -114,6 +121,21 @@ public class AbstractShoutActivity extends Activity {
 	private void uninitialize() {
 		if (network != null) {
 			network.unbind();
+		}
+	}
+
+	/**
+	 * Ensures that the background Shout service is started, if the user has
+	 * that option enabled.
+	 */
+	private void startBackgroundService() {
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		boolean runInBackground = prefs.getBoolean(
+				BootReceiver.START_SERVICE_ON_BOOT, true);
+		if (runInBackground) {
+			Intent intent = new Intent(this, NetworkService.class);
+			this.startService(intent);
 		}
 	}
 

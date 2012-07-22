@@ -11,9 +11,7 @@ import org.whispercomm.manes.client.maclib.ManesNotRegisteredException;
 import org.whispercomm.shout.customwidgets.ShoutListViewRow;
 import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.id.UserNotInitiatedException;
-import org.whispercomm.shout.network.BootReceiver;
 import org.whispercomm.shout.network.NetworkInterface.NotConnectedException;
-import org.whispercomm.shout.network.NetworkService;
 import org.whispercomm.shout.provider.ParcelableShout;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.serialization.ShoutChainTooLongException;
@@ -24,10 +22,8 @@ import org.whispercomm.shout.tasks.SendShoutTask;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -64,8 +60,6 @@ public class ShoutActivity extends AbstractShoutActivity {
 		super.initialize();
 
 		setContentView(R.layout.main);
-
-		startBackgroundService();
 
 		this.idManager = new IdManager(this);
 		this.cursor = ShoutProviderContract
@@ -129,21 +123,6 @@ public class ShoutActivity extends AbstractShoutActivity {
 
 		startActivity(intent);
 		return true;
-	}
-
-	/**
-	 * Ensures that the background Shout service is started, if the user has
-	 * that option enabled.
-	 */
-	private void startBackgroundService() {
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(this);
-		boolean runInBackground = prefs.getBoolean(
-				BootReceiver.START_SERVICE_ON_BOOT, true);
-		if (runInBackground) {
-			Intent intent = new Intent(this, NetworkService.class);
-			this.startService(intent);
-		}
 	}
 
 	public void onClickShout(View v) {
