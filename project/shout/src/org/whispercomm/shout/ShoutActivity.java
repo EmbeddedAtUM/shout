@@ -34,6 +34,12 @@ import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+/**
+ * The main activity for Shout. The activity displays a list of all received
+ * shouts and provides interfaces for shouting, reshouting, and commenting.
+ * 
+ * @author David R. Bild
+ */
 public class ShoutActivity extends AbstractShoutActivity {
 	private static final String TAG = "ShoutActivity";
 
