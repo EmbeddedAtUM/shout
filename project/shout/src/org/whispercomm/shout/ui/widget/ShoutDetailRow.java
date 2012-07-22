@@ -1,5 +1,5 @@
 
-package org.whispercomm.shout.customwidgets;
+package org.whispercomm.shout.ui.widget;
 
 import org.whispercomm.shout.R;
 

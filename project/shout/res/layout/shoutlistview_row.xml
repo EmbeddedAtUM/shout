@@ -15,7 +15,7 @@
             android:layout_height="wrap_content"
             android:paddingTop="1dip" >
 
-            <org.whispercomm.shout.customwidgets.ActionShoutView
+            <org.whispercomm.shout.ui.widget.ActionShoutView
                 android:id="@+id/actionshoutview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -26,7 +26,7 @@
                 custom:onReshoutClick="onClickReshout" />
         </LinearLayout>
 
-        <org.whispercomm.shout.customwidgets.ShoutChainView
+        <org.whispercomm.shout.ui.widget.ShoutChainView
             android:id="@+id/commentsview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

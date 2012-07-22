@@ -1,10 +1,13 @@
 
-package org.whispercomm.shout;
+package org.whispercomm.shout.ui;
 
 import java.io.IOException;
 
 import org.whispercomm.manes.client.maclib.ManesNotInstalledException;
 import org.whispercomm.manes.client.maclib.ManesNotRegisteredException;
+import org.whispercomm.shout.LocalShout;
+import org.whispercomm.shout.R;
+import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.id.UserNotInitiatedException;
 import org.whispercomm.shout.network.NetworkInterface.NotConnectedException;

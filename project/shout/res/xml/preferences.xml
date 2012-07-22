@@ -2,17 +2,17 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <!-- defaultValue should be changed to default username, i.e. user123 -->
-    <org.whispercomm.shout.customwidgets.ShoutPreferenceCategory android:title="Identity Settings" >
-        <org.whispercomm.shout.customwidgets.ShoutUsernamePreference
+    <org.whispercomm.shout.ui.widget.ShoutPreferenceCategory android:title="Identity Settings" >
+        <org.whispercomm.shout.ui.widget.ShoutUsernamePreference
             android:name="Username Custom Preference"
             android:defaultValue="@string/defaultUsername"
             android:key="usernamePref"
             android:summary="Your username and associated unique keys are used to authenticate Shouts behind the scenes, so try to pick a good username the first time."
             android:title="Username" />
-    </org.whispercomm.shout.customwidgets.ShoutPreferenceCategory>
+    </org.whispercomm.shout.ui.widget.ShoutPreferenceCategory>
 
     <PreferenceCategory android:title="Background Service" >
-        <org.whispercomm.shout.customwidgets.ShoutCheckBoxPreference
+        <org.whispercomm.shout.ui.widget.ShoutCheckBoxPreference
             android:defaultValue="true"
             android:key="runInBackground"
             android:summary="If checked, Shout will run in the background listening for new shouts."

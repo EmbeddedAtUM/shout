@@ -1,9 +1,12 @@
 
-package org.whispercomm.shout;
+package org.whispercomm.shout.ui;
 
-import org.whispercomm.shout.customwidgets.ShoutChainView;
-import org.whispercomm.shout.customwidgets.ShoutView;
+import org.whispercomm.shout.LocalShout;
+import org.whispercomm.shout.R;
+import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.provider.ShoutProviderContract;
+import org.whispercomm.shout.ui.widget.ShoutChainView;
+import org.whispercomm.shout.ui.widget.ShoutView;
 
 import android.app.Activity;
 import android.content.Context;

@@ -11,12 +11,12 @@
         android:layout_height="match_parent"
         android:orientation="vertical" >
 
-        <org.whispercomm.shout.customwidgets.ShoutView
+        <org.whispercomm.shout.ui.widget.ShoutView
             android:id="@+id/shoutview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-        <org.whispercomm.shout.customwidgets.ShoutChainView
+        <org.whispercomm.shout.ui.widget.ShoutChainView
             android:id="@+id/commentsview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

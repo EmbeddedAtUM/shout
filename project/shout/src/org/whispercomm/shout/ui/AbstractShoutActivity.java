@@ -1,14 +1,14 @@
 
-package org.whispercomm.shout;
+package org.whispercomm.shout.ui;
 
 import org.whispercomm.manes.client.maclib.ManesActivityHelper;
-import org.whispercomm.shout.customwidgets.DialogFactory;
 import org.whispercomm.shout.network.BootReceiver;
 import org.whispercomm.shout.network.NetworkInterface;
 import org.whispercomm.shout.network.NetworkInterface.ShoutServiceConnection;
 import org.whispercomm.shout.network.NetworkService;
 import org.whispercomm.shout.terms.AgreementListener;
 import org.whispercomm.shout.terms.AgreementManager;
+import org.whispercomm.shout.ui.widget.DialogFactory;
 
 import android.app.Activity;
 import android.content.DialogInterface;

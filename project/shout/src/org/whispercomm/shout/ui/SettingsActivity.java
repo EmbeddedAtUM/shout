@@ -1,6 +1,7 @@
 
-package org.whispercomm.shout;
+package org.whispercomm.shout.ui;
 
+import org.whispercomm.shout.R;
 import org.whispercomm.shout.network.NetworkService;
 
 import android.content.Context;

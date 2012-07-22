@@ -1,5 +1,5 @@
 
-package org.whispercomm.shout;
+package org.whispercomm.shout.ui;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -8,7 +8,8 @@ import java.util.Set;
 
 import org.whispercomm.manes.client.maclib.ManesNotInstalledException;
 import org.whispercomm.manes.client.maclib.ManesNotRegisteredException;
-import org.whispercomm.shout.customwidgets.ShoutListViewRow;
+import org.whispercomm.shout.LocalShout;
+import org.whispercomm.shout.R;
 import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.id.UserNotInitiatedException;
 import org.whispercomm.shout.network.NetworkInterface.NotConnectedException;
@@ -19,6 +20,7 @@ import org.whispercomm.shout.tasks.AsyncTaskCallback.AsyncTaskCompleteListener;
 import org.whispercomm.shout.tasks.ReshoutTask;
 import org.whispercomm.shout.tasks.SendResult;
 import org.whispercomm.shout.tasks.SendShoutTask;
+import org.whispercomm.shout.ui.widget.ShoutListViewRow;
 
 import android.content.Context;
 import android.content.Intent;

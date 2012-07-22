@@ -1,8 +1,8 @@
 
 package org.whispercomm.shout.terms;
 
-import org.whispercomm.shout.customwidgets.DialogFactory;
-import org.whispercomm.shout.customwidgets.ShoutAgreementView;
+import org.whispercomm.shout.ui.widget.DialogFactory;
+import org.whispercomm.shout.ui.widget.ShoutAgreementView;
 
 import android.app.AlertDialog;
 import android.content.Context;
