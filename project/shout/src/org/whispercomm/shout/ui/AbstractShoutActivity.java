@@ -8,7 +8,6 @@ import org.whispercomm.shout.network.NetworkInterface.ShoutServiceConnection;
 import org.whispercomm.shout.network.NetworkService;
 import org.whispercomm.shout.terms.AgreementListener;
 import org.whispercomm.shout.terms.AgreementManager;
-import org.whispercomm.shout.ui.widget.DialogFactory;
 
 import android.app.Activity;
 import android.content.DialogInterface;

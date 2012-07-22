@@ -1,7 +1,8 @@
 
-package org.whispercomm.shout.ui.widget;
+package org.whispercomm.shout.ui;
 
 import org.whispercomm.shout.R;
+import org.whispercomm.shout.ui.widget.ShoutAgreementView;
 
 import android.app.AlertDialog;
 import android.content.Context;

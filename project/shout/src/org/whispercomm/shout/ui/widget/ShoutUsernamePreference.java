@@ -3,6 +3,7 @@ package org.whispercomm.shout.ui.widget;
 
 import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.id.UserNameInvalidException;
+import org.whispercomm.shout.ui.DialogFactory;
 
 import android.app.AlertDialog;
 import android.content.Context;
