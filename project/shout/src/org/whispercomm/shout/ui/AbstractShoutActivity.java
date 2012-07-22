@@ -62,7 +62,7 @@ public class AbstractShoutActivity extends Activity {
 	private final DialogInterface.OnCancelListener stayCancelListener = new DialogInterface.OnCancelListener() {
 		@Override
 		public void onCancel(DialogInterface dialog) {
-			finish();
+			// Do nothing
 		}
 	};
 
