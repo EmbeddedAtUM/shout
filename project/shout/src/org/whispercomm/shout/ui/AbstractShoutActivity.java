@@ -40,7 +40,7 @@ public class AbstractShoutActivity extends Activity {
 		@Override
 		public void onClick(DialogInterface dialog, int which) {
 			ManesActivityHelper
-					.launchManesInstallation(AbstractShoutActivity.this);
+					.startInstallation(AbstractShoutActivity.this);
 		}
 	};
 
@@ -48,7 +48,7 @@ public class AbstractShoutActivity extends Activity {
 		@Override
 		public void onClick(DialogInterface dialog, int which) {
 			ManesActivityHelper
-					.launchRegistrationActivity(AbstractShoutActivity.this);
+					.startRegistration(AbstractShoutActivity.this);
 		}
 	};
 
