@@ -52,17 +52,10 @@ public class AbstractShoutActivity extends Activity {
 		}
 	};
 
-	private final DialogInterface.OnCancelListener finishCancelListener = new DialogInterface.OnCancelListener() {
+	private final DialogInterface.OnCancelListener cancelListener = new DialogInterface.OnCancelListener() {
 		@Override
 		public void onCancel(DialogInterface dialog) {
 			finish();
-		}
-	};
-
-	private final DialogInterface.OnCancelListener stayCancelListener = new DialogInterface.OnCancelListener() {
-		@Override
-		public void onCancel(DialogInterface dialog) {
-			// Do nothing
 		}
 	};
 
@@ -106,13 +99,13 @@ public class AbstractShoutActivity extends Activity {
 			@Override
 			public void manesNotInstalled() {
 				DialogFactory.buildInstallationPromptDialog(AbstractShoutActivity.this,
-						installClickListener, finishCancelListener).show();
+						installClickListener, cancelListener).show();
 			}
 
 			@Override
 			public void manesNotRegistered() {
 				DialogFactory.buildRegistrationPromptDialog(AbstractShoutActivity.this,
-						registerClickListener, finishCancelListener).show();
+						registerClickListener, cancelListener).show();
 			}
 		});
 	}
@@ -140,25 +133,17 @@ public class AbstractShoutActivity extends Activity {
 
 	/**
 	 * Prompts the user to install the Manes client.
-	 * 
-	 * @param finish {@code true} if the activity should finish if the
-	 *            registration does not succeed or {@code false} if it should
-	 *            remain active.
 	 */
-	public void promptForInstallation(boolean finish) {
+	public void promptForInstallation() {
 		DialogFactory.buildInstallationPromptDialog(AbstractShoutActivity.this,
-				installClickListener, finish ? finishCancelListener : stayCancelListener).show();
+				installClickListener, cancelListener).show();
 	}
 
 	/**
 	 * Prompts the user to register the Manes client.
-	 * 
-	 * @param finish {@code true} if the activity should finish if the
-	 *            registration does not succeed or {@code false} if it should
-	 *            remain active.
 	 */
-	public void promptForRegistration(boolean finish) {
+	public void promptForRegistration() {
 		DialogFactory.buildRegistrationPromptDialog(AbstractShoutActivity.this,
-				registerClickListener, finish ? finishCancelListener : stayCancelListener).show();
+				registerClickListener, cancelListener).show();
 	}
 }

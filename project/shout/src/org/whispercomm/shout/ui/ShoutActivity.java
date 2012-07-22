@@ -183,9 +183,9 @@ public class ShoutActivity extends AbstractShoutActivity {
 			Toast.makeText(this, R.string.send_shout_failure, Toast.LENGTH_LONG)
 					.show();
 		} catch (ManesNotInstalledException e) {
-			this.promptForInstallation(true);
+			this.promptForInstallation();
 		} catch (ManesNotRegisteredException e) {
-			this.promptForRegistration(true);
+			this.promptForRegistration();
 		} catch (IOException e) {
 			Toast.makeText(this, R.string.send_shout_failure, Toast.LENGTH_LONG)
 					.show();
