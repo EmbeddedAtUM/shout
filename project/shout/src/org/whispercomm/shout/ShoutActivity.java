@@ -6,17 +6,13 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.whispercomm.manes.client.maclib.ManesActivityHelper;
 import org.whispercomm.manes.client.maclib.ManesNotInstalledException;
 import org.whispercomm.manes.client.maclib.ManesNotRegisteredException;
-import org.whispercomm.shout.customwidgets.DialogFactory;
 import org.whispercomm.shout.customwidgets.ShoutListViewRow;
 import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.id.UserNotInitiatedException;
 import org.whispercomm.shout.network.BootReceiver;
-import org.whispercomm.shout.network.NetworkInterface;
 import org.whispercomm.shout.network.NetworkInterface.NotConnectedException;
-import org.whispercomm.shout.network.NetworkInterface.ShoutServiceConnection;
 import org.whispercomm.shout.network.NetworkService;
 import org.whispercomm.shout.provider.ParcelableShout;
 import org.whispercomm.shout.provider.ShoutProviderContract;
@@ -25,12 +21,8 @@ import org.whispercomm.shout.tasks.AsyncTaskCallback.AsyncTaskCompleteListener;
 import org.whispercomm.shout.tasks.ReshoutTask;
 import org.whispercomm.shout.tasks.SendResult;
 import org.whispercomm.shout.tasks.SendShoutTask;
-import org.whispercomm.shout.terms.AgreementListener;
-import org.whispercomm.shout.terms.AgreementManager;
 
-import android.app.ListActivity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -43,49 +35,52 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
 
-public class ShoutActivity extends ListActivity {
+public class ShoutActivity extends AbstractShoutActivity {
 	private static final String TAG = "ShoutActivity";
 
 	private static final String BUNDLE_KEY = "parceled_shouts";
 
-	private NetworkInterface network;
 	private IdManager idManager;
 	private Cursor cursor;
 
 	private Set<LocalShout> expandedShouts;
 
-	private final DialogInterface.OnClickListener installClickListener = new DialogInterface.OnClickListener() {
-		@Override
-		public void onClick(DialogInterface dialog, int which) {
-			ManesActivityHelper
-					.launchManesInstallation(ShoutActivity.this);
-			finish();
-		}
-	};
-
-	private final DialogInterface.OnClickListener registerClickListener = new DialogInterface.OnClickListener() {
-		@Override
-		public void onClick(DialogInterface dialog, int which) {
-			ManesActivityHelper
-					.launchRegistrationActivity(ShoutActivity.this);
-		}
-	};
-
-	private final DialogInterface.OnCancelListener cancelListener = new DialogInterface.OnCancelListener() {
-		@Override
-		public void onCancel(DialogInterface dialog) {
-			finish();
-		}
-	};
-
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+	}
+
+	@Override
+	protected void onDestroy() {
+		uninitialize();
+		super.onDestroy();
+	}
+
+	protected void initialize() {
+		super.initialize();
+
 		setContentView(R.layout.main);
-		Log.v(TAG, "Finished onCreate");
+
+		startBackgroundService();
+
+		this.idManager = new IdManager(this);
+		this.cursor = ShoutProviderContract
+				.getCursorOverAllShouts(getApplicationContext());
+		this.expandedShouts = new HashSet<LocalShout>();
+
+		ListView listView = (ListView) findViewById(android.R.id.list);
+		listView.setEmptyView(findViewById(android.R.id.empty));
+		listView.setAdapter(new TimelineAdapter(this, cursor));
+	}
+
+	private void uninitialize() {
+		if (this.cursor != null) {
+			this.cursor.close();
+		}
 	}
 
 	@Override
@@ -109,85 +104,6 @@ public class ShoutActivity extends ListActivity {
 		}
 
 		super.onRestoreInstanceState(saveInstanceState);
-	}
-
-	private void initialize() {
-		startBackgroundService();
-
-		this.network = new NetworkInterface(this, new ShoutServiceConnection() {
-			@Override
-			public void manesNotInstalled() {
-				DialogFactory.buildInstallationPromptDialog(ShoutActivity.this,
-						installClickListener, cancelListener).show();
-			}
-
-			@Override
-			public void manesNotRegistered() {
-				DialogFactory.buildRegistrationPromptDialog(ShoutActivity.this,
-						registerClickListener, cancelListener).show();
-			}
-		});
-
-		this.idManager = new IdManager(this);
-		this.cursor = ShoutProviderContract
-				.getCursorOverAllShouts(getApplicationContext());
-		this.expandedShouts = new HashSet<LocalShout>();
-
-		setListAdapter(new TimelineAdapter(this, cursor));
-	}
-
-	private void uninitialize() {
-		if (this.network != null) {
-			this.network.unbind();
-		}
-		if (this.cursor != null) {
-			this.cursor.close();
-		}
-	}
-
-	/**
-	 * Ensures that the background Shout service is started, if the user has
-	 * that option enabled.
-	 */
-	private void startBackgroundService() {
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(this);
-		boolean runInBackground = prefs.getBoolean(
-				BootReceiver.START_SERVICE_ON_BOOT, true);
-		if (runInBackground) {
-			Intent intent = new Intent(this, NetworkService.class);
-			this.startService(intent);
-		}
-	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		Log.v(TAG, "Finished onDestroy");
-	}
-
-	@Override
-	protected void onStart() {
-		super.onStart();
-		AgreementListener listener = new AgreementListener() {
-
-			@Override
-			public void declined() {
-				finish();
-			}
-
-			@Override
-			public void accepted() {
-				initialize();
-			}
-		};
-		AgreementManager.getConsent(this, listener);
-	}
-
-	@Override
-	protected void onStop() {
-		uninitialize();
-		super.onStop();
 	}
 
 	@Override
@@ -215,6 +131,21 @@ public class ShoutActivity extends ListActivity {
 		return true;
 	}
 
+	/**
+	 * Ensures that the background Shout service is started, if the user has
+	 * that option enabled.
+	 */
+	private void startBackgroundService() {
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		boolean runInBackground = prefs.getBoolean(
+				BootReceiver.START_SERVICE_ON_BOOT, true);
+		if (runInBackground) {
+			Intent intent = new Intent(this, NetworkService.class);
+			this.startService(intent);
+		}
+	}
+
 	public void onClickShout(View v) {
 		Log.v(TAG, "Shout button clicked");
 		startActivity(new Intent(this, MessageActivity.class));
@@ -237,6 +168,20 @@ public class ShoutActivity extends ListActivity {
 					Toast.LENGTH_LONG).show();
 			displaySettings();
 		}
+	}
+
+	public void onClickComment(LocalShout shout) {
+		Log.v(TAG, "Comment button clicked");
+		Intent intent = new Intent(this, MessageActivity.class);
+		intent.putExtra(MessageActivity.PARENT_ID, shout.getHash());
+		startActivity(intent);
+	}
+
+	public void onClickDetails(LocalShout shout) {
+		Log.v(TAG, "Details buttons clicked");
+		Intent intent = new Intent(this, DetailsActivity.class);
+		intent.putExtra(DetailsActivity.SHOUT_ID, shout.getHash());
+		startActivity(intent);
 	}
 
 	private void shoutCreated(LocalShout result) {
@@ -262,17 +207,13 @@ public class ShoutActivity extends ListActivity {
 			Toast.makeText(this, R.string.send_shout_failure, Toast.LENGTH_LONG)
 					.show();
 		} catch (ManesNotInstalledException e) {
-			DialogFactory.buildInstallationPromptDialog(this, installClickListener, cancelListener)
-					.show();
+			this.promptForInstallation(true);
 		} catch (ManesNotRegisteredException e) {
-			DialogFactory
-					.buildRegistrationPromptDialog(this, registerClickListener, cancelListener)
-					.show();
+			this.promptForRegistration(true);
 		} catch (IOException e) {
 			Toast.makeText(this, R.string.send_shout_failure, Toast.LENGTH_LONG)
 					.show();
 		}
-
 	}
 
 	private class ShoutCreationCompleteListener implements
@@ -293,22 +234,6 @@ public class ShoutActivity extends ListActivity {
 
 	private void displaySettings() {
 		startActivity(new Intent(this, SettingsActivity.class));
-	}
-
-	public void onClickComment(LocalShout shout) {
-		Log.v(TAG, "Comment button clicked");
-
-		Intent intent = new Intent(this, MessageActivity.class);
-		intent.putExtra(MessageActivity.PARENT_ID, shout.getHash());
-		startActivity(intent);
-	}
-
-	public void onClickDetails(LocalShout shout) {
-		Log.v(TAG, "Details buttons clicked");
-
-		Intent intent = new Intent(this, DetailsActivity.class);
-		intent.putExtra(DetailsActivity.SHOUT_ID, shout.getHash());
-		startActivity(intent);
 	}
 
 	private class TimelineAdapter extends CursorAdapter {
@@ -336,8 +261,6 @@ public class ShoutActivity extends ListActivity {
 					}
 				}
 			});
-
-			Log.v(TAG, "Binding shout: " + shout);
 
 			row.bindShout(shout, expandedShouts.contains(shout));
 		}
