@@ -18,6 +18,7 @@ import org.whispercomm.shout.tasks.SendShoutTask;
 import org.whispercomm.shout.tasks.ShoutTask;
 import org.whispercomm.shout.thirdparty.Utf8ByteLengthFilter;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputFilter;
@@ -29,9 +30,32 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 public class MessageActivity extends AbstractShoutActivity {
-
 	public static final String TAG = "MessageActivity";
-	public static final String PARENT_ID = "parent";
+
+	private static final String PARENT_ID = "parent";
+
+	/**
+	 * Starts the message activity to send a new original shout.
+	 * 
+	 * @param context the context used to start the activity
+	 */
+	public static void shout(Context context) {
+		comment(context, null);
+	}
+
+	/**
+	 * Starts the message activity to send a new comment on the specified shout.
+	 * 
+	 * @param context the context used to start the activity
+	 * @param shout the shout on which to comment
+	 */
+	public static void comment(Context context, Shout shout) {
+		Intent intent = new Intent(context, MessageActivity.class);
+		if (shout != null) {
+			intent.putExtra(PARENT_ID, shout.getHash());
+		}
+		context.startActivity(intent);
+	}
 
 	private IdManager idManager;
 

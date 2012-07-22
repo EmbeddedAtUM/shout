@@ -6,15 +6,30 @@ import org.whispercomm.shout.customwidgets.ShoutView;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
 // TODO Make this page not look terrible
 public class DetailsActivity extends Activity {
-
 	private static final String TAG = "DetailsActivity";
-	public static final String SHOUT_ID = "shout_id";
+
+	private static final String SHOUT_ID = "shout_id";
+
+	/**
+	 * Starts the details activity to display the specified shout.
+	 * 
+	 * @param context the context used to start the activity
+	 * @param hash the shout to display
+	 */
+	public static void show(Context context, Shout shout) {
+		Intent intent = new Intent(context, DetailsActivity.class);
+		intent.putExtra(SHOUT_ID, shout.getHash());
+		context.startActivity(intent);
+	}
+
 	private LocalShout shout;
 
 	/** Called when the activity is first created. */

@@ -50,7 +50,6 @@ public class ShoutActivity extends AbstractShoutActivity {
 
 	private Set<LocalShout> expandedShouts;
 
-	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -132,18 +131,14 @@ public class ShoutActivity extends AbstractShoutActivity {
 	}
 
 	public void onClickShout(View v) {
-		Log.v(TAG, "Shout button clicked");
-		startActivity(new Intent(this, MessageActivity.class));
+		MessageActivity.shout(this);
 	}
 
 	public void onClickSettings(View v) {
-		Log.v(TAG, "Settings button clicked");
-		displaySettings();
+		SettingsActivity.show(this);
 	}
 
 	public void onClickReshout(LocalShout shout) {
-		Log.v(TAG, "Reshout button clicked");
-
 		try {
 			new ReshoutTask(getApplicationContext(),
 					new ShoutCreationCompleteListener(), idManager.getMe(),
@@ -151,22 +146,16 @@ public class ShoutActivity extends AbstractShoutActivity {
 		} catch (UserNotInitiatedException e) {
 			Toast.makeText(this, "Please set a username before shouting.",
 					Toast.LENGTH_LONG).show();
-			displaySettings();
+			SettingsActivity.show(this);
 		}
 	}
 
 	public void onClickComment(LocalShout shout) {
-		Log.v(TAG, "Comment button clicked");
-		Intent intent = new Intent(this, MessageActivity.class);
-		intent.putExtra(MessageActivity.PARENT_ID, shout.getHash());
-		startActivity(intent);
+		MessageActivity.comment(this, shout);
 	}
 
 	public void onClickDetails(LocalShout shout) {
-		Log.v(TAG, "Details buttons clicked");
-		Intent intent = new Intent(this, DetailsActivity.class);
-		intent.putExtra(DetailsActivity.SHOUT_ID, shout.getHash());
-		startActivity(intent);
+		DetailsActivity.show(this, shout);
 	}
 
 	private void shoutCreated(LocalShout result) {
@@ -215,10 +204,6 @@ public class ShoutActivity extends AbstractShoutActivity {
 		public void onComplete(SendResult result) {
 			shoutSent(result);
 		}
-	}
-
-	private void displaySettings() {
-		startActivity(new Intent(this, SettingsActivity.class));
 	}
 
 	private class TimelineAdapter extends CursorAdapter {

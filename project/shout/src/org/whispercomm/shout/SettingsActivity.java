@@ -3,6 +3,7 @@ package org.whispercomm.shout;
 
 import org.whispercomm.shout.network.NetworkService;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -15,6 +16,16 @@ import android.util.Log;
 public class SettingsActivity extends PreferenceActivity {
 
 	public static final String TAG = "SettingsActivity";
+
+	/**
+	 * Starts the settings activity.
+	 * 
+	 * @param context the context used to start the activity
+	 */
+	public static void show(Context context) {
+		Intent intent = new Intent(context, SettingsActivity.class);
+		context.startActivity(intent);
+	}
 
 	boolean autoRotatePreference;
 	String usernamePreference;
