@@ -14,7 +14,7 @@ import android.view.View;
 
 // TODO Make this page not look terrible
 public class DetailsActivity extends Activity {
-	private static final String TAG = "DetailsActivity";
+	private static final String TAG = DetailsActivity.class.getSimpleName();
 
 	private static final String SHOUT_ID = "shout_id";
 

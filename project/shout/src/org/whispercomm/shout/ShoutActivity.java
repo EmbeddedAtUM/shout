@@ -41,7 +41,7 @@ import android.widget.Toast;
  * @author David R. Bild
  */
 public class ShoutActivity extends AbstractShoutActivity {
-	private static final String TAG = "ShoutActivity";
+	private static final String TAG = ShoutActivity.class.getSimpleName();
 
 	private static final String BUNDLE_KEY = "parceled_shouts";
 

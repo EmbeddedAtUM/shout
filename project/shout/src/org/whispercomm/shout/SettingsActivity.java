@@ -14,8 +14,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 public class SettingsActivity extends PreferenceActivity {
-
-	public static final String TAG = "SettingsActivity";
+	private static final String TAG = SettingsActivity.class.getSimpleName();
 
 	/**
 	 * Starts the settings activity.

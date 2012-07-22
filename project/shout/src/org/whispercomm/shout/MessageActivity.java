@@ -30,7 +30,7 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 public class MessageActivity extends AbstractShoutActivity {
-	public static final String TAG = "MessageActivity";
+	private static final String TAG = MessageActivity.class.getSimpleName();
 
 	private static final String PARENT_ID = "parent";
 
