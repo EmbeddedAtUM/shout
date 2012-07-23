@@ -2,6 +2,7 @@
 package org.whispercomm.shout.ui;
 
 import org.whispercomm.manes.client.maclib.ManesActivityHelper;
+import org.whispercomm.shout.expiry.ExpiryManager;
 import org.whispercomm.shout.network.BootReceiver;
 import org.whispercomm.shout.network.NetworkInterface;
 import org.whispercomm.shout.network.NetworkInterface.ShoutServiceConnection;
@@ -74,6 +75,26 @@ public class AbstractShoutActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		/*
+		 * If the expiry date is passed, instruct the user to update and then
+		 * quit the activity.
+		 */
+		if (ExpiryManager.hasExpired()) {
+			ExpiryManager.buildExpirationDialog(this, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					finish();
+				}
+			}, new DialogInterface.OnCancelListener() {
+				@Override
+				public void onCancel(DialogInterface dialog) {
+					finish();
+				}
+			}).show();
+			return;
+		}
+
 		AgreementManager.getConsent(this, agreementListener);
 	}
 

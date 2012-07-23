@@ -34,6 +34,9 @@
     <string name="user_agreement_dialog_postive">I agree.</string>
     <string name="user_agreement_dialog_negative">I decline.</string>
     <string name="user_agreement_dialog_title">Shout User Agreement</string>
+    <string name="expiry_dialog_title">Update Shout</string>
+    <string name="expiry_dialog_netural">OK</string>
+    <string name="expiry_dialog_message">Please update to the latest version of Shout available at http://whispercomm.org/manes/downloads/shout.apk.  This version of Shout will no longer work.</string>
     <string name="serviceTickerText">Starting Shout listener service</string>
     <string name="serviceTitleText">Shout Service</string>
     <string name="serviceDescriptionText">Currently listening for nearby Shouts</string>
