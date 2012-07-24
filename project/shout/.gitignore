@@ -8,3 +8,11 @@ gen/*
 
 # Ignore the tmp folder
 tmp/*
+
+nbandroid
+ant.properties
+build.properties
+build.xml
+default.properties
+local.properties
+proguard-project.txt
