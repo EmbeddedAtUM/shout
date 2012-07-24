@@ -6,14 +6,13 @@
         android:id="@+id/border"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/SeparatorGray"
         android:paddingTop="1dip" >
 
         <org.whispercomm.shout.ui.widget.ActionShoutView
             android:id="@+id/actionshoutview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
+            android:background="@drawable/rounded"
             android:paddingTop="5dip"
             custom:onDetailsClick="onClickDetails"
             custom:onReshoutClick="onClickReshout" />
