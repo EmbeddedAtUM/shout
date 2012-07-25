@@ -1,34 +1,11 @@
 Shout Serialization Version 0
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-canonical form:   ||====================|| 
-(1490 bytes       || header             ||
- with 3 shouts)   ||====================||
-                  || shout              ||
+Shout:            ||====================||
+(max 415 bytes)   || version || flags   || |   0-3   |     4      | 5 | 6 | 7 | 
+                  || (1 byte)           || | version | has_parent |   |   |   |
                   ||====================||
-                  || signature          ||
-                  ||====================||
-                  || shout              ||
-                  ||====================||
-                  || signature          ||
-                  ||====================||
-                          etc.
-                             .
-                             .
-
-
-
-"header":         ||====================||
-(2 bytes)         || version            ||
-                  || (1 byte)           ||
-                  ||--------------------||
-                  || shout_count*       ||
-                  || (1 byte)           ||
-                  ||====================||
-
-
-"shout":          ||====================||
-(max 415 bytes)   || time               ||
+                  || time               ||
                   || (8 bytes)          ||
                   ||--------------------|| 
                   || sender_name_len*   ||
@@ -45,14 +22,8 @@ canonical form:   ||====================||
                   ||--------------------||
                   || message*           ||
                   || (max 240 bytes)    ||
-                  ||====================||
-                  || has_parent*        ||
-                  || (1 byte)           ||
-                  ||--------------------||
                   || parent_hash*       ||
                   || (32 or 0 bytes)    ||
-                  ||====================|| 
-
 "signature"       ||====================||
 (71 - 81 bytes)   || signature_len*     ||
                   || (1 byte)           ||
@@ -60,6 +31,24 @@ canonical form:   ||====================||
                   || signature          ||
                   || (70-80 bytes)      ||
                   ||====================||
+
+
+Shout packet:
+                  ||====================||
+                  || version            ||
+                  || (1 byte)           ||
+                  ||--------------------||
+                  || shout_count*       ||
+                  || (1 byte)           ||
+                  ||====================||
+                  || shout              ||
+                  ||====================||
+                  || shout              ||
+                  ||====================||
+                          etc.
+                             .
+                             .
+
 
 Notes:
 *shout_count: Max is 3 to fit into a single packet with size < 1500 bytes
