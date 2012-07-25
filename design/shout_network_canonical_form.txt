@@ -1,115 +1,85 @@
-canonical form:  ||=================||
-      		 ||   signatures    ||
-       		 ||=================||
-       		 ||      shouts     ||
-       		 ||=================||
+Shout Serialization Version 0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-"signatures":    ||=================|| ---------|
-		 ||  signature_len* ||		|
-		 ||    (2 bytes)    ||		|
-		 ||-----------------||		|
-		 ||    signature*   ||		|
-		 || (as previous    ||		|
-		 || field specified)||		|
-		 ||-----------------||		\ one "signature" (sig1)
-		 ||     has_next*   ||		/ 
-		 ||     (1 byte)    ||		|
-		 ||=================|| ---------|
-		 ||  signature_len  ||		|
-		 ||    (2 bytes)    ||		|
-		 ||-----------------||		|
-		 ||    signature    ||		|
-		 || (as previous    ||		|
-		 || field specified)||		\ one "signature" (sig2)
-		 ||-----------------||		/
-		 ||     has_next    ||		| 
-		 ||     (1 byte)    ||		|
-		 ||=================|| ---------|
-		 || ...             ||
-		 || up to three     ||
-		 || "signature"s in ||
-		 || total           ||
-		 ||=================||
+canonical form:   ||====================|| 
+(1490 bytes       || header             ||
+ with 3 shouts)   ||====================||
+                  || shout              ||
+                  ||====================||
+                  || signature          ||
+                  ||====================||
+                  || shout              ||
+                  ||====================||
+                  || signature          ||
+                  ||====================||
+                          etc.
+                             .
+                             .
 
-"shouts":        ||=================||----------|
-		 ||      time       ||		|
-		 ||    (8 bytes)    ||		|
-		 ||-----------------||		|
-		 || sender_name_len*||		|
-		 ||    (1 byte)     ||		|
-		 ||-----------------||		|
-		 ||   sender_name   ||		|
-		 || (as previous    ||		|
-		 || field specified)||		|
-		 ||-----------------||		|
-		 || sender_pub_key* ||		|
-		 ||    (91 bytes)   ||		|
-		 ||-----------------||		\ one "shout" (shout1)
-		 ||   content_len*  ||		/ 
-		 ||    (2 bytes)    ||		|
-		 ||-----------------||		|
-		 ||     content     ||		|
-		 || (as previous    ||		|
-		 || field specified)||		|
-		 ||-----------------||		|
-		 ||   has_reshout   ||		|
-		 ||     (1 byte)    ||		|
-		 ||=================||----------|
-		 ||      time       ||		|
-		 ||    (8 bytes)    ||		|
-		 ||-----------------||		|
-		 || sender_name_len ||		|
-		 ||    (1 byte)     ||		|
-		 ||-----------------||		|
-		 ||   sender_name   ||		|
-		 || (as previous    ||		|
-		 || field specified)||		|
-		 ||-----------------||		|
-		 ||  sender_pub_key ||		|
-		 ||    (91 bytes)   ||		|
-		 ||-----------------||		\ one "shout" (shout2)
-		 ||   content_len   ||		/ 
-		 ||    (2 bytes)    ||		|
-		 ||-----------------||		|
-		 ||     content     ||		|
-		 || (as previous    ||		|
-		 || field specified)||		|
-		 ||-----------------||		|
-		 ||   has_reshout   ||		|
-		 ||     (1 byte)    ||		|
-		 ||=================||----------|
-		 || ...             ||
-		 || up to three     ||
-		 ||"shout"s in total||
-		 ||=================||
 
-The canonical form is composed of two parts, "signatures" and
-"shouts", corresponding to the digital signatures and bodies of up to
-three chained shouts. The correspondence between the signature and the
-shout body follows. "sig1" is the digital signature of "shout1" +
-"shout2" + .... "sig2" is the digital signature of "shout2" + ...
-		 
-	 
-A few notes: 
 
-* "signature_len" field exists because the length of ECDSA signature
-  varies according to ANSI X9.62 standards. For "secp256r1" key, ECDSA
-  usually varies between 70~80.
+"header":         ||====================||
+(2 bytes)         || version            ||
+                  || (1 byte)           ||
+                  ||--------------------||
+                  || shout_count*       ||
+                  || (1 byte)           ||
+                  ||====================||
 
-* "has_next" denotes whether the next few bytes represent
-another digital signature.
 
-* "sender_name_len" records the number of bytes "sender_name" has. One
-  byte is enough because "sender_name" is less than 20 charactors
-  (i.e., 40 bytes in Java).
+"shout":          ||====================||
+(max 415 bytes)   || time               ||
+                  || (8 bytes)          ||
+                  ||--------------------|| 
+                  || sender_name_len*   ||
+                  || (1 byte)           ||
+                  ||--------------------||
+                  || sender_name*       ||
+                  || (max 40 bytes)     ||
+                  ||--------------------||
+                  || sender_pub_key*    ||
+                  || (91 bytes)         ||
+                  ||--------------------||
+                  || message_len*       ||
+                  || (1 byte)           ||
+                  ||--------------------||
+                  || message*           ||
+                  || (max 240 bytes)    ||
+                  ||====================||
+                  || has_parent*        ||
+                  || (1 byte)           ||
+                  ||--------------------||
+                  || parent_hash*       ||
+                  || (32 or 0 bytes)    ||
+                  ||====================|| 
 
-* "sender_pub_key" is 91 bytes as returned by Bouncy Castle's X.509
-  encoding scheme using ECDSA and "secp256r1".
+"signature"       ||====================||
+(71 - 81 bytes)   || signature_len*     ||
+                  || (1 byte)           ||
+                  ||--------------------|| 
+                  || signature          ||
+                  || (70-80 bytes)      ||
+                  ||====================||
 
-* "content_len" records the number of bytes "content" has. Two bytes
-  are needed because "content" is less than 140 characters (i.e., 280
-  bytes in Java).
+Notes:
+*shout_count: Max is 3 to fit into a single packet with size < 1500 bytes
 
-* "has_reshout" represents whether the current shout has a parent
-  shout. If so, the next few bytes need to be interpreted as the
-  parent shout.
+*sender_name_len: Length of next field, values range 1 - 40 
+
+*sender_name: UTF-8 encoded sender username
+
+*sender_pub_key: 91 bytes as returned by Bouncy Castle's X.509 encoding scheme
+using ECDSA and "secp256r1"
+
+*message_len: Length of next field, values range 0 - 240. This allows for
+message sizes of up to 240 ASCII characters, or 55 obscure 4-byte characters
+
+*message: UTF-8 encoded message string
+
+*has_parent: Value 0 or 1, boolean if this Shout has a parent
+
+*parent_hash: If this Shout has a parent, this field is the hash of
+signed parent shout. The hash should be over the following fields concatenated:
+    "shout" + "signature"
+*signature_len: Need because the length of ECDSA signatures varies from 70-80
+bytes using the ANSI X9.62 standards with a "secp256r1" key.
