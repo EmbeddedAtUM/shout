@@ -92,9 +92,10 @@ public class ShoutView extends RelativeLayout {
 		if (shout.getReshoutCount() > 0) {
 			reshoutIcon.setVisibility(View.VISIBLE);
 			reshouters.setVisibility(View.VISIBLE);
-			reshouters.setText(String
-					.format("Reshouted %s.", ShoutMessageUtility
-							.getCountAsText(shout.getReshoutCount())));
+			int count = shout.getReshouters().size();
+			reshouters.setText(String.format("Reshouted by %d %s.", count, count == 1 ? "user"
+					: "users"));
+
 		} else {
 			reshoutIcon.setVisibility(View.GONE);
 			reshouters.setVisibility(View.GONE);

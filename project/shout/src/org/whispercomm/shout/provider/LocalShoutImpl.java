@@ -4,6 +4,8 @@ package org.whispercomm.shout.provider;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.joda.time.DateTime;
 import org.whispercomm.shout.LocalShout;
@@ -109,11 +111,14 @@ public class LocalShoutImpl implements LocalShout {
 	public List<LocalUser> getReshouters() {
 		Cursor cursor = ShoutProviderContract.getCursorOverReshouts(context, hashBytes);
 		List<LocalUser> users = new ArrayList<LocalUser>(cursor.getCount());
+		Set<String> keys = new TreeSet<String>();
 		int authorIndex = cursor.getColumnIndex(ShoutProviderContract.Shouts.AUTHOR);
 		while (cursor.moveToNext()) {
 			String author = cursor.getString(authorIndex);
-			LocalUser user = new LazyLocalUserImpl(context, author);
-			users.add(user);
+			keys.add(author);
+		}
+		for (String key : keys) {
+			users.add(new LazyLocalUserImpl(context, key));
 		}
 		return users;
 	}
