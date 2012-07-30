@@ -3,7 +3,7 @@
     xmlns:custom="http://schemas.android.com/apk/res/org.whispercomm.shout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white" >
+    android:background="@color/BackgroundGray" >
 
     <LinearLayout
         android:id="@+id/detailsView"
@@ -14,13 +14,15 @@
         <org.whispercomm.shout.ui.widget.ShoutView
             android:id="@+id/shoutview"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dip"
+            android:background="@color/white" />
 
         <org.whispercomm.shout.ui.widget.ShoutChainView
             android:id="@+id/commentsview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="15dip"
+            android:layout_marginLeft="20dip"
             android:orientation="vertical" />
     </LinearLayout>
 
