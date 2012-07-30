@@ -245,6 +245,10 @@ public class ActionShoutView extends LinearLayout {
 		}
 	}
 
+	public void showDetails() {
+		shoutView.showDetails();
+	}
+
 	/**
 	 * Sets the {@link OnClickListener} callback for the reshout button.
 	 * 

@@ -5,8 +5,8 @@ import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.R;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.provider.ShoutProviderContract;
+import org.whispercomm.shout.ui.widget.ActionShoutView;
 import org.whispercomm.shout.ui.widget.ShoutChainView;
-import org.whispercomm.shout.ui.widget.ShoutView;
 
 import android.content.Context;
 import android.content.Intent;
@@ -52,8 +52,8 @@ public class DetailsActivity extends AbstractShoutViewActivity {
 				break;
 
 		}
-		ShoutView shoutView = (ShoutView) findViewById(R.id.shoutview);
-		shoutView.bindShout(shout);
+		ActionShoutView shoutView = (ActionShoutView) findViewById(R.id.actionshoutview);
+		shoutView.bindShout(shout, false);
 		shoutView.showDetails();
 
 	}

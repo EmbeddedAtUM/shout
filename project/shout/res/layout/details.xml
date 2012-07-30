@@ -11,8 +11,8 @@
         android:layout_height="match_parent"
         android:orientation="vertical" >
 
-        <org.whispercomm.shout.ui.widget.ShoutView
-            android:id="@+id/shoutview"
+        <org.whispercomm.shout.ui.widget.ActionShoutView
+            android:id="@+id/actionshoutview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dip"
