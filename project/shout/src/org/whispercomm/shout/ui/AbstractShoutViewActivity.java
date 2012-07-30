@@ -19,9 +19,9 @@ import org.whispercomm.shout.tasks.SendShoutTask;
 import android.util.Log;
 import android.widget.Toast;
 
-public class AbstractTimelineActivity extends AbstractShoutActivity {
+public class AbstractShoutViewActivity extends AbstractShoutActivity {
 
-	private static final String TAG = AbstractTimelineActivity.class.getSimpleName();
+	private static final String TAG = AbstractShoutViewActivity.class.getSimpleName();
 
 	private IdManager idManager;
 

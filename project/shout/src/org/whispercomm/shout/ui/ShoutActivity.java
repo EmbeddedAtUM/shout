@@ -26,7 +26,7 @@ import android.widget.ListView;
  * 
  * @author David R. Bild
  */
-public class ShoutActivity extends AbstractTimelineActivity {
+public class ShoutActivity extends AbstractShoutViewActivity {
 
 	private static final String BUNDLE_KEY = "parceled_shouts";
 
