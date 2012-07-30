@@ -15,7 +15,7 @@ import android.util.Log;
 import android.view.View;
 
 // TODO Make this page not look terrible
-public class DetailsActivity extends AbstractShoutActivity {
+public class DetailsActivity extends AbstractTimelineActivity {
 	private static final String TAG = DetailsActivity.class.getSimpleName();
 
 	private static final String SHOUT_ID = "shout_id";
@@ -38,6 +38,7 @@ public class DetailsActivity extends AbstractShoutActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		super.initialize();
 		setContentView(R.layout.details);
 		Bundle extras = getIntent().getExtras();
 		shout = getShoutFromBundle(extras);
