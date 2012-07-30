@@ -8,7 +8,6 @@ import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.ui.widget.ShoutChainView;
 import org.whispercomm.shout.ui.widget.ShoutView;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,7 +15,7 @@ import android.util.Log;
 import android.view.View;
 
 // TODO Make this page not look terrible
-public class DetailsActivity extends Activity {
+public class DetailsActivity extends AbstractShoutActivity {
 	private static final String TAG = DetailsActivity.class.getSimpleName();
 
 	private static final String SHOUT_ID = "shout_id";
