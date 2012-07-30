@@ -120,6 +120,7 @@ public class LocalShoutImpl implements LocalShout {
 		for (String key : keys) {
 			users.add(new LazyLocalUserImpl(context, key));
 		}
+		cursor.close();
 		return users;
 	}
 
