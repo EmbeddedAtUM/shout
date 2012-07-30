@@ -20,9 +20,8 @@ import org.whispercomm.shout.tasks.AsyncTaskCallback.AsyncTaskCompleteListener;
 import org.whispercomm.shout.tasks.ReshoutTask;
 import org.whispercomm.shout.tasks.SendResult;
 import org.whispercomm.shout.tasks.SendShoutTask;
-import org.whispercomm.shout.ui.widget.ShoutListViewRow;
+import org.whispercomm.shout.ui.widget.TimelineAdapter;
 
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -31,8 +30,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -75,7 +72,7 @@ public class ShoutActivity extends AbstractShoutActivity {
 
 		ListView listView = (ListView) findViewById(android.R.id.list);
 		listView.setEmptyView(findViewById(android.R.id.empty));
-		listView.setAdapter(new TimelineAdapter(this, cursor));
+		listView.setAdapter(new TimelineAdapter(this, cursor, expandedShouts));
 	}
 
 	private void uninitialize() {
@@ -205,42 +202,6 @@ public class ShoutActivity extends AbstractShoutActivity {
 		@Override
 		public void onComplete(SendResult result) {
 			shoutSent(result);
-		}
-	}
-
-	private class TimelineAdapter extends CursorAdapter {
-
-		public TimelineAdapter(Context context, Cursor c) {
-			super(context, c);
-		}
-
-		@Override
-		public void bindView(View view, Context context, Cursor cursor) {
-			ShoutListViewRow row = (ShoutListViewRow) view;
-
-			// Get the shout
-			final LocalShout shout = ShoutProviderContract.retrieveShoutFromCursor(
-					context, cursor);
-
-			row.clearExpandedStateChangeListeners();
-			row.registerExpandedStateChangeListener(new ShoutListViewRow.ExpandedStateChangeListener() {
-				@Override
-				public void stateChanged(boolean expanded) {
-					if (expanded) {
-						expandedShouts.add(shout);
-					} else {
-						expandedShouts.remove(shout);
-					}
-				}
-			});
-
-			row.bindShout(shout, expandedShouts.contains(shout));
-		}
-
-		@Override
-		public View newView(final Context context, Cursor cursor,
-				ViewGroup parent) {
-			return new ShoutListViewRow(context);
 		}
 	}
 }
