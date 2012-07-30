@@ -1,37 +1,24 @@
 
 package org.whispercomm.shout.ui;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.whispercomm.manes.client.maclib.ManesNotInstalledException;
-import org.whispercomm.manes.client.maclib.ManesNotRegisteredException;
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.R;
-import org.whispercomm.shout.id.IdManager;
-import org.whispercomm.shout.id.UserNotInitiatedException;
-import org.whispercomm.shout.network.NetworkInterface.NotConnectedException;
 import org.whispercomm.shout.provider.ParcelableShout;
 import org.whispercomm.shout.provider.ShoutProviderContract;
-import org.whispercomm.shout.serialization.ShoutChainTooLongException;
-import org.whispercomm.shout.tasks.AsyncTaskCallback.AsyncTaskCompleteListener;
-import org.whispercomm.shout.tasks.ReshoutTask;
-import org.whispercomm.shout.tasks.SendResult;
-import org.whispercomm.shout.tasks.SendShoutTask;
 import org.whispercomm.shout.ui.widget.TimelineAdapter;
 
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
-import android.widget.Toast;
 
 /**
  * The main activity for Shout. The activity displays a list of all received
@@ -39,12 +26,10 @@ import android.widget.Toast;
  * 
  * @author David R. Bild
  */
-public class ShoutActivity extends AbstractShoutActivity {
-	private static final String TAG = ShoutActivity.class.getSimpleName();
+public class ShoutActivity extends AbstractTimelineActivity {
 
 	private static final String BUNDLE_KEY = "parceled_shouts";
 
-	private IdManager idManager;
 	private Cursor cursor;
 
 	private Set<LocalShout> expandedShouts;
@@ -65,7 +50,6 @@ public class ShoutActivity extends AbstractShoutActivity {
 
 		setContentView(R.layout.shout_activity);
 
-		this.idManager = new IdManager(this);
 		this.cursor = ShoutProviderContract
 				.getCursorOverAllShouts(getApplicationContext());
 		this.expandedShouts = new HashSet<LocalShout>();
@@ -135,73 +119,5 @@ public class ShoutActivity extends AbstractShoutActivity {
 
 	public void onClickSettings(View v) {
 		SettingsActivity.show(this);
-	}
-
-	public void onClickReshout(LocalShout shout) {
-		try {
-			new ReshoutTask(getApplicationContext(),
-					new ShoutCreationCompleteListener(), idManager.getMe(),
-					shout).execute();
-		} catch (UserNotInitiatedException e) {
-			Toast.makeText(this, "Please set a username before shouting.",
-					Toast.LENGTH_LONG).show();
-			SettingsActivity.show(this);
-		}
-	}
-
-	public void onClickComment(LocalShout shout) {
-		MessageActivity.comment(this, shout);
-	}
-
-	public void onClickDetails(LocalShout shout) {
-		DetailsActivity.show(this, shout);
-	}
-
-	private void shoutCreated(LocalShout result) {
-		if (result != null) {
-			new SendShoutTask(network, new ShoutSendCompleteListener())
-					.execute(result);
-		} else {
-			Toast.makeText(this, R.string.create_shout_failure,
-					Toast.LENGTH_LONG).show();
-		}
-	}
-
-	private void shoutSent(SendResult result) {
-		try {
-			result.getResultOrThrow();
-			Toast.makeText(this, R.string.send_shout_success, Toast.LENGTH_SHORT)
-					.show();
-		} catch (NotConnectedException e) {
-			Toast.makeText(this, R.string.send_shout_failure, Toast.LENGTH_LONG)
-					.show();
-		} catch (ShoutChainTooLongException e) {
-			Log.e(TAG, "SHOUT_CHAIN_TOO_LONG error.  Unable to send shout.");
-			Toast.makeText(this, R.string.send_shout_failure, Toast.LENGTH_LONG)
-					.show();
-		} catch (ManesNotInstalledException e) {
-			this.promptForInstallation();
-		} catch (ManesNotRegisteredException e) {
-			this.promptForRegistration();
-		} catch (IOException e) {
-			Toast.makeText(this, R.string.send_shout_failure, Toast.LENGTH_LONG)
-					.show();
-		}
-	}
-
-	private class ShoutCreationCompleteListener implements
-			AsyncTaskCompleteListener<LocalShout> {
-		@Override
-		public void onComplete(LocalShout result) {
-			shoutCreated(result);
-		}
-	}
-
-	private class ShoutSendCompleteListener implements
-			AsyncTaskCompleteListener<SendResult> {
-		@Override
-		public void onComplete(SendResult result) {
-			shoutSent(result);
-		}
 	}
 }
