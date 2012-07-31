@@ -36,6 +36,7 @@ public class ActionShoutView extends LinearLayout {
 	private ImageButton btnDetails;
 
 	private boolean actionBarVisibility;
+	private boolean detailsVisibility = false;
 
 	// Listeners called when a button is clicked
 	private OnClickListener reshoutListener;
@@ -105,7 +106,8 @@ public class ActionShoutView extends LinearLayout {
 			@Override
 			public void onClick(View v) {
 				if (detailsListener != null) {
-					detailsListener.onClick(shoutView.getBoundShout());
+					ActionShoutView.this.toggleDetails();
+					// detailsListener.onClick(shoutView.getBoundShout());
 				}
 			}
 		});
@@ -247,6 +249,16 @@ public class ActionShoutView extends LinearLayout {
 
 	public void showDetails() {
 		shoutView.showDetails();
+	}
+
+	public void toggleDetails() {
+		if (detailsVisibility) {
+			shoutView.hideDetails();
+			detailsVisibility = false;
+		} else {
+			shoutView.showDetails();
+			detailsVisibility = true;
+		}
 	}
 
 	/**

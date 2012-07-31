@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.View;
 
 // TODO Make this page not look terrible
+@Deprecated
 public class DetailsActivity extends AbstractShoutViewActivity {
 	private static final String TAG = DetailsActivity.class.getSimpleName();
 
