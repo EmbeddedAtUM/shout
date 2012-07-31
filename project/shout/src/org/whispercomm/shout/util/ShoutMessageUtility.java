@@ -50,7 +50,10 @@ public class ShoutMessageUtility {
 				unit = "second";
 			}
 		} else {
-			if (age.getStandardDays() >= 7) {
+			if (age.getStandardDays() >= 14) {
+				return getReadableDateTime(dt);
+			}
+			else if (age.getStandardDays() >= 7) {
 				timePassed = age.getStandardDays() / 7;
 				unit = "week";
 			} else if (age.getStandardHours() >= 24) {
