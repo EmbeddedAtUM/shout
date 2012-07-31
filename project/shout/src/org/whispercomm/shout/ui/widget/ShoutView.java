@@ -119,12 +119,14 @@ public class ShoutView extends RelativeLayout {
 		// Add the time sent
 		ShoutDetailRow timeSent = new ShoutDetailRow(getContext());
 		timeSent.setTitleText("Time Sent");
-		timeSent.setEntryText(shout.getTimestamp().toString());
+		String sent = ShoutMessageUtility.getReadableDateTime(shout.getTimestamp());
+		timeSent.setEntryText(sent);
 		detailsTable.addView(timeSent);
 		// Add the time received
 		ShoutDetailRow timeReceived = new ShoutDetailRow(getContext());
 		timeReceived.setTitleText("Time Received");
-		timeReceived.setEntryText(shout.getReceivedTime().toString());
+		String received = ShoutMessageUtility.getReadableDateTime(shout.getReceivedTime());
+		timeReceived.setEntryText(received);
 		detailsTable.addView(timeReceived);
 		// Add the signature
 		ShoutDetailRow signature = new ShoutDetailRow(getContext());

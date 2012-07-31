@@ -3,10 +3,18 @@ package org.whispercomm.shout.util;
 
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.whispercomm.shout.ShoutType;
 import org.whispercomm.shout.UnsignedShout;
 
 public class ShoutMessageUtility {
+
+	private static final DateTimeFormatter previousYear = DateTimeFormat
+			.forPattern("MMM d',' yyyy 'at' h:m a");
+	private static final DateTimeFormatter thisYear = DateTimeFormat.forPattern("MMM d 'at' h:m a");
+	private static final DateTimeFormatter today = DateTimeFormat.forPattern("'Today at' h:m a");
+
 	public static ShoutType getShoutType(UnsignedShout shout) {
 		if (shout.getParent() == null) {
 			return ShoutType.SHOUT;
@@ -55,6 +63,17 @@ public class ShoutMessageUtility {
 				return "twice";
 			default:
 				return String.format("%d times", count);
+		}
+	}
+
+	public static String getReadableDateTime(DateTime time) {
+		DateTime now = DateTime.now();
+		if (time.getDayOfYear() == now.getDayOfYear()) {
+			return today.print(time);
+		} else if (time.getYear() == now.getYear()) {
+			return thisYear.print(time);
+		} else {
+			return previousYear.print(time);
 		}
 	}
 }
