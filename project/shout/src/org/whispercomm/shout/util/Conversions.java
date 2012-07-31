@@ -12,10 +12,10 @@ import android.util.TypedValue;
 public class Conversions {
 
 	/**
-	 * Convert from display indepedent pixels to pixels.
+	 * Convert from display independent pixels to pixels.
 	 * 
 	 * @param dp numbers display independent pixels
-	 * @param res resources object providing access to the screen densitity
+	 * @param res resources object providing access to the screen density
 	 * @return number of pixels
 	 */
 	public static int dpToPx(int dp, Resources res) {
