@@ -12,8 +12,9 @@ public class ShoutMessageUtility {
 
 	private static final DateTimeFormatter previousYear = DateTimeFormat
 			.forPattern("MMM d',' yyyy 'at' h:m a");
-	private static final DateTimeFormatter thisYear = DateTimeFormat.forPattern("MMM d 'at' h:m a");
-	private static final DateTimeFormatter today = DateTimeFormat.forPattern("'Today at' h:m a");
+	private static final DateTimeFormatter thisYear = DateTimeFormat
+			.forPattern("MMM d 'at' h:mm a");
+	private static final DateTimeFormatter today = DateTimeFormat.forPattern("'Today at' h:mm a");
 
 	public static ShoutType getShoutType(UnsignedShout shout) {
 		if (shout.getParent() == null) {
