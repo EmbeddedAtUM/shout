@@ -31,23 +31,41 @@ public class ShoutMessageUtility {
 	public static String getDateTimeAge(DateTime dt) {
 		long timePassed;
 		String unit;
-		// TODO Handle timestamps FROM THE FUTURE!!!!!
 		Duration age = new Duration(dt, null);
-		if (age.getStandardDays() >= 7) {
-			timePassed = age.getStandardDays() / 7;
-			unit = "week";
-		} else if (age.getStandardHours() >= 24) {
-			timePassed = age.getStandardDays();
-			unit = "day";
-		} else if (age.getStandardMinutes() >= 60) {
-			timePassed = age.getStandardHours();
-			unit = "hour";
-		} else if (age.getStandardSeconds() >= 60) {
-			timePassed = age.getStandardMinutes();
-			unit = "minute";
+		if (dt.isBeforeNow()) {
+			if (age.getStandardDays() <= -7) {
+				timePassed = age.getStandardDays() / 7;
+				unit = "week";
+			} else if (age.getStandardHours() <= -24) {
+				timePassed = age.getStandardDays();
+				unit = "day";
+			} else if (age.getStandardMinutes() <= -60) {
+				timePassed = age.getStandardHours();
+				unit = "hour";
+			} else if (age.getStandardSeconds() <= -60) {
+				timePassed = age.getStandardMinutes();
+				unit = "minute";
+			} else {
+				timePassed = age.getStandardSeconds();
+				unit = "second";
+			}
 		} else {
-			timePassed = age.getStandardSeconds();
-			unit = "second";
+			if (age.getStandardDays() >= 7) {
+				timePassed = age.getStandardDays() / 7;
+				unit = "week";
+			} else if (age.getStandardHours() >= 24) {
+				timePassed = age.getStandardDays();
+				unit = "day";
+			} else if (age.getStandardMinutes() >= 60) {
+				timePassed = age.getStandardHours();
+				unit = "hour";
+			} else if (age.getStandardSeconds() >= 60) {
+				timePassed = age.getStandardMinutes();
+				unit = "minute";
+			} else {
+				timePassed = age.getStandardSeconds();
+				unit = "second";
+			}
 		}
 
 		return String.format("%d %s%s ago.", timePassed, unit,
