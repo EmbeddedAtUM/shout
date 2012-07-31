@@ -11,6 +11,7 @@
         android:id="@+id/rowEntry"
         android:text="Table Entry"
         android:layout_width="match_parent"
+        android:lines="1"
         android:ellipsize="middle"
         android:paddingRight="5dip"
         android:textColor="@color/gray" />
