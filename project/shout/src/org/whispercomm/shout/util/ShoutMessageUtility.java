@@ -32,7 +32,7 @@ public class ShoutMessageUtility {
 		long timePassed;
 		String unit;
 		Duration age = new Duration(dt, null);
-		if (dt.isBeforeNow()) {
+		if (dt.isAfterNow()) {
 			if (age.getStandardDays() <= -7) {
 				timePassed = age.getStandardDays() / 7;
 				unit = "week";
