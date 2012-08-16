@@ -24,7 +24,9 @@ import org.whispercomm.shout.thirdparty.Utf8ByteLengthFilter;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.InputFilter;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -91,6 +93,8 @@ public class MessageActivity extends AbstractShoutActivity {
 				new Utf8ByteLengthFilter(
 						SerializeUtility.MAX_MESSAGE_SIZE)
 		});
+		edtMessage.addTextChangedListener(new EditMessageWatcher());
+		btnSend.setEnabled(false);
 	}
 
 	private LocalShout getParent(Bundle extras) {
@@ -216,5 +220,32 @@ public class MessageActivity extends AbstractShoutActivity {
 		public void onComplete(SendResult result) {
 			shoutSent(result);
 		}
+	}
+
+	/**
+	 * A textwatcher, listen to the textchange event of edtMessage Enable the
+	 * btnSend when the text field is not empty.
+	 * 
+	 * @author Junzhe Zhang
+	 */
+	private class EditMessageWatcher implements TextWatcher {
+
+		@Override
+		public void afterTextChanged(Editable s) {
+			if (!edtMessage.getText().toString().equals("")) {
+				btnSend.setEnabled(true);
+			} else {
+				btnSend.setEnabled(false);
+			}
+		}
+
+		@Override
+		public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+		}
+
+		@Override
+		public void onTextChanged(CharSequence s, int start, int before, int count) {
+		}
+
 	}
 }
