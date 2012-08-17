@@ -20,6 +20,7 @@ import org.whispercomm.shout.tasks.SendResult;
 import org.whispercomm.shout.tasks.SendShoutTask;
 import org.whispercomm.shout.tasks.ShoutTask;
 import org.whispercomm.shout.thirdparty.Utf8ByteLengthFilter;
+import org.whispercomm.shout.ui.widget.ShoutView;
 
 import android.content.Context;
 import android.content.Intent;
@@ -67,6 +68,8 @@ public class MessageActivity extends AbstractShoutActivity {
 	private Button btnSend;
 	private EditText edtMessage;
 	private FrameLayout frmProgressBar;
+	private FrameLayout frmTxtParent;
+	private ShoutView shoutParent;
 
 	private LocalShout parent = null;
 
@@ -77,8 +80,8 @@ public class MessageActivity extends AbstractShoutActivity {
 
 	protected void initialize() {
 		super.initialize();
-		initializeViews();
 		parent = getParent(getIntent().getExtras());
+		initializeViews();
 		idManager = new IdManager(getApplicationContext());
 	}
 
@@ -87,6 +90,8 @@ public class MessageActivity extends AbstractShoutActivity {
 
 		btnSend = (Button) findViewById(R.id.send);
 		frmProgressBar = (FrameLayout) findViewById(R.id.frmProgressBar);
+		shoutParent = (ShoutView) findViewById(R.id.shoutParent);
+		frmTxtParent = (FrameLayout) findViewById(R.id.frmParent);
 		edtMessage = (EditText) findViewById(R.id.compose);
 
 		edtMessage.setFilters(new InputFilter[] {
@@ -95,6 +100,11 @@ public class MessageActivity extends AbstractShoutActivity {
 		});
 		edtMessage.addTextChangedListener(new EditMessageWatcher());
 		btnSend.setEnabled(false);
+		if (parent != null) {
+			Toast.makeText(this, parent.getMessage(), Toast.LENGTH_LONG).show();
+			shoutParent.bindShout(parent);
+			frmTxtParent.setVisibility(FrameLayout.VISIBLE);
+		}
 	}
 
 	private LocalShout getParent(Bundle extras) {

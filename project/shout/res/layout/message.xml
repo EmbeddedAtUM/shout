@@ -4,8 +4,25 @@
     android:layout_height="match_parent"
     android:background="@drawable/messageviewgradient"
     android:orientation="vertical" >
+    
+   <FrameLayout
+           android:id="@+id/frmParent"
+           android:layout_width="match_parent"
+           android:layout_height="0dip"
+           android:layout_weight="1"
+           android:visibility="gone">
+         <org.whispercomm.shout.ui.widget.ShoutView
+            android:id="@+id/shoutParent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|center_horizontal"
+            android:background="@color/white"
+            />
+       
+   </FrameLayout>
+           
 
-    <FrameLayout
+   <FrameLayout
         android:id="@+id/frmCompose"
         android:layout_width="match_parent"
         android:layout_height="0dip"
@@ -36,6 +53,8 @@
                 android:indeterminateOnly="true" >
             </ProgressBar>
         </FrameLayout>
+
+
     </FrameLayout>
 
     <RelativeLayout
