@@ -2,6 +2,7 @@
 package org.whispercomm.shout.provider;
 
 import java.security.interfaces.ECPublicKey;
+import java.security.spec.InvalidKeySpecException;
 
 import org.whispercomm.shout.LocalUser;
 import org.whispercomm.shout.id.SignatureUtility;
@@ -20,7 +21,12 @@ public class LazyLocalUserImpl implements LocalUser {
 	public LazyLocalUserImpl(Context context, String encodedAuthor) {
 		this.context = context;
 		byte[] keyBytes = Base64.decode(encodedAuthor, Base64.DEFAULT);
-		this.key = SignatureUtility.getPublicKeyFromBytes(keyBytes);
+		try {
+			this.key = SignatureUtility.getPublicKeyFromBytes(keyBytes);
+		} catch (InvalidKeySpecException e) {
+			// TODO: Figure out what to do about this
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override

@@ -79,7 +79,7 @@ public class ShoutPacket {
 	 */
 	public Shout decodeShout() throws BadShoutVersionException, ShoutPacketException,
 			InvalidShoutSignatureException {
-		return SerializeUtility.deserializeShout(count, body);
+		return SerializeUtility.deserializeSequenceOfShouts(count, body);
 	}
 
 	/**
@@ -108,7 +108,8 @@ public class ShoutPacket {
 		public static final int CURRENT = VERSION_0;
 		private static final int HEADER_SIZE = 2;
 		private static final int MAX_PACKET_SIZE = HEADER_SIZE + 3
-				* (SerializeUtility.MAX_SHOUT_SIZE + SerializeUtility.MAX_SIGNATURE_SIZE);
+				* SerializeUtility.SHOUT_SIGNED_SIZE_MAX;
+
 		private static final int MASK = 0x00FF;
 
 		private int version;

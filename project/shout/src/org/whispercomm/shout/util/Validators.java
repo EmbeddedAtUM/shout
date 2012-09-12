@@ -7,7 +7,7 @@ public class Validators {
 
 	public static boolean validateUsername(String username) {
 		byte[] bytes = username.getBytes();
-		if (bytes.length > SerializeUtility.MAX_USERNAME_SIZE) {
+		if (bytes.length > SerializeUtility.USERNAME_SIZE_MAX) {
 			return false;
 		}
 		char c;
@@ -22,7 +22,7 @@ public class Validators {
 
 	public static boolean validateShoutMessage(String message) {
 		byte[] bytes = message.getBytes();
-		if (bytes.length > SerializeUtility.MAX_MESSAGE_SIZE) {
+		if (bytes.length > SerializeUtility.MESSAGE_SIZE_MAX) {
 			return false;
 		}
 		return true;

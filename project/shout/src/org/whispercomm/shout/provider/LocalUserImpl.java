@@ -2,6 +2,7 @@
 package org.whispercomm.shout.provider;
 
 import java.security.interfaces.ECPublicKey;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 
 import org.whispercomm.shout.LocalUser;
@@ -31,7 +32,12 @@ public class LocalUserImpl implements LocalUser {
 
 	@Override
 	public ECPublicKey getPublicKey() {
-		return SignatureUtility.getPublicKeyFromBytes(keyBytes);
+		try {
+			return SignatureUtility.getPublicKeyFromBytes(keyBytes);
+		} catch (InvalidKeySpecException e) {
+			// TODO: Figure out what to do about this
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override

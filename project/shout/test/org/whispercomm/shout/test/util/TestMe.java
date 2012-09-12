@@ -11,9 +11,9 @@ public class TestMe implements Me {
 	public String username;
 	public KeyPair keyPair;
 
-	public TestMe(String username) {
-		this.keyPair = TestFactory.genKeyPair();
+	public TestMe(String username, KeyPair keyPair) {
 		this.username = username;
+		this.keyPair = keyPair;
 	}
 
 	@Override

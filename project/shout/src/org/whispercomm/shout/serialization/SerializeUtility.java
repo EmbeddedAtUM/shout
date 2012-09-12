@@ -1,12 +1,20 @@
 
 package org.whispercomm.shout.serialization;
 
-import java.io.UnsupportedEncodingException;
+import static org.whispercomm.shout.util.ByteBufferUtils.flipToMark;
+import static org.whispercomm.shout.util.ByteBufferUtils.getArray;
+import static org.whispercomm.shout.util.ByteBufferUtils.getVArray;
+import static org.whispercomm.shout.util.ByteBufferUtils.putVArray;
+import static org.whispercomm.shout.util.CharUtils.decodeUtf8Safe;
+import static org.whispercomm.shout.util.CharUtils.encodeUtf8;
+
+import java.nio.BufferOverflowException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.nio.ByteOrder;
+import java.nio.charset.CharacterCodingException;
 import java.security.interfaces.ECPublicKey;
+import java.security.spec.InvalidKeySpecException;
 
 import org.joda.time.DateTime;
 import org.whispercomm.shout.Shout;
@@ -15,9 +23,11 @@ import org.whispercomm.shout.UnsignedShout;
 import org.whispercomm.shout.User;
 import org.whispercomm.shout.id.SignatureUtility;
 import org.whispercomm.shout.util.Arrays;
+import org.whispercomm.shout.util.ByteBufferUtils;
+import org.whispercomm.shout.util.ByteBufferUtils.InvalidLengthException;
+import org.whispercomm.shout.util.ByteBufferUtils.LengthType;
+import org.whispercomm.shout.util.HashUtils;
 import org.whispercomm.shout.util.ShoutMessageUtility;
-
-import android.util.Log;
 
 /**
  * Static utility class for serializing and deserializing Shouts, and generating
@@ -26,255 +36,411 @@ import android.util.Log;
  * @author David Adrian
  */
 public class SerializeUtility {
+	@SuppressWarnings("unused")
 	private static final String TAG = SerializeUtility.class.getSimpleName();
-	public static final int SINGLE_SHOUT_FLAG = 1;
-	public static final int TIMESTAMP_SIZE = 8;
-	public static final int USERNAME_LENGTH_SIZE = 1;
-	public static final int MAX_USERNAME_SIZE = 40;
-	public static final int PUBLIC_KEY_SIZE = 91;
-	public static final int MESSAGE_LENGTH_SIZE = 1;
-	public static final int MAX_MESSAGE_SIZE = 240;
-	public static final int HASH_SIZE = 256 / 8;
-
-	public static final int MAX_SHOUT_SIZE = SINGLE_SHOUT_FLAG + TIMESTAMP_SIZE
-			+ USERNAME_LENGTH_SIZE
-			+ MAX_USERNAME_SIZE + PUBLIC_KEY_SIZE + MESSAGE_LENGTH_SIZE
-			+ MAX_MESSAGE_SIZE + HASH_SIZE;
-
-	public static final int SIGNATURE_LENGTH_SIZE = 1;
-	public static final int MAX_SIGNATURE_DATA_SIZE = 80;
-	public static final int MAX_SIGNATURE_SIZE = SIGNATURE_LENGTH_SIZE + MAX_SIGNATURE_DATA_SIZE;
 
 	public static final String HASH_ALGORITHM = "SHA-256";
+	public static final int HASH_SIZE = 256 / 8;
 
-	private static final int MASK = 0x00FF;
-	private static final int HAS_PARENT_BITS = 1;
+	// Header fields sizes
+	public static final int SHOUT_FLAG_SIZE = 1;
+	public static final int TIMESTAMP_SIZE = 8;
+
+	// User fields sizes
+	public static final int PUBLIC_KEY_SIZE = 91;
+	public static final int AVATAR_HASH_SIZE = HASH_SIZE;
+	public static final int USERNAME_LENGTH_SIZE = 1;
+	public static final int USERNAME_SIZE_MAX = 40;
+
+	// Message field sizes
+	public static final int MESSAGE_LENGTH_SIZE = 1;
+	public static final int MESSAGE_SIZE_MAX = 240;
+	public static final int LONGITUDE_SIZE = 8;
+	public static final int LATITUDE_SIZE = 8;
+
+	// Parent fields sizes
+	public static final int PARENT_HASH_SIZE = HASH_SIZE;
+
+	// Signature fields sizes
+	public static final int SIGNATURE_LENGTH_SIZE = 1;
+	public static final int SIGNATURE_SIZE_MAX = 80;
+
+	// Max size computations
+	public static final int SHOUT_HEADER_FIELDS_SIZE = SHOUT_FLAG_SIZE + TIMESTAMP_SIZE;
+	public static final int SHOUT_USER_FIELDS_SIZE_MAX = PUBLIC_KEY_SIZE + AVATAR_HASH_SIZE
+			+ USERNAME_LENGTH_SIZE + USERNAME_SIZE_MAX;
+	public static final int SHOUT_MESSAGE_FIELDS_SIZE_MAX = MESSAGE_LENGTH_SIZE + MESSAGE_SIZE_MAX
+			+ LONGITUDE_SIZE + LATITUDE_SIZE;
+	public static final int SHOUT_PARENT_FIELDS_SIZE = PARENT_HASH_SIZE;
+	public static final int SHOUT_SIGNATURE_FIELDS_SIZE_MAX = SIGNATURE_LENGTH_SIZE
+			+ SIGNATURE_SIZE_MAX;
+
+	public static final int SHOUT_UNSIGNED_SIZE_MAX = SHOUT_HEADER_FIELDS_SIZE
+			+ SHOUT_USER_FIELDS_SIZE_MAX + SHOUT_MESSAGE_FIELDS_SIZE_MAX + SHOUT_PARENT_FIELDS_SIZE;
+
+	public static final int SHOUT_SIGNED_SIZE_MAX = SHOUT_UNSIGNED_SIZE_MAX
+			+ SHOUT_SIGNATURE_FIELDS_SIZE_MAX;
+
+	private static final int VERSION_MASK = 0x0F;
+	private static final int LOCATION_BIT_MASK = 1 << 4;
+	private static final int PARENT_BIT_MASK = 1 << 5;
+
+	// Version to use when serializing a shout
+	private static final int VERSION = 0;
+
+	/**
+	 * Extracts the version from the flags byte
+	 * 
+	 * @param flags the flag byte
+	 * @return the version number
+	 */
+	private static final int VERSION(byte flags) {
+		return flags & VERSION_MASK;
+	}
+
+	/**
+	 * Checks if the "has_location" bit is set in the flags byte.
+	 * 
+	 * @param flags the flag byte
+	 * @return {@code true} if the "has_location" bit is set or {@code false}
+	 *         otherwise.
+	 */
+	private static final boolean HAS_LOCATION(byte flags) {
+		return (flags & LOCATION_BIT_MASK) != 0;
+	}
+
+	/**
+	 * Checks if the "has_parent" bit is set in the flags byte.
+	 * 
+	 * @param flags the flag byte
+	 * @return {@code true} if the "has_parent" bit is set or {@code false}
+	 *         otherwise.
+	 */
+	private static final boolean HAS_PARENT(byte flags) {
+		return (flags & PARENT_BIT_MASK) != 0;
+	}
+
+	/**
+	 * Serializes the portion of the shout data over which the signature is
+	 * computed. The buffer position is increased by the size of the shout data.
+	 * If the buffer is too small, the position is increased by the amount of
+	 * data that was added and a {@link BufferOverflowException} is thrown.
+	 * 
+	 * @param buffer the buffer into which to serialize the shout data
+	 * @param shout the shout to serialize
+	 * @return the provided buffer
+	 * @throws BufferOverflowException if {@code buffer} does not have room for
+	 *             the shout data
+	 */
+	public static ByteBuffer serializeShoutData(ByteBuffer buffer, UnsignedShout shout)
+			throws BufferOverflowException {
+		// Compute flags byte
+		byte flags = VERSION;
+
+		Shout parent = shout.getParent();
+		if (parent != null) {
+			flags |= PARENT_BIT_MASK;
+		}
+
+		boolean hasLocation = false; // TODO: check Shout object for location
+		if (hasLocation) {
+			flags |= LOCATION_BIT_MASK;
+		}
+
+		// Build the packet
+		buffer.order(ByteOrder.BIG_ENDIAN); // network byte order;
+
+		// Add Header Fields
+		buffer.put(flags);
+		buffer.putLong(shout.getTimestamp().getMillis());
+
+		// Add User Fields
+		buffer.put(shout.getSender().getPublicKey().getEncoded());
+		buffer.put(new byte[AVATAR_HASH_SIZE]); // TODO: Get real hash from
+												// User object
+		putVArray(buffer, encodeUtf8(shout.getSender().getUsername()),
+				LengthType.BYTE);
+
+		// Add Message Fields
+		String message = shout.getMessage();
+		if (message != null) {
+			putVArray(buffer, encodeUtf8(message), LengthType.BYTE);
+		} else {
+			buffer.put((byte) 0); // No message, put in 0 as length
+		}
+		if (hasLocation) {
+			// TODO: get real location information
+			buffer.putDouble(0);
+			buffer.putDouble(0);
+		}
+
+		// Add Parent Reference Fields
+		if (parent != null) {
+			buffer.put(parent.getHash());
+		}
+
+		return buffer;
+	}
+
+	/**
+	 * Serializes an already-signed shout. The buffer position is increased by
+	 * the size of the shout data. If the buffer is too small, the position is
+	 * increased by the amount of data that was added and a
+	 * {@link BufferOverflowException} is thrown.
+	 * 
+	 * @param buffer the buffer into which to serialize the shout
+	 * @param shout the shout to serialize
+	 * @return the provided buffer
+	 * @throws BufferOverflowException if {@code buffer} does not have room for
+	 *             the shout
+	 */
+	public static ByteBuffer serializeShout(ByteBuffer buffer, Shout shout) {
+		serializeShoutData(buffer, shout);
+		ByteBufferUtils.putVArray(buffer, shout.getSignature(), LengthType.BYTE);
+		return buffer;
+	}
 
 	/**
 	 * Serialize the Shout data (not signature).
+	 * <p>
+	 * Should be using the ByteBuffer version to avoid unnecessary data copying.
 	 * 
-	 * @param shout The Shout to serialize
-	 * @return A serialized version of this Shout
+	 * @param shout the shout to serialize
+	 * @return A serialized version of the shout
 	 */
+	@Deprecated
 	public static byte[] serializeShoutData(UnsignedShout shout) {
-		ByteBuffer buffer = ByteBuffer.allocate(MAX_SHOUT_SIZE);
-		int size = 0;
-		try {
-			// Check if parent
-			Shout parent = shout.getParent();
-			if (parent != null) {
-				// Use the LSB as a has parent flag
-				buffer.put((byte) 0x01);
-			} else {
-				buffer.put((byte) 0x00);
-			}
-			size += SINGLE_SHOUT_FLAG;
-			// Put in the 8-byte timestamp
-			long time = shout.getTimestamp().getMillis();
-			buffer.putLong(time);
-			size += TIMESTAMP_SIZE;
-
-			// Get the username as UTF-8 encoded bytes
-			byte[] username = shout.getSender().getUsername().getBytes(Shout.CHARSET_NAME);
-
-			// Get the length of the username
-			byte usernameLength = (byte) (username.length);
-
-			// Put the username length in the buffer
-			buffer.put(usernameLength);
-			size += USERNAME_LENGTH_SIZE;
-
-			// Put the username in the buffer
-			buffer.put(username);
-			size += username.length;
-
-			// Put in the sender public key
-			byte[] keyBytes = shout.getSender().getPublicKey().getEncoded();
-			buffer.put(keyBytes);
-			size += PUBLIC_KEY_SIZE;
-
-			// Serialize the message
-			String message = shout.getMessage();
-			if (message != null) {
-				// Get the message as UTF-8 encoded bytes
-				byte[] messageBytes = message.getBytes(Shout.CHARSET_NAME);
-				int messageLength = messageBytes.length;
-				// Hack to get length as unsigned two bytes
-				byte lengthByte = (byte) (messageLength);
-				buffer.put(lengthByte);
-				size += MESSAGE_LENGTH_SIZE;
-				buffer.put(messageBytes);
-				size += messageLength;
-			} else {
-				// No message, put in 0x0000 as length
-				byte zero = 0;
-				buffer.put(zero);
-				size += MESSAGE_LENGTH_SIZE;
-			}
-			// Handle the parent
-			if (parent != null) {
-				// Put in the parent signature hash
-				byte[] parentHash = parent.getHash();
-				buffer.put(parentHash);
-				size += HASH_SIZE;
-			}
-			return Arrays.copyOfRange(buffer.array(), 0, size);
-		} catch (UnsupportedEncodingException e) {
-			Log.e(TAG, e.getMessage());
-		}
-		// Should never happen
-		return null;
+		ByteBuffer buffer = ByteBuffer.allocate(SHOUT_UNSIGNED_SIZE_MAX);
+		serializeShoutData(buffer, shout);
+		return Arrays.copyOfRange(buffer.array(), 0, buffer.position());
 	}
 
 	/**
-	 * Deserialize the body of a Shout packet. Most likely you want to pass this
-	 * function the result of {@link ShoutPacket#getBodyBytes()}.
+	 * Serializes an already-signed shout.
+	 * <p>
+	 * Should be use the ByteBuffer version to avoid unnecessary data copying.
 	 * 
-	 * @param count How long the Shout chain is.
-	 * @param body The serialized Shout chain.
-	 * @return The Java object representation of this serialized Shout chain.
-	 * @throws BadShoutVersionException If the version on the Shout is unknown
-	 * @throws ShoutPacketException If the serialization does not match any know
-	 *             Shout standard
-	 * @throws InvalidShoutSignatureException If a Shout contained in
-	 *             {@code body} did not have a valid signature
+	 * @param shout the shout to serialize
+	 * @return the serialized version of the shout
 	 */
-	public static Shout deserializeShout(int count, byte[] body) throws BadShoutVersionException,
-			ShoutPacketException, InvalidShoutSignatureException {
-		/*
-		 * TODO Make everything about this function not be awful TODO Check that
-		 * the hash is equivalent to the parent hash
-		 */
-		boolean hasNext = count > 0;
-		ByteBuffer buffer = ByteBuffer.wrap(body);
-		BuildableShout shout = new BuildableShout();
-		BuildableShout child = shout;
-		int start = 0;
-		while (hasNext) {
-			try {
-				int size = 0;
-				byte versionFlag = buffer.get();
-				size += SINGLE_SHOUT_FLAG;
-				// Handle version
-				int version = (int) (versionFlag >>> HAS_PARENT_BITS);
-				if (version != 0) {
-					throw new BadShoutVersionException();
-				}
-				// Get the has_parent flag
-				int parentFlag = versionFlag & 0x01;
-				// Get the timestamp
-				long time = buffer.getLong();
-				size += TIMESTAMP_SIZE;
-				byte nameLengthByte = buffer.get();
-				size += USERNAME_LENGTH_SIZE;
-				int nameLength = (((int) nameLengthByte) & MASK);
-				byte[] nameBytes = new byte[nameLength];
-				buffer.get(nameBytes);
-				size += nameLength;
-				byte[] publicKeyBytes = new byte[PUBLIC_KEY_SIZE];
-				buffer.get(publicKeyBytes);
-				size += PUBLIC_KEY_SIZE;
-				String message = null;
-				byte messageLengthByte = buffer.get();
-				size += MESSAGE_LENGTH_SIZE;
-				int messageLength = (((int) messageLengthByte) & MASK);
-				if (messageLength > 0) {
-					byte[] messageBytes = new byte[messageLength];
-					buffer.get(messageBytes);
-					size += messageLength;
-					try {
-						message = new String(messageBytes, Shout.CHARSET_NAME);
-					} catch (UnsupportedEncodingException e) {
-						// Should never happen
-						Log.e(TAG, e.getMessage());
-						return null;
-					}
-				}
-				byte[] parentHash;
-				if (parentFlag == 1) {
-					parentHash = new byte[HASH_SIZE];
-					buffer.get(parentHash);
-					size += HASH_SIZE;
-					hasNext = true;
-				} else {
-					hasNext = false;
-				}
-				byte[] shoutData = Arrays.copyOfRange(buffer.array(), start, start + size);
-				byte signatureLengthByte = buffer.get();
-				size += SIGNATURE_LENGTH_SIZE;
-				int signatureLength = (((int) signatureLengthByte) & MASK);
-				byte[] signatureBytes = new byte[signatureLength];
-				buffer.get(signatureBytes);
-				size += signatureLength;
-				start += size;
-				BuildableUser user = new BuildableUser();
-				try {
-					user.username = new String(nameBytes, Shout.CHARSET_NAME);
-					user.publicKey = SignatureUtility.getPublicKeyFromBytes(publicKeyBytes);
-				} catch (UnsupportedEncodingException e) {
-					// Should never happen
-					Log.e(TAG, e.getMessage());
-					return null;
-				}
-				shout.timestamp = new DateTime(time);
-				shout.user = user;
-				shout.message = message;
-				shout.signature = signatureBytes;
-				shout.hash = SerializeUtility.generateHash(shoutData, signatureBytes);
-				if (hasNext) {
-					shout.parent = new BuildableShout();
-					shout = shout.parent;
-				}
-			} catch (BufferUnderflowException e) {
-				throw new ShoutPacketException();
-			}
-		}
-		return child;
+	@Deprecated
+	public static byte[] serializeShout(Shout shout) {
+		ByteBuffer buffer = ByteBuffer.allocate(SHOUT_SIGNED_SIZE_MAX);
+		serializeShout(buffer, shout);
+		return Arrays.copyOfRange(buffer.array(), 0, buffer.position());
 	}
 
 	/**
-	 * Convenience method to serialize this Shout, and then use the serialized
-	 * data bytes and signature to generate the hash, using SHA-256.
+	 * Deserializes a shout.
 	 * 
-	 * @param shout The shout to hash
-	 * @return A unique hash over the Shout and its signature
+	 * @param buffer the buffer holding the serialized shout.
+	 * @return the deserialized shout
+	 * @throws BadShoutVersionException if the serialized shout is an
+	 *             unsupported version
+	 * @throws ShoutPacketException if the serialized shout contains invalid
+	 *             data
+	 * @throws InvalidShoutSignatureException if the included signature is
+	 *             invalid
+	 */
+	public static BuildableShout deserializeShout(ByteBuffer buffer)
+			throws BadShoutVersionException,
+			ShoutPacketException, InvalidShoutSignatureException {
+		try {
+			byte flags = buffer.get(buffer.position());
+			switch (VERSION(flags)) {
+				case 0:
+					return deserializeVersion0Shout(buffer);
+				default:
+					throw new BadShoutVersionException(
+							String.format(
+									"Packet version %d is unsupported. Only version %d and below are supported.",
+									VERSION(flags), VERSION));
+			}
+		} catch (BufferUnderflowException e) {
+			throw new ShoutPacketException("Shout packet is missing expected data.", e);
+		}
+	}
+
+	/**
+	 * Deserialize a version 0 Shout.
+	 * 
+	 * @param buffer the buffer holding the serialized shout.
+	 * @return the deserialized shout
+	 * @throws ShoutPacketException if the serialized shout contains invalid
+	 *             data
+	 * @throws InvalidShoutSignatureException if the included signature is
+	 *             invalid
+	 */
+	private static BuildableShout deserializeVersion0Shout(ByteBuffer buffer)
+			throws ShoutPacketException,
+			InvalidShoutSignatureException {
+
+		BuildableUser user = new BuildableUser();
+		BuildableShout shout = new BuildableShout();
+		shout.user = user;
+
+		try {
+			buffer.order(ByteOrder.BIG_ENDIAN); // Network-byte order
+			/*
+			 * Mark the start of this shout in the buffer, so that clones made
+			 * for hash and signature operations can be reset back to the
+			 * correct starting position.
+			 */
+			buffer.mark();
+
+			// Header fields
+			byte flags = buffer.get();
+			shout.timestamp = new DateTime(buffer.getLong());
+
+			// Public Key
+			try {
+				user.publicKey = SignatureUtility.getPublicKeyFromBytes(getArray(buffer,
+						PUBLIC_KEY_SIZE));
+			} catch (InvalidKeySpecException e) {
+				throw new ShoutPacketException("Invalid key encoding in public key field.", e);
+			}
+
+			// Avatar hash
+			user.avatarHash = getArray(buffer, AVATAR_HASH_SIZE);
+
+			// Username
+			try {
+				user.username = decodeUtf8Safe(getVArray(buffer, LengthType.BYTE, 1,
+						USERNAME_SIZE_MAX));
+			} catch (CharacterCodingException e) {
+				throw new ShoutPacketException("Invalid encoding in username field.", e);
+			} catch (InvalidLengthException e) {
+				throw new ShoutPacketException("Invalid length for username field.", e);
+			}
+
+			// Message
+			try {
+				shout.message = decodeUtf8Safe(getVArray(buffer, LengthType.BYTE, 0,
+						MESSAGE_SIZE_MAX));
+			} catch (CharacterCodingException e) {
+				throw new ShoutPacketException("Invalid encoding in message field.", e);
+			} catch (InvalidLengthException e) {
+				throw new ShoutPacketException("Invalid length for message field.", e);
+			}
+
+			// Location
+			if (HAS_LOCATION(flags)) {
+				shout.longitude = buffer.getDouble();
+				shout.latitude = buffer.getDouble();
+			}
+
+			// Parent reference
+			if (HAS_PARENT(flags)) {
+				shout.parentHash = getArray(buffer, PARENT_HASH_SIZE);
+			}
+
+			/*
+			 * Create a view of the portion of the data over which the signature
+			 * is computed, for later signature verification.
+			 */
+			ByteBuffer signedData = flipToMark(buffer.asReadOnlyBuffer());
+
+			// Signature
+			shout.signature = getVArray(buffer, LengthType.BYTE);
+
+			if (!SignatureUtility.verifySignature(signedData, shout.signature, user.publicKey)) {
+				throw new InvalidShoutSignatureException();
+			}
+
+			// Compute hash
+			ByteBuffer clone = flipToMark(buffer.asReadOnlyBuffer());
+			shout.hash = HashUtils.sha256(clone);
+
+			return shout;
+		} catch (BufferUnderflowException e) {
+			throw new ShoutPacketException("Shout packet missing bytes", e);
+		}
+	}
+
+	/**
+	 * Deserializes the body of a Shout packet (including ancestors) given the
+	 * result of {@link ShoutPacket#getBodyBytes()} in a ByteBuffer.
+	 * 
+	 * @param count the number of Shouts in the chain
+	 * @param buffer the buffer containing the serialized shout sequence
+	 * @return the root of the shout chain
+	 * @throws BadShoutVersionException if a serialized shout has an unsupported
+	 *             version
+	 * @throws ShoutPacketException if a serialized shout contains invalid data
+	 * @throws InvalidShoutSignatureException if one of the included signatures
+	 *             is invalid
+	 */
+	public static Shout deserializeSequenceOfShouts(int count, ByteBuffer buffer)
+			throws BadShoutVersionException, ShoutPacketException, InvalidShoutSignatureException {
+		BuildableShout root = null;
+		BuildableShout child = null;
+		for (int idx = 0; idx < count; ++idx) {
+			// Get the next shout
+			BuildableShout shout = deserializeShout(buffer);
+
+			if (root == null) {
+				root = shout;
+			}
+
+			// Connect the parent, if needed
+			if (child != null && child.parentHash != null) {
+				if (Arrays.equals(child.parentHash, shout.hash)) {
+					child.parent = shout;
+				} else {
+					throw new ShoutPacketException(
+							"The referenced parent shout is missing from the packet.");
+				}
+			}
+
+			child = shout;
+		}
+
+		if (child.parentHash != null && child.parent == null) {
+			throw new ShoutPacketException(
+					"The referenced parent shout is missing from the packet.");
+		}
+
+		return root;
+	}
+
+	/**
+	 * Deserializes the body of a Shout packet (including ancestors) given the
+	 * result of {@link ShoutPacket#getBodyBytes()}.
+	 * 
+	 * @param count the number of Shouts in the chain
+	 * @param body the concatenation of the serialized shouts
+	 * @return the root of the shout chain
+	 * @throws BadShoutVersionException if a serialized shout has an unsupported
+	 *             version
+	 * @throws ShoutPacketException if a serialized shout contains invalid data
+	 * @throws InvalidShoutSignatureException if one of the included signatures
+	 *             is invalid
+	 */
+	@Deprecated
+	public static Shout deserializeSequenceOfShouts(int count, byte[] body)
+			throws BadShoutVersionException, ShoutPacketException, InvalidShoutSignatureException {
+		return deserializeSequenceOfShouts(count, ByteBuffer.wrap(body));
+	}
+
+	/**
+	 * Generates the hash of the provided signed shout.
+	 * 
+	 * @param shout the shout to hash
+	 * @return the hash of the provied shout
 	 */
 	public static byte[] generateHash(Shout shout) {
-		byte[] dataBytes = serializeShoutData(shout);
-		byte[] signatureBytes = shout.getSignature();
-		return generateHash(dataBytes, signatureBytes);
-	}
-
-	/**
-	 * Generate a hash over the serialized data bytes and the signature bytes
-	 * using SHA-256. The hash is over the concatenation of
-	 * {@code data + ((byte) signature.length) + signature}.
-	 * 
-	 * @param data The serialized data bytes.
-	 * @param signature The serialized signature bytes
-	 * @return A unique hash over data and signature.
-	 */
-	public static byte[] generateHash(byte[] data, byte[] signature) {
-		byte lengthByte = (byte) (signature.length);
-		ByteBuffer buffer = ByteBuffer.allocate(data.length + 1 + signature.length);
-		buffer.put(data);
-		buffer.put(lengthByte);
-		buffer.put(signature);
-		try {
-			MessageDigest md = MessageDigest.getInstance(HASH_ALGORITHM);
-			md.update(buffer.array());
-			return md.digest();
-		} catch (NoSuchAlgorithmException e) {
-			Log.e(TAG, e.getMessage());
-		}
-		// Should never happen
-		return null;
+		ByteBuffer serialized = serializeShout(ByteBuffer.allocate(SHOUT_SIGNED_SIZE_MAX),
+				shout);
+		serialized.flip();
+		return HashUtils.sha256(serialized);
 	}
 
 	private static class BuildableUser implements User {
 
 		String username;
 		ECPublicKey publicKey;
+		@SuppressWarnings("unused")
+		byte[] avatarHash;
 
 		@Override
 		public String getUsername() {
@@ -290,10 +456,18 @@ public class SerializeUtility {
 
 	private static class BuildableShout implements Shout {
 
-		User user = null;
-		String message = null;
 		DateTime timestamp = null;
+		User user = null;
+
+		String message = null;
+		@SuppressWarnings("unused")
+		Double longitude = null;
+		@SuppressWarnings("unused")
+		Double latitude = null;
+
 		BuildableShout parent = null;
+		byte[] parentHash = null;
+
 		byte[] signature = null;
 		byte[] hash = null;
 

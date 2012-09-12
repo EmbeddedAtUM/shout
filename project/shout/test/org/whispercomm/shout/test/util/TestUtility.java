@@ -5,9 +5,15 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.MalformedInputException;
+import java.nio.charset.UnmappableCharacterException;
+
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.Tag;
 import org.whispercomm.shout.User;
+import org.whispercomm.shout.util.CharUtils;
+import org.whispercomm.shout.util.Encoders;
 
 public class TestUtility {
 
@@ -42,8 +48,8 @@ public class TestUtility {
 		assertEquals(lhs.getSender().getUsername(), rhs.getSender().getUsername());
 		assertEquals(lhs.getSender().getPublicKey(), rhs.getSender().getPublicKey());
 		assertArrayEquals(lhs.getSignature(), rhs.getSignature());
-		assertArrayEquals(lhs.getHash(), rhs.getHash());
 		assertArrayEquals(lhs.getSender().getPublicKey().getEncoded(), rhs.getSender().getPublicKey().getEncoded());
+		assertArrayEquals(lhs.getHash(), rhs.getHash());
 		testEqualShoutFields(lhs.getParent(), rhs.getParent());
 	}
 

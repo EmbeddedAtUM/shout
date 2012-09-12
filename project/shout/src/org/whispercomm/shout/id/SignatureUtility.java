@@ -1,6 +1,7 @@
 
 package org.whispercomm.shout.id;
 
+import java.nio.ByteBuffer;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
@@ -26,13 +27,13 @@ import org.whispercomm.shout.serialization.SerializeUtility;
 import android.util.Log;
 
 public class SignatureUtility {
+	private static final String TAG = SignatureUtility.class.getSimpleName();
 
 	public static final String ECC_PARAMS = "secp256r1";
 	public static final String CRYPTO_ALGO = "ECDSA";
 	public static final String CRYPTO_PROVIDER = "SC";
 	public static final String SIGN_ALGORITHM = "SHA256withECDSA";
 	public static final String HASH_ALGO = "SHA-256";
-	private static final String TAG = SignatureUtility.class.getSimpleName();
 
 	static {
 		Security.addProvider(new BouncyCastleProvider());
@@ -69,9 +70,11 @@ public class SignatureUtility {
 	 * Get ECPublicKey from X.509 encoded bytes.
 	 * 
 	 * @param publicKeyBytes
-	 * @return {@code null} on failure
+	 * @return the public key
+	 * @throws InvalidKeySpecException
 	 */
-	public static ECPublicKey getPublicKeyFromBytes(byte[] publicKeyBytes) {
+	public static ECPublicKey getPublicKeyFromBytes(byte[] publicKeyBytes)
+			throws InvalidKeySpecException {
 		try {
 			KeyFactory kf = KeyFactory
 					.getInstance(CRYPTO_ALGO, CRYPTO_PROVIDER);
@@ -79,13 +82,12 @@ public class SignatureUtility {
 			ECPublicKey pubKey = (ECPublicKey) kf.generatePublic(x509ks);
 			return pubKey;
 		} catch (NoSuchAlgorithmException e) {
-			Log.e(TAG, e.getMessage());
+			// Should not occur. Testing will catch invalid algorithms.
+			throw new RuntimeException(e);
 		} catch (NoSuchProviderException e) {
-			Log.e(TAG, e.getMessage());
-		} catch (InvalidKeySpecException e) {
-			Log.e(TAG, e.getMessage());
+			// Should not occur. Testing will catch missing providers.
+			throw new RuntimeException(e);
 		}
-		return null;
 	}
 
 	/**
@@ -93,8 +95,10 @@ public class SignatureUtility {
 	 * 
 	 * @param privateKeyBytes
 	 * @return {@code null} on failure
+	 * @throws InvalidKeySpecException
 	 */
-	public static ECPrivateKey getPrivateKeyFromBytes(byte[] privateKeyBytes) {
+	public static ECPrivateKey getPrivateKeyFromBytes(byte[] privateKeyBytes)
+			throws InvalidKeySpecException {
 		try {
 			KeyFactory kf = KeyFactory
 					.getInstance(CRYPTO_ALGO, CRYPTO_PROVIDER);
@@ -102,13 +106,36 @@ public class SignatureUtility {
 			ECPrivateKey privateKey = (ECPrivateKey) kf.generatePrivate(p8ks);
 			return privateKey;
 		} catch (NoSuchAlgorithmException e) {
-			Log.e(TAG, e.getMessage());
+			// Should not occur. Testing will catch invalid algorithms.
+			throw new RuntimeException(e);
 		} catch (NoSuchProviderException e) {
-			Log.e(TAG, e.getMessage());
-		} catch (InvalidKeySpecException e) {
-			Log.e(TAG, e.getMessage());
+			// Should not occur. Testing will catch missing providers.
+			throw new RuntimeException(e);
 		}
-		return null;
+	}
+
+	public static boolean verifySignature(ByteBuffer data, byte[] signature, ECPublicKey publicKey) {
+		try {
+			Signature verifier = Signature.getInstance(SIGN_ALGORITHM, CRYPTO_PROVIDER);
+			verifier.initVerify(publicKey);
+			verifier.update(data);
+			return verifier.verify(signature);
+		} catch (SignatureException e) {
+			// Can occur if the signature data is not a valid encoded signature.
+			// TODO: Store signature numbers in packets, not some ASN.1
+			// encoding.
+			Log.i(TAG, "SignatureException when verifying shout signature.", e);
+			return false;
+		} catch (InvalidKeyException e) {
+			// Should not occur. Testing will catch key/algorithm mismatches.
+			throw new RuntimeException(e);
+		} catch (NoSuchAlgorithmException e) {
+			// Should not occur. Testing will catch missing algorithms.
+			throw new RuntimeException(e);
+		} catch (NoSuchProviderException e) {
+			// Should not occur. Testing will catch missing providers.
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**
@@ -122,6 +149,7 @@ public class SignatureUtility {
 	 * @throws InvalidKeyException
 	 * @throws SignatureException
 	 */
+	@Deprecated
 	public static boolean verifySignature(byte[] data, byte[] dataSignature,
 			ECPublicKey pubKey) {
 		try {
@@ -162,6 +190,7 @@ public class SignatureUtility {
 		} catch (SignatureException e) {
 			Log.e(TAG, e.getMessage());
 		}
+		// TODO: Convert should-never-happen execptions to RuntimeExceptions.
 		// Should never happen
 		return null;
 	}

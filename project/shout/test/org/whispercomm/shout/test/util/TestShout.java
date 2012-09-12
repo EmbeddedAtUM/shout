@@ -17,11 +17,6 @@ public class TestShout extends TestUnsignedShout implements Shout {
 		this.hash = hash;
 	}
 
-	public TestShout(User user, String message, DateTime timestamp, Shout parent,
-			byte[] signature, byte[] hash) {
-		this(user, parent, message, timestamp, signature, hash);
-	}
-
 	@Override
 	public byte[] getHash() {
 		return hash;

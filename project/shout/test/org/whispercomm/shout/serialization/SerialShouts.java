@@ -53,25 +53,25 @@ public class SerialShouts {
 	 */
 	public static Shout GRANDPARENT = new TestShout(
 			GRANDPARENT_USER,
+			null,
 			"٩(-̮̮̃-̃)۶: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus congue rutrum quam quis sollicitudin.",
 			new DateTime(2010, 9, 8, 7, 6, 5, DateTimeZone.UTC),
-			null,
 			Hex.decode("304402205fdfb5963542a59ebb68771063c3117d4a63b080743ce8707d53ab80a70c21ff02204a091e4394ab2b95c1eb201694f35ac84993e9b85a6b5fb78e009e3ba380e7a9"),
 			Hex.decode("9C019522796E25E742AEDFBA0844A1EF344F4897F88BFABD39365A553941F137"));
 
 	public static Shout PARENT = new TestShout(
 			PARENT_USER,
+			GRANDPARENT,
 			"٩(-̮̮̃•̃): Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti. Etiam a dui ut dolor pellentesque faucibus in vitae nibh.",
 			new DateTime(2011, 10, 9, 8, 7, 6, 5, DateTimeZone.UTC),
-			GRANDPARENT,
 			Hex.decode("30450220453471c42d032fd8ee1708d70644da4c99c72f797479199796527172df0598d8022100af718b5e41e3f4437780ef57325dca25ff3ee35332f9539621e9e7d3cdab238b"),
 			Hex.decode("1A604881053AE042E1A5DC02ED0D275B9206AF00EDE5399739510B91CDC348E8"));
 
 	public static Shout CHILD = new TestShout(
 			CHILD_USER,
+			PARENT,
 			"٩(͡๏̯͡๏)۶: Sed vehicula placerat velit, sed pretium lacus luctus tincidunt. Vestibulum suscipit elit et turpis tristique lobortis.",
 			new DateTime(2012, 11, 10, 9, 8, 7, DateTimeZone.UTC),
-			PARENT,
 			Hex.decode("304402203e00d21a26028659e2c1b46a8fb27d0fe307204afe289d8ff74f588ddf372aef02206e559b2c993cd8928e67949241067957863d60a644c291325121b2244b8eec29"),
 			Hex.decode("B2E74FC24E02A31CF8DF4F2826F2CD0E97B68F876E3AC85A30E51F9A26A144EB"));
 

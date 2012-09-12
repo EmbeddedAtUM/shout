@@ -4,6 +4,7 @@ package org.whispercomm.shout.id;
 import java.security.KeyPair;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
+import java.security.spec.InvalidKeySpecException;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -44,12 +45,25 @@ public class KeyStorageSharedPrefs implements KeyStorage {
 		if (isEmpty()) {
 			throw new UserNotInitiatedException();
 		}
+
 		String encodedPublicKey = sharedPrefs.getString(KEY_PUBLIC, null);
 		String encodedPrivateKey = sharedPrefs.getString(KEY_PRIVATE, null);
 		byte[] publicKeyBytes = Base64.decode(encodedPublicKey, Base64.DEFAULT);
 		byte[] privateKeyBytes = Base64.decode(encodedPrivateKey, Base64.DEFAULT);
-		ECPublicKey publicKey = SignatureUtility.getPublicKeyFromBytes(publicKeyBytes);
-		ECPrivateKey privateKey = SignatureUtility.getPrivateKeyFromBytes(privateKeyBytes);
+		ECPublicKey publicKey;
+		try {
+			publicKey = SignatureUtility.getPublicKeyFromBytes(publicKeyBytes);
+		} catch (InvalidKeySpecException e) {
+			// TODO: Figure out what to do about this.
+			throw new RuntimeException("Could not decode the stored public key.", e);
+		}
+		ECPrivateKey privateKey;
+		try {
+			privateKey = SignatureUtility.getPrivateKeyFromBytes(privateKeyBytes);
+		} catch (InvalidKeySpecException e) {
+			// TODO: Figure out what to do about this.
+			throw new RuntimeException("Could not decode the stored private key.", e);
+		}
 		return new KeyPair(publicKey, privateKey);
 	}
 

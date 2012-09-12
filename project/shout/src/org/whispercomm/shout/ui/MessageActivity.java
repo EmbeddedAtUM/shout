@@ -96,7 +96,7 @@ public class MessageActivity extends AbstractShoutActivity {
 
 		edtMessage.setFilters(new InputFilter[] {
 				new Utf8ByteLengthFilter(
-						SerializeUtility.MAX_MESSAGE_SIZE)
+						SerializeUtility.MESSAGE_SIZE_MAX)
 		});
 		edtMessage.addTextChangedListener(new EditMessageWatcher());
 		btnSend.setEnabled(false);
