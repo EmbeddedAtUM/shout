@@ -2,26 +2,36 @@ Shout Serialization Version 0
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Shout:            ||====================||
-(max 415 bytes)   || version || flags   || |   0-3   |     4      | 5 | 6 | 7 | 
-                  || (1 byte)           || | version | has_parent |   |   |   |
+(max 415 bytes)   || version || flags   || |   0-3   |     4        | 5          | 6 | 7 | 
+                  || (1 byte)           || | version | has_location | has_parent |   |   |
                   ||====================||
                   || time               ||
                   || (8 bytes)          ||
-                  ||--------------------|| 
+                  ||====================||
+                  || sender_pub_key*    ||
+                  || (91 bytes)         ||
+                  ||--------------------||
+                  || avatar_hash        ||
+                  || (32 bytes)         ||
+                  ||--------------------||
                   || sender_name_len*   ||
                   || (1 byte)           ||
                   ||--------------------||
                   || sender_name*       ||
                   || (max 40 bytes)     ||
-                  ||--------------------||
-                  || sender_pub_key*    ||
-                  || (91 bytes)         ||
-                  ||--------------------||
+                  ||====================||
                   || message_len*       ||
                   || (1 byte)           ||
                   ||--------------------||
                   || message*           ||
                   || (max 240 bytes)    ||
+                  ||--------------------||
+                  || longitude*         ||
+                  || (8 or 0 bytes)     ||
+                  ||--------------------||
+                  || longitude*         ||
+                  || (8 or 0 bytes)     ||
+                  ||--------------------||
                   || parent_hash*       ||
                   || (32 or 0 bytes)    ||
 "signature"       ||====================||
