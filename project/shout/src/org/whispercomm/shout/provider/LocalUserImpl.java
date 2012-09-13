@@ -33,7 +33,7 @@ public class LocalUserImpl implements LocalUser {
 	@Override
 	public ECPublicKey getPublicKey() {
 		try {
-			return SignatureUtility.getPublicKeyFromBytes(keyBytes);
+			return SignatureUtility.generatePublic(keyBytes);
 		} catch (InvalidKeySpecException e) {
 			// TODO: Figure out what to do about this
 			throw new RuntimeException(e);

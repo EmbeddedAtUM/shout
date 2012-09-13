@@ -63,7 +63,7 @@ public class KeyStorageImplTest {
 	@Test
 	public void testReadWriteKeyPair() {
 		try {
-			KeyPair keyPair = SignatureUtility.generateECKeyPair();
+			KeyPair keyPair = SignatureUtility.generateKeyPair();
 			boolean status = keyStore.writeMe(username, keyPair);
 			assertTrue(status);
 			assertFalse(keyStore.isEmpty());
@@ -79,7 +79,7 @@ public class KeyStorageImplTest {
 
 	@Test
 	public void testReadWriteUsername() {
-		KeyPair keyPair = SignatureUtility.generateECKeyPair();
+		KeyPair keyPair = SignatureUtility.generateKeyPair();
 		boolean status = keyStore.writeMe(username, keyPair);
 		assertTrue(status);
 		assertFalse(keyStore.isEmpty());

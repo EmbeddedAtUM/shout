@@ -52,7 +52,7 @@ public class KeyStorageSharedPrefs implements KeyStorage {
 		byte[] privateKeyBytes = Base64.decode(encodedPrivateKey, Base64.DEFAULT);
 		ECPublicKey publicKey;
 		try {
-			publicKey = SignatureUtility.getPublicKeyFromBytes(publicKeyBytes);
+			publicKey = SignatureUtility.generatePublic(publicKeyBytes);
 		} catch (InvalidKeySpecException e) {
 			// TODO: Figure out what to do about this.
 			throw new RuntimeException("Could not decode the stored public key.", e);

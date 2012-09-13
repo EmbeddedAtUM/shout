@@ -15,7 +15,6 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
-import java.security.spec.ECGenParameterSpec;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.ECPoint;
 import java.security.spec.ECPublicKeySpec;
@@ -90,6 +89,32 @@ public class SignatureUtility {
 		throw new IllegalStateException("Cannot instantiate SignatureUtility.");
 	}
 
+	/*
+	 * Key Generation methods
+	 */
+	/**
+	 * Generates a new random {@link KeyPair} from the default curve.
+	 * 
+	 * @return the new key pair
+	 */
+	public static KeyPair generateKeyPair() {
+		try {
+			KeyPairGenerator kpg = KeyPairGenerator.getInstance(CRYPTO_ALGORITHM,
+					CRYPTO_PROVIDER);
+			kpg.initialize(EC_PARAMS);
+			return kpg.generateKeyPair();
+		} catch (InvalidAlgorithmParameterException e) {
+			// Should not happen. Testing will catch invalid parameter specs.
+			throw new RuntimeException(e);
+		} catch (NoSuchAlgorithmException e) {
+			// Should not happen. Testing will catch a missing algorithm.
+			throw new RuntimeException(e);
+		} catch (NoSuchProviderException e) {
+			// Should not happen. Testing will catch a missing provider.
+			throw new RuntimeException(e);
+		}
+	}
+
 	/**
 	 * Generates an {@link ECPublicKey} for the default curve from the provided
 	 * affine coordinates.
@@ -117,42 +142,20 @@ public class SignatureUtility {
 		}
 	}
 
-	public static KeyPair generateECKeyPair() {
-		try {
-			ECGenParameterSpec ecParamSpec = new ECGenParameterSpec(EC_PARAM_NAME);
-			KeyPairGenerator kpg;
-			kpg = KeyPairGenerator.getInstance(CRYPTO_ALGORITHM,
-					CRYPTO_PROVIDER);
-			kpg.initialize(ecParamSpec);
-			KeyPair keyPair = kpg.generateKeyPair();
-			return keyPair;
-		} catch (InvalidAlgorithmParameterException e) {
-			Log.e(TAG, e.getMessage());
-		} catch (NoSuchAlgorithmException e) {
-			Log.e(TAG, e.getMessage());
-		} catch (NoSuchProviderException e) {
-			Log.e(TAG, e.getMessage());
-		}
-		// TODO: Convert should-never-happen exceptions to RuntimeExceptions
-		// Should never happen
-		return null;
-	}
-
 	/**
-	 * Get ECPublicKey from X.509 encoded bytes.
+	 * Generates an {@link ECPublicKey} from the provided X.509-encoded bytes.
 	 * 
-	 * @param publicKeyBytes
+	 * @param encoded the X.509 encoding of the public key
 	 * @return the public key
-	 * @throws InvalidKeySpecException
+	 * @throws InvalidKeySpecException if the bytes are not an X.509 encoding of
+	 *             a valid public key
 	 */
-	public static ECPublicKey getPublicKeyFromBytes(byte[] publicKeyBytes)
+	public static ECPublicKey generatePublic(byte[] encoded)
 			throws InvalidKeySpecException {
 		try {
 			KeyFactory kf = KeyFactory
 					.getInstance(CRYPTO_ALGORITHM, CRYPTO_PROVIDER);
-			X509EncodedKeySpec x509ks = new X509EncodedKeySpec(publicKeyBytes);
-			ECPublicKey pubKey = (ECPublicKey) kf.generatePublic(x509ks);
-			return pubKey;
+			return (ECPublicKey) kf.generatePublic(new X509EncodedKeySpec(encoded));
 		} catch (NoSuchAlgorithmException e) {
 			// Should not occur. Testing will catch invalid algorithms.
 			throw new RuntimeException(e);
@@ -163,20 +166,19 @@ public class SignatureUtility {
 	}
 
 	/**
-	 * Get private key from PKCS8 encoded bytes
+	 * Generates an {@link ECPrivateKey} from the provdied PKCS8-encoded bytes.
 	 * 
-	 * @param privateKeyBytes
-	 * @return {@code null} on failure
-	 * @throws InvalidKeySpecException
+	 * @param encoded the PKCS8 encoding of the private key
+	 * @return the private key
+	 * @throws InvalidKeySpecException if the bytes are not a PKCS8 encoding of
+	 *             a valid private key
 	 */
-	public static ECPrivateKey getPrivateKeyFromBytes(byte[] privateKeyBytes)
+	public static ECPrivateKey getPrivateKeyFromBytes(byte[] encoded)
 			throws InvalidKeySpecException {
 		try {
 			KeyFactory kf = KeyFactory
 					.getInstance(CRYPTO_ALGORITHM, CRYPTO_PROVIDER);
-			PKCS8EncodedKeySpec p8ks = new PKCS8EncodedKeySpec(privateKeyBytes);
-			ECPrivateKey privateKey = (ECPrivateKey) kf.generatePrivate(p8ks);
-			return privateKey;
+			return (ECPrivateKey) kf.generatePrivate(new PKCS8EncodedKeySpec(encoded));
 		} catch (NoSuchAlgorithmException e) {
 			// Should not occur. Testing will catch invalid algorithms.
 			throw new RuntimeException(e);
@@ -210,6 +212,9 @@ public class SignatureUtility {
 		}
 	}
 
+	/*
+	 * Signature methods
+	 */
 	/**
 	 * Verify the signature of data using pubKey.
 	 * 
@@ -229,44 +234,68 @@ public class SignatureUtility {
 					CRYPTO_PROVIDER);
 			signature.initVerify(pubKey);
 			signature.update(data);
-			boolean result = signature.verify(dataSignature);
-			return result;
-		} catch (NoSuchAlgorithmException e) {
-			Log.e(TAG, e.getMessage());
-		} catch (InvalidKeyException e) {
-			Log.e(TAG, e.getMessage());
+			return signature.verify(dataSignature);
 		} catch (SignatureException e) {
-			Log.e(TAG, e.getMessage());
+			// Can occur if the signature data is not a valid encoded signature.
+			// TODO: Store signature numbers in packets, not some ASN.1
+			// encoding.
+			Log.i(TAG, "SignatureException when verifying shout signature.", e);
+			return false;
+		} catch (NoSuchAlgorithmException e) {
+			// Should not happen. Testing will catch missing algorithms.
+			throw new RuntimeException(e);
 		} catch (NoSuchProviderException e) {
-			Log.e(TAG, e.getMessage());
+			// Should not happen. Testing will catch missing providers.
+			throw new RuntimeException(e);
+		} catch (InvalidKeyException e) {
+			// Should not happen. A non-default-curve key to be passed
+			// to this method indicates a bug in the key-deserializing code.
+			throw new RuntimeException(e);
 		}
-		Log.v(TAG, "Exception thrown");
-		return false;
 	}
 
-	public static byte[] generateSignature(byte[] dataBytes, Me me) {
-		ECPrivateKey privateKey = (ECPrivateKey) me.getKeyPair().getPrivate();
+	/**
+	 * Generates the signature for the given array of bytes, using the private
+	 * key of the given {@code Me}.
+	 * 
+	 * @param data the data to sign
+	 * @param me the Me whose key with which to sign
+	 * @return the signature
+	 */
+	private static byte[] generateSignature(byte[] data, Me me) {
 		try {
+			ECPrivateKey privateKey = (ECPrivateKey) me.getKeyPair().getPrivate();
 			Signature signature = Signature.getInstance(SIGNING_ALGORITHM,
 					CRYPTO_PROVIDER);
 			signature.initSign(privateKey);
-			signature.update(dataBytes);
-			byte[] dataSignature = signature.sign();
-			return dataSignature;
+			signature.update(data);
+			return signature.sign();
 		} catch (NoSuchAlgorithmException e) {
-			Log.e(TAG, e.getMessage());
+			// Should not happen. Testing will catch missing algorithms.
+			throw new RuntimeException(e);
 		} catch (NoSuchProviderException e) {
-			Log.e(TAG, e.getMessage());
-		} catch (InvalidKeyException e) {
-			Log.e(TAG, e.getMessage());
+			// Should not happen. Testing will catch missing providers.
+			throw new RuntimeException(e);
 		} catch (SignatureException e) {
-			Log.e(TAG, e.getMessage());
+			// Should not happen. Testing will catch if the Signature instance
+			// is
+			// not configured properly.
+			throw new RuntimeException(e);
+		} catch (InvalidKeyException e) {
+			// Should not happen. A non-default-curve key to be passed
+			// to this method indicates a bug in the key-deserializing code.
+			throw new RuntimeException(e);
 		}
-		// TODO: Convert should-never-happen execptions to RuntimeExceptions.
-		// Should never happen
-		return null;
 	}
 
+	/**
+	 * Generates the signature for the given shout, using the private key of the
+	 * given {@code Me}.
+	 * 
+	 * @param shout the shout to sign
+	 * @param me the Me whose key with which to sign
+	 * @return the signature
+	 */
 	public static byte[] generateSignature(UnsignedShout shout, Me me) {
 		byte[] dataBytes = SerializeUtility.serializeShoutData(shout);
 		return generateSignature(dataBytes, me);

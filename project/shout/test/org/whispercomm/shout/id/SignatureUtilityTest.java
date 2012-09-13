@@ -3,7 +3,6 @@ package org.whispercomm.shout.id;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.security.interfaces.ECPrivateKey;
@@ -46,7 +45,7 @@ public class SignatureUtilityTest {
 	@Test
 	public void testGetPublicKeyFromBytes() throws InvalidKeySpecException {
 		byte[] keyBytes = publicKey.getEncoded();
-		ECPublicKey fromBytes = SignatureUtility.getPublicKeyFromBytes(keyBytes);
+		ECPublicKey fromBytes = SignatureUtility.generatePublic(keyBytes);
 		assertEquals(publicKey, fromBytes);
 	}
 
@@ -55,20 +54,6 @@ public class SignatureUtilityTest {
 		byte[] keyBytes = privateKey.getEncoded();
 		ECPrivateKey fromBytes = SignatureUtility.getPrivateKeyFromBytes(keyBytes);
 		assertEquals(privateKey, fromBytes);
-	}
-
-	@Test
-	public void testSignatureParametersDoNotThrowExceptions() {
-		byte[] dataBytes = TestFactory.genByteArray(1000);
-		byte[] signature = SignatureUtility.generateSignature(dataBytes, me);
-		assertNotNull(signature);
-	}
-
-	@Test
-	public void testValidSignatureIsValid() {
-		byte[] dataBytes = TestFactory.genByteArray(1000);
-		byte[] signature = SignatureUtility.generateSignature(dataBytes, me);
-		assertTrue(SignatureUtility.verifySignature(dataBytes, signature, me.getPublicKey()));
 	}
 
 	@Test

@@ -22,7 +22,7 @@ public class LazyLocalUserImpl implements LocalUser {
 		this.context = context;
 		byte[] keyBytes = Base64.decode(encodedAuthor, Base64.DEFAULT);
 		try {
-			this.key = SignatureUtility.getPublicKeyFromBytes(keyBytes);
+			this.key = SignatureUtility.generatePublic(keyBytes);
 		} catch (InvalidKeySpecException e) {
 			// TODO: Figure out what to do about this
 			throw new RuntimeException(e);

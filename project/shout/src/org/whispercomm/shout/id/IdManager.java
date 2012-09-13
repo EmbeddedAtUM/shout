@@ -33,7 +33,7 @@ public class IdManager {
 		}
 		newUsername = Validators.removeTrailingSpaces(newUsername);
 		// Generate a new key pair
-		KeyPair newKeyPair = SignatureUtility.generateECKeyPair();
+		KeyPair newKeyPair = SignatureUtility.generateKeyPair();
 		// Write the username, key pair tuple
 		keyStorage.writeMe(newUsername, newKeyPair);
 		return;
