@@ -20,7 +20,6 @@ import org.whispercomm.shout.User;
 import org.whispercomm.shout.test.ShoutTestRunner;
 import org.whispercomm.shout.test.util.TestFactory;
 import org.whispercomm.shout.test.util.TestShout;
-import org.whispercomm.shout.test.util.TestUser;
 import org.whispercomm.shout.test.util.TestUtility;
 
 import android.app.Activity;
@@ -41,7 +40,7 @@ public class ShoutSearchContractTest {
 
 	@Before
 	public void setUp() {
-		this.sender = new TestUser("dadrian");
+		this.sender = TestFactory.TEST_USER_1;
 		this.context = new Activity();
 		shouts = new ArrayList<Shout>();
 		for (int i = 0; i < 5; i++) {

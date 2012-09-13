@@ -158,42 +158,6 @@ public class TestFactory {
 			TEST_ME_3);
 
 	/**
-	 * Generate a valid EC key pair
-	 */
-	public static KeyPair genKeyPair() {
-		ECGenParameterSpec ecParamSpec = new ECGenParameterSpec(
-				SignatureUtility.ECC_PARAMS);
-		KeyPairGenerator kpg;
-		try {
-			kpg = KeyPairGenerator.getInstance(
-					SignatureUtility.CRYPTO_ALGO, SignatureUtility.CRYPTO_PROVIDER);
-			kpg.initialize(ecParamSpec);
-			KeyPair kpA = kpg.generateKeyPair();
-			return kpA;
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		} catch (NoSuchProviderException e) {
-			e.printStackTrace();
-		} catch (InvalidAlgorithmParameterException e) {
-			e.printStackTrace();
-		}
-		fail("Test writer is a failure at generating Key Pairs");
-		return null;
-	}
-
-	/**
-	 * Generate an ECPublicKey by generating a valid key pair, then dropping the
-	 * private key and returning the public key
-	 * 
-	 * @return Valid ECPublicKey
-	 */
-	public static ECPublicKey genPublicKey() {
-		KeyPair keyPair = genKeyPair();
-		ECPublicKey pubKey = (ECPublicKey) keyPair.getPublic();
-		return pubKey;
-	}
-
-	/**
 	 * Generate a unique, random byte array of a given size
 	 * 
 	 * @param size

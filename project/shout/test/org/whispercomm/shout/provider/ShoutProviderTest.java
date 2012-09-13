@@ -13,10 +13,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.whispercomm.shout.User;
 import org.whispercomm.shout.test.ShoutTestRunner;
 import org.whispercomm.shout.test.util.TestFactory;
 import org.whispercomm.shout.test.util.TestShout;
-import org.whispercomm.shout.test.util.TestUser;
 
 import android.app.Activity;
 import android.content.ContentResolver;
@@ -32,7 +32,7 @@ public class ShoutProviderTest {
 
 	private Context context;
 	private ContentResolver cr;
-	private TestUser user;
+	private User user;
 	private String base64Key;
 	private TestShout shout;
 	private String base64Hash;
@@ -45,13 +45,13 @@ public class ShoutProviderTest {
 	public void setUp() {
 		this.context = new Activity();
 		this.cr = context.getContentResolver();
-		this.user = new TestUser("dadrian");
+		this.user = TestFactory.TEST_USER_1;
 		this.base64Key = Base64.encodeToString(user.getPublicKey().getEncoded(), Base64.DEFAULT);
 		this.shout = new TestShout(user, null, "Hello Database", DateTime.now(),
 				TestFactory.genByteArray(71), TestFactory.genByteArray(32));
 		this.base64Hash = Base64.encodeToString(shout.hash, Base64.DEFAULT);
-		this.userLocation = ProviderTestUtility.insertIntoUserTable(cr, user.username,
-				user.ecPubKey.getEncoded());
+		this.userLocation = ProviderTestUtility.insertIntoUserTable(cr, user.getUsername(),
+				user.getPublicKey().getEncoded());
 		this.shoutLocation = ProviderTestUtility.insertIntoShoutTable(cr, shout.sender
 				.getPublicKey().getEncoded(), null, shout.message, shout.timestamp.getMillis(),
 				shout.signature, shout.hash);
@@ -79,10 +79,11 @@ public class ShoutProviderTest {
 		assertEquals(userId, newId);
 
 		String encodedKey = cursor.getString(keyIndex);
-		assertArrayEquals(user.ecPubKey.getEncoded(), Base64.decode(encodedKey, Base64.DEFAULT));
+		assertArrayEquals(user.getPublicKey().getEncoded(),
+				Base64.decode(encodedKey, Base64.DEFAULT));
 
 		String username = cursor.getString(nameIndex);
-		assertEquals(user.username, username);
+		assertEquals(user.getUsername(), username);
 
 		assertFalse(cursor.moveToNext());
 	}
@@ -170,7 +171,8 @@ public class ShoutProviderTest {
 	@Test
 	public void testInsertDuplicateUserDoesNothing() {
 		try {
-			ProviderTestUtility.insertIntoUserTable(cr, user.username, user.ecPubKey.getEncoded());
+			ProviderTestUtility.insertIntoUserTable(cr, user.getUsername(), user.getPublicKey()
+					.getEncoded());
 		} catch (SQLException e) {
 			fail("Inserting a duplicate should not throw an exception");
 		}

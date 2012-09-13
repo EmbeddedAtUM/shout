@@ -15,7 +15,6 @@ import org.whispercomm.shout.User;
 import org.whispercomm.shout.test.ShoutTestRunner;
 import org.whispercomm.shout.test.util.TestFactory;
 import org.whispercomm.shout.test.util.TestShout;
-import org.whispercomm.shout.test.util.TestUser;
 import org.whispercomm.shout.test.util.TestUtility;
 
 import android.app.Activity;
@@ -24,7 +23,6 @@ import android.content.Context;
 @RunWith(ShoutTestRunner.class)
 public class ShoutProviderContractTest {
 
-	private static final String NAME = "duiu";
 	private static final String MESSAGE = "Can you repeat the part of the stuff where you said all about the things?";
 	private static final long TIME = 8675309L;
 	private static final byte[] SIGNATURE = TestFactory.genByteArray(10);
@@ -37,7 +35,7 @@ public class ShoutProviderContractTest {
 	@Before
 	public void setUp() {
 		this.context = new Activity();
-		this.testUser = new TestUser(NAME);
+		this.testUser = TestFactory.TEST_USER_1;
 		this.testShout = new TestShout(testUser, null, MESSAGE, new DateTime(TIME), SIGNATURE, HASH);
 	}
 
@@ -73,7 +71,7 @@ public class ShoutProviderContractTest {
 
 	@Test
 	public void testStoreShoutWithParent() {
-		User sender = new TestUser("drbeagle");
+		User sender = TestFactory.TEST_USER_1;
 		Shout withParent = new TestShout(sender, testShout,
 				"This is what happens when you Google people you work with", new DateTime(),
 				TestFactory.genByteArray(10), TestFactory.genByteArray(10));

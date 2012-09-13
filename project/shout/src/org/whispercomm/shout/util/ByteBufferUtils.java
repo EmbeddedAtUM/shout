@@ -1,6 +1,7 @@
 
 package org.whispercomm.shout.util;
 
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 
 /**
@@ -166,6 +167,65 @@ public class ByteBufferUtils {
 		return getArray(buffer, len);
 	}
 
+	/**
+	 * Serializes a {@link BigInteger} into the given buffer, padding with sign
+	 * extension bits up to the specified length. If the value is unsigned,
+	 * extraneous leading zero byte are removed, up to the required padding.
+	 * 
+	 * @param buffer the buffer to which to serialize the integer
+	 * @param value the integer to serialize
+	 * @param len the number of bytes to fill
+	 * @param unsigned {@code true} if {@code value} should be treated as
+	 *            unsigned
+	 * @return the provided buffer
+	 */
+	public static ByteBuffer putBigInteger(ByteBuffer buffer, BigInteger value,
+			int len, boolean unsigned) {
+		// Get the value in big endian 2's complement.
+		byte[] data = value.toByteArray();
+
+		// If unsigned, don't store the extra 0 byte that contains the sign-bit,
+		// if it exists.
+		int startIdx = 0;
+		if (unsigned && data[0] == 0) {
+			startIdx = 1;
+		}
+
+		// Ensure the requested length is large enough
+		int dataLen = data.length - startIdx;
+		if (dataLen > len) {
+			throw new IllegalArgumentException(String.format(
+					"Argument len too small. Got: %d.  Must be at least: %d.", len, dataLen));
+		}
+
+		// Insert padding first, for big endian
+		int padLen = len - dataLen;
+		byte padValue = (byte) (data[0] >> 7);
+		for (int i = 0; i < padLen; ++i) {
+			buffer.put(padValue);
+		}
+
+		return buffer.put(data, startIdx, dataLen);
+	}
+
+	/**
+	 * Deserializes a {@link BigInteger} from the given buffer.
+	 * 
+	 * @param buffer the buffer from which to deserialize the integer
+	 * @param len the number of bytes that hold the serialized integer
+	 * @param unsigned {@code true} if {@code value} should be treated as
+	 *            unsigned
+	 * @return the integer
+	 */
+	public static BigInteger getBigInteger(ByteBuffer buffer, int len, boolean unsigned) {
+		byte[] data = unsigned ? new byte[len + 1] : new byte[len];
+
+		int startIdx = unsigned ? 1 : 0;
+		buffer.get(data, startIdx, len);
+
+		return new BigInteger(data);
+	}
+
 	public static class InvalidLengthException extends Exception {
 		private static final long serialVersionUID = -4898459278333707998L;
 
@@ -175,4 +235,5 @@ public class ByteBufferUtils {
 			super(String.format(MSG, length, minLength, maxLength));
 		}
 	}
+
 }

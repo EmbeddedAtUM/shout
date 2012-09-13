@@ -13,7 +13,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.whispercomm.shout.test.ShoutTestRunner;
-import org.whispercomm.shout.test.util.TestFactory;
 
 import android.app.Activity;
 import android.content.Context;
@@ -64,7 +63,7 @@ public class KeyStorageImplTest {
 	@Test
 	public void testReadWriteKeyPair() {
 		try {
-			KeyPair keyPair = TestFactory.genKeyPair();
+			KeyPair keyPair = SignatureUtility.generateECKeyPair();
 			boolean status = keyStore.writeMe(username, keyPair);
 			assertTrue(status);
 			assertFalse(keyStore.isEmpty());
@@ -80,7 +79,7 @@ public class KeyStorageImplTest {
 
 	@Test
 	public void testReadWriteUsername() {
-		KeyPair keyPair = TestFactory.genKeyPair();
+		KeyPair keyPair = SignatureUtility.generateECKeyPair();
 		boolean status = keyStore.writeMe(username, keyPair);
 		assertTrue(status);
 		assertFalse(keyStore.isEmpty());

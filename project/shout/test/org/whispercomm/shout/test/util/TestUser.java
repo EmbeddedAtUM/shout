@@ -10,11 +10,6 @@ public class TestUser implements User {
 	public String username;
 	public ECPublicKey ecPubKey;
 
-	public TestUser(String username) {
-		this.username = username;
-		this.ecPubKey = TestFactory.genPublicKey();
-	}
-
 	public TestUser(String username, ECPublicKey ecPubKey) {
 		this.username = username;
 		this.ecPubKey = ecPubKey;

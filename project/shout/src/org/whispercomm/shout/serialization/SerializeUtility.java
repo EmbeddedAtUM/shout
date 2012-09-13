@@ -3,17 +3,21 @@ package org.whispercomm.shout.serialization;
 
 import static org.whispercomm.shout.util.ByteBufferUtils.flipToMark;
 import static org.whispercomm.shout.util.ByteBufferUtils.getArray;
+import static org.whispercomm.shout.util.ByteBufferUtils.getBigInteger;
 import static org.whispercomm.shout.util.ByteBufferUtils.getVArray;
+import static org.whispercomm.shout.util.ByteBufferUtils.putBigInteger;
 import static org.whispercomm.shout.util.ByteBufferUtils.putVArray;
 import static org.whispercomm.shout.util.CharUtils.decodeUtf8Safe;
 import static org.whispercomm.shout.util.CharUtils.encodeUtf8;
 
+import java.math.BigInteger;
 import java.nio.BufferOverflowException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.CharacterCodingException;
 import java.security.interfaces.ECPublicKey;
+import java.security.spec.ECPoint;
 import java.security.spec.InvalidKeySpecException;
 
 import org.joda.time.DateTime;
@@ -47,7 +51,8 @@ public class SerializeUtility {
 	public static final int TIMESTAMP_SIZE = 8;
 
 	// User fields sizes
-	public static final int PUBLIC_KEY_SIZE = 91;
+	public static final int PUBLIC_KEY_AFFINE_SIZE = 256 / 8;
+	public static final int PUBLIC_KEY_SIZE = 2 * PUBLIC_KEY_AFFINE_SIZE;
 	public static final int AVATAR_HASH_SIZE = HASH_SIZE;
 	public static final int USERNAME_LENGTH_SIZE = 1;
 	public static final int USERNAME_SIZE_MAX = 40;
@@ -81,11 +86,16 @@ public class SerializeUtility {
 	public static final int SHOUT_SIGNED_SIZE_MAX = SHOUT_UNSIGNED_SIZE_MAX
 			+ SHOUT_SIGNATURE_FIELDS_SIZE_MAX;
 
+	// A recomment cannot have its own message
+	public static final int SHOUT_CHAIN_MAX = 3 * SHOUT_SIGNED_SIZE_MAX - MESSAGE_SIZE_MAX;
+
 	private static final int VERSION_MASK = 0x0F;
 	private static final int LOCATION_BIT_MASK = 1 << 4;
 	private static final int PARENT_BIT_MASK = 1 << 5;
 
-	// Version to use when serializing a shout
+	/**
+	 * Version to use when serializing a shout
+	 */
 	private static final int VERSION = 0;
 
 	/**
@@ -155,7 +165,7 @@ public class SerializeUtility {
 		buffer.putLong(shout.getTimestamp().getMillis());
 
 		// Add User Fields
-		buffer.put(shout.getSender().getPublicKey().getEncoded());
+		putPublicKey(buffer, shout.getSender().getPublicKey());
 		buffer.put(new byte[AVATAR_HASH_SIZE]); // TODO: Get real hash from
 												// User object
 		putVArray(buffer, encodeUtf8(shout.getSender().getUsername()),
@@ -294,8 +304,7 @@ public class SerializeUtility {
 
 			// Public Key
 			try {
-				user.publicKey = SignatureUtility.getPublicKeyFromBytes(getArray(buffer,
-						PUBLIC_KEY_SIZE));
+				user.publicKey = getPublicKey(buffer);
 			} catch (InvalidKeySpecException e) {
 				throw new ShoutPacketException("Invalid key encoding in public key field.", e);
 			}
@@ -420,6 +429,37 @@ public class SerializeUtility {
 	public static Shout deserializeSequenceOfShouts(int count, byte[] body)
 			throws BadShoutVersionException, ShoutPacketException, InvalidShoutSignatureException {
 		return deserializeSequenceOfShouts(count, ByteBuffer.wrap(body));
+	}
+
+	/**
+	 * Serializes the x and y affine coordinates of public key to the provided
+	 * buffer.
+	 * 
+	 * @param buffer the buffer to which to serialize the key
+	 * @param key the key to serialize
+	 * @return the provided buffer
+	 */
+	public static ByteBuffer putPublicKey(ByteBuffer buffer, ECPublicKey key) {
+		ECPoint w = key.getW();
+		putBigInteger(buffer, w.getAffineX(), PUBLIC_KEY_AFFINE_SIZE, true);
+		putBigInteger(buffer, w.getAffineY(), PUBLIC_KEY_AFFINE_SIZE, true);
+		return buffer;
+	}
+
+	/**
+	 * Deserializes a public key from the provided buffer, assuming the default
+	 * named curve.
+	 * 
+	 * @param buffer the buffer from which to read the key
+	 * @return the deserialized public key
+	 * @throws InvalidKeySpecException if the buffer does not contain a valid
+	 *             point on the default curve
+	 */
+	public static ECPublicKey getPublicKey(ByteBuffer buffer)
+			throws InvalidKeySpecException {
+		BigInteger x = getBigInteger(buffer, PUBLIC_KEY_AFFINE_SIZE, true);
+		BigInteger y = getBigInteger(buffer, PUBLIC_KEY_AFFINE_SIZE, true);
+		return SignatureUtility.generatePublic(x, y);
 	}
 
 	/**

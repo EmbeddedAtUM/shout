@@ -1,6 +1,7 @@
 
 package org.whispercomm.shout.id;
 
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -15,11 +16,17 @@ import java.security.SignatureException;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECGenParameterSpec;
+import java.security.spec.ECParameterSpec;
+import java.security.spec.ECPoint;
+import java.security.spec.ECPublicKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
+import org.spongycastle.jce.ECNamedCurveTable;
 import org.spongycastle.jce.provider.BouncyCastleProvider;
+import org.spongycastle.jce.spec.ECNamedCurveParameterSpec;
+import org.spongycastle.jce.spec.ECNamedCurveSpec;
 import org.whispercomm.shout.Me;
 import org.whispercomm.shout.UnsignedShout;
 import org.whispercomm.shout.serialization.SerializeUtility;
@@ -29,28 +36,92 @@ import android.util.Log;
 public class SignatureUtility {
 	private static final String TAG = SignatureUtility.class.getSimpleName();
 
-	public static final String ECC_PARAMS = "secp256r1";
-	public static final String CRYPTO_ALGO = "ECDSA";
-	public static final String CRYPTO_PROVIDER = "SC";
-	public static final String SIGN_ALGORITHM = "SHA256withECDSA";
-	public static final String HASH_ALGO = "SHA-256";
-
+	/*
+	 * Use the BouncyCastle provider;
+	 */
 	static {
 		Security.addProvider(new BouncyCastleProvider());
 	}
 
-	/*
-	 * Make this class uninstantiable
+	/**
+	 * Java does not provide a way to construct an ECPublicKey from a known
+	 * point on a named curve. Instead, some classes from Bouncycastle must be
+	 * used directly.
+	 * <p>
+	 * This method converts from the Bouncycastle parameter spec class to the
+	 * Java parameter spec class, minimizing the amount of Bouncastle-specific
+	 * code used elsewhere.
+	 * 
+	 * @param spec
+	 * @return
 	 */
+	private static ECParameterSpec convert(ECNamedCurveParameterSpec spec) {
+		return new ECNamedCurveSpec(spec.getName(), spec.getCurve(), spec.getG(), spec.getN(),
+				spec.getH(), spec.getSeed());
+	}
+
+	/**
+	 * The security provider to use
+	 */
+	private static final String CRYPTO_PROVIDER = "SC";
+
+	/**
+	 * The name of the elliptic curve used
+	 */
+	private static final String EC_PARAM_NAME = "secp256r1";
+
+	/**
+	 * The EC parameters for the named curved
+	 */
+	private static final ECParameterSpec EC_PARAMS =
+			convert(ECNamedCurveTable.getParameterSpec(EC_PARAM_NAME));
+
+	/**
+	 * The crypto algorithm to use
+	 */
+	private static final String CRYPTO_ALGORITHM = "ECDSA";
+
+	/**
+	 * The signing algorithm to use
+	 */
+	private static final String SIGNING_ALGORITHM = "SHA256withECDSA";
+
 	private SignatureUtility() {
-		throw new IllegalStateException("Cannot instantiate SignatureUtility!");
+		throw new IllegalStateException("Cannot instantiate SignatureUtility.");
+	}
+
+	/**
+	 * Generates an {@link ECPublicKey} for the default curve from the provided
+	 * affine coordinates.
+	 * 
+	 * @param x the affine x coordinate
+	 * @param y the affine y coordinate
+	 * @return the genereated key
+	 * @throws InvalidKeySpecException if and {@code x} and {@code y} do not
+	 *             define a valid point on the curve
+	 */
+	public static ECPublicKey generatePublic(BigInteger x, BigInteger y)
+			throws InvalidKeySpecException {
+		try {
+			ECPoint w = new ECPoint(x, y);
+			ECPublicKeySpec spec = new ECPublicKeySpec(w, EC_PARAMS);
+			KeyFactory kf = KeyFactory
+					.getInstance(CRYPTO_ALGORITHM, CRYPTO_PROVIDER);
+			return (ECPublicKey) kf.generatePublic(spec);
+		} catch (NoSuchAlgorithmException e) {
+			// Should not happen. Testing will catch a missing algorithm
+			throw new RuntimeException(e);
+		} catch (NoSuchProviderException e) {
+			// Should not happen. Testing will catch a missing provider
+			throw new RuntimeException(e);
+		}
 	}
 
 	public static KeyPair generateECKeyPair() {
 		try {
-			ECGenParameterSpec ecParamSpec = new ECGenParameterSpec(ECC_PARAMS);
+			ECGenParameterSpec ecParamSpec = new ECGenParameterSpec(EC_PARAM_NAME);
 			KeyPairGenerator kpg;
-			kpg = KeyPairGenerator.getInstance(CRYPTO_ALGO,
+			kpg = KeyPairGenerator.getInstance(CRYPTO_ALGORITHM,
 					CRYPTO_PROVIDER);
 			kpg.initialize(ecParamSpec);
 			KeyPair keyPair = kpg.generateKeyPair();
@@ -62,6 +133,7 @@ public class SignatureUtility {
 		} catch (NoSuchProviderException e) {
 			Log.e(TAG, e.getMessage());
 		}
+		// TODO: Convert should-never-happen exceptions to RuntimeExceptions
 		// Should never happen
 		return null;
 	}
@@ -77,7 +149,7 @@ public class SignatureUtility {
 			throws InvalidKeySpecException {
 		try {
 			KeyFactory kf = KeyFactory
-					.getInstance(CRYPTO_ALGO, CRYPTO_PROVIDER);
+					.getInstance(CRYPTO_ALGORITHM, CRYPTO_PROVIDER);
 			X509EncodedKeySpec x509ks = new X509EncodedKeySpec(publicKeyBytes);
 			ECPublicKey pubKey = (ECPublicKey) kf.generatePublic(x509ks);
 			return pubKey;
@@ -101,7 +173,7 @@ public class SignatureUtility {
 			throws InvalidKeySpecException {
 		try {
 			KeyFactory kf = KeyFactory
-					.getInstance(CRYPTO_ALGO, CRYPTO_PROVIDER);
+					.getInstance(CRYPTO_ALGORITHM, CRYPTO_PROVIDER);
 			PKCS8EncodedKeySpec p8ks = new PKCS8EncodedKeySpec(privateKeyBytes);
 			ECPrivateKey privateKey = (ECPrivateKey) kf.generatePrivate(p8ks);
 			return privateKey;
@@ -116,7 +188,7 @@ public class SignatureUtility {
 
 	public static boolean verifySignature(ByteBuffer data, byte[] signature, ECPublicKey publicKey) {
 		try {
-			Signature verifier = Signature.getInstance(SIGN_ALGORITHM, CRYPTO_PROVIDER);
+			Signature verifier = Signature.getInstance(SIGNING_ALGORITHM, CRYPTO_PROVIDER);
 			verifier.initVerify(publicKey);
 			verifier.update(data);
 			return verifier.verify(signature);
@@ -153,7 +225,7 @@ public class SignatureUtility {
 	public static boolean verifySignature(byte[] data, byte[] dataSignature,
 			ECPublicKey pubKey) {
 		try {
-			Signature signature = Signature.getInstance(SIGN_ALGORITHM,
+			Signature signature = Signature.getInstance(SIGNING_ALGORITHM,
 					CRYPTO_PROVIDER);
 			signature.initVerify(pubKey);
 			signature.update(data);
@@ -175,7 +247,7 @@ public class SignatureUtility {
 	public static byte[] generateSignature(byte[] dataBytes, Me me) {
 		ECPrivateKey privateKey = (ECPrivateKey) me.getKeyPair().getPrivate();
 		try {
-			Signature signature = Signature.getInstance(SIGN_ALGORITHM,
+			Signature signature = Signature.getInstance(SIGNING_ALGORITHM,
 					CRYPTO_PROVIDER);
 			signature.initSign(privateKey);
 			signature.update(dataBytes);
