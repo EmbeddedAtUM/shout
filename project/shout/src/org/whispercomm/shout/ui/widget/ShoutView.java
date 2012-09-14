@@ -130,7 +130,9 @@ public class ShoutView extends RelativeLayout {
 		// Add the signature
 		ShoutDetailRow signature = new ShoutDetailRow(getContext());
 		signature.setTitleText("Signature");
-		signature.setEntryText(Encoders.toHexString(shout.getSignature()));
+		signature.setEntryText(String.format("R<%s> S<%s>",
+				Encoders.toHexString(shout.getSignature().getS().toByteArray()),
+				Encoders.toHexString(shout.getSignature().getS().toByteArray())));
 		detailsTable.addView(signature);
 		// Add the hash
 		ShoutDetailRow hash = new ShoutDetailRow(getContext());

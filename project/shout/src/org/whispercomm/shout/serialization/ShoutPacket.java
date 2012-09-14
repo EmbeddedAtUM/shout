@@ -214,17 +214,9 @@ public class ShoutPacket {
 			ByteBuffer buffer = ByteBuffer.allocate(MAX_PACKET_SIZE - HEADER_SIZE);
 			int size = 0;
 			for (Shout shout : shouts) {
-				byte[] data = SerializeUtility.serializeShoutData(shout);
-				buffer.put(data);
-				size += data.length;
-				byte[] signature = shout.getSignature();
-				byte length = (byte) signature.length;
-				buffer.put(length);
-				size += 1;
-				buffer.put(signature);
-				size += signature.length;
+				SerializeUtility.serializeShout(buffer, shout);
 			}
-			return Arrays.copyOfRange(buffer.array(), 0, size);
+			return Arrays.copyOfRange(buffer.array(), 0, buffer.limit());
 		}
 
 	}

@@ -11,7 +11,6 @@ import org.whispercomm.shout.id.SignatureUtility;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.serialization.BadShoutVersionException;
 import org.whispercomm.shout.serialization.InvalidShoutSignatureException;
-import org.whispercomm.shout.serialization.SerializeUtility;
 import org.whispercomm.shout.serialization.ShoutChainTooLongException;
 import org.whispercomm.shout.serialization.ShoutPacket;
 import org.whispercomm.shout.serialization.ShoutPacket.PacketBuilder;
@@ -104,8 +103,7 @@ public class NaiveNetworkProtocol implements NetworkProtocol {
 			Shout shout = packet.decodeShout();
 			Shout current = shout;
 			while (current != null) {
-				if (!SignatureUtility.verifySignature(SerializeUtility.serializeShoutData(current),
-						current.getSignature(), current.getSender().getPublicKey())) {
+				if (!SignatureUtility.verifyShout(current)) {
 					throw new InvalidShoutSignatureException();
 				}
 				current = current.getParent();

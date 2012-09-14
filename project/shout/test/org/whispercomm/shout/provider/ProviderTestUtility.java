@@ -4,6 +4,9 @@ package org.whispercomm.shout.provider;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.math.BigInteger;
+
+import org.whispercomm.shout.crypto.DsaSignature;
 import org.whispercomm.shout.test.util.TestFactory;
 
 import android.content.ContentResolver;
@@ -23,7 +26,7 @@ public class ProviderTestUtility {
 	}
 
 	public static Uri insertIntoShoutTable(ContentResolver cr, byte[] author, byte[] parentHash,
-			String message, long time, byte[] signature, byte[] hash) {
+			String message, long time, DsaSignature signature, byte[] hash) {
 		ContentValues values = new ContentValues();
 		values.put(ShoutProviderContract.Shouts.AUTHOR,
 				Base64.encodeToString(author, Base64.DEFAULT));
@@ -34,7 +37,7 @@ public class ProviderTestUtility {
 		values.put(ShoutProviderContract.Shouts.MESSAGE, message);
 		values.put(ShoutProviderContract.Shouts.TIME_SENT, time);
 		values.put(ShoutProviderContract.Shouts.SIGNATURE,
-				Base64.encodeToString(signature, Base64.DEFAULT));
+				Base64.encodeToString(DsaSignature.encode(signature), Base64.DEFAULT));
 		values.put(ShoutProviderContract.Shouts.HASH, Base64.encodeToString(hash, Base64.DEFAULT));
 		Uri location = cr.insert(ShoutProviderContract.Shouts.CONTENT_URI, values);
 		return location;
@@ -55,7 +58,8 @@ public class ProviderTestUtility {
 		};
 		for (int i = 0; i < messages.length; i++) {
 			byte[] hash = TestFactory.genByteArray(10);
-			byte[] sig = TestFactory.genByteArray(32);
+			DsaSignature sig = new DsaSignature(BigInteger.valueOf(i * 1000),
+					BigInteger.valueOf(i * 100000 + 12344));
 			Uri at = ProviderTestUtility.insertIntoShoutTable(cr, authors[i], parents[i],
 					messages[i], times[i], sig, hash);
 			assertNotNull(at);

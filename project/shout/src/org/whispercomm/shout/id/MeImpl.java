@@ -1,35 +1,41 @@
 
 package org.whispercomm.shout.id;
 
-import java.security.KeyPair;
-import java.security.interfaces.ECPublicKey;
-
 import org.whispercomm.shout.Me;
+import org.whispercomm.shout.crypto.ECKeyPair;
+import org.whispercomm.shout.crypto.ECPrivateKey;
+import org.whispercomm.shout.crypto.ECPublicKey;
 
 public class MeImpl implements Me {
 
-	private KeyPair keyPair;
+	private ECPublicKey publicKey;
+	private ECPrivateKey privateKey;
+
 	private String username;
 
-	public MeImpl(String username, KeyPair keyPair) {
+	public MeImpl(String username, ECPublicKey publicKey, ECPrivateKey privateKey) {
 		this.username = username;
-		this.keyPair = keyPair;
+		this.publicKey = publicKey;
+		this.privateKey = privateKey;
+	}
+
+	public MeImpl(String username, ECKeyPair keyPair) {
+		this(username, keyPair.getPublicKey(), keyPair.getPrivateKey());
 	}
 
 	@Override
-	public KeyPair getKeyPair() {
-		return this.keyPair;
+	public ECPublicKey getPublicKey() {
+		return this.publicKey;
+	}
+
+	@Override
+	public ECPrivateKey getPrivateKey() {
+		return this.privateKey;
 	}
 
 	@Override
 	public String getUsername() {
 		return this.username;
-	}
-
-	@Override
-	public ECPublicKey getPublicKey() {
-		ECPublicKey ecPubKey = (ECPublicKey) keyPair.getPublic();
-		return ecPubKey;
 	}
 
 }

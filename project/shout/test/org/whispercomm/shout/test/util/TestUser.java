@@ -1,9 +1,8 @@
 
 package org.whispercomm.shout.test.util;
 
-import java.security.interfaces.ECPublicKey;
-
 import org.whispercomm.shout.User;
+import org.whispercomm.shout.crypto.ECPublicKey;
 
 public class TestUser implements User {
 

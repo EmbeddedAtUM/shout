@@ -1,10 +1,10 @@
 
 package org.whispercomm.shout;
 
-import java.security.KeyPair;
+import org.whispercomm.shout.crypto.ECPrivateKey;
 
 public interface Me extends LocalUser {
 
-	public KeyPair getKeyPair();
+	public ECPrivateKey getPrivateKey();
 
 }

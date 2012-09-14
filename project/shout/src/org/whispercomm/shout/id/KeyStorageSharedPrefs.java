@@ -1,10 +1,12 @@
 
 package org.whispercomm.shout.id;
 
-import java.security.KeyPair;
-import java.security.interfaces.ECPrivateKey;
-import java.security.interfaces.ECPublicKey;
 import java.security.spec.InvalidKeySpecException;
+
+import org.whispercomm.shout.crypto.ECKeyPair;
+import org.whispercomm.shout.crypto.ECPrivateKey;
+import org.whispercomm.shout.crypto.ECPublicKey;
+import org.whispercomm.shout.crypto.KeyGenerator;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -27,44 +29,55 @@ public class KeyStorageSharedPrefs implements KeyStorage {
 	}
 
 	@Override
-	public boolean writeMe(String username, KeyPair keyPair) {
-		byte[] publicKey = keyPair.getPublic().getEncoded();
-		byte[] privateKey = keyPair.getPrivate().getEncoded();
-		String encodedPublicKey = Base64.encodeToString(publicKey, Base64.DEFAULT);
-		String encodedPrivateKey = Base64.encodeToString(privateKey, Base64.DEFAULT);
+	public boolean writeMe(String username, ECKeyPair keyPair) {
+		String encodedPublicKey = Base64.encodeToString(
+				KeyGenerator.encodePublic(keyPair.getPublicKey()), Base64.DEFAULT);
+		String encodedPrivateKey = Base64.encodeToString(
+				KeyGenerator.encodePrivate(keyPair.getPrivateKey()), Base64.DEFAULT);
+
 		Editor editor = sharedPrefs.edit();
+
+		editor.putString(KEY_USERNAME, username);
 		editor.putString(KEY_PUBLIC, encodedPublicKey);
 		editor.putString(KEY_PRIVATE, encodedPrivateKey);
-		editor.putString(KEY_USERNAME, username);
 		editor.putBoolean(KEY_VALID, true);
+
 		return editor.commit();
 	}
 
 	@Override
-	public KeyPair readKeyPair() throws UserNotInitiatedException {
+	public ECKeyPair readKeyPair() throws UserNotInitiatedException {
 		if (isEmpty()) {
 			throw new UserNotInitiatedException();
 		}
 
-		String encodedPublicKey = sharedPrefs.getString(KEY_PUBLIC, null);
-		String encodedPrivateKey = sharedPrefs.getString(KEY_PRIVATE, null);
-		byte[] publicKeyBytes = Base64.decode(encodedPublicKey, Base64.DEFAULT);
-		byte[] privateKeyBytes = Base64.decode(encodedPrivateKey, Base64.DEFAULT);
 		ECPublicKey publicKey;
 		try {
-			publicKey = SignatureUtility.generatePublic(publicKeyBytes);
+			byte[] encodedPublicKey = Base64.decode(sharedPrefs.getString(KEY_PUBLIC, ""),
+					Base64.DEFAULT);
+			publicKey = KeyGenerator.generatePublic(encodedPublicKey);
+		} catch (IllegalArgumentException e) {
+			// TODO: Figure out what to do about this
+			throw new RuntimeException("Could not decode the stored public key.", e);
 		} catch (InvalidKeySpecException e) {
 			// TODO: Figure out what to do about this.
 			throw new RuntimeException("Could not decode the stored public key.", e);
 		}
+
 		ECPrivateKey privateKey;
 		try {
-			privateKey = SignatureUtility.getPrivateKeyFromBytes(privateKeyBytes);
+			byte[] encodedPrivateKey = Base64.decode(sharedPrefs.getString(KEY_PRIVATE, ""),
+					Base64.DEFAULT);
+			privateKey = KeyGenerator.generatePrivate(encodedPrivateKey);
 		} catch (InvalidKeySpecException e) {
 			// TODO: Figure out what to do about this.
 			throw new RuntimeException("Could not decode the stored private key.", e);
+		} catch (IllegalArgumentException e) {
+			// TODO: Figure out what to do about this
+			throw new RuntimeException("Could not decode the stored public key.", e);
 		}
-		return new KeyPair(publicKey, privateKey);
+
+		return new ECKeyPair(publicKey, privateKey);
 	}
 
 	@Override
@@ -78,8 +91,7 @@ public class KeyStorageSharedPrefs implements KeyStorage {
 
 	@Override
 	public boolean isEmpty() {
-		boolean valid = sharedPrefs.getBoolean(KEY_VALID, false);
-		return (!valid);
+		return !sharedPrefs.getBoolean(KEY_VALID, false);
 	}
 
 }

@@ -1,7 +1,7 @@
 
 package org.whispercomm.shout.id;
 
-import java.security.KeyPair;
+import org.whispercomm.shout.crypto.ECKeyPair;
 
 /**
  * Package private interface for storing/retrieving identity information, e.g.,
@@ -20,14 +20,14 @@ interface KeyStorage {
 	 * @param keyPair
 	 * @return {@code true} if write was successful
 	 */
-	public boolean writeMe(String username, KeyPair keyPair);
+	public boolean writeMe(String username, ECKeyPair keyPair);
 
 	/**
 	 * Read the key pair
 	 * 
 	 * @return {@code null} on failure
 	 */
-	public KeyPair readKeyPair() throws UserNotInitiatedException;
+	public ECKeyPair readKeyPair() throws UserNotInitiatedException;
 
 	/**
 	 * Read the username from storage.

@@ -2,6 +2,7 @@
 package org.whispercomm.shout;
 
 import org.joda.time.DateTime;
+import org.whispercomm.shout.crypto.DsaSignature;
 
 public class SimpleShout extends AbstractShout implements Shout {
 
@@ -9,10 +10,10 @@ public class SimpleShout extends AbstractShout implements Shout {
 	private User sender;
 	private String message;
 	private Shout parent;
-	private byte[] signature;
+	private DsaSignature signature;
 
 	public SimpleShout(DateTime timestamp, User sender, String message,
-			Shout parent, byte[] signature) {
+			Shout parent, DsaSignature signature) {
 		this.timestamp = timestamp;
 		this.sender = sender;
 		this.message = message;
@@ -21,7 +22,7 @@ public class SimpleShout extends AbstractShout implements Shout {
 	}
 
 	@Override
-	public byte[] getSignature() {
+	public DsaSignature getSignature() {
 		return this.signature;
 	}
 

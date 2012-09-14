@@ -4,14 +4,15 @@ package org.whispercomm.shout.test.util;
 import org.joda.time.DateTime;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.User;
+import org.whispercomm.shout.crypto.DsaSignature;
 
 public class TestShout extends TestUnsignedShout implements Shout {
 
 	public byte[] hash = null;
-	public byte[] signature = null;
+	public DsaSignature signature = null;
 
 	public TestShout(User sender, Shout parent, String message,
-			DateTime timestamp, byte[] signature, byte[] hash) {
+			DateTime timestamp, DsaSignature signature, byte[] hash) {
 		super(sender, parent, message, timestamp);
 		this.signature = signature;
 		this.hash = hash;
@@ -23,7 +24,7 @@ public class TestShout extends TestUnsignedShout implements Shout {
 	}
 
 	@Override
-	public byte[] getSignature() {
+	public DsaSignature getSignature() {
 		return signature;
 	}
 

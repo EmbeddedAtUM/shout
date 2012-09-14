@@ -8,8 +8,11 @@ Shout:            ||====================||
                   || time               ||
                   || (8 bytes)          ||
                   ||====================||
-                  || sender_pub_key*    ||
-                  || (91 bytes)         ||
+                  || public_key x coord ||
+                  || (32 bytes)         ||
+                  ||--------------------||
+                  || public_key y coord ||
+                  || (32 bytes)         ||
                   ||--------------------||
                   || avatar_hash        ||
                   || (32 bytes)         ||
@@ -34,12 +37,12 @@ Shout:            ||====================||
                   ||--------------------||
                   || parent_hash*       ||
                   || (32 or 0 bytes)    ||
-"signature"       ||====================||
-(71 - 81 bytes)   || signature_len*     ||
-                  || (1 byte)           ||
+                  ||====================||
+                  || signature r value  ||
+                  || (32 bytes)         ||
                   ||--------------------|| 
-                  || signature          ||
-                  || (70-80 bytes)      ||
+                  || signature s value  ||
+                  || (32 bytes)         ||
                   ||====================||
 
 

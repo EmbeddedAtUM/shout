@@ -11,6 +11,7 @@ import org.joda.time.DateTime;
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.LocalUser;
 import org.whispercomm.shout.ShoutType;
+import org.whispercomm.shout.crypto.DsaSignature;
 import org.whispercomm.shout.util.ShoutMessageUtility;
 
 import android.content.Context;
@@ -21,7 +22,7 @@ public class LocalShoutImpl implements LocalShout {
 
 	private LocalUser sender;
 	private String message;
-	private byte[] signatureBytes;
+	private DsaSignature signature;
 	private byte[] hashBytes;
 	private DateTime sentTime;
 	private DateTime receivedTime;
@@ -40,7 +41,7 @@ public class LocalShoutImpl implements LocalShout {
 		this.context = context;
 		this.sender = sender;
 		this.message = message;
-		this.signatureBytes = Base64.decode(encodedSig, Base64.DEFAULT);
+		this.signature = DsaSignature.decode(Base64.decode(encodedSig, Base64.DEFAULT));
 		this.hashBytes = Base64.decode(encodedHash, Base64.DEFAULT);
 		this.sentTime = new DateTime(sentTime);
 		this.receivedTime = new DateTime(receivedTime);
@@ -67,8 +68,8 @@ public class LocalShoutImpl implements LocalShout {
 	}
 
 	@Override
-	public byte[] getSignature() {
-		return this.signatureBytes;
+	public DsaSignature getSignature() {
+		return this.signature;
 	}
 
 	@Override

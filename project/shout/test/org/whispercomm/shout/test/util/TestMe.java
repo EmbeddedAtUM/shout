@@ -1,19 +1,25 @@
 
 package org.whispercomm.shout.test.util;
 
-import java.security.KeyPair;
-import java.security.interfaces.ECPublicKey;
-
 import org.whispercomm.shout.Me;
+import org.whispercomm.shout.crypto.ECKeyPair;
+import org.whispercomm.shout.crypto.ECPrivateKey;
+import org.whispercomm.shout.crypto.ECPublicKey;
 
 public class TestMe implements Me {
 
 	public String username;
-	public KeyPair keyPair;
+	public ECPublicKey publicKey;
+	public ECPrivateKey privateKey;
 
-	public TestMe(String username, KeyPair keyPair) {
+	public TestMe(String username, ECPublicKey publicKey, ECPrivateKey privateKey) {
 		this.username = username;
-		this.keyPair = keyPair;
+		this.publicKey = publicKey;
+		this.privateKey = privateKey;
+	}
+
+	public TestMe(String username, ECKeyPair keyPair) {
+		this(username, keyPair.getPublicKey(), keyPair.getPrivateKey());
 	}
 
 	@Override
@@ -23,12 +29,12 @@ public class TestMe implements Me {
 
 	@Override
 	public ECPublicKey getPublicKey() {
-		return (ECPublicKey) keyPair.getPublic();
+		return publicKey;
 	}
 
 	@Override
-	public KeyPair getKeyPair() {
-		return keyPair;
+	public ECPrivateKey getPrivateKey() {
+		return privateKey;
 	}
 
 }

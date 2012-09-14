@@ -1,6 +1,8 @@
 
 package org.whispercomm.shout;
 
+import org.whispercomm.shout.crypto.DsaSignature;
+
 /**
  * A Shout message.
  * 
@@ -13,7 +15,7 @@ public interface Shout extends UnsignedShout {
 	 * 
 	 * @return The ECC signature for this Shout object
 	 */
-	public byte[] getSignature();
+	public DsaSignature getSignature();
 
 	/**
 	 * This hash is a full hash of all included Shouts that were sent with this

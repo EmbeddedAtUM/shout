@@ -6,12 +6,12 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.security.KeyPair;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.whispercomm.shout.crypto.ECKeyPair;
+import org.whispercomm.shout.crypto.KeyGenerator;
 import org.whispercomm.shout.test.ShoutTestRunner;
 
 import android.app.Activity;
@@ -63,14 +63,14 @@ public class KeyStorageImplTest {
 	@Test
 	public void testReadWriteKeyPair() {
 		try {
-			KeyPair keyPair = SignatureUtility.generateKeyPair();
+			ECKeyPair keyPair = new KeyGenerator().generateKeyPair();
 			boolean status = keyStore.writeMe(username, keyPair);
 			assertTrue(status);
 			assertFalse(keyStore.isEmpty());
-			KeyPair fromStore;
+			ECKeyPair fromStore;
 			fromStore = keyStore.readKeyPair();
-			assertEquals(keyPair.getPublic(), fromStore.getPublic());
-			assertEquals(keyPair.getPrivate(), fromStore.getPrivate());
+			assertEquals(keyPair.getPublicKey(), fromStore.getPublicKey());
+			assertEquals(keyPair.getPrivateKey(), fromStore.getPrivateKey());
 		} catch (UserNotInitiatedException e) {
 			e.printStackTrace();
 			fail(USER_INIT_FAIL);
@@ -79,7 +79,7 @@ public class KeyStorageImplTest {
 
 	@Test
 	public void testReadWriteUsername() {
-		KeyPair keyPair = SignatureUtility.generateKeyPair();
+		ECKeyPair keyPair = new KeyGenerator().generateKeyPair();
 		boolean status = keyStore.writeMe(username, keyPair);
 		assertTrue(status);
 		assertFalse(keyStore.isEmpty());

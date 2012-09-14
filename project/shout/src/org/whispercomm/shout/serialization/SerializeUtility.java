@@ -16,18 +16,18 @@ import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.CharacterCodingException;
-import java.security.interfaces.ECPublicKey;
-import java.security.spec.ECPoint;
-import java.security.spec.InvalidKeySpecException;
 
 import org.joda.time.DateTime;
+import org.spongycastle.math.ec.ECPoint;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.ShoutType;
 import org.whispercomm.shout.UnsignedShout;
 import org.whispercomm.shout.User;
-import org.whispercomm.shout.id.SignatureUtility;
+import org.whispercomm.shout.crypto.DsaSignature;
+import org.whispercomm.shout.crypto.ECPublicKey;
+import org.whispercomm.shout.crypto.EcdsaWithSha256;
+import org.whispercomm.shout.crypto.KeyGenerator;
 import org.whispercomm.shout.util.Arrays;
-import org.whispercomm.shout.util.ByteBufferUtils;
 import org.whispercomm.shout.util.ByteBufferUtils.InvalidLengthException;
 import org.whispercomm.shout.util.ByteBufferUtils.LengthType;
 import org.whispercomm.shout.util.HashUtils;
@@ -67,8 +67,8 @@ public class SerializeUtility {
 	public static final int PARENT_HASH_SIZE = HASH_SIZE;
 
 	// Signature fields sizes
-	public static final int SIGNATURE_LENGTH_SIZE = 1;
-	public static final int SIGNATURE_SIZE_MAX = 80;
+	public static final int SIGNATURE_R_SIZE = 256 / 8;
+	public static final int SIGNATURE_S_SIZE = 256 / 8;
 
 	// Max size computations
 	public static final int SHOUT_HEADER_FIELDS_SIZE = SHOUT_FLAG_SIZE + TIMESTAMP_SIZE;
@@ -77,8 +77,7 @@ public class SerializeUtility {
 	public static final int SHOUT_MESSAGE_FIELDS_SIZE_MAX = MESSAGE_LENGTH_SIZE + MESSAGE_SIZE_MAX
 			+ LONGITUDE_SIZE + LATITUDE_SIZE;
 	public static final int SHOUT_PARENT_FIELDS_SIZE = PARENT_HASH_SIZE;
-	public static final int SHOUT_SIGNATURE_FIELDS_SIZE_MAX = SIGNATURE_LENGTH_SIZE
-			+ SIGNATURE_SIZE_MAX;
+	public static final int SHOUT_SIGNATURE_FIELDS_SIZE_MAX = SIGNATURE_R_SIZE + SIGNATURE_S_SIZE;
 
 	public static final int SHOUT_UNSIGNED_SIZE_MAX = SHOUT_HEADER_FIELDS_SIZE
 			+ SHOUT_USER_FIELDS_SIZE_MAX + SHOUT_MESSAGE_FIELDS_SIZE_MAX + SHOUT_PARENT_FIELDS_SIZE;
@@ -97,6 +96,11 @@ public class SerializeUtility {
 	 * Version to use when serializing a shout
 	 */
 	private static final int VERSION = 0;
+
+	/**
+	 * KeyGenerator used to recover keys from X and Y coordinates
+	 */
+	private static final KeyGenerator KEY_GENERATOR = new KeyGenerator();
 
 	/**
 	 * Extracts the version from the flags byte
@@ -206,7 +210,7 @@ public class SerializeUtility {
 	 */
 	public static ByteBuffer serializeShout(ByteBuffer buffer, Shout shout) {
 		serializeShoutData(buffer, shout);
-		ByteBufferUtils.putVArray(buffer, shout.getSignature(), LengthType.BYTE);
+		putDsaSignature(buffer, shout.getSignature());
 		return buffer;
 	}
 
@@ -303,11 +307,7 @@ public class SerializeUtility {
 			shout.timestamp = new DateTime(buffer.getLong());
 
 			// Public Key
-			try {
-				user.publicKey = getPublicKey(buffer);
-			} catch (InvalidKeySpecException e) {
-				throw new ShoutPacketException("Invalid key encoding in public key field.", e);
-			}
+			user.publicKey = getPublicKey(buffer);
 
 			// Avatar hash
 			user.avatarHash = getArray(buffer, AVATAR_HASH_SIZE);
@@ -350,9 +350,8 @@ public class SerializeUtility {
 			ByteBuffer signedData = flipToMark(buffer.asReadOnlyBuffer());
 
 			// Signature
-			shout.signature = getVArray(buffer, LengthType.BYTE);
-
-			if (!SignatureUtility.verifySignature(signedData, shout.signature, user.publicKey)) {
+			shout.signature = getDsaSignature(buffer);
+			if (!EcdsaWithSha256.verify(shout.signature, signedData, user.publicKey)) {
 				throw new InvalidShoutSignatureException();
 			}
 
@@ -440,9 +439,9 @@ public class SerializeUtility {
 	 * @return the provided buffer
 	 */
 	public static ByteBuffer putPublicKey(ByteBuffer buffer, ECPublicKey key) {
-		ECPoint w = key.getW();
-		putBigInteger(buffer, w.getAffineX(), PUBLIC_KEY_AFFINE_SIZE, true);
-		putBigInteger(buffer, w.getAffineY(), PUBLIC_KEY_AFFINE_SIZE, true);
+		ECPoint q = key.getECPublicKeyParameters().getQ();
+		putBigInteger(buffer, q.getX().toBigInteger(), PUBLIC_KEY_AFFINE_SIZE, true);
+		putBigInteger(buffer, q.getY().toBigInteger(), PUBLIC_KEY_AFFINE_SIZE, true);
 		return buffer;
 	}
 
@@ -452,14 +451,37 @@ public class SerializeUtility {
 	 * 
 	 * @param buffer the buffer from which to read the key
 	 * @return the deserialized public key
-	 * @throws InvalidKeySpecException if the buffer does not contain a valid
-	 *             point on the default curve
 	 */
-	public static ECPublicKey getPublicKey(ByteBuffer buffer)
-			throws InvalidKeySpecException {
+	public static ECPublicKey getPublicKey(ByteBuffer buffer) {
 		BigInteger x = getBigInteger(buffer, PUBLIC_KEY_AFFINE_SIZE, true);
 		BigInteger y = getBigInteger(buffer, PUBLIC_KEY_AFFINE_SIZE, true);
-		return SignatureUtility.generatePublic(x, y);
+		return KEY_GENERATOR.generatePublic(x, y);
+	}
+
+	/**
+	 * Serializes the r and s values of the DSA signature to the provided
+	 * buffer.
+	 * 
+	 * @param buffer the buffer to which to serialize the signature
+	 * @param sig the signature to serialize
+	 * @return the provided buffer
+	 */
+	public static ByteBuffer putDsaSignature(ByteBuffer buffer, DsaSignature sig) {
+		putBigInteger(buffer, sig.getR(), SIGNATURE_R_SIZE, true);
+		putBigInteger(buffer, sig.getS(), SIGNATURE_S_SIZE, true);
+		return buffer;
+	}
+
+	/**
+	 * Deserializes a DSA signature from the provided buffer.
+	 * 
+	 * @param buffer the buffer from which to read the signature
+	 * @return the deserialized signature
+	 */
+	public static DsaSignature getDsaSignature(ByteBuffer buffer) {
+		BigInteger r = getBigInteger(buffer, SIGNATURE_R_SIZE, true);
+		BigInteger s = getBigInteger(buffer, SIGNATURE_S_SIZE, true);
+		return new DsaSignature(r, s);
 	}
 
 	/**
@@ -508,7 +530,7 @@ public class SerializeUtility {
 		BuildableShout parent = null;
 		byte[] parentHash = null;
 
-		byte[] signature = null;
+		DsaSignature signature = null;
 		byte[] hash = null;
 
 		@Override
@@ -537,7 +559,7 @@ public class SerializeUtility {
 		}
 
 		@Override
-		public byte[] getSignature() {
+		public DsaSignature getSignature() {
 			return signature;
 		}
 

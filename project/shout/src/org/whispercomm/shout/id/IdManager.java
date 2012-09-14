@@ -1,28 +1,27 @@
 
 package org.whispercomm.shout.id;
 
-import java.security.KeyPair;
-
 import org.whispercomm.shout.Me;
+import org.whispercomm.shout.crypto.ECKeyPair;
+import org.whispercomm.shout.crypto.KeyGenerator;
 import org.whispercomm.shout.util.Validators;
 
 import android.content.Context;
 
 public class IdManager {
-
 	public static final String TAG = IdManager.class.getSimpleName();
-	public static final String ECC_PARAMS = "secp256r1";
-	public static final String CRYPTO_ALGO = "ECDSA";
-	public static final String CRYPTO_PROVIDER = "SC";
 
 	private KeyStorage keyStorage;
 
+	private KeyGenerator keyGenerator;
+
 	public IdManager(Context context) {
-		this.keyStorage = new KeyStorageSharedPrefs(context);
+		this(new KeyStorageSharedPrefs(context));
 	}
 
 	public IdManager(KeyStorage keyStorage) {
 		this.keyStorage = keyStorage;
+		this.keyGenerator = new KeyGenerator();
 	}
 
 	public void resetUser(String newUsername) throws UserNameInvalidException {
@@ -33,7 +32,7 @@ public class IdManager {
 		}
 		newUsername = Validators.removeTrailingSpaces(newUsername);
 		// Generate a new key pair
-		KeyPair newKeyPair = SignatureUtility.generateKeyPair();
+		ECKeyPair newKeyPair = keyGenerator.generateKeyPair();
 		// Write the username, key pair tuple
 		keyStorage.writeMe(newUsername, newKeyPair);
 		return;
@@ -41,7 +40,7 @@ public class IdManager {
 
 	public Me getMe() throws UserNotInitiatedException {
 		String username = keyStorage.readUsername();
-		KeyPair keyPair = keyStorage.readKeyPair();
+		ECKeyPair keyPair = keyStorage.readKeyPair();
 		return new MeImpl(username, keyPair);
 	}
 

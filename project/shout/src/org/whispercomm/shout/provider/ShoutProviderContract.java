@@ -1,12 +1,13 @@
 
 package org.whispercomm.shout.provider;
 
-import java.security.interfaces.ECPublicKey;
-
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.LocalUser;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.User;
+import org.whispercomm.shout.crypto.DsaSignature;
+import org.whispercomm.shout.crypto.ECPublicKey;
+import org.whispercomm.shout.crypto.KeyGenerator;
 
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -280,9 +281,8 @@ public class ShoutProviderContract {
 	 *         not exist
 	 */
 	public static LocalUser retrieveUserByKey(Context context, ECPublicKey key) {
-		byte[] keyBytes = key.getEncoded();
-		String encodedKey = Base64.encodeToString(keyBytes, Base64.DEFAULT);
-		return retrieveUserByEncodedKey(context, encodedKey);
+		String encoded = Base64.encodeToString(KeyGenerator.encodePublic(key), Base64.DEFAULT);
+		return retrieveUserByEncodedKey(context, encoded);
 	}
 
 	/**
@@ -417,7 +417,8 @@ public class ShoutProviderContract {
 
 		public static ContentValues buildContentValues(User user) {
 			ContentValues values = new ContentValues();
-			String encodedKey = Base64.encodeToString(user.getPublicKey().getEncoded(),
+			String encodedKey = Base64.encodeToString(
+					KeyGenerator.encodePublic(user.getPublicKey()),
 					Base64.DEFAULT);
 			values.put(Users.USERNAME, user.getUsername());
 			values.put(Users.PUB_KEY, encodedKey);
@@ -426,9 +427,10 @@ public class ShoutProviderContract {
 
 		public static ContentValues buildContentValues(Shout shout) {
 			String encodedHash = Base64.encodeToString(shout.getHash(), Base64.DEFAULT);
-			String encodedSig = Base64.encodeToString(shout.getSignature(), Base64.DEFAULT);
-			String encodedSender = Base64.encodeToString(shout.getSender().getPublicKey()
-					.getEncoded(), Base64.DEFAULT);
+			String encodedSig = Base64.encodeToString(DsaSignature.encode(shout.getSignature()),
+					Base64.DEFAULT);
+			String encodedSender = Base64.encodeToString(
+					KeyGenerator.encodePublic(shout.getSender().getPublicKey()), Base64.DEFAULT);
 			ContentValues values = new ContentValues();
 			values.put(Shouts.AUTHOR, encodedSender);
 			values.put(Shouts.MESSAGE, shout.getMessage());

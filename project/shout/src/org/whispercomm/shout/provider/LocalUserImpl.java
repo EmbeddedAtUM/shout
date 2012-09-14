@@ -1,12 +1,11 @@
 
 package org.whispercomm.shout.provider;
 
-import java.security.interfaces.ECPublicKey;
 import java.security.spec.InvalidKeySpecException;
-import java.util.Arrays;
 
 import org.whispercomm.shout.LocalUser;
-import org.whispercomm.shout.id.SignatureUtility;
+import org.whispercomm.shout.crypto.ECPublicKey;
+import org.whispercomm.shout.crypto.KeyGenerator;
 
 import android.content.Context;
 import android.util.Base64;
@@ -17,11 +16,16 @@ public class LocalUserImpl implements LocalUser {
 	private Context context;
 
 	private String username;
-	private byte[] keyBytes;
+	private ECPublicKey publicKey;
 
 	public LocalUserImpl(Context context, String username, String encodedKey) {
 		this.username = username;
-		this.keyBytes = Base64.decode(encodedKey, Base64.DEFAULT);
+		try {
+			this.publicKey = KeyGenerator.generatePublic(Base64.decode(encodedKey, Base64.DEFAULT));
+		} catch (InvalidKeySpecException e) {
+			// TODO: Figure out what to do about this
+			throw new RuntimeException(e);
+		}
 		this.context = context;
 	}
 
@@ -32,19 +36,14 @@ public class LocalUserImpl implements LocalUser {
 
 	@Override
 	public ECPublicKey getPublicKey() {
-		try {
-			return SignatureUtility.generatePublic(keyBytes);
-		} catch (InvalidKeySpecException e) {
-			// TODO: Figure out what to do about this
-			throw new RuntimeException(e);
-		}
+		return publicKey;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + Arrays.hashCode(keyBytes);
+		result = prime * result + ((publicKey == null) ? 0 : publicKey.hashCode());
 		result = prime * result + ((username == null) ? 0 : username.hashCode());
 		return result;
 	}
@@ -58,7 +57,10 @@ public class LocalUserImpl implements LocalUser {
 		if (getClass() != obj.getClass())
 			return false;
 		LocalUserImpl other = (LocalUserImpl) obj;
-		if (!Arrays.equals(keyBytes, other.keyBytes))
+		if (publicKey == null) {
+			if (other.publicKey != null)
+				return false;
+		} else if (!publicKey.equals(other.publicKey))
 			return false;
 		if (username == null) {
 			if (other.username != null)

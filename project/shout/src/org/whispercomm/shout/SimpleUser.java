@@ -1,7 +1,7 @@
 
 package org.whispercomm.shout;
 
-import java.security.interfaces.ECPublicKey;
+import org.whispercomm.shout.crypto.ECPublicKey;
 
 public class SimpleUser implements User {
 

@@ -8,15 +8,16 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.User;
+import org.whispercomm.shout.crypto.DsaSignature;
+import org.whispercomm.shout.crypto.KeyGenerator;
 import org.whispercomm.shout.test.ShoutTestRunner;
 import org.whispercomm.shout.test.util.TestFactory;
-import org.whispercomm.shout.test.util.TestShout;
 
 import android.app.Activity;
 import android.content.ContentResolver;
@@ -34,7 +35,7 @@ public class ShoutProviderTest {
 	private ContentResolver cr;
 	private User user;
 	private String base64Key;
-	private TestShout shout;
+	private Shout shout;
 	private String base64Hash;
 	private Uri userLocation;
 	private Uri shoutLocation;
@@ -46,15 +47,17 @@ public class ShoutProviderTest {
 		this.context = new Activity();
 		this.cr = context.getContentResolver();
 		this.user = TestFactory.TEST_USER_1;
-		this.base64Key = Base64.encodeToString(user.getPublicKey().getEncoded(), Base64.DEFAULT);
-		this.shout = new TestShout(user, null, "Hello Database", DateTime.now(),
-				TestFactory.genByteArray(71), TestFactory.genByteArray(32));
-		this.base64Hash = Base64.encodeToString(shout.hash, Base64.DEFAULT);
+		this.base64Key = Base64.encodeToString(KeyGenerator.encodePublic(user.getPublicKey()),
+				Base64.DEFAULT);
+		this.shout = TestFactory.ROOT_SHOUT;
+		this.base64Hash = Base64.encodeToString(shout.getHash(), Base64.DEFAULT);
 		this.userLocation = ProviderTestUtility.insertIntoUserTable(cr, user.getUsername(),
-				user.getPublicKey().getEncoded());
-		this.shoutLocation = ProviderTestUtility.insertIntoShoutTable(cr, shout.sender
-				.getPublicKey().getEncoded(), null, shout.message, shout.timestamp.getMillis(),
-				shout.signature, shout.hash);
+				KeyGenerator.encodePublic(user.getPublicKey()));
+		this.shoutLocation = ProviderTestUtility.insertIntoShoutTable(cr,
+				KeyGenerator.encodePublic(shout.getSender()
+						.getPublicKey()), null, shout.getMessage(), shout.getTimestamp()
+						.getMillis(),
+				shout.getSignature(), shout.getHash());
 		this.userId = Integer.valueOf(userLocation.getLastPathSegment());
 		this.shoutId = Integer.valueOf(shoutLocation.getLastPathSegment());
 	}
@@ -79,7 +82,7 @@ public class ShoutProviderTest {
 		assertEquals(userId, newId);
 
 		String encodedKey = cursor.getString(keyIndex);
-		assertArrayEquals(user.getPublicKey().getEncoded(),
+		assertArrayEquals(KeyGenerator.encodePublic(user.getPublicKey()),
 				Base64.decode(encodedKey, Base64.DEFAULT));
 
 		String username = cursor.getString(nameIndex);
@@ -107,7 +110,7 @@ public class ShoutProviderTest {
 		assertEquals(base64Key, author);
 
 		String content = cursor.getString(messageIndex);
-		assertEquals(shout.message, content);
+		assertEquals(shout.getMessage(), content);
 
 		long time = cursor.getLong(timeIndex);
 		assertEquals(shout.getTimestamp().getMillis(), time);
@@ -116,7 +119,8 @@ public class ShoutProviderTest {
 		assertEquals(base64Hash, encodedHash);
 
 		String encodedSig = cursor.getString(sigIndex);
-		assertArrayEquals(shout.signature, Base64.decode(encodedSig, Base64.DEFAULT));
+		assertEquals(shout.getSignature(),
+				DsaSignature.decode(Base64.decode(encodedSig, Base64.DEFAULT)));
 
 		assertFalse(cursor.moveToNext());
 	}
@@ -161,8 +165,10 @@ public class ShoutProviderTest {
 	@Test
 	public void testInsertDuplicateShoutDoesNothing() {
 		try {
-			ProviderTestUtility.insertIntoShoutTable(cr, user.getPublicKey().getEncoded(), null,
-					shout.message, shout.timestamp.getMillis(), shout.signature, shout.hash);
+			ProviderTestUtility.insertIntoShoutTable(cr,
+					KeyGenerator.encodePublic(user.getPublicKey()), null,
+					shout.getMessage(), shout.getTimestamp().getMillis(), shout.getSignature(),
+					shout.getHash());
 		} catch (SQLException e) {
 			fail("Inserting a duplicate should not throw an exception");
 		}
@@ -171,8 +177,8 @@ public class ShoutProviderTest {
 	@Test
 	public void testInsertDuplicateUserDoesNothing() {
 		try {
-			ProviderTestUtility.insertIntoUserTable(cr, user.getUsername(), user.getPublicKey()
-					.getEncoded());
+			ProviderTestUtility.insertIntoUserTable(cr, user.getUsername(),
+					KeyGenerator.encodePublic(user.getPublicKey()));
 		} catch (SQLException e) {
 			fail("Inserting a duplicate should not throw an exception");
 		}

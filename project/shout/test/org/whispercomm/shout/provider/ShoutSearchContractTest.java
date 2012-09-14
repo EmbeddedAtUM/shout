@@ -6,6 +6,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
@@ -17,6 +18,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.User;
+import org.whispercomm.shout.crypto.DsaSignature;
 import org.whispercomm.shout.test.ShoutTestRunner;
 import org.whispercomm.shout.test.util.TestFactory;
 import org.whispercomm.shout.test.util.TestShout;
@@ -45,13 +47,15 @@ public class ShoutSearchContractTest {
 		shouts = new ArrayList<Shout>();
 		for (int i = 0; i < 5; i++) {
 			byte[] hash = TestFactory.genByteArray(32);
-			byte[] sig = TestFactory.genByteArray(32);
+			DsaSignature sig = new DsaSignature(BigInteger.valueOf(i * 10000),
+					BigInteger.valueOf(i * 10000000 + 123523554));
 			TestShout test = new TestShout(sender, null, MESSAGE, DateTime.now(), sig, hash);
 			ShoutProviderContract.saveShout(context, test);
 			shouts.add(test);
 		}
 		unique = new TestShout(sender, null, "Imma firin mah lazor!", DateTime.now(),
-				TestFactory.genByteArray(18), TestFactory.genByteArray(8));
+				new DsaSignature(BigInteger.valueOf(1030239349), BigInteger.valueOf(234834934)),
+				TestFactory.genByteArray(8));
 		ShoutProviderContract.saveShout(context, unique);
 	}
 
@@ -103,7 +107,8 @@ public class ShoutSearchContractTest {
 	public void testSearchPrefix() {
 		TestShout similar = new TestShout(sender, null,
 				"I am firing my employees because they spend too much time on Reddit",
-				new DateTime(), TestFactory.genByteArray(9), TestFactory.genByteArray(9));
+				new DateTime(), new DsaSignature(BigInteger.valueOf(2389239),
+						BigInteger.valueOf(23923939)), TestFactory.genByteArray(9));
 		ShoutProviderContract.saveShout(context, similar);
 		List<Shout> result = ShoutSearchContract.searchShoutMessage(context, "firin*");
 		assertNotNull(result);
