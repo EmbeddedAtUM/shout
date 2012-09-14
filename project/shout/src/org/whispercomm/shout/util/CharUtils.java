@@ -82,4 +82,5 @@ public class CharUtils {
 	public static ByteBuffer encodeUtf8(String string) {
 		return UTF_8.encode(string);
 	}
+
 }

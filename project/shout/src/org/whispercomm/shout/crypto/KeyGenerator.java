@@ -1,14 +1,15 @@
 
 package org.whispercomm.shout.crypto;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 
 import org.spongycastle.asn1.ASN1Encodable;
+import org.spongycastle.asn1.ASN1Encoding;
 import org.spongycastle.asn1.ASN1OctetString;
 import org.spongycastle.asn1.pkcs.PrivateKeyInfo;
-import org.spongycastle.asn1.sec.ECPrivateKeyStructure;
 import org.spongycastle.asn1.x509.AlgorithmIdentifier;
 import org.spongycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.spongycastle.asn1.x9.X962Parameters;
@@ -96,12 +97,17 @@ public class KeyGenerator {
 		ASN1Encodable params = new X962Parameters(ecP);
 
 		ASN1OctetString p = (ASN1OctetString)
-				(new X9ECPoint(ecParams.getQ())).toASN1Object();
+				new X9ECPoint(ecParams.getQ()).toASN1Primitive();
 
 		SubjectPublicKeyInfo info = new SubjectPublicKeyInfo(new AlgorithmIdentifier(
 				X9ObjectIdentifiers.id_ecPublicKey, params), p.getOctets());
 
-		return info.getDEREncoded();
+		try {
+			return info.getEncoded(ASN1Encoding.DER);
+		} catch (IOException e) {
+			// Should not happen. 'info' can always be encoded in DER form.
+			throw new RuntimeException(e);
+		}
 	}
 
 	public static ECPrivateKey generatePrivate(byte[] encoded)
@@ -138,12 +144,18 @@ public class KeyGenerator {
 				dParams.getH(), dParams.getSeed());
 		ASN1Encodable params = new X962Parameters(ecP);
 
-		ECPrivateKeyStructure keyStructure = new ECPrivateKeyStructure(ecParams.getD(), params);
-		PrivateKeyInfo info = new PrivateKeyInfo(new AlgorithmIdentifier(
-				X9ObjectIdentifiers.id_ecPublicKey, params.toASN1Object()),
-				keyStructure.toASN1Object());
+		org.spongycastle.asn1.sec.ECPrivateKey keyStructure = new org.spongycastle.asn1.sec.ECPrivateKey(
+				ecParams.getD(), params.toASN1Primitive());
 
-		return info.getDEREncoded();
+		try {
+			PrivateKeyInfo info = new PrivateKeyInfo(new AlgorithmIdentifier(
+					X9ObjectIdentifiers.id_ecPublicKey, params.toASN1Primitive()),
+					keyStructure.toASN1Primitive());
+			return info.getEncoded(ASN1Encoding.DER);
+		} catch (IOException e) {
+			// Should not happen. These items can always be encoded.
+			throw new RuntimeException(e);
+		}
 	}
 
 }

@@ -1,7 +1,6 @@
 
 package org.whispercomm.shout.crypto;
 
-import org.spongycastle.crypto.params.ECDomainParameters;
 import org.spongycastle.crypto.params.ECPublicKeyParameters;
 
 public class ECPublicKey {
@@ -41,9 +40,4 @@ public class ECPublicKey {
 		return true;
 	}
 
-	@Override
-	public String toString() {
-		ECDomainParameters dParams = params.getParameters();
-		return String.format("DParams[%s]", dParams);
-	}
 }
