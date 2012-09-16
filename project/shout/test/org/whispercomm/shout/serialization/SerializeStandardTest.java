@@ -2,8 +2,9 @@
 package org.whispercomm.shout.serialization;
 
 import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
+
+import java.nio.ByteBuffer;
 
 import org.junit.After;
 import org.junit.Before;
@@ -40,8 +41,9 @@ public class SerializeStandardTest {
 	public void testSerializeSingleShoutNoSignature() {
 		Shout grandparent = SerialShouts.GRANDPARENT;
 		byte[] grandparentBytes = SerialShouts.GRANDPARENT_SERIALIZED;
-		byte[] fromUtility = SerializeUtility.serializeShoutData(grandparent);
-		assertArrayEquals(grandparentBytes, fromUtility);
+		ByteBuffer from = ByteBuffer.allocate(grandparentBytes.length);
+		SerializeUtility.serializeShoutData(from, grandparent);
+		assertArrayEquals(grandparentBytes, from.array());
 	}
 
 	// TODO: Fix manual sigs and hashes in TestFactory, update this test to use
@@ -49,10 +51,9 @@ public class SerializeStandardTest {
 	public void testDeserializeSingleShoutWithSignature() {
 		try {
 			Shout grandparent = SerialShouts.GRANDPARENT;
-			byte[] signedGrandparent = SerialShouts.GRANDPARENT_SIGNED;
-			Shout fromBytes = SerializeUtility.deserializeSequenceOfShouts(1, signedGrandparent);
-			assertNotNull(fromBytes);
-			TestUtility.testEqualShoutFields(grandparent, fromBytes);
+			ByteBuffer signedGrandparent = ByteBuffer.wrap(SerialShouts.GRANDPARENT_SIGNED);
+			Shout from = SerializeUtility.deserializeShout(signedGrandparent);
+			TestUtility.testEqualShoutFields(grandparent, from);
 		} catch (UnsupportedVersionException e) {
 			fail("Shout version is not bad!");
 		} catch (ShoutPacketException e) {

@@ -33,23 +33,16 @@ public class SerializeUtilityTest {
 	private void testShoutSerDes(Shout shout) throws UnsupportedVersionException,
 			ShoutPacketException,
 			InvalidShoutSignatureException {
-		ByteBuffer serialized = ByteBuffer.allocate(3
-				* SerializeUtility.SHOUT_SIGNED_SIZE_MAX);
+		ByteBuffer serialized = ByteBuffer.allocate(SerializeUtility.SHOUT_SIGNED_SIZE_MAX);
 
-		Shout cur = shout;
-		int cnt = 0;
-		while (cur != null) {
-			SerializeUtility
-					.serializeShout(serialized,
-							cur);
-			cur = cur.getParent();
-			++cnt;
-		}
+		SerializeUtility
+				.serializeShout(serialized,
+						shout);
 
 		serialized.flip();
-		Shout deserialized = SerializeUtility.deserializeSequenceOfShouts(cnt, serialized);
+		Shout deserialized = SerializeUtility.deserializeShout(serialized);
 
-		TestUtility.testEqualShoutFields(shout, deserialized);
+		TestUtility.testEqualShoutFieldsNoParent(shout, deserialized);
 	}
 
 	@Test

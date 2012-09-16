@@ -46,4 +46,21 @@ public class TestUtility {
 		testEqualShoutFields(lhs.getParent(), rhs.getParent());
 	}
 
+	public static void testEqualShoutFieldsNoParent(Shout lhs, Shout rhs) {
+		if (lhs == null) {
+			assertNull(rhs);
+			return;
+		}
+		if (rhs == null) {
+			assertNull(lhs);
+			return;
+		}
+		assertEquals(lhs.getMessage(), rhs.getMessage());
+		assertEquals(lhs.getTimestamp().getMillis(), rhs.getTimestamp().getMillis());
+		assertEquals(lhs.getSender().getUsername(), rhs.getSender().getUsername());
+		assertEquals(lhs.getSender().getPublicKey(), rhs.getSender().getPublicKey());
+		assertEquals(lhs.getSignature(), rhs.getSignature());
+		assertArrayEquals(lhs.getHash(), rhs.getHash());
+	}
+
 }

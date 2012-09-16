@@ -219,30 +219,16 @@ public class SerializeUtility {
 	/**
 	 * Serialize the Shout data (not signature).
 	 * <p>
-	 * Should be using the ByteBuffer version to avoid unnecessary data copying.
+	 * If the returned data is to be copied into another array, prefer using
+	 * {@link #serializeShout(ByteBuffer, Shout)} to do the serialization in
+	 * place.
 	 * 
 	 * @param shout the shout to serialize
 	 * @return A serialized version of the shout
 	 */
-	@Deprecated
 	public static byte[] serializeShoutData(UnsignedShout shout) {
 		ByteBuffer buffer = ByteBuffer.allocate(SHOUT_UNSIGNED_SIZE_MAX);
 		serializeShoutData(buffer, shout);
-		return Arrays.copyOfRange(buffer.array(), 0, buffer.position());
-	}
-
-	/**
-	 * Serializes an already-signed shout.
-	 * <p>
-	 * Should be use the ByteBuffer version to avoid unnecessary data copying.
-	 * 
-	 * @param shout the shout to serialize
-	 * @return the serialized version of the shout
-	 */
-	@Deprecated
-	public static byte[] serializeShout(Shout shout) {
-		ByteBuffer buffer = ByteBuffer.allocate(SHOUT_SIGNED_SIZE_MAX);
-		serializeShout(buffer, shout);
 		return Arrays.copyOfRange(buffer.array(), 0, buffer.position());
 	}
 
@@ -365,73 +351,6 @@ public class SerializeUtility {
 		} catch (BufferUnderflowException e) {
 			throw new ShoutPacketException("Shout packet missing bytes", e);
 		}
-	}
-
-	/**
-	 * Deserializes the body of a Shout packet (including ancestors) given the
-	 * result of {@link ShoutPacket#getBodyBytes()} in a ByteBuffer.
-	 * 
-	 * @param count the number of Shouts in the chain
-	 * @param buffer the buffer containing the serialized shout sequence
-	 * @return the root of the shout chain
-	 * @throws BadShoutVersionException if a serialized shout has an unsupported
-	 *             version
-	 * @throws ShoutPacketException if a serialized shout contains invalid data
-	 * @throws InvalidShoutSignatureException if one of the included signatures
-	 *             is invalid
-	 */
-	public static Shout deserializeSequenceOfShouts(int count, ByteBuffer buffer)
-			throws UnsupportedVersionException, ShoutPacketException,
-			InvalidShoutSignatureException {
-		BuildableShout root = null;
-		BuildableShout child = null;
-		for (int idx = 0; idx < count; ++idx) {
-			// Get the next shout
-			BuildableShout shout = deserializeShout(buffer);
-
-			if (root == null) {
-				root = shout;
-			}
-
-			// Connect the parent, if needed
-			if (child != null && child.parentHash != null) {
-				if (Arrays.equals(child.parentHash, shout.hash)) {
-					child.parent = shout;
-				} else {
-					throw new ShoutPacketException(
-							"The referenced parent shout is missing from the packet.");
-				}
-			}
-
-			child = shout;
-		}
-
-		if (child.parentHash != null && child.parent == null) {
-			throw new ShoutPacketException(
-					"The referenced parent shout is missing from the packet.");
-		}
-
-		return root;
-	}
-
-	/**
-	 * Deserializes the body of a Shout packet (including ancestors) given the
-	 * result of {@link ShoutPacket#getBodyBytes()}.
-	 * 
-	 * @param count the number of Shouts in the chain
-	 * @param body the concatenation of the serialized shouts
-	 * @return the root of the shout chain
-	 * @throws BadShoutVersionException if a serialized shout has an unsupported
-	 *             version
-	 * @throws ShoutPacketException if a serialized shout contains invalid data
-	 * @throws InvalidShoutSignatureException if one of the included signatures
-	 *             is invalid
-	 */
-	@Deprecated
-	public static Shout deserializeSequenceOfShouts(int count, byte[] body)
-			throws UnsupportedVersionException, ShoutPacketException,
-			InvalidShoutSignatureException {
-		return deserializeSequenceOfShouts(count, ByteBuffer.wrap(body));
 	}
 
 	/**
