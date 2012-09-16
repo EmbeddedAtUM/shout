@@ -19,6 +19,7 @@ import java.nio.charset.CharacterCodingException;
 
 import org.joda.time.DateTime;
 import org.spongycastle.math.ec.ECPoint;
+import org.whispercomm.shout.Location;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.ShoutType;
 import org.whispercomm.shout.UnsignedShout;
@@ -158,7 +159,7 @@ public class SerializeUtility {
 			flags |= PARENT_BIT_MASK;
 		}
 
-		boolean hasLocation = false; // TODO: check Shout object for location
+		boolean hasLocation = (shout.getLocation() != null);
 		if (hasLocation) {
 			flags |= LOCATION_BIT_MASK;
 		}
@@ -185,9 +186,8 @@ public class SerializeUtility {
 			buffer.put((byte) 0); // No message, put in 0 as length
 		}
 		if (hasLocation) {
-			// TODO: get real location information
-			buffer.putDouble(0);
-			buffer.putDouble(0);
+			buffer.putDouble(shout.getLocation().getLongitude());
+			buffer.putDouble(shout.getLocation().getLongitude());
 		}
 
 		// Add Parent Reference Fields
@@ -322,8 +322,12 @@ public class SerializeUtility {
 
 			// Location
 			if (HAS_LOCATION(flags)) {
-				shout.longitude = buffer.getDouble();
-				shout.latitude = buffer.getDouble();
+				BuildableLocation location = new BuildableLocation();
+				location.longitude = buffer.getDouble();
+				location.latitude = buffer.getDouble();
+				shout.location = location;
+			} else {
+				shout.location = null;
 			}
 
 			// Parent reference
@@ -420,6 +424,21 @@ public class SerializeUtility {
 		return HashUtils.sha256(serialized);
 	}
 
+	private static class BuildableLocation implements Location {
+		double longitude;
+		double latitude;
+
+		@Override
+		public double getLongitude() {
+			return longitude;
+		}
+
+		@Override
+		public double getLatitude() {
+			return latitude;
+		}
+	}
+
 	private static class BuildableUser implements User {
 
 		String username;
@@ -445,8 +464,7 @@ public class SerializeUtility {
 		public User user = null;
 
 		public String message = null;
-		public Double longitude = null;
-		public Double latitude = null;
+		public Location location = null;
 
 		public BuildableShout parent = null;
 		public byte[] parentHash = null;
@@ -462,6 +480,10 @@ public class SerializeUtility {
 		@Override
 		public String getMessage() {
 			return message;
+		}
+
+		public Location getLocation() {
+			return location;
 		}
 
 		@Override

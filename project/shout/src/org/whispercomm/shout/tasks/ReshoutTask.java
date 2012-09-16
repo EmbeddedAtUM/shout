@@ -45,7 +45,7 @@ public class ReshoutTask extends AsyncTaskCallback<Void, Void, LocalShout> {
 	@Override
 	protected LocalShout doInBackground(Void... params) {
 		ShoutCreator creator = new ShoutCreator(context);
-		return creator.createReshout(DateTime.now(), parent, me);
+		return creator.createReshout(DateTime.now(), null, parent, me);
 	}
 
 }

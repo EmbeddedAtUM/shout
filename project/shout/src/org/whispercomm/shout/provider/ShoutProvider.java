@@ -350,7 +350,7 @@ public class ShoutProvider extends ContentProvider {
 		private static final String TAG = ShoutDatabaseHelper.class
 				.getSimpleName();
 
-		public static final int VERSION = 1;
+		public static final int VERSION = 2;
 		public static final String DBNAME = "shout_base";
 
 		private static final String SQL_CREATE_USER = "CREATE TABLE "
@@ -368,6 +368,8 @@ public class ShoutProvider extends ContentProvider {
 				+ ShoutProviderContract.Shouts.AUTHOR + " TEXT, "
 				+ ShoutProviderContract.Shouts.PARENT + " TEXT, "
 				+ ShoutProviderContract.Shouts.MESSAGE + " TEXT, "
+				+ ShoutProviderContract.Shouts.LONGITUDE + "REAL, "
+				+ ShoutProviderContract.Shouts.LATITUDE + "REAL, "
 				+ ShoutProviderContract.Shouts.TIME_SENT + " LONG, "
 				+ ShoutProviderContract.Shouts.TIME_RECEIVED + " LONG, "
 				+ ShoutProviderContract.Shouts.HASH + " TEXT, "
@@ -381,6 +383,14 @@ public class ShoutProvider extends ContentProvider {
 				+ "FOREIGN KEY(" + ShoutProviderContract.Shouts.PARENT
 				+ ") REFERENCES " + ShoutProviderContract.Shouts.TABLE_NAME +
 				"(" + ShoutProviderContract.Shouts.HASH + ")" + ");";
+
+		private static final String SQL_ALTER_SHOUT_VERSION_1_TO_VERSION_2_STEP_1 = "ALTER TABLE "
+				+ ShoutProviderContract.Shouts.TABLE_NAME + " ADD "
+				+ ShoutProviderContract.Shouts.LONGITUDE + " REAL";
+
+		private static final String SQL_ALTER_SHOUT_VERSION_1_TO_VERSION_2_STEP_2 = "ALTER TABLE "
+				+ ShoutProviderContract.Shouts.TABLE_NAME + " ADD "
+				+ ShoutProviderContract.Shouts.LATITUDE + " REAL";
 
 		private static final String SQL_CREATE_VIRTUAL_MESSAGE = "CREATE VIRTUAL TABLE "
 				+ ShoutSearchContract.Messages.TABLE_NAME
@@ -444,8 +454,17 @@ public class ShoutProvider extends ContentProvider {
 
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-			Log.e(TAG, "Unsupported call to onUpgrade");
-			throw new IllegalStateException();
+			if (oldVersion == 1 && newVersion == 2) {
+				Log.i(TAG, "Updating database from version 1 to version 2...");
+				db.execSQL(SQL_ALTER_SHOUT_VERSION_1_TO_VERSION_2_STEP_1);
+				db.execSQL(SQL_ALTER_SHOUT_VERSION_1_TO_VERSION_2_STEP_2);
+				Log.i(TAG, "Database update complete.");
+			} else {
+				Log.e(TAG, String.format(
+						"Unsupported call to onUpgrade. Old Version: %d. New Version: %d.",
+						oldVersion, newVersion));
+				throw new IllegalStateException();
+			}
 		}
 
 	}

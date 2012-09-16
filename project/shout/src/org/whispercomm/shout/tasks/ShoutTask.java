@@ -42,7 +42,7 @@ public class ShoutTask extends AsyncTaskCallback<String, Void, LocalShout> {
 		String message = params[0];
 
 		ShoutCreator creator = new ShoutCreator(context);
-		return creator.createShout(DateTime.now(), message, me);
+		return creator.createShout(DateTime.now(), message, null, me);
 	}
 
 }

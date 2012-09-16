@@ -3,7 +3,9 @@ package org.whispercomm.shout.provider;
 
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.LocalUser;
+import org.whispercomm.shout.Location;
 import org.whispercomm.shout.Shout;
+import org.whispercomm.shout.SimpleLocation;
 import org.whispercomm.shout.User;
 import org.whispercomm.shout.crypto.DsaSignature;
 import org.whispercomm.shout.crypto.ECPublicKey;
@@ -79,6 +81,16 @@ public class ShoutProviderContract {
 		 * Column name for the message in a Shout. Stored as text.
 		 */
 		public static final String MESSAGE = "Message";
+
+		/**
+		 * Column name for the longitude in a Shout. Stored as a real.
+		 */
+		public static final String LONGITUDE = "Longitude";
+
+		/**
+		 * Column name for the latitude in a Shout. Stored as a real.
+		 */
+		public static final String LATITUDE = "Latitude";
 
 		/**
 		 * Column name for the parent Shout. Stored as a reference to another
@@ -203,6 +215,8 @@ public class ShoutProviderContract {
 		int authorIndex = cursor.getColumnIndex(Shouts.AUTHOR);
 		int parentIndex = cursor.getColumnIndex(Shouts.PARENT);
 		int messageIndex = cursor.getColumnIndex(Shouts.MESSAGE);
+		int longitudeIndex = cursor.getColumnIndex(Shouts.LONGITUDE);
+		int latitudeIndex = cursor.getColumnIndex(Shouts.LATITUDE);
 		int hashIndex = cursor.getColumnIndex(Shouts.HASH);
 		int sigIndex = cursor.getColumnIndex(Shouts.SIGNATURE);
 		int timeIndex = cursor.getColumnIndex(Shouts.TIME_SENT);
@@ -214,14 +228,29 @@ public class ShoutProviderContract {
 		String encodedParentHash = cursor.isNull(parentIndex) ? null : cursor
 				.getString(parentIndex);
 		String message = cursor.getString(messageIndex);
+		Long longitude = null;
+		Long latitude = null;
+		/*
+		 * Check for unit tests. RoboEletric isn't aware of null columns, but
+		 * returns -1 as the index instead.
+		 */
+		if (longitudeIndex >= 0 && latitudeIndex >= 0) {
+			longitude = cursor.getLong(longitudeIndex);
+			latitude = cursor.getLong(latitudeIndex);
+		}
 		String encodedSig = cursor.getString(sigIndex);
 		String encodedHash = cursor.getString(hashIndex);
 		Long sentTime = cursor.getLong(timeIndex);
 		Long receivedTime = cursor.getLong(revcIndex);
 		int numComments = cursor.getInt(commentIndex);
 		int numReshouts = cursor.getInt(reshoutIndex);
+
+		Location location = null;
+		if (longitude != null && latitude != null) {
+			location = new SimpleLocation(longitude, latitude);
+		}
 		LocalUser sender = retrieveUserByEncodedKey(context, encodedAuthor);
-		LocalShout shout = new LocalShoutImpl(context, sender, message,
+		LocalShout shout = new LocalShoutImpl(context, sender, message, location,
 				encodedSig, encodedHash, sentTime, receivedTime, numComments,
 				numReshouts, encodedParentHash);
 		return shout;
@@ -434,6 +463,10 @@ public class ShoutProviderContract {
 			ContentValues values = new ContentValues();
 			values.put(Shouts.AUTHOR, encodedSender);
 			values.put(Shouts.MESSAGE, shout.getMessage());
+			if (shout.getLocation() != null) {
+				values.put(Shouts.LONGITUDE, shout.getLocation().getLongitude());
+				values.put(Shouts.LATITUDE, shout.getLocation().getLatitude());
+			}
 			values.put(Shouts.HASH, encodedHash);
 			values.put(Shouts.SIGNATURE, encodedSig);
 			values.put(Shouts.TIME_SENT, shout.getTimestamp().getMillis());

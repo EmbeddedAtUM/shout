@@ -7,15 +7,17 @@ import org.whispercomm.shout.util.ShoutMessageUtility;
 public class SimpleUnsignedShout implements UnsignedShout {
 
 	private User sender;
+	private Location location;
 	private String message;
 	private Shout parent;
 	private DateTime timestamp;
 
-	public SimpleUnsignedShout(DateTime timestamp, User sender, String message,
+	public SimpleUnsignedShout(DateTime timestamp, User sender, String message, Location location,
 			Shout parent) {
 		this.timestamp = timestamp;
 		this.sender = sender;
 		this.message = message;
+		this.location = location;
 		this.parent = parent;
 	}
 
@@ -27,6 +29,11 @@ public class SimpleUnsignedShout implements UnsignedShout {
 	@Override
 	public String getMessage() {
 		return this.message;
+	}
+
+	@Override
+	public Location getLocation() {
+		return this.location;
 	}
 
 	@Override

@@ -9,14 +9,16 @@ public class SimpleShout extends AbstractShout implements Shout {
 	private DateTime timestamp;
 	private User sender;
 	private String message;
+	private Location location;
 	private Shout parent;
 	private DsaSignature signature;
 
-	public SimpleShout(DateTime timestamp, User sender, String message,
+	public SimpleShout(DateTime timestamp, User sender, String message, Location location,
 			Shout parent, DsaSignature signature) {
 		this.timestamp = timestamp;
 		this.sender = sender;
 		this.message = message;
+		this.location = location;
 		this.parent = parent;
 		this.signature = signature;
 	}
@@ -34,6 +36,11 @@ public class SimpleShout extends AbstractShout implements Shout {
 	@Override
 	public String getMessage() {
 		return this.message;
+	}
+
+	@Override
+	public Location getLocation() {
+		return this.location;
 	}
 
 	@Override

@@ -10,6 +10,7 @@ import java.util.TreeSet;
 import org.joda.time.DateTime;
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.LocalUser;
+import org.whispercomm.shout.Location;
 import org.whispercomm.shout.ShoutType;
 import org.whispercomm.shout.crypto.DsaSignature;
 import org.whispercomm.shout.util.ShoutMessageUtility;
@@ -22,6 +23,7 @@ public class LocalShoutImpl implements LocalShout {
 
 	private LocalUser sender;
 	private String message;
+	private Location location;
 	private DsaSignature signature;
 	private byte[] hashBytes;
 	private DateTime sentTime;
@@ -35,12 +37,13 @@ public class LocalShoutImpl implements LocalShout {
 
 	private Context context;
 
-	public LocalShoutImpl(Context context, LocalUser sender, String message,
+	public LocalShoutImpl(Context context, LocalUser sender, String message, Location location,
 			String encodedSig, String encodedHash, Long sentTime, Long receivedTime,
 			int commentCount, int reshoutCount, String encodedParentHash) {
 		this.context = context;
 		this.sender = sender;
 		this.message = message;
+		this.location = location;
 		this.signature = DsaSignature.decode(Base64.decode(encodedSig, Base64.DEFAULT));
 		this.hashBytes = Base64.decode(encodedHash, Base64.DEFAULT);
 		this.sentTime = new DateTime(sentTime);
@@ -60,6 +63,11 @@ public class LocalShoutImpl implements LocalShout {
 	@Override
 	public String getMessage() {
 		return this.message;
+	}
+
+	@Override
+	public Location getLocation() {
+		return this.location;
 	}
 
 	@Override

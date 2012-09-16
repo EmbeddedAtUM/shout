@@ -47,7 +47,7 @@ public class CommentTask extends AsyncTaskCallback<String, Void, LocalShout> {
 		String message = params[0];
 
 		ShoutCreator creator = new ShoutCreator(context);
-		return creator.createComment(DateTime.now(), message, parent, me);
+		return creator.createComment(DateTime.now(), message, null, parent, me);
 	}
 
 }

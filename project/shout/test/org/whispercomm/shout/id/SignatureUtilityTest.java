@@ -71,7 +71,8 @@ public class SignatureUtilityTest {
 
 	@Test
 	public void testValidSignatureFromShoutIsValid() {
-		UnsignedShout unsigned = new TestUnsignedShout(me, null, "message content", DateTime.now());
+		UnsignedShout unsigned = new TestUnsignedShout(me, null, "message content", null,
+				DateTime.now());
 		DsaSignature signature = SignatureUtility.signShout(unsigned, me);
 		Shout shout = new TestShout(unsigned.getSender(), null, unsigned.getMessage(),
 				unsigned.getTimestamp(), signature, null);

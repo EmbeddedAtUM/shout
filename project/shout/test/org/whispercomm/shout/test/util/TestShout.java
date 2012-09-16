@@ -13,7 +13,7 @@ public class TestShout extends TestUnsignedShout implements Shout {
 
 	public TestShout(User sender, Shout parent, String message,
 			DateTime timestamp, DsaSignature signature, byte[] hash) {
-		super(sender, parent, message, timestamp);
+		super(sender, parent, message, null, timestamp);
 		this.signature = signature;
 		this.hash = hash;
 	}

@@ -32,11 +32,11 @@ public class ShoutCreator {
 	 * @param sender the identity for the sender field of the shout
 	 * @return the saved shout
 	 */
-	public LocalShout createShout(DateTime timestamp, String message, Me sender) {
+	public LocalShout createShout(DateTime timestamp, String message, Location location, Me sender) {
 		UnsignedShout unsigned = new SimpleUnsignedShout(timestamp, sender,
-				message, null);
+				message, location, null);
 		DsaSignature signature = SignatureUtility.signShout(unsigned, sender);
-		Shout shout = new SimpleShout(timestamp, sender, message, null,
+		Shout shout = new SimpleShout(timestamp, sender, message, location, null,
 				signature);
 		return ShoutProviderContract.saveShout(context, shout);
 	}
@@ -50,12 +50,12 @@ public class ShoutCreator {
 	 * @param sender the identity for the sender field of the shout
 	 * @return the saved shout
 	 */
-	public LocalShout createComment(DateTime timestamp, String message,
+	public LocalShout createComment(DateTime timestamp, String message, Location location,
 			Shout parent, Me sender) {
 		UnsignedShout unsigned = new SimpleUnsignedShout(timestamp, sender,
-				message, parent);
+				message, location, parent);
 		DsaSignature signature = SignatureUtility.signShout(unsigned, sender);
-		Shout shout = new SimpleShout(timestamp, sender, message, parent,
+		Shout shout = new SimpleShout(timestamp, sender, message, location, parent,
 				signature);
 		return ShoutProviderContract.saveShout(context, shout);
 	}
@@ -68,11 +68,11 @@ public class ShoutCreator {
 	 * @param sender the identity for the sender field of the shout
 	 * @return the saved shout
 	 */
-	public LocalShout createReshout(DateTime timestamp, Shout parent, Me sender) {
+	public LocalShout createReshout(DateTime timestamp, Location location, Shout parent, Me sender) {
 		UnsignedShout unsigned = new SimpleUnsignedShout(timestamp, sender,
-				null, parent);
+				null, location, parent);
 		DsaSignature signature = SignatureUtility.signShout(unsigned, sender);
-		Shout shout = new SimpleShout(timestamp, sender, null, parent,
+		Shout shout = new SimpleShout(timestamp, sender, null, location, parent,
 				signature);
 		return ShoutProviderContract.saveShout(context, shout);
 	}

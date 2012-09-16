@@ -31,6 +31,12 @@ public interface UnsignedShout {
 	public DateTime getTimestamp();
 
 	/**
+	 * @return the location of this shout or {@code null} if no location is
+	 *         available
+	 */
+	public Location getLocation();
+
+	/**
 	 * Get a Shout object for any referenced / included Shout within this Shout
 	 * as a stand-alone Shout object.
 	 * 
