@@ -1,5 +1,5 @@
 
-package org.whispercomm.shout.network;
+package org.whispercomm.shout.network.service;
 
 import org.whispercomm.shout.terms.AgreementManager;
 

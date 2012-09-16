@@ -6,9 +6,9 @@ import java.io.IOException;
 import org.whispercomm.manes.client.maclib.ManesNotInstalledException;
 import org.whispercomm.manes.client.maclib.ManesNotRegisteredException;
 import org.whispercomm.shout.LocalShout;
-import org.whispercomm.shout.network.NetworkInterface;
-import org.whispercomm.shout.network.NetworkInterface.NotConnectedException;
-import org.whispercomm.shout.serialization.ShoutChainTooLongException;
+import org.whispercomm.shout.network.service.NetworkInterface;
+import org.whispercomm.shout.network.service.NetworkInterface.NotConnectedException;
+import org.whispercomm.shout.network.shout.ShoutChainTooLongException;
 
 /**
  * A class encapsulating the result of a

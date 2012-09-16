@@ -8,6 +8,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.whispercomm.shout.Shout;
+import org.whispercomm.shout.network.UnsupportedVersionException;
+import org.whispercomm.shout.network.shout.InvalidShoutSignatureException;
 import org.whispercomm.shout.test.ShoutTestRunner;
 import org.whispercomm.shout.test.util.TestFactory;
 import org.whispercomm.shout.test.util.TestUtility;
@@ -28,7 +30,7 @@ public class SerializeUtilityTest {
 	public void takeDown() {
 	}
 
-	private void testShoutSerDes(Shout shout) throws BadShoutVersionException,
+	private void testShoutSerDes(Shout shout) throws UnsupportedVersionException,
 			ShoutPacketException,
 			InvalidShoutSignatureException {
 		ByteBuffer serialized = ByteBuffer.allocate(3
@@ -51,25 +53,25 @@ public class SerializeUtilityTest {
 	}
 
 	@Test
-	public void testSerDesRoot() throws BadShoutVersionException, ShoutPacketException,
+	public void testSerDesRoot() throws UnsupportedVersionException, ShoutPacketException,
 			InvalidShoutSignatureException {
 		testShoutSerDes(TestFactory.ROOT_SHOUT);
 	}
 
 	@Test
-	public void testSerDesReshout() throws BadShoutVersionException, ShoutPacketException,
+	public void testSerDesReshout() throws UnsupportedVersionException, ShoutPacketException,
 			InvalidShoutSignatureException {
 		testShoutSerDes(TestFactory.RESHOUT_SHOUT);
 	}
 
 	@Test
-	public void testSerDesComment() throws BadShoutVersionException, ShoutPacketException,
+	public void testSerDesComment() throws UnsupportedVersionException, ShoutPacketException,
 			InvalidShoutSignatureException {
 		testShoutSerDes(TestFactory.COMMENT_SHOUT);
 	}
 
 	@Test
-	public void testSerDesRecomment() throws BadShoutVersionException, ShoutPacketException,
+	public void testSerDesRecomment() throws UnsupportedVersionException, ShoutPacketException,
 			InvalidShoutSignatureException {
 		testShoutSerDes(TestFactory.RECOMMENT_SHOUT);
 	}

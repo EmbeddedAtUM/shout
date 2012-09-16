@@ -1,7 +1,7 @@
-package org.whispercomm.shout.network;
+package org.whispercomm.shout.network.service;
 
-import org.whispercomm.shout.network.ErrorCode;
-import org.whispercomm.shout.network.ManesStatusCallback;
+import org.whispercomm.shout.network.service.ErrorCode;
+import org.whispercomm.shout.network.service.ManesStatusCallback;
 
 interface NetworkServiceBinder {
 	ErrorCode send(in byte[] hash);

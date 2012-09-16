@@ -1,5 +1,5 @@
 
-package org.whispercomm.shout.serialization;
+package org.whispercomm.shout.network.shout;
 
 /**
  * An exception indicating a Shout chain was too long to be serialized into a

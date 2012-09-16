@@ -1,9 +1,8 @@
 
-package org.whispercomm.shout.network;
+package org.whispercomm.shout.network.shout;
 
 import org.whispercomm.manes.client.maclib.ManesNotRegisteredException;
 import org.whispercomm.shout.Shout;
-import org.whispercomm.shout.serialization.ShoutChainTooLongException;
 
 /**
  * Interface for accessing the network logic of Shout. The network logic has two
@@ -35,6 +34,6 @@ public interface NetworkProtocol {
 	/**
 	 * Handle a Shout received from the network interface.
 	 */
-	public void receivePacket(byte[] data);
+	public void receive(Shout shout);
 
 }

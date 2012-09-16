@@ -1,5 +1,5 @@
 
-package org.whispercomm.shout.serialization;
+package org.whispercomm.shout.network.shout;
 
 public class InvalidShoutSignatureException extends Exception {
 

@@ -3,10 +3,10 @@ package org.whispercomm.shout.ui;
 
 import org.whispercomm.manes.client.maclib.ManesActivityHelper;
 import org.whispercomm.shout.expiry.ExpiryManager;
-import org.whispercomm.shout.network.BootReceiver;
-import org.whispercomm.shout.network.NetworkInterface;
-import org.whispercomm.shout.network.NetworkInterface.ShoutServiceConnection;
-import org.whispercomm.shout.network.NetworkService;
+import org.whispercomm.shout.network.service.BootReceiver;
+import org.whispercomm.shout.network.service.NetworkInterface;
+import org.whispercomm.shout.network.service.NetworkService;
+import org.whispercomm.shout.network.service.NetworkInterface.ShoutServiceConnection;
 import org.whispercomm.shout.terms.AgreementListener;
 import org.whispercomm.shout.terms.AgreementManager;
 

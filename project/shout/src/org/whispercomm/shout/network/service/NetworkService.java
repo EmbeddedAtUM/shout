@@ -1,5 +1,5 @@
 
-package org.whispercomm.shout.network;
+package org.whispercomm.shout.network.service;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -10,8 +10,14 @@ import org.whispercomm.manes.client.maclib.ManesInterface.ManesConnection;
 import org.whispercomm.manes.client.maclib.ManesNotInstalledException;
 import org.whispercomm.manes.client.maclib.ManesNotRegisteredException;
 import org.whispercomm.shout.Shout;
+import org.whispercomm.shout.network.NetworkReceiver;
+import org.whispercomm.shout.network.ObjectType;
+import org.whispercomm.shout.network.PacketProtocol;
+import org.whispercomm.shout.network.shout.NaiveNetworkProtocol;
+import org.whispercomm.shout.network.shout.NetworkProtocol;
+import org.whispercomm.shout.network.shout.ShoutChainTooLongException;
+import org.whispercomm.shout.network.shout.ShoutProtocol;
 import org.whispercomm.shout.provider.ShoutProviderContract;
-import org.whispercomm.shout.serialization.ShoutChainTooLongException;
 
 import android.app.Service;
 import android.content.Intent;
@@ -25,9 +31,15 @@ public class NetworkService extends Service implements ManesConnection, ManesIns
 	public static final int APP_ID = 74688;// "shout" on a phone keyboard
 
 	private ManesInterface manes;
-	private NetworkProtocol networkProtocol;
-	private NetworkReceiver networkReceiver;
 
+	// Packets are passed from socket to NetworkReceiver to PacketReceiver to
+	// ShoutReceiver to NetworkProtocol.
+	private NetworkReceiver networkReceiver;
+	private PacketProtocol packetProtocol;
+	private ShoutProtocol shoutProtocol;
+	private NetworkProtocol networkProtocol;
+
+	// Starts the service once MANES client is installed.
 	private ManesInstallationReceiver manesInstallReceiver;
 
 	private CopyOnWriteArrayList<ManesStatusCallback> callbacks;
@@ -56,12 +68,18 @@ public class NetworkService extends Service implements ManesConnection, ManesIns
 		if (manes == null) {
 			Log.i(TAG, "Starting initialization.");
 			try {
-				this.manes = new ManesInterface(APP_ID, getApplicationContext(), this);
+				manes = new ManesInterface(APP_ID, getApplicationContext(), this);
 
-				this.networkProtocol = new NaiveNetworkProtocol(manes,
-						getApplicationContext());
-				this.networkReceiver = new NetworkReceiver(this.manes,
-						this.networkProtocol);
+				networkReceiver = new NetworkReceiver(this.manes);
+
+				packetProtocol = new PacketProtocol(manes);
+				networkReceiver.register(packetProtocol);
+
+				shoutProtocol = new ShoutProtocol(packetProtocol);
+				packetProtocol.register(ObjectType.Shout, shoutProtocol);
+
+				networkProtocol = new NaiveNetworkProtocol(shoutProtocol, getApplicationContext());
+				shoutProtocol.register(networkProtocol);
 
 				this.networkProtocol.initialize();
 				this.networkReceiver.initialize();

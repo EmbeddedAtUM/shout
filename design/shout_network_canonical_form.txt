@@ -1,87 +1,89 @@
-Shout Serialization Version 0
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+================================================================================
+Network Packet
+--------------------------------------------------------------------------------
+Version 0:
+(max 1500 bytes)  ||====================||
+                  || version || flags   || |   0-3   | 4 | 5 | 6 | 7 |
+                  || (1 byte)           || | version |   |   |   |   |
+                  ||====================||
+                  || Object type id     || 
+                  || (1 byte)           ||
+		  ||--------------------||
+                  || Object length      ||
+                  || (2 bytes)          ||
+                  ||--------------------||
+                  || Object             ||
+                  || (variable)         ||
+                  ||====================||
+                  || Object type        ||
+                  || (1 byte)           ||
+                  ||--------------------||
+                  || Object length      ||
+                  || (2 bytes)          ||
+                  ||--------------------||
+		  || Object             ||
+                  || (variable)         ||
+                  ||====================||
+                           etc
+                            .
+                            .
+                            .
 
-Shout:            ||====================||
-(max 467 bytes)   || version || flags   || |   0-3   |     4        | 5          | 6 | 7 | 
+
+================================================================================
+Object Type Identifiers
+--------------------------------------------------------------------------------
+0x00 - Shout object
+0x01 - Content object (merkle-tree addressed)
+
+
+================================================================================
+Shout Object
+--------------------------------------------------------------------------------
+Version O:
+(max 467 bytes)   ||====================||
+                  || version || flags   || |   0-3   |     4        | 5          | 6 | 7 | 
                   || (1 byte)           || | version | has_location | has_parent |   |   |
                   ||====================||
-                  || time               ||
+                  || time               || milliseconds sinch Unix epoch, big endian
                   || (8 bytes)          ||
                   ||====================||
-                  || public_key x coord ||
+                  || public_key x coord || unsigned, big endian
                   || (32 bytes)         ||
                   ||--------------------||
-                  || public_key y coord ||
+                  || public_key y coord || unsigned, big endian
                   || (32 bytes)         ||
                   ||--------------------||
-                  || avatar_hash        ||
+                  || avatar_hash        || SHA-256 hash of avatar
                   || (32 bytes)         ||
                   ||--------------------||
-                  || sender_name_len*   ||
+                  || sender_name_len    || length of next field in [1, 40] 
                   || (1 byte)           ||
-                  ||--------------------||
-                  || sender_name*       ||
+                  ||--------------------|| 
+                  || sender_name        || UTF-8
                   || (max 40 bytes)     ||
                   ||====================||
-                  || message_len*       ||
+                  || message_len        || length of next field in [0,240]
                   || (1 byte)           ||
                   ||--------------------||
-                  || message*           ||
+                  || message            || UTF-8
                   || (max 240 bytes)    ||
                   ||--------------------||
-                  || longitude*         ||
+                  || longitude          || IEEE-754 double
                   || (8 or 0 bytes)     ||
                   ||--------------------||
-                  || longitude*         ||
+                  || longitude          || IEEE-754 double
                   || (8 or 0 bytes)     ||
                   ||--------------------||
-                  || parent_hash*       ||
+                  || parent_hash        || SHA-256 hash of parent shout
                   || (32 or 0 bytes)    ||
                   ||====================||
-                  || signature r value  ||
+                  || signature r value  || unsigned, big endian
                   || (32 bytes)         ||
                   ||--------------------|| 
-                  || signature s value  ||
+                  || signature s value  || unsigned, big endian
                   || (32 bytes)         ||
                   ||====================||
 
 
-Shout packet:
-                  ||====================||
-                  || version            ||
-                  || (1 byte)           ||
-                  ||--------------------||
-                  || shout_count*       ||
-                  || (1 byte)           ||
-                  ||====================||
-                  || shout              ||
-                  ||====================||
-                  || shout              ||
-                  ||====================||
-                          etc.
-                             .
-                             .
 
-
-Notes:
-*shout_count: Max is 3 to fit into a single packet with size < 1500 bytes
-
-*sender_name_len: Length of next field, values range 1 - 40 
-
-*sender_name: UTF-8 encoded sender username
-
-*sender_pub_key: 91 bytes as returned by Bouncy Castle's X.509 encoding scheme
-using ECDSA and "secp256r1"
-
-*message_len: Length of next field, values range 0 - 240. This allows for
-message sizes of up to 240 ASCII characters, or 55 obscure 4-byte characters
-
-*message: UTF-8 encoded message string
-
-*has_parent: Value 0 or 1, boolean if this Shout has a parent
-
-*parent_hash: If this Shout has a parent, this field is the hash of
-signed parent shout. The hash should be over the following fields concatenated:
-    "shout" + "signature"
-*signature_len: Need because the length of ECDSA signatures varies from 70-80
-bytes using the ANSI X9.62 standards with a "secp256r1" key.

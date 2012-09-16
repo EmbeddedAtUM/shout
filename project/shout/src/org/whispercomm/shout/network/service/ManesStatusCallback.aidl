@@ -1,6 +1,6 @@
-package org.whispercomm.shout.network;
+package org.whispercomm.shout.network.service;
 
-import org.whispercomm.shout.network.ErrorCode;
+import org.whispercomm.shout.network.service.ErrorCode;
 
 /**
  * Interface for the Shout network service to notify the {@code NetworkInterface}

@@ -27,6 +27,8 @@ import org.whispercomm.shout.crypto.DsaSignature;
 import org.whispercomm.shout.crypto.ECPublicKey;
 import org.whispercomm.shout.crypto.EcdsaWithSha256;
 import org.whispercomm.shout.crypto.KeyGenerator;
+import org.whispercomm.shout.network.UnsupportedVersionException;
+import org.whispercomm.shout.network.shout.InvalidShoutSignatureException;
 import org.whispercomm.shout.util.Arrays;
 import org.whispercomm.shout.util.ByteBufferUtils.InvalidLengthException;
 import org.whispercomm.shout.util.ByteBufferUtils.LengthType;
@@ -257,7 +259,7 @@ public class SerializeUtility {
 	 *             invalid
 	 */
 	public static BuildableShout deserializeShout(ByteBuffer buffer)
-			throws BadShoutVersionException,
+			throws UnsupportedVersionException,
 			ShoutPacketException, InvalidShoutSignatureException {
 		try {
 			byte flags = buffer.get(buffer.position());
@@ -265,9 +267,9 @@ public class SerializeUtility {
 				case 0:
 					return deserializeVersion0Shout(buffer);
 				default:
-					throw new BadShoutVersionException(
+					throw new UnsupportedVersionException(
 							String.format(
-									"Packet version %d is unsupported. Only version %d and below are supported.",
+									"Shout object version %d is unsupported. Only version %d and below are supported.",
 									VERSION(flags), VERSION));
 			}
 		} catch (BufferUnderflowException e) {
@@ -379,7 +381,8 @@ public class SerializeUtility {
 	 *             is invalid
 	 */
 	public static Shout deserializeSequenceOfShouts(int count, ByteBuffer buffer)
-			throws BadShoutVersionException, ShoutPacketException, InvalidShoutSignatureException {
+			throws UnsupportedVersionException, ShoutPacketException,
+			InvalidShoutSignatureException {
 		BuildableShout root = null;
 		BuildableShout child = null;
 		for (int idx = 0; idx < count; ++idx) {
@@ -426,7 +429,8 @@ public class SerializeUtility {
 	 */
 	@Deprecated
 	public static Shout deserializeSequenceOfShouts(int count, byte[] body)
-			throws BadShoutVersionException, ShoutPacketException, InvalidShoutSignatureException {
+			throws UnsupportedVersionException, ShoutPacketException,
+			InvalidShoutSignatureException {
 		return deserializeSequenceOfShouts(count, ByteBuffer.wrap(body));
 	}
 
@@ -516,22 +520,20 @@ public class SerializeUtility {
 
 	}
 
-	private static class BuildableShout implements Shout {
+	public static class BuildableShout implements Shout {
 
-		DateTime timestamp = null;
-		User user = null;
+		public DateTime timestamp = null;
+		public User user = null;
 
-		String message = null;
-		@SuppressWarnings("unused")
-		Double longitude = null;
-		@SuppressWarnings("unused")
-		Double latitude = null;
+		public String message = null;
+		public Double longitude = null;
+		public Double latitude = null;
 
-		BuildableShout parent = null;
-		byte[] parentHash = null;
+		public BuildableShout parent = null;
+		public byte[] parentHash = null;
 
-		DsaSignature signature = null;
-		byte[] hash = null;
+		public DsaSignature signature = null;
+		public byte[] hash = null;
 
 		@Override
 		public User getSender() {

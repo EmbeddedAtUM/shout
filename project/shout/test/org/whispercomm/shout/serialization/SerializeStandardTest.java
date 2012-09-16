@@ -10,6 +10,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.whispercomm.shout.Shout;
+import org.whispercomm.shout.network.UnsupportedVersionException;
+import org.whispercomm.shout.network.shout.InvalidShoutSignatureException;
 import org.whispercomm.shout.test.ShoutTestRunner;
 import org.whispercomm.shout.test.util.TestUtility;
 
@@ -51,7 +53,7 @@ public class SerializeStandardTest {
 			Shout fromBytes = SerializeUtility.deserializeSequenceOfShouts(1, signedGrandparent);
 			assertNotNull(fromBytes);
 			TestUtility.testEqualShoutFields(grandparent, fromBytes);
-		} catch (BadShoutVersionException e) {
+		} catch (UnsupportedVersionException e) {
 			fail("Shout version is not bad!");
 		} catch (ShoutPacketException e) {
 			fail("Shout packet is valid!");

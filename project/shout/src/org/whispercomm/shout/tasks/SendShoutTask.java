@@ -3,7 +3,7 @@ package org.whispercomm.shout.tasks;
 
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.Shout;
-import org.whispercomm.shout.network.NetworkInterface;
+import org.whispercomm.shout.network.service.NetworkInterface;
 
 /**
  * Asynchronously send a {@link Shout} over the network

@@ -2,7 +2,7 @@
 package org.whispercomm.shout.ui;
 
 import org.whispercomm.shout.R;
-import org.whispercomm.shout.network.NetworkService;
+import org.whispercomm.shout.network.service.NetworkService;
 
 import android.content.Context;
 import android.content.Intent;

@@ -35,12 +35,12 @@
         </provider>
 
         <service
-            android:name=".network.NetworkService"
+            android:name=".network.service.NetworkService"
             android:enabled="true"
             android:exported="false" >
         </service>
 
-        <receiver android:name=".network.BootReceiver" >
+        <receiver android:name=".network.service.BootReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>

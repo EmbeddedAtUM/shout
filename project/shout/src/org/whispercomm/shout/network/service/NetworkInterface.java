@@ -1,12 +1,12 @@
 
-package org.whispercomm.shout.network;
+package org.whispercomm.shout.network.service;
 
 import java.io.IOException;
 
 import org.whispercomm.manes.client.maclib.ManesNotInstalledException;
 import org.whispercomm.manes.client.maclib.ManesNotRegisteredException;
 import org.whispercomm.shout.LocalShout;
-import org.whispercomm.shout.serialization.ShoutChainTooLongException;
+import org.whispercomm.shout.network.shout.ShoutChainTooLongException;
 
 import android.content.ComponentName;
 import android.content.Context;

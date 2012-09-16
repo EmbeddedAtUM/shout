@@ -1,20 +1,12 @@
 
-package org.whispercomm.shout.network;
+package org.whispercomm.shout.network.shout;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.whispercomm.manes.client.maclib.ManesInterface;
 import org.whispercomm.manes.client.maclib.ManesNotRegisteredException;
 import org.whispercomm.shout.Shout;
-import org.whispercomm.shout.id.SignatureUtility;
 import org.whispercomm.shout.provider.ShoutProviderContract;
-import org.whispercomm.shout.serialization.BadShoutVersionException;
-import org.whispercomm.shout.serialization.InvalidShoutSignatureException;
-import org.whispercomm.shout.serialization.ShoutChainTooLongException;
-import org.whispercomm.shout.serialization.ShoutPacket;
-import org.whispercomm.shout.serialization.ShoutPacket.PacketBuilder;
-import org.whispercomm.shout.serialization.ShoutPacketException;
 
 import android.content.Context;
 import android.util.Log;
@@ -44,16 +36,19 @@ public class NaiveNetworkProtocol implements NetworkProtocol {
 	 * total number of re-sends for each message
 	 */
 	public static int RESEND_NUM = 20;
+
 	/**
 	 * timer for scheduling periodic re-broadcast
 	 */
-	Timer sendScheduler;
-	ManesInterface manes;
-	Context context;
+	private Timer sendScheduler;
 
-	public NaiveNetworkProtocol(ManesInterface manes, Context context) {
-		this.manes = manes;
+	private Context context;
+
+	private ShoutProtocol shoutProtocol;
+
+	public NaiveNetworkProtocol(ShoutProtocol shoutProtocol, Context context) {
 		this.context = context;
+		this.shoutProtocol = shoutProtocol;
 		this.sendScheduler = new Timer();
 	}
 
@@ -68,16 +63,10 @@ public class NaiveNetworkProtocol implements NetworkProtocol {
 	}
 
 	@Override
-	public void sendShout(Shout shout) throws ShoutChainTooLongException,
+	public void sendShout(final Shout shout) throws ShoutChainTooLongException,
 			ManesNotRegisteredException {
-		final byte[] shoutBytes;
-		PacketBuilder builder = new ShoutPacket.PacketBuilder();
-		builder.addShout(shout);
-		ShoutPacket packet = builder.build();
-		shoutBytes = packet.getPacketBytes();
-
 		// Send once now, and then queue for further deliveries
-		manes.send(shoutBytes);
+		shoutProtocol.send(shout);
 
 		// schedule periodic re-broadcast up to RESEND_NUM times.
 		long delay = PERIOD;
@@ -86,7 +75,7 @@ public class NaiveNetworkProtocol implements NetworkProtocol {
 				@Override
 				public void run() {
 					try {
-						manes.send(shoutBytes);
+						shoutProtocol.send(shout);
 					} catch (ManesNotRegisteredException e) {
 						Log.e(TAG, "send() failed because not registered.", e);
 					}
@@ -97,25 +86,8 @@ public class NaiveNetworkProtocol implements NetworkProtocol {
 	}
 
 	@Override
-	public void receivePacket(byte[] data) {
-		try {
-			ShoutPacket packet = ShoutPacket.wrap(data);
-			Shout shout = packet.decodeShout();
-			Shout current = shout;
-			while (current != null) {
-				if (!SignatureUtility.verifyShout(current)) {
-					throw new InvalidShoutSignatureException();
-				}
-				current = current.getParent();
-			}
-			ShoutProviderContract.saveShout(context, shout);
-		} catch (BadShoutVersionException e) {
-			Log.v(TAG, e.getMessage());
-		} catch (ShoutPacketException e) {
-			Log.v(TAG, e.getMessage());
-		} catch (InvalidShoutSignatureException e) {
-			Log.v(TAG, e.getMessage());
-		}
+	public void receive(Shout shout) {
+		ShoutProviderContract.saveShout(context, shout);
 	}
 
 }

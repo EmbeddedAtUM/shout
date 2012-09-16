@@ -1,7 +1,12 @@
 
 package org.whispercomm.shout.network;
 
+import java.nio.ByteBuffer;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import org.whispercomm.manes.client.maclib.ManesInterface;
+import org.whispercomm.shout.network.shout.NetworkProtocol;
 
 /**
  * Listens for incoming Shout packets, passing them to the
@@ -20,15 +25,23 @@ public class NetworkReceiver {
 	private static final int BLOCK_INTERVAL_MS = 10;
 
 	private final ManesInterface manes;
-	private final NetworkProtocol networkProtocol;
+	private final List<PacketProtocol> protocols;
 
 	private Thread thread;
 	private volatile boolean running;
 
-	public NetworkReceiver(ManesInterface manes, NetworkProtocol networkProtocol) {
+	public NetworkReceiver(ManesInterface manes) {
 		this.manes = manes;
-		this.networkProtocol = networkProtocol;
+		this.protocols = new CopyOnWriteArrayList<PacketProtocol>();
 		this.running = false;
+	}
+
+	public void register(PacketProtocol receiver) {
+		protocols.add(receiver);
+	}
+
+	public void unregister(PacketProtocol receiver) {
+		protocols.remove(receiver);
 	}
 
 	public void initialize() {
@@ -67,7 +80,14 @@ public class NetworkReceiver {
 
 	private void receivePacket() {
 		byte[] data = manes.receive(BLOCK_INTERVAL_MS);
-		if (data != null)
-			networkProtocol.receivePacket(data);
+		if (data != null) {
+			for (PacketProtocol receiver : protocols) {
+				try {
+					receiver.receive(ByteBuffer.wrap(data));
+				} catch (RuntimeException e) {
+					// Ignore bad receiver;
+				}
+			}
+		}
 	}
 }
