@@ -187,7 +187,7 @@ public class SerializeUtility {
 		}
 		if (hasLocation) {
 			buffer.putDouble(shout.getLocation().getLongitude());
-			buffer.putDouble(shout.getLocation().getLongitude());
+			buffer.putDouble(shout.getLocation().getLatitude());
 		}
 
 		// Add Parent Reference Fields
