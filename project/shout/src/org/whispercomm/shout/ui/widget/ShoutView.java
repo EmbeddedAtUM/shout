@@ -2,6 +2,7 @@
 package org.whispercomm.shout.ui.widget;
 
 import org.whispercomm.shout.LocalShout;
+import org.whispercomm.shout.Location;
 import org.whispercomm.shout.R;
 import org.whispercomm.shout.ShoutType;
 import org.whispercomm.shout.util.Encoders;
@@ -127,6 +128,19 @@ public class ShoutView extends RelativeLayout {
 		String received = ShoutMessageUtility.getReadableDateTime(shout.getReceivedTime());
 		timeReceived.setEntryText(received);
 		detailsTable.addView(timeReceived);
+		// Add the location
+		Location location = shout.getLocation();
+		if (location != null) {
+			ShoutDetailRow longitude = new ShoutDetailRow(getContext());
+			ShoutDetailRow latitude = new ShoutDetailRow(getContext());
+			longitude.setTitleText("Longitude");
+			latitude.setTitleText("Latitude");
+			longitude.setEntryText(String.format("%f\u00b0", location.getLongitude()));
+			latitude.setEntryText(String.format("%f\u00b0", location.getLatitude()));
+			detailsTable.addView(longitude);
+			detailsTable.addView(latitude);
+		}
+
 		// Add the signature
 		ShoutDetailRow signature = new ShoutDetailRow(getContext());
 		signature.setTitleText("Signature");
