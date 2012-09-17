@@ -10,6 +10,13 @@ public class SimpleLocation implements Location {
 	private final double longitude;
 	private final double latitude;
 
+	public static SimpleLocation create(android.location.Location location) {
+		if (location == null) {
+			return null;
+		}
+		return new SimpleLocation(location.getLongitude(), location.getLatitude());
+	}
+
 	/**
 	 * Creates a new {@code SimpleLocation}.
 	 * 
