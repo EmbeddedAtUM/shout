@@ -9,6 +9,7 @@
     <string name="avatarDesc">Avatar</string>
     <string name="compose">Compose Message</string>
     <string name="shout">Shout!</string>
+    <string name="attachLocation">Include Location</string>
     <string name="logoDesc">Logo</string>
     <string name="providerAuthority">org.whispercomm.shout.provider</string>
     <string name="timelineTitle">All Shouts</string>
