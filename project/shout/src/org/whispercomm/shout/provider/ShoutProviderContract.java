@@ -228,15 +228,18 @@ public class ShoutProviderContract {
 		String encodedParentHash = cursor.isNull(parentIndex) ? null : cursor
 				.getString(parentIndex);
 		String message = cursor.getString(messageIndex);
-		Long longitude = null;
-		Long latitude = null;
+		Double longitude = null;
+		Double latitude = null;
 		/*
-		 * Check for unit tests. RoboEletric isn't aware of null columns, but
-		 * returns -1 as the index instead.
+		 * -1 check is for unit tests. RoboEletric isn't aware of columns with
+		 * all null values, but returns -1 as the index instead.
 		 */
 		if (longitudeIndex >= 0 && latitudeIndex >= 0) {
-			longitude = cursor.getLong(longitudeIndex);
-			latitude = cursor.getLong(latitudeIndex);
+			if (!cursor.isNull(longitudeIndex)
+					&& !cursor.isNull(latitudeIndex)) {
+				longitude = cursor.getDouble(longitudeIndex);
+				latitude = cursor.getDouble(latitudeIndex);
+			}
 		}
 		String encodedSig = cursor.getString(sigIndex);
 		String encodedHash = cursor.getString(hashIndex);
