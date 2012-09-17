@@ -3,6 +3,7 @@ package org.whispercomm.shout.tasks;
 
 import org.joda.time.DateTime;
 import org.whispercomm.shout.LocalShout;
+import org.whispercomm.shout.Location;
 import org.whispercomm.shout.Me;
 import org.whispercomm.shout.ShoutCreator;
 
@@ -17,6 +18,7 @@ public class ShoutTask extends AsyncTaskCallback<String, Void, LocalShout> {
 
 	private Context context;
 	private Me me;
+	private Location location;
 
 	/**
 	 * Create a new {@code ShoutTask}.
@@ -31,10 +33,11 @@ public class ShoutTask extends AsyncTaskCallback<String, Void, LocalShout> {
 	 * @param me the user for the sender field of the shout
 	 */
 	public ShoutTask(Context context,
-			AsyncTaskCompleteListener<LocalShout> completeListener, Me me) {
+			AsyncTaskCompleteListener<LocalShout> completeListener, Me me, Location location) {
 		super(completeListener);
 		this.context = context;
 		this.me = me;
+		this.location = location;
 	}
 
 	@Override
@@ -42,7 +45,7 @@ public class ShoutTask extends AsyncTaskCallback<String, Void, LocalShout> {
 		String message = params[0];
 
 		ShoutCreator creator = new ShoutCreator(context);
-		return creator.createShout(DateTime.now(), message, null, me);
+		return creator.createShout(DateTime.now(), message, location, me);
 	}
 
 }

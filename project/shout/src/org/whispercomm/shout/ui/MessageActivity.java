@@ -6,10 +6,14 @@ import java.io.IOException;
 import org.whispercomm.manes.client.maclib.ManesNotInstalledException;
 import org.whispercomm.manes.client.maclib.ManesNotRegisteredException;
 import org.whispercomm.shout.LocalShout;
+import org.whispercomm.shout.Location;
+import org.whispercomm.shout.Me;
 import org.whispercomm.shout.R;
 import org.whispercomm.shout.Shout;
+import org.whispercomm.shout.SimpleLocation;
 import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.id.UserNotInitiatedException;
+import org.whispercomm.shout.location.LocationProvider;
 import org.whispercomm.shout.network.service.NetworkInterface.NotConnectedException;
 import org.whispercomm.shout.network.shout.ShoutChainTooLongException;
 import org.whispercomm.shout.provider.ShoutProviderContract;
@@ -24,13 +28,16 @@ import org.whispercomm.shout.ui.widget.ShoutView;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.Toast;
@@ -65,6 +72,9 @@ public class MessageActivity extends AbstractShoutActivity {
 
 	private IdManager idManager;
 
+	private LocationProvider mLocation;
+
+	private CheckBox chkAttachLocation;
 	private Button btnSend;
 	private EditText edtMessage;
 	private FrameLayout frmProgressBar;
@@ -76,6 +86,18 @@ public class MessageActivity extends AbstractShoutActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
+		mLocation = new LocationProvider(this);
+	}
+
+	@Override
+	public void onStop() {
+		mLocation.stop();
+		super.onStop();
 	}
 
 	protected void initialize() {
@@ -105,6 +127,15 @@ public class MessageActivity extends AbstractShoutActivity {
 			shoutParent.bindShout(parent);
 			frmTxtParent.setVisibility(FrameLayout.VISIBLE);
 		}
+
+		initializeAttachLocation();
+	}
+
+	private void initializeAttachLocation() {
+		chkAttachLocation = (CheckBox) findViewById(R.id.attachLocation);
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(getBaseContext());
+		chkAttachLocation.setChecked(prefs.getBoolean("attachLocation", true));
 	}
 
 	private LocalShout getParent(Bundle extras) {
@@ -162,19 +193,26 @@ public class MessageActivity extends AbstractShoutActivity {
 	public void onClickSend(View v) {
 		showProgressBar();
 		String content = edtMessage.getText().toString();
+		Location location = null;
+		if (chkAttachLocation.isChecked()) {
+			location = SimpleLocation.create(mLocation.getLocation());
+		}
+		Me me;
 		try {
-			if (parent == null) {
-				new ShoutTask(getApplicationContext(),
-						new ShoutCreationCompleteListener(), idManager.getMe())
-						.execute(content);
-			} else {
-				new CommentTask(getApplicationContext(),
-						new ShoutCreationCompleteListener(), idManager.getMe(),
-						parent).execute(content);
-			}
+			me = idManager.getMe();
 		} catch (UserNotInitiatedException e) {
 			promptForUsername();
 			hideProgressBar();
+			return;
+		}
+		if (parent == null) {
+			new ShoutTask(getApplicationContext(),
+					new ShoutCreationCompleteListener(), me, location)
+					.execute(content);
+		} else {
+			new CommentTask(getApplicationContext(),
+					new ShoutCreationCompleteListener(), me, location,
+					parent).execute(content);
 		}
 	}
 

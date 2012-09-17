@@ -3,6 +3,7 @@ package org.whispercomm.shout.tasks;
 
 import org.joda.time.DateTime;
 import org.whispercomm.shout.LocalShout;
+import org.whispercomm.shout.Location;
 import org.whispercomm.shout.Me;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.ShoutCreator;
@@ -19,6 +20,7 @@ public class CommentTask extends AsyncTaskCallback<String, Void, LocalShout> {
 	private Context context;
 	private Shout parent;
 	private Me me;
+	private Location location;
 
 	/**
 	 * Create a new {@code CommentTask}.
@@ -34,12 +36,13 @@ public class CommentTask extends AsyncTaskCallback<String, Void, LocalShout> {
 	 * @param parent the shout being commented on
 	 */
 	public CommentTask(Context context,
-			AsyncTaskCompleteListener<LocalShout> completeListener, Me me,
+			AsyncTaskCompleteListener<LocalShout> completeListener, Me me, Location location,
 			Shout parent) {
 		super(completeListener);
 		this.context = context;
 		this.parent = parent;
 		this.me = me;
+		this.location = location;
 	}
 
 	@Override
@@ -47,7 +50,7 @@ public class CommentTask extends AsyncTaskCallback<String, Void, LocalShout> {
 		String message = params[0];
 
 		ShoutCreator creator = new ShoutCreator(context);
-		return creator.createComment(DateTime.now(), message, null, parent, me);
+		return creator.createComment(DateTime.now(), message, location, parent, me);
 	}
 
 }
