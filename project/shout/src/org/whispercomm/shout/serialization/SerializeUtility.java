@@ -98,7 +98,7 @@ public class SerializeUtility {
 	/**
 	 * Version to use when serializing a shout
 	 */
-	private static final int VERSION = 0;
+	public static final int VERSION = 0;
 
 	/**
 	 * KeyGenerator used to recover keys from X and Y coordinates
@@ -145,11 +145,35 @@ public class SerializeUtility {
 	 * 
 	 * @param buffer the buffer into which to serialize the shout data
 	 * @param shout the shout to serialize
+	 * @param version the version of the canonical form to use
 	 * @return the provided buffer
 	 * @throws BufferOverflowException if {@code buffer} does not have room for
 	 *             the shout data
 	 */
-	public static ByteBuffer serializeShoutData(ByteBuffer buffer, UnsignedShout shout)
+	public static ByteBuffer serializeShoutData(ByteBuffer buffer, UnsignedShout shout, int version)
+	{
+		if (version == 0) {
+			return serializeVersion0ShoutData(buffer, shout);
+		} else {
+			// Untrusted version values (e.g., those coming from the network)
+			// should be validated before calling this method.
+			throw new IllegalArgumentException("Unsupported shout object version.");
+		}
+	}
+
+	/**
+	 * Serializes the portion of the shout data over which the signature is
+	 * computed. The buffer position is increased by the size of the shout data.
+	 * If the buffer is too small, the position is increased by the amount of
+	 * data that was added and a {@link BufferOverflowException} is thrown.
+	 * 
+	 * @param buffer the buffer into which to serialize the shout data
+	 * @param shout the shout to serialize
+	 * @return the provided buffer
+	 * @throws BufferOverflowException if {@code buffer} does not have room for
+	 *             the shout data
+	 */
+	private static ByteBuffer serializeVersion0ShoutData(ByteBuffer buffer, UnsignedShout shout)
 			throws BufferOverflowException {
 		// Compute flags byte
 		byte flags = VERSION;
@@ -207,11 +231,12 @@ public class SerializeUtility {
 	 * @param buffer the buffer into which to serialize the shout
 	 * @param shout the shout to serialize
 	 * @return the provided buffer
+	 * @throws UnsupportedVersionException
 	 * @throws BufferOverflowException if {@code buffer} does not have room for
 	 *             the shout
 	 */
 	public static ByteBuffer serializeShout(ByteBuffer buffer, Shout shout) {
-		serializeShoutData(buffer, shout);
+		serializeShoutData(buffer, shout, shout.getVersion());
 		putDsaSignature(buffer, shout.getSignature());
 		return buffer;
 	}
@@ -228,7 +253,7 @@ public class SerializeUtility {
 	 */
 	public static byte[] serializeShoutData(UnsignedShout shout) {
 		ByteBuffer buffer = ByteBuffer.allocate(SHOUT_UNSIGNED_SIZE_MAX);
-		serializeShoutData(buffer, shout);
+		serializeShoutData(buffer, shout, VERSION);
 		return Arrays.copyOfRange(buffer.array(), 0, buffer.position());
 	}
 
@@ -279,6 +304,7 @@ public class SerializeUtility {
 
 		BuildableUser user = new BuildableUser();
 		BuildableShout shout = new BuildableShout();
+		shout.version = 0;
 		shout.user = user;
 
 		try {
@@ -460,6 +486,8 @@ public class SerializeUtility {
 
 	public static class BuildableShout implements Shout {
 
+		public int version = 0;
+
 		public DateTime timestamp = null;
 		public User user = null;
 
@@ -471,6 +499,11 @@ public class SerializeUtility {
 
 		public DsaSignature signature = null;
 		public byte[] hash = null;
+
+		@Override
+		public int getVersion() {
+			return version;
+		}
 
 		@Override
 		public User getSender() {

@@ -85,7 +85,9 @@ public class TestFactory {
 	 * method.
 	 */
 	private static Shout SignAndHashShout(TestShout shout, Me me) {
-		shout.signature = SignatureUtility.signShout(shout, me);
+		Shout signed = SignatureUtility.signShout(shout, me);
+		shout.version = signed.getVersion();
+		shout.signature = signed.getSignature();
 		shout.hash = SerializeUtility.generateHash(shout);
 		return shout;
 	}

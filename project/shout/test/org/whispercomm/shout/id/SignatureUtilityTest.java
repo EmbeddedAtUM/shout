@@ -23,7 +23,6 @@ import org.whispercomm.shout.crypto.EcdsaWithSha256;
 import org.whispercomm.shout.crypto.KeyGenerator;
 import org.whispercomm.shout.test.ShoutTestRunner;
 import org.whispercomm.shout.test.util.TestFactory;
-import org.whispercomm.shout.test.util.TestShout;
 import org.whispercomm.shout.test.util.TestUnsignedShout;
 
 @RunWith(ShoutTestRunner.class)
@@ -73,10 +72,8 @@ public class SignatureUtilityTest {
 	public void testValidSignatureFromShoutIsValid() {
 		UnsignedShout unsigned = new TestUnsignedShout(me, null, "message content", null,
 				DateTime.now());
-		DsaSignature signature = SignatureUtility.signShout(unsigned, me);
-		Shout shout = new TestShout(unsigned.getSender(), null, unsigned.getMessage(),
-				unsigned.getTimestamp(), signature, null);
-		boolean valid = SignatureUtility.verifyShout(shout);
+		Shout signed = SignatureUtility.signShout(unsigned, me);
+		boolean valid = SignatureUtility.verifyShout(signed);
 		assertTrue(valid);
 	}
 

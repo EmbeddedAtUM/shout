@@ -365,6 +365,7 @@ public class ShoutProvider extends ContentProvider {
 				+ ShoutProviderContract.Shouts.TABLE_NAME + "("
 				+ ShoutProviderContract.Shouts._ID
 				+ " INTEGER PRIMARY KEY ASC AUTOINCREMENT, "
+				+ ShoutProviderContract.Shouts.VERSION + " INTEGER, "
 				+ ShoutProviderContract.Shouts.AUTHOR + " TEXT, "
 				+ ShoutProviderContract.Shouts.PARENT + " TEXT, "
 				+ ShoutProviderContract.Shouts.MESSAGE + " TEXT, "

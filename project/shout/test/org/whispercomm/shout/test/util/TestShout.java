@@ -8,6 +8,7 @@ import org.whispercomm.shout.crypto.DsaSignature;
 
 public class TestShout extends TestUnsignedShout implements Shout {
 
+	public int version;
 	public byte[] hash = null;
 	public DsaSignature signature = null;
 
@@ -16,6 +17,11 @@ public class TestShout extends TestUnsignedShout implements Shout {
 		super(sender, parent, message, null, timestamp);
 		this.signature = signature;
 		this.hash = hash;
+	}
+
+	@Override
+	public int getVersion() {
+		return version;
 	}
 
 	@Override

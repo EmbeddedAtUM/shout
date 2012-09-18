@@ -72,6 +72,12 @@ public class ShoutProviderContract {
 		public static final String _ID = BaseColumns._ID;
 
 		/**
+		 * Column name for the version of the canonical form use for signing the
+		 * shout.
+		 */
+		public static final String VERSION = "Version";
+
+		/**
 		 * Column name for the author of a Shout. Stored as a reference to a
 		 * user public key, Base64 encoded.
 		 */
@@ -212,6 +218,7 @@ public class ShoutProviderContract {
 	 */
 	public static LocalShout retrieveShoutFromCursor(Context context,
 			Cursor cursor) {
+		int versionIndex = cursor.getColumnIndex(Shouts.VERSION);
 		int authorIndex = cursor.getColumnIndex(Shouts.AUTHOR);
 		int parentIndex = cursor.getColumnIndex(Shouts.PARENT);
 		int messageIndex = cursor.getColumnIndex(Shouts.MESSAGE);
@@ -224,6 +231,7 @@ public class ShoutProviderContract {
 		int commentIndex = cursor.getColumnIndex(Shouts.COMMENT_COUNT);
 		int reshoutIndex = cursor.getColumnIndex(Shouts.RESHOUT_COUNT);
 
+		int version = cursor.getInt(versionIndex);
 		String encodedAuthor = cursor.getString(authorIndex);
 		String encodedParentHash = cursor.isNull(parentIndex) ? null : cursor
 				.getString(parentIndex);
@@ -253,7 +261,7 @@ public class ShoutProviderContract {
 			location = new SimpleLocation(longitude, latitude);
 		}
 		LocalUser sender = retrieveUserByEncodedKey(context, encodedAuthor);
-		LocalShout shout = new LocalShoutImpl(context, sender, message, location,
+		LocalShout shout = new LocalShoutImpl(context, version, sender, message, location,
 				encodedSig, encodedHash, sentTime, receivedTime, numComments,
 				numReshouts, encodedParentHash);
 		return shout;
@@ -464,6 +472,7 @@ public class ShoutProviderContract {
 			String encodedSender = Base64.encodeToString(
 					KeyGenerator.encodePublic(shout.getSender().getPublicKey()), Base64.DEFAULT);
 			ContentValues values = new ContentValues();
+			values.put(Shouts.VERSION, shout.getVersion());
 			values.put(Shouts.AUTHOR, encodedSender);
 			values.put(Shouts.MESSAGE, shout.getMessage());
 			if (shout.getLocation() != null) {

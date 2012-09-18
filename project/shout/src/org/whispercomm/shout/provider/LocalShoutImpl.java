@@ -21,6 +21,7 @@ import android.util.Base64;
 
 public class LocalShoutImpl implements LocalShout {
 
+	private int version;
 	private LocalUser sender;
 	private String message;
 	private Location location;
@@ -37,9 +38,11 @@ public class LocalShoutImpl implements LocalShout {
 
 	private Context context;
 
-	public LocalShoutImpl(Context context, LocalUser sender, String message, Location location,
+	public LocalShoutImpl(Context context, int version, LocalUser sender, String message,
+			Location location,
 			String encodedSig, String encodedHash, Long sentTime, Long receivedTime,
 			int commentCount, int reshoutCount, String encodedParentHash) {
+		this.version = version;
 		this.context = context;
 		this.sender = sender;
 		this.message = message;
@@ -53,6 +56,11 @@ public class LocalShoutImpl implements LocalShout {
 		if (encodedParentHash != null) {
 			this.parentHash = Base64.decode(encodedParentHash, Base64.DEFAULT);
 		}
+	}
+
+	@Override
+	public int getVersion() {
+		return this.version;
 	}
 
 	@Override

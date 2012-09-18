@@ -2,7 +2,6 @@
 package org.whispercomm.shout;
 
 import org.joda.time.DateTime;
-import org.whispercomm.shout.crypto.DsaSignature;
 import org.whispercomm.shout.id.SignatureUtility;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 
@@ -35,9 +34,7 @@ public class ShoutCreator {
 	public LocalShout createShout(DateTime timestamp, String message, Location location, Me sender) {
 		UnsignedShout unsigned = new SimpleUnsignedShout(timestamp, sender,
 				message, location, null);
-		DsaSignature signature = SignatureUtility.signShout(unsigned, sender);
-		Shout shout = new SimpleShout(timestamp, sender, message, location, null,
-				signature);
+		Shout shout = SignatureUtility.signShout(unsigned, sender);
 		return ShoutProviderContract.saveShout(context, shout);
 	}
 
@@ -54,9 +51,7 @@ public class ShoutCreator {
 			Shout parent, Me sender) {
 		UnsignedShout unsigned = new SimpleUnsignedShout(timestamp, sender,
 				message, location, parent);
-		DsaSignature signature = SignatureUtility.signShout(unsigned, sender);
-		Shout shout = new SimpleShout(timestamp, sender, message, location, parent,
-				signature);
+		Shout shout = SignatureUtility.signShout(unsigned, sender);
 		return ShoutProviderContract.saveShout(context, shout);
 	}
 
@@ -71,9 +66,7 @@ public class ShoutCreator {
 	public LocalShout createReshout(DateTime timestamp, Location location, Shout parent, Me sender) {
 		UnsignedShout unsigned = new SimpleUnsignedShout(timestamp, sender,
 				null, location, parent);
-		DsaSignature signature = SignatureUtility.signShout(unsigned, sender);
-		Shout shout = new SimpleShout(timestamp, sender, null, location, parent,
-				signature);
+		Shout shout = SignatureUtility.signShout(unsigned, sender);
 		return ShoutProviderContract.saveShout(context, shout);
 	}
 

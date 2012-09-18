@@ -42,7 +42,7 @@ public class SerializeStandardTest {
 		Shout grandparent = SerialShouts.GRANDPARENT;
 		byte[] grandparentBytes = SerialShouts.GRANDPARENT_SERIALIZED;
 		ByteBuffer from = ByteBuffer.allocate(grandparentBytes.length);
-		SerializeUtility.serializeShoutData(from, grandparent);
+		SerializeUtility.serializeShoutData(from, grandparent, SerializeUtility.VERSION);
 		assertArrayEquals(grandparentBytes, from.array());
 	}
 
