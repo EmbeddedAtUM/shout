@@ -3,9 +3,12 @@ package org.whispercomm.shout.tasks;
 
 import org.joda.time.DateTime;
 import org.whispercomm.shout.LocalShout;
+import org.whispercomm.shout.Location;
 import org.whispercomm.shout.Me;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.ShoutCreator;
+import org.whispercomm.shout.SimpleLocation;
+import org.whispercomm.shout.location.LocationProvider;
 
 import android.content.Context;
 
@@ -44,8 +47,13 @@ public class ReshoutTask extends AsyncTaskCallback<Void, Void, LocalShout> {
 
 	@Override
 	protected LocalShout doInBackground(Void... params) {
+		// Get current estimate for location, if available.
+		LocationProvider locationProvider = new LocationProvider(context);
+		Location location = SimpleLocation.create(locationProvider.getLocation());
+		locationProvider.stop();
+
 		ShoutCreator creator = new ShoutCreator(context);
-		return creator.createReshout(DateTime.now(), null, parent, me);
+		return creator.createReshout(DateTime.now(), location, parent, me);
 	}
 
 }
