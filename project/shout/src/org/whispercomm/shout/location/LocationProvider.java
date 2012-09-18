@@ -7,6 +7,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 /**
@@ -44,6 +45,8 @@ public class LocationProvider {
 
 	private final LocationManager mLocationManager;
 
+	private final Looper mLooper;
+
 	private final LocationListenerImpl mGps;
 
 	private final LocationListenerImpl mNetwork;
@@ -53,14 +56,16 @@ public class LocationProvider {
 	private Location bestLocation;
 
 	public LocationProvider(Context context) {
+		mLooper = Looper.getMainLooper();
+
 		mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
 		mGps = new LocationListenerImpl(mLocationManager, LocationManager.GPS_PROVIDER,
-				GPS_TIMEOUT_MS, DESIRED_ACCURACY_M);
+				GPS_TIMEOUT_MS, DESIRED_ACCURACY_M, mLooper);
 		mNetwork = new LocationListenerImpl(mLocationManager, LocationManager.NETWORK_PROVIDER, -1,
-				DESIRED_ACCURACY_M);
+				DESIRED_ACCURACY_M, mLooper);
 		mPassive = new LocationListenerImpl(mLocationManager, LocationManager.PASSIVE_PROVIDER, -1,
-				-1);
+				-1, mLooper);
 
 		mGps.getLastKnownLocation();
 		mNetwork.getLastKnownLocation();
@@ -124,6 +129,8 @@ public class LocationProvider {
 	 */
 	private class LocationListenerImpl implements LocationListener {
 
+		private final Looper mLooper;
+
 		private final LocationManager mLocationManager;
 
 		private final String provider;
@@ -140,14 +147,16 @@ public class LocationProvider {
 
 		private boolean receivedUpdate = false;
 
-		public LocationListenerImpl(LocationManager locationManager, String provider, int timeout,
-				int accuracy) {
+		public LocationListenerImpl(LocationManager locationManager,
+				String provider, int timeout,
+				int accuracy, Looper looper) {
+			this.mLooper = looper;
 			this.mLocationManager = locationManager;
 			this.provider = provider;
 			this.timeout = timeout;
 			this.accuracy = accuracy;
 
-			this.mHandler = new Handler();
+			this.mHandler = new Handler(mLooper);
 			this.mTimeout = new Runnable() {
 				@Override
 				public void run() {
@@ -179,7 +188,7 @@ public class LocationProvider {
 					mLocationManager.requestLocationUpdates(provider,
 							MIN_TIME_MS,
 							MIN_DISTANCE_M,
-							this);
+							this, mLooper);
 					if (timeout > 0) {
 						mHandler.postDelayed(mTimeout, timeout);
 					}
