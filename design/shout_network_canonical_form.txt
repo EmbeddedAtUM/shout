@@ -26,7 +26,8 @@ Object Header
 Object Types
 --------------------------------------------------------------------------------
 0x00 - Shout object
-0x01 - Content object (merkle-tree addressed)
+0x01 - Content Descriptor object
+0x02 - Merkle Node object
 
 ================================================================================
 Network Packet
@@ -112,3 +113,156 @@ Version O:
                   || signature s value  || unsigned, big endian
                   || (32 bytes)         ||
                   ||====================||
+
+
+================================================================================
+Content Descriptor object
+--------------------------------------------------------------------------------
+Version O:
+(max 292 bytes)   ||====================||
+                  || Object type        || 0x01
+                  || (1 byte)           ||
+                  ||--------------------||
+                  || Content length     || max 289
+                  || (2 bytes)          ||
+                  ||====================||
+                  || version || flags   || |   0-3   | 4-7 | 
+                  || (1 byte)           || | version |     |
+                  ||====================||
+                  || object root hash   || merkle tree root hash 
+                  || (32 bytes)         ||
+                  ||====================||
+                  || MIME type len      || length of next field in [0,255]
+                  || (1 byte)           ||
+                  ||--------------------||
+                  || MIME type          || ASCII
+                  || (max 255 bytes)    ||
+                  ||====================||
+
+A hash of a content descriptor is computed as the hash of the above 
+
+
+================================================================================
+Merkle Tree node object
+--------------------------------------------------------------------------------
+Version O Header:
+                  ||====================||
+                  || version || flags   || |   0-3   |   4  | 5-7 | 
+                  || (1 byte)           || | version | type |     |
+                  ||====================||
+
+The 4th bit indicates if the packet is a node (0) or leaf (1).
+
+Version 0 Node:   ||====================||
+                  || Object type        || 0x02
+                  || (1 byte)           ||
+                  ||--------------------||
+                  || Content length     || 65
+                  || (2 bytes)          ||
+                  ||====================||
+                  || version || flags   || |   0-3   | 4 | 5-7 | 
+                  || (1 byte)           || | version | 0 |     |
+                  ||====================||
+		  || left child hash    ||
+  		  || (32 bytes)         ||
+ 		  ||--------------------||
+		  || right child hash   ||
+		  || (32 bytes)         ||
+		  ||====================||
+
+Version 0 Leaf:   ||====================||
+                  || Object type        || 0x02
+                  || (1 byte)           ||
+                  ||--------------------||
+                  || Content length     || 65
+                  || (2 bytes)          ||
+		  ||====================||
+		  || version ||  flags  || |   0-3   | 4 | 5-7 | 
+                  || (1 byte)           || | version | 1 |     |
+		  ||====================||
+		  || data block         ||
+		  || (max 1450 bytes)   ||
+		  ||====================||
+
+
+================================================================================
+Merkle Tree hashes
+--------------------------------------------------------------------------------
+Let IH(X) = SHA256(0x02||size(0x00||X)||0x00||X)
+and LF(X) = SHA256(0x02||size(0x10||X)||0x10||X)
+
+The hash tree for an object X=(X1|X2|X3|X4) is
+             IH(E|F)
+            /      \
+           /        \
+       IH(A|B)    IH(C|D)
+       /   \        /   \
+      /     \      /     \
+    LH(X1) LH(X2) LH(X3) LH(X4)      
+
+The tree should be complete: all levels except possibly the last are
+full and leaves are as far left as possible.
+
+Separate hashes are used for internal nodes and leaf nodes to prevent
+collisions: a block will not verify if it is incorrectly interpreted
+as a inner node (or leaf node).
+
+A tree with a single leaf node is valid:
+            IH(X1)
+
+For us, the maximum size of a data block is 1450 bytes and so an
+object X of length x will comprise ceil(x/1450) data blocks.
+
+================================================================================
+On-disk Merkle Node storage
+--------------------------------------------------------------------------------
+Both inner nodes and data blocks are stored in files named after the
+hash of the block.
+
+Inner node on-disk format
+-------------------------
+Filename: HexString(IF(LeftHash|RightHash))
+Byte  0: 0x02
+      1: 0x00
+      2: 0x41
+      3: 0x00
+      4: LeftHash[0]
+        ...
+     35: LeftHash[31]
+     36: RightHash[0]
+        ...
+     67: RightHash[31]
+
+Data node on-disk format
+------------------------
+Filename: HexString(LF(Data))
+Byte  0: 0x02
+      1: MSB(1+n)
+      2: LSB(1+n)
+      3: 0x10
+      4: Data[0]
+        ...
+    n+3: Data[n-1]
+
+================================================================================
+On-disk Content Descriptor storage
+--------------------------------------------------------------------------------
+Context descriptors are stored in files named after the hash of the descriptor.
+
+The on-disk format is identical to the network format, but is repeated
+below for convenience.
+
+Context descriptor on-disk format
+---------------------------------
+Filename: HexString(sha256(0x01|size(0x00|object_root_hash|len|mimetype)|0x00|object_root_hash|len|mime_type))
+Byte  0: 0x01
+      1: MSB(1+32+1+n) 
+      2: LSB(1+32+1+n)
+      3: 0x00  (version number, basically) 
+      4: object_root_hash[0]
+        ...
+     35: object_root_hash[31]
+     36: n
+     37: mime_type first letter
+        ...
+   36+n: mime_type last letter
