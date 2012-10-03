@@ -20,7 +20,7 @@ public class ExpiryManager {
 	/**
 	 * Expiration time
 	 */
-	public static final DateTime EXPIRY = new DateTime(2012, 9, 30, 23, 59, 59,
+	public static final DateTime EXPIRY = new DateTime(2012, 10, 30, 23, 59, 59,
 			DateTimeZone.forID("America/Detroit"));
 
 	/**
