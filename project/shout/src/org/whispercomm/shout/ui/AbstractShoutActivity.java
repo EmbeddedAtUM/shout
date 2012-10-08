@@ -10,12 +10,12 @@ import org.whispercomm.shout.network.NetworkService;
 import org.whispercomm.shout.terms.AgreementListener;
 import org.whispercomm.shout.terms.AgreementManager;
 
-import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentActivity;
 
 /**
  * Base class for Shout {@code Activity Activities} that takes care of:
@@ -33,7 +33,7 @@ import android.preference.PreferenceManager;
  * 
  * @author David R. Bild
  */
-public class AbstractShoutActivity extends Activity {
+public class AbstractShoutActivity extends FragmentActivity {
 
 	protected NetworkInterface network;
 

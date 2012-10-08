@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/BackgroundGray"
+    android:orientation="vertical" >
+
+    <!-- Title Bar -->
+
+    <RelativeLayout style="@style/TitleBar" >
+
+        <ImageView
+            style="@style/TitleBarLogo"
+            android:contentDescription="@string/logoDesc" />
+
+        <ImageButton
+            android:id="@+id/settingsButton"
+            style="@style/TitleBarButton"
+            android:layout_alignParentRight="true"
+            android:contentDescription="@string/settingsDesc"
+            android:onClick="onClickSettings"
+            android:src="@drawable/gear" />
+
+        <ImageButton
+            android:id="@+id/composeButton"
+            style="@style/TitleBarButton"
+            android:layout_toLeftOf="@id/settingsButton"
+            android:contentDescription="@string/shoutDesc"
+            android:onClick="onClickShout"
+            android:src="@drawable/chat" />
+    </RelativeLayout>
+
+    <!-- Title of page -->
+
+    <TextView
+        style="@style/PageTitle"
+        android:text="@string/timelineTitle" />
+
+    <!-- ListView displaying the shouts -->
+
+    <ListView
+        android:id="@android:id/list"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@color/BackgroundGray"
+        android:cacheColorHint="#00000000"
+        android:clickable="false"
+        android:divider="@null"
+        android:dividerHeight="0dp" />
+
+    <!-- TextView displayed if the ListView is empty -->
+
+    <TextView
+        android:id="@android:id/empty"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@drawable/titlegradient"
+        android:gravity="center|center_horizontal"
+        android:text="@string/no_shouts"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@android:color/black" />
+
+</LinearLayout>
