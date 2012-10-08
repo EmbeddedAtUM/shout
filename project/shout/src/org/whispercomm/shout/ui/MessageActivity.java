@@ -86,7 +86,7 @@ public class MessageActivity extends AbstractShoutActivity {
 	}
 
 	private void initializeViews() {
-		setContentView(R.layout.message);
+		setContentView(R.layout.message_activity);
 
 		btnSend = (Button) findViewById(R.id.send);
 		frmProgressBar = (FrameLayout) findViewById(R.id.frmProgressBar);
