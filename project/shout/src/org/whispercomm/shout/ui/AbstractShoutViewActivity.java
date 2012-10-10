@@ -46,6 +46,10 @@ public class AbstractShoutViewActivity extends AbstractShoutActivity {
 		MessageActivity.comment(this, shout);
 	}
 
+	public void onClickDetails(LocalShout shout) {
+		DetailsActivity.show(this, shout);
+	}
+
 	private void shoutCreated(LocalShout result) {
 		if (result != null) {
 			new SendShoutTask(network, new ShoutSendCompleteListener())

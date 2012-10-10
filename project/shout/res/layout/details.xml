@@ -1,28 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:custom="http://schemas.android.com/apk/res/org.whispercomm.shout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/BackgroundGray" >
+    android:fillViewport="true"
+    android:padding="10dip"
+    android:paddingBottom="20dip"
+    android:background="@drawable/messageviewgradient" >
 
     <LinearLayout
         android:id="@+id/detailsView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:orientation="vertical"
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="10dip"
+        android:background="@drawable/settingslistshape" >
 
         <org.whispercomm.shout.ui.widget.ActionShoutView
             android:id="@+id/actionshoutview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dip"
             android:background="@color/white" />
 
         <org.whispercomm.shout.ui.widget.ShoutChainView
             android:id="@+id/commentsview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="20dip"
             android:orientation="vertical" />
     </LinearLayout>
 

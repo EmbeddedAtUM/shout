@@ -106,8 +106,8 @@ public class ActionShoutView extends LinearLayout {
 			@Override
 			public void onClick(View v) {
 				if (detailsListener != null) {
-					ActionShoutView.this.toggleDetails();
-					// detailsListener.onClick(shoutView.getBoundShout());
+					// ActionShoutView.this.toggleDetails();
+					detailsListener.onClick(shoutView.getBoundShout());
 				}
 			}
 		});
