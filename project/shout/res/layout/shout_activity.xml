@@ -4,6 +4,7 @@
     android:layout_height="match_parent" >
     
 <fragment android:name="org.whispercomm.shout.ui.fragment.ShoutFragment"
+    android:id="@+id/shout_fragment"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent" />
 
