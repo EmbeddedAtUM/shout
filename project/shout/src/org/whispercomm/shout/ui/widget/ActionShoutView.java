@@ -36,7 +36,6 @@ public class ActionShoutView extends LinearLayout {
 	private ImageButton btnDetails;
 
 	private boolean actionBarVisibility;
-	private boolean detailsVisibility = false;
 
 	// Listeners called when a button is clicked
 	private OnClickListener reshoutListener;
@@ -244,20 +243,6 @@ public class ActionShoutView extends LinearLayout {
 				Log.e(TAG, "Unexpected shout type in bindShout(LocalShout): "
 						+ shout.getType().name());
 				break;
-		}
-	}
-
-	public void showDetails() {
-		shoutView.showDetails();
-	}
-
-	public void toggleDetails() {
-		if (detailsVisibility) {
-			shoutView.hideDetails();
-			detailsVisibility = false;
-		} else {
-			shoutView.showDetails();
-			detailsVisibility = true;
 		}
 	}
 

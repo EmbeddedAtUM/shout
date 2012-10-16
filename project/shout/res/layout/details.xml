@@ -16,10 +16,11 @@
         android:paddingTop="10dip"
         android:background="@drawable/settingslistshape" >
 
-        <org.whispercomm.shout.ui.widget.ActionShoutView
-            android:id="@+id/actionshoutview"
+        <org.whispercomm.shout.ui.widget.ShoutView
+            android:id="@+id/shoutview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dip"
             android:background="@color/white" />
 
         <org.whispercomm.shout.ui.widget.ShoutChainView

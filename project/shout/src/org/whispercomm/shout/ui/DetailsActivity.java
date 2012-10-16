@@ -5,8 +5,8 @@ import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.R;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.provider.ShoutProviderContract;
-import org.whispercomm.shout.ui.widget.ActionShoutView;
 import org.whispercomm.shout.ui.widget.ShoutChainView;
+import org.whispercomm.shout.ui.widget.ShoutView;
 
 import android.content.Context;
 import android.content.Intent;
@@ -14,8 +14,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
-// TODO Make this page not look terrible
-@Deprecated
 public class DetailsActivity extends AbstractShoutViewActivity {
 	private static final String TAG = DetailsActivity.class.getSimpleName();
 
@@ -53,10 +51,9 @@ public class DetailsActivity extends AbstractShoutViewActivity {
 				break;
 
 		}
-		ActionShoutView shoutView = (ActionShoutView) findViewById(R.id.actionshoutview);
-		shoutView.bindShout(shout, false);
+		ShoutView shoutView = (ShoutView) findViewById(R.id.shoutview);
+		shoutView.bindShout(shout);
 		shoutView.showDetails();
-
 	}
 
 	private LocalShout getShoutFromBundle(Bundle bundle) {

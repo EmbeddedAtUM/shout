@@ -102,7 +102,6 @@ public class ShoutView extends RelativeLayout {
 		}
 
 		detailsTable.setVisibility(GONE);
-
 	}
 
 	/**
