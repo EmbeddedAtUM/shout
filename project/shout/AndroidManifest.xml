@@ -8,11 +8,24 @@
         android:minSdkVersion="8"
         android:targetSdkVersion="14" />
 
+    <permission-group
+        android:name="org.whispercomm.shout"
+        android:description="@string/permgroupdesc_Shout"
+        android:label="@string/permgrouplab_Shout" />
+
+    <permission
+        android:name="org.whispercomm.shout.ACCESS_SHOUTS"
+        android:description="@string/permdesc_accessShouts"
+        android:label="@string/permlab_accessShouts"
+        android:permissionGroup="org.whispercomm.shout"
+        android:protectionLevel="dangerous" />
+
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <!-- Inherited from Manes Client MacLib -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="org.whispercomm.shout.ACCESS_SHOUTS" />
 
     <application
         android:icon="@drawable/icon"
@@ -33,8 +46,8 @@
 
         <provider
             android:name=".provider.ShoutProvider"
-            android:authorities="@string/providerAuthority" >
-        </provider>
+            android:authorities="@string/providerAuthority"
+            android:permission="org.whispercomm.shout.ACCESS_SHOUTS" />
 
         <service
             android:name=".network.service.NetworkService"

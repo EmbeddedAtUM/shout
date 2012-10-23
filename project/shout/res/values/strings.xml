@@ -43,5 +43,9 @@
     <string name="serviceDescriptionText">Currently listening for nearby Shouts</string>
     <string name="splashDesc">Splash screen logo</string>
     <string name="shoutAgreement">To support our research on the types of communication protocols that make applications like Shout possible, we aggregate on our servers information that would be visible to your nearby neighbors when you Shout. The data collected consists of the content and the device location when a Shout is sent either by you or automatically by the Shout software. This data collection is only a temporary measure; once Shout is based on a true ad hoc network (rather than <a href="http://whispercomm.org/manes/">MANES</a>), absolutely no data will be logged. We hope to reach this point as soon as possible, but we need to know how this version of Shout works to make progress, which is why we are requesting to store the data.\n\nFor more information, <a href="http://whispercomm.org/shout">click here</a>.</string>
+    <string name="permlab_accessShouts">read and modify stored shouts</string>
+    <string name="permdesc_accessShouts">Allows the app to read or modify the shouts stored on your device.</string>
+    <string name="permgrouplab_Shout">Shout</string>
+    <string name="permgroupdesc_Shout">Read and send shouts.</string>
 
 </resources>
