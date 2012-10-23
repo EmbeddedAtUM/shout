@@ -22,7 +22,7 @@ public class NetworkReceiver {
 	/**
 	 * Time to block while checking for a new incoming packet in milliseconds.
 	 */
-	private static final int BLOCK_INTERVAL_MS = 10;
+	private static final int BLOCK_INTERVAL_MS = 1 * 60 * 1000;
 
 	private final ManesInterface manes;
 	private final List<PacketProtocol> protocols;
