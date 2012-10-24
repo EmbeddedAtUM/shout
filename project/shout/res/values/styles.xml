@@ -1,34 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<style name="TitleBar">
-	    <item name="android:layout_width">fill_parent</item>
-	    <item name="android:layout_height">45dip</item>  
-	    <item name="android:background">@drawable/navgradient</item>
-	</style>
-	<style name="TitleBarLogo">
-	    <item name="android:id">@+id/logo</item>
-	    <item name="android:layout_width">wrap_content</item>
-	    <item name="android:layout_height">fill_parent</item>
-	    <item name="android:paddingLeft">20dip</item>
-	    <item name="android:src">@drawable/shoutlogo</item>	   
-	</style>
-	<style name="TitleBarButton">
-	    <item name="android:layout_width">45dip</item>
-	    <item name="android:layout_height">fill_parent</item>
-		<item name="android:background">@drawable/title_button</item>
-	</style>
-	
-	<style name="PageTitle">
-	    <item name="android:id">@+id/pagetitle</item>
-   	    <item name="android:layout_height">40dip</item>
-   	    <item name="android:layout_width">fill_parent</item>
-   	    <item name="android:gravity">top|left</item>
-   	    <item name="android:paddingLeft">10dip</item>
-   	    <item name="android:paddingTop">10dip</item>
-   	    <item name="android:background">@drawable/titlegradient</item>
-   	    <item name="android:textColor">@android:color/black</item>
-	</style>
-	<style parent="TitleBarButton" name="ShoutActionButton">
-		<item name="android:background">@color/action_bg</item>
-	</style>
-</resources> 
+
+    <style name="TitleBar">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">45dip</item>
+        <item name="android:background">@drawable/navgradient</item>
+    </style>
+
+    <style name="TitleBarLogo">
+        <item name="android:id">@+id/logo</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">fill_parent</item>
+        <item name="android:paddingLeft">20dip</item>
+        <item name="android:src">@drawable/shoutlogo</item>
+    </style>
+
+    <style name="TitleBarButton">
+        <item name="android:layout_width">45dip</item>
+        <item name="android:layout_height">fill_parent</item>
+        <item name="android:background">@drawable/title_button</item>
+    </style>
+
+    <style name="PageTitle">
+        <item name="android:id">@+id/pagetitle</item>
+        <item name="android:layout_height">40dip</item>
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:gravity">top|left</item>
+        <item name="android:paddingLeft">10dip</item>
+        <item name="android:paddingTop">10dip</item>
+        <item name="android:background">@drawable/titlegradient</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <style name="ShoutActionButton" parent="TitleBarButton">
+        <item name="android:background">@color/action_bg</item>
+    </style>
+
+</resources>
