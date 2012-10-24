@@ -1,5 +1,5 @@
 
-package org.whispercomm.shout.ui.widget;
+package org.whispercomm.shout.ui.preference;
 
 import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.id.UserNameInvalidException;
