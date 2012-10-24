@@ -1,7 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <style name="AppTheme" parent="@android:style/Theme.NoTitleBar" />
+
+    <style name="AppTheme.Settings">
+
+        <!-- These color overrides should be removed when the main theme is fixed. -->
+        <!-- Override bad text colors that propagate through to preferences title and summary fields -->
+        <item name="@android:attr/textColorPrimary">@android:color/primary_text_light</item>
+        <item name="@android:attr/textColorSecondary">@android:color/secondary_text_light</item>
+
+        <!-- Override bad text and background colors in PreferenceCategory title display. -->
+        <item name="@android:attr/listSeparatorTextViewStyle">@style/ListSeparatorView</item>
+    </style>
+
+    <style name="ListSeparatorView" parent="@android:attr/textViewStyle">
+        <item name="android:background">@android:color/black</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@android:color/darker_gray</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingLeft">8dip</item>
+    </style>
 
     <style name="TitleBar">
         <item name="android:layout_width">fill_parent</item>
