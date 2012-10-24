@@ -12,14 +12,14 @@
     </org.whispercomm.shout.ui.widget.ShoutPreferenceCategory>
 
     <PreferenceCategory android:title="Background Service" >
-        <org.whispercomm.shout.ui.widget.ShoutCheckBoxPreference
+        <CheckBoxPreference
             android:defaultValue="true"
             android:key="runInBackground"
             android:summary="If checked, Shout will run in the background listening for new shouts."
             android:title="Run in Background" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Location Settings" >
-        <org.whispercomm.shout.ui.widget.ShoutCheckBoxPreference
+        <CheckBoxPreference
             android:defaultValue="true"
             android:key="attachLocation"
             android:summary="If checked, your current location will be included with your shouts and reshouts."

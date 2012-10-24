@@ -9,11 +9,12 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.util.AttributeSet;
 import android.util.Log;
 
-public class ShoutUsernamePreference extends ShoutEditTextPreference {
+public class ShoutUsernamePreference extends EditTextPreference {
 
 	private static final String TAG = ShoutUsernamePreference.class
 			.getSimpleName();
