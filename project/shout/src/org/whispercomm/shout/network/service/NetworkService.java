@@ -17,10 +17,13 @@ import org.whispercomm.shout.network.shout.NaiveNetworkProtocol;
 import org.whispercomm.shout.network.shout.NetworkProtocol;
 import org.whispercomm.shout.network.shout.ShoutChainTooLongException;
 import org.whispercomm.shout.network.shout.ShoutProtocol;
+import org.whispercomm.shout.notification.ShoutContentObserver;
 import org.whispercomm.shout.provider.ShoutProviderContract;
+import org.whispercomm.shout.provider.ShoutProviderContract.Shouts;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
@@ -46,12 +49,17 @@ public class NetworkService extends Service implements ManesConnection, ManesIns
 
 	private boolean manesConnected;
 
+	private ShoutContentObserver shoutContentObserver;
+
 	@Override
 	public final void onCreate() {
 		Log.i(TAG, "Starting service.");
 		manesConnected = false;
 		callbacks = new CopyOnWriteArrayList<ManesStatusCallback>();
 		manesInstallReceiver = ManesInstallationReceiver.start(this, this);
+		shoutContentObserver = new ShoutContentObserver(new Handler(), this);
+		getApplicationContext().getContentResolver().registerContentObserver(Shouts.CONTENT_URI,
+				true, shoutContentObserver);
 		initialize();
 		Log.i(TAG, "Service started.");
 	}
@@ -59,6 +67,8 @@ public class NetworkService extends Service implements ManesConnection, ManesIns
 	@Override
 	public final void onDestroy() {
 		Log.i(TAG, "Stopping service.");
+		getApplicationContext().getContentResolver()
+				.unregisterContentObserver(shoutContentObserver);
 		uninitialize();
 		manesInstallReceiver.stop();
 		Log.i(TAG, "Service stopped.");

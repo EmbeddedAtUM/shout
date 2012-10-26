@@ -51,7 +51,7 @@ public class ShoutProviderContract {
 	 * 
 	 * @author David Adrian
 	 */
-	static class Shouts implements BaseColumns {
+	public static class Shouts implements BaseColumns {
 		/**
 		 * SQLite table name. Not needed for managed queries, and can be ignored
 		 * in most use cases
