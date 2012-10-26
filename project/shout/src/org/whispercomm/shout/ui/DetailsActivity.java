@@ -17,7 +17,7 @@ import android.view.View;
 public class DetailsActivity extends AbstractShoutViewActivity {
 	private static final String TAG = DetailsActivity.class.getSimpleName();
 
-	private static final String SHOUT_ID = "shout_id";
+	public static final String SHOUT_ID = "shout_id";
 
 	/**
 	 * Starts the details activity to display the specified shout.

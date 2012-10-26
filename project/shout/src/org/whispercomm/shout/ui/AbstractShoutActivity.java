@@ -35,6 +35,9 @@ import android.support.v4.app.FragmentActivity;
  */
 public class AbstractShoutActivity extends FragmentActivity {
 
+	/** True if the activity is in the resumed state, false otherwise */
+	private static boolean visible = false;
+
 	protected NetworkInterface network;
 
 	private final DialogInterface.OnClickListener installClickListener = new DialogInterface.OnClickListener() {
@@ -99,6 +102,18 @@ public class AbstractShoutActivity extends FragmentActivity {
 	}
 
 	@Override
+	protected void onResume() {
+		super.onResume();
+		visible = true;
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		visible = false;
+	}
+
+	@Override
 	protected void onDestroy() {
 		uninitialize();
 		super.onDestroy();
@@ -150,6 +165,14 @@ public class AbstractShoutActivity extends FragmentActivity {
 			Intent intent = new Intent(this, NetworkService.class);
 			this.startService(intent);
 		}
+	}
+
+	/**
+	 * @return true if any AbstractShoutActivity is visible (in the resumed
+	 *         state), false otherwise
+	 */
+	public static boolean isVisible() {
+		return visible;
 	}
 
 	/**
