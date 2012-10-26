@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/TitleBar" >
+
+        <ImageView
+            style="@style/TitleBarLogo"
+            android:contentDescription="@string/logoDesc" />
+
+        <ImageButton
+            android:id="@+id/settingsButton"
+            style="@style/TitleBarButton"
+            android:layout_alignParentRight="true"
+            android:contentDescription="@string/settingsDesc"
+            android:onClick="onClickSettings"
+            android:src="@drawable/gear" />
+
+        <ImageButton
+            android:id="@+id/composeButton"
+            style="@style/TitleBarButton"
+            android:layout_toLeftOf="@id/settingsButton"
+            android:contentDescription="@string/shoutDesc"
+            android:onClick="onClickShout"
+            android:src="@drawable/chat" />
+    </RelativeLayout>

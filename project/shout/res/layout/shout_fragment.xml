@@ -5,31 +5,6 @@
     android:background="@color/BackgroundGray"
     android:orientation="vertical" >
 
-    <!-- Title Bar -->
-
-    <RelativeLayout style="@style/TitleBar" >
-
-        <ImageView
-            style="@style/TitleBarLogo"
-            android:contentDescription="@string/logoDesc" />
-
-        <ImageButton
-            android:id="@+id/settingsButton"
-            style="@style/TitleBarButton"
-            android:layout_alignParentRight="true"
-            android:contentDescription="@string/settingsDesc"
-            android:onClick="onClickSettings"
-            android:src="@drawable/gear" />
-
-        <ImageButton
-            android:id="@+id/composeButton"
-            style="@style/TitleBarButton"
-            android:layout_toLeftOf="@id/settingsButton"
-            android:contentDescription="@string/shoutDesc"
-            android:onClick="onClickShout"
-            android:src="@drawable/chat" />
-    </RelativeLayout>
-
     <!-- Title of page -->
 
     <TextView
