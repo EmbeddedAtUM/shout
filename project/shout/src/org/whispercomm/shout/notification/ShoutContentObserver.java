@@ -15,6 +15,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.ContentObserver;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Handler;
 
 public class ShoutContentObserver extends ContentObserver {
@@ -43,17 +44,30 @@ public class ShoutContentObserver extends ContentObserver {
 		return PendingIntent.getActivity(context, 0, intent, 0);
 	}
 
-	// TODO This displays the original shout even for comments/reshouts
-	/*
-	 * TODO We should probably limit what causes a notification. If a message is
-	 * reshouted 100 times, they shouldn't get 100 notifications
-	 */
+	// TODO Ideally, we want to call something like
+	// ShoutProviderContract.getCursorOverAllShouts(context);, but this only
+	// gets original shouts, not comments
+	private Cursor getShoutCursor() {
+		String sortOrder = Shouts.TIME_RECEIVED + " DESC";
+		Uri uri = Shouts.CONTENT_URI;
+		String selection = null;
+		Cursor result = context.getContentResolver().query(uri, null,
+				selection, null, sortOrder);
+		return result;
+	}
+
+	// TODO We should probably limit what causes a notification. If a message is
+	// reshouted 100 times, they shouldn't get 100 notifications
 	@Override
 	public void onChange(boolean selfChange) {
 		if (!selfChange && !AbstractShoutActivity.isVisible()) {
-			Cursor cursor = ShoutProviderContract.getCursorOverAllShouts(context);
+			Cursor cursor = getShoutCursor();
 			cursor.moveToFirst();
 			Shout shout = ShoutProviderContract.retrieveShoutFromCursor(context, cursor);
+			// If it is a reshout, get the parent shout
+			if (shout.getMessage() == null && shout.getParent() != null) {
+				shout = shout.getParent();
+			}
 			sendNotification(shout);
 		}
 	}
