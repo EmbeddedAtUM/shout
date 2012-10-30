@@ -69,6 +69,7 @@ public class ShoutContentObserver extends ContentObserver {
 				shout = shout.getParent();
 			}
 			sendNotification(shout);
+			cursor.close();
 		}
 	}
 
