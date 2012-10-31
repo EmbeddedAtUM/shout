@@ -9,6 +9,7 @@ import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.R;
 import org.whispercomm.shout.provider.ParcelableShout;
 import org.whispercomm.shout.provider.ShoutProviderContract;
+import org.whispercomm.shout.tutorial.TutorialManager;
 import org.whispercomm.shout.ui.widget.TimelineAdapter;
 
 import android.content.Intent;
@@ -47,6 +48,8 @@ public class ShoutActivity extends AbstractShoutViewActivity {
 
 	protected void initialize() {
 		super.initialize();
+
+		TutorialManager.showHelp(this);
 
 		setContentView(R.layout.shout_activity);
 

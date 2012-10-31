@@ -45,6 +45,7 @@
             android:name=".ui.SettingsActivity"
             android:theme="@style/AppTheme.Settings" />
         <activity android:name=".ui.DetailsActivity" />
+        <activity android:name=".tutorial.TutorialActivity" />
 
         <provider
             android:name=".provider.ShoutProvider"
