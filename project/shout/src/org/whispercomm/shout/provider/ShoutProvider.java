@@ -144,16 +144,15 @@ public class ShoutProvider extends ContentProvider {
 			default:
 				throw new IllegalArgumentException("Unknown or invalid URI " + uri);
 		}
-		long rowId = queryForPrexistingThenInsert(match, values, table);
-		Uri insertLocation = ContentUris.withAppendedId(uri, rowId);
-		this.getContext().getContentResolver()
-				.notifyChange(insertLocation, null);
+		Uri insertLocation = queryForPrexistingThenInsert(match, values, table, uri);
 		return insertLocation;
 	}
 
-	private long queryForPrexistingThenInsert(int match, ContentValues values, String table) {
+	private Uri queryForPrexistingThenInsert(int match, ContentValues values, String table, Uri uri) {
 		long id = queryForPrexisting(match, values);
-		if (id == -1) {
+		// In the database already if the id is not -1
+		boolean exists = (id != -1);
+		if (!exists) {
 			// Not in the database, so insert
 			mDB = mOpenHelper.getWritableDatabase();
 			long error = mDB.insert(table, null, values);
@@ -167,7 +166,13 @@ public class ShoutProvider extends ContentProvider {
 				id = queryForPrexisting(match, values);
 			}
 		}
-		return id;
+		Uri insertLocation = ContentUris.withAppendedId(uri, id);
+		if (!exists) {
+			// Only notify the observers if this was a new insert
+			this.getContext().getContentResolver()
+					.notifyChange(insertLocation, null);
+		}
+		return insertLocation;
 	}
 
 	/**
