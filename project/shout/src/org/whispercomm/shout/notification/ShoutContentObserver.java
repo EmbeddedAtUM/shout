@@ -64,11 +64,10 @@ public class ShoutContentObserver extends ContentObserver {
 			Cursor cursor = getShoutCursor();
 			cursor.moveToFirst();
 			Shout shout = ShoutProviderContract.retrieveShoutFromCursor(context, cursor);
-			// If it is a reshout, get the parent shout
-			if (shout.getMessage() == null && shout.getParent() != null) {
-				shout = shout.getParent();
+			// Only notify if it is not a reshout
+			if (shout.getMessage() != null) {
+				sendNotification(shout);
 			}
-			sendNotification(shout);
 			cursor.close();
 		}
 	}
