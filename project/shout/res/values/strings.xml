@@ -47,5 +47,17 @@
     <string name="permdesc_accessShouts">Allows the app to read or modify the shouts stored on your device.</string>
     <string name="permgrouplab_Shout">Shout</string>
     <string name="permgroupdesc_Shout">Read and send shouts.</string>
-
+    <string name="preftitle_Avatar">Avatar</string>
+    <string name="prefsummary_Avatar">Profile image displayed with your shouts.</string>
+    <string name="delegatepreftitle_Avatar">Get Avatar From</string>
+    <string name="delegateprefcancel_Avatar">Avatar change canceled.</string>
+    <string name="delegateprompt_Camera">Camera</string>
+    <string name="delegateprompt_Gallery">Gallery</string>
+    <string name="delegateprompt_Twitter">Twitter Profile</string>
+    <string name="prefavatar_imagetoolarge">Image is too large.</string>
+    <string name="delegatetwittererror_invalidscreenname">User \'%s\' not found.</string>
+    <string name="delegatetwittererror_networkconnection">No network connection.</string>
+    <string name="delegatetwittererror_unknown">Unknown error.</string>
+    <string name="delegatetwittertitle">Enter Your Twitter Screenname</string>
+	<string name="delegategalleryerror">Error retrieving image.</string>
 </resources>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="48dp"
+    android:layout_height="48dp"
+    android:layout_gravity="center"
+    android:layout_marginBottom="8dp"
+    android:layout_marginTop="8dp"
+    android:focusable="false" >
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:focusable="false"
+        android:scaleType="centerCrop"
+        tools:ignore="Accessibility" >
+    </ImageView>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:focusable="false"
+        android:indeterminateOnly="true"
+        android:visibility="invisible"
+        android:background="@color/progress_bar_background" >
+    </ProgressBar>
+
+</FrameLayout>

@@ -10,10 +10,23 @@
         <attr name="android:dialogTitle" />
         <attr name="cancelText" format="string" />
     </declare-styleable>
+    <declare-styleable name="BitmapPreference">
+        <attr name="maxScaledHeight" format="integer" min="1" />
+        <attr name="maxScaledWidth" format="integer" min="1" />
+        <attr name="compressionQuality" format="integer" min="0" />
+        <!--
+         compressionFormat should be an Enum, not string, but the AAPT included
+         with version 20 of Android SDK Tools segfaults when the Enum form is used.
+           Change this when AAPT is fixed.
+        -->
+        <attr name="compressionFormat" format="string" />
+        <attr name="maxCompressedSize" format="integer" min="1" />
+    </declare-styleable>
     <declare-styleable name="DelegatedPreference">
         <attr name="android:dialogTitle" />
     </declare-styleable>
 
     <attr name="delegatedPreferenceStyle" format="reference" />
+    <attr name="bitmapPreferenceStyle" format="reference" />
 
 </resources>
