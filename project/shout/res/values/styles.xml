@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="AppTheme" parent="@android:style/Theme.NoTitleBar" />
+    <style name="AppTheme" parent="@android:style/Theme.NoTitleBar">
+        <item name="@attr/delegatedPreferenceStyle">@style/DelegatedPreference</item>
+    </style>
 
     <style name="AppTheme.Settings">
 
@@ -58,6 +60,10 @@
 
     <style name="ShoutActionButton" parent="TitleBarButton">
         <item name="android:background">@color/action_bg</item>
+    </style>
+
+    <style name="DelegatedPreference">
+        <!-- No special style to set here -->
     </style>
 
 </resources>
