@@ -47,6 +47,8 @@ public class MessageActivity extends AbstractShoutActivity {
 
 	private static final String PARENT_ID = "parent";
 
+	private static final String SAVED_TEXT_KEY = "saved_text";
+
 	/**
 	 * Starts the message activity to send a new original shout.
 	 * 
@@ -86,6 +88,11 @@ public class MessageActivity extends AbstractShoutActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		if (savedInstanceState != null) {
+			String savedText = savedInstanceState.getString(SAVED_TEXT_KEY);
+			edtMessage.setText(savedText);
+			edtMessage.setSelection(savedText.length());
+		}
 	}
 
 	@Override
@@ -98,6 +105,12 @@ public class MessageActivity extends AbstractShoutActivity {
 	public void onStop() {
 		mLocation.stop();
 		super.onStop();
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle savedInstanceState) {
+		savedInstanceState.putString(SAVED_TEXT_KEY,
+				edtMessage.getText().toString());
 	}
 
 	protected void initialize() {
