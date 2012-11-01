@@ -37,7 +37,6 @@ public class DetailsActivity extends AbstractShoutViewActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		super.initialize();
 		setContentView(R.layout.details);
 		Bundle extras = getIntent().getExtras();
 		shout = getShoutFromBundle(extras);
