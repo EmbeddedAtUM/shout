@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:shout="http://schemas.android.com/apk/res/org.whispercomm.shout" >
 
     <!-- defaultValue should be changed to default username, i.e. user123 -->
     <org.whispercomm.shout.ui.preference.ShoutPreferenceCategory android:title="Identity Settings" >
@@ -9,6 +10,19 @@
             android:key="usernamePref"
             android:summary="Your username and associated unique keys are used to authenticate Shouts behind the scenes, so try to pick a good username the first time."
             android:title="Username" />
+
+        <org.whispercomm.shout.ui.preference.BitmapPreference
+            android:defaultValue="@drawable/defaultavatar"
+            android:dialogTitle="@string/delegatepreftitle_Avatar"
+            android:key="avatarPref"
+            android:summary="@string/prefsummary_Avatar"
+            android:title="@string/preftitle_Avatar"
+            shout:compressionFormat="PNG"
+            shout:compressionQuality="100"
+            shout:maxCompressedSize="20480"
+            shout:maxScaledHeight="73"
+            shout:maxScaledWidth="73"
+            shout:cancelText="@string/delegateprefcancel_Avatar" />
     </org.whispercomm.shout.ui.preference.ShoutPreferenceCategory>
 
     <PreferenceCategory android:title="Background Service" >
