@@ -77,8 +77,7 @@ public class ShoutContentObserver extends ContentObserver {
 		String message = shout.getMessage();
 		String shoutText = author + ": " + message;
 		Notification notification = constructNotification(shoutText, shoutText, createIntent(shout));
-		notificationManager
-				.notify(SHOUT_RECEIVED_NOTIFICATION_ID, notification);
+		notificationManager.notify(SHOUT_RECEIVED_NOTIFICATION_ID, notification);
 	}
 
 	public Notification constructNotification(String tickerText, String contentText,

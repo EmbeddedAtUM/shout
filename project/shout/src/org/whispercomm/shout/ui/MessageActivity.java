@@ -123,7 +123,6 @@ public class MessageActivity extends AbstractShoutActivity {
 		edtMessage.addTextChangedListener(new EditMessageWatcher());
 		btnSend.setEnabled(false);
 		if (parent != null) {
-			Toast.makeText(this, parent.getMessage(), Toast.LENGTH_LONG).show();
 			shoutParent.bindShout(parent);
 			frmTxtParent.setVisibility(FrameLayout.VISIBLE);
 		}
