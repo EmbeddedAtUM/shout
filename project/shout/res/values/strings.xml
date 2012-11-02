@@ -1,6 +1,8 @@
 <resources>
 
     <string name="app_name">Shout</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
     <string name="no_shouts">You haven\'t received any Shouts.</string>
     <string name="separatorDesc">Separator</string>
     <string name="shoutDesc">Separator</string>
@@ -59,5 +61,8 @@
     <string name="delegatetwittererror_networkconnection">No network connection.</string>
     <string name="delegatetwittererror_unknown">Unknown error.</string>
     <string name="delegatetwittertitle">Enter Your Twitter Screenname</string>
-	<string name="delegategalleryerror">Error retrieving image.</string>
+    <string name="delegategalleryerror">Error retrieving image.</string>
+    <string name="settings_runinbackground_warning_title">Are you sure?</string>
+    <string name="settings_runinbackground_warning_message">You will not receive new shouts while this option is disabled.</string>
+
 </resources>
