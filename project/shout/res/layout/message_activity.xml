@@ -2,9 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
-    
-<fragment android:name="org.whispercomm.shout.ui.fragment.MessageFragment"
-   	android:layout_width="match_parent"
-   	android:layout_height="match_parent" />
+
+    <fragment
+        android:id="@+id/fragMessage"
+        android:name="org.whispercomm.shout.ui.fragment.MessageFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </LinearLayout>
