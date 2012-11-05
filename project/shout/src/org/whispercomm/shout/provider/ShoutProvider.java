@@ -148,8 +148,63 @@ public class ShoutProvider extends ContentProvider {
 		return insertLocation;
 	}
 
+	/**
+	 * Query to see if there is a row in the table at the specified URI that
+	 * will cause a conflict due to a unique constraint.
+	 * 
+	 * @param uri The URI of the table with a unique constraint
+	 * @param values The values that may cause conflict
+	 * @param uniqueCols The columns specified as unique in the schema
+	 * @param _ID The name of the integer primary key field
+	 * @return The ID of the conflicting row, or -1 if there is no conflict
+	 */
+	private int queryForUniqueConflict(Uri uri, ContentValues values,
+			String[] uniqueCols, final String _ID) {
+		int id = -1;
+		String[] projection = new String[] {
+				_ID
+		};
+		StringBuilder selectionBuilder = new StringBuilder(16 * uniqueCols.length);
+		String[] selectionArgs = new String[uniqueCols.length];
+		for (int i = 0; i < uniqueCols.length; i++) {
+			if (i > 0) {
+				selectionBuilder.append(" AND ");
+			}
+			selectionBuilder.append(uniqueCols[i] + " = ?");
+			String arg = values.getAsString(uniqueCols[i]);
+			if (arg == null) {
+				return -1;
+			}
+			selectionArgs[i] = arg;
+		}
+		Cursor cursor = query(uri, projection, selectionBuilder.toString(), selectionArgs, null);
+		if (cursor.moveToFirst()) {
+			int idIndex = cursor.getColumnIndex(_ID);
+			id = cursor.getInt(idIndex);
+		}
+		cursor.close();
+		return id;
+	}
+
 	private Uri queryForPrexistingThenInsert(int match, ContentValues values, String table, Uri uri) {
-		long id = queryForPrexisting(match, values);
+		int id;
+		String[] uniqueCols;
+		String idColumnName;
+		switch (match) {
+			case SHOUTS:
+				uniqueCols = ShoutDatabaseHelper.SHOUT_UNIQUE_COLS;
+				idColumnName = ShoutProviderContract.Shouts._ID;
+				break;
+			case USERS:
+				uniqueCols = ShoutDatabaseHelper.USER_UNIQUE_COLS;
+				idColumnName = ShoutProviderContract.Users._ID;
+				break;
+			default:
+				throw new SQLException(
+						"There is no unique column constraint, but you are checking for prexisting at uri: "
+								+ uri.toString());
+		}
+		id = queryForUniqueConflict(uri, values, uniqueCols, idColumnName);
 		// In the database already if the id is not -1
 		boolean exists = (id != -1);
 		if (!exists) {
@@ -163,7 +218,7 @@ public class ShoutProvider extends ContentProvider {
 			if (error == -1) {
 				throw new SQLException("Unable to insert into table " + table);
 			} else {
-				id = queryForPrexisting(match, values);
+				id = queryForUniqueConflict(uri, values, uniqueCols, idColumnName);
 			}
 		}
 		Uri insertLocation = ContentUris.withAppendedId(uri, id);
@@ -173,58 +228,6 @@ public class ShoutProvider extends ContentProvider {
 					.notifyChange(insertLocation, null);
 		}
 		return insertLocation;
-	}
-
-	/**
-	 * Query for a prexisting entry in the table, based on the UNIQUE
-	 * constrained columns. Return the prexisting row ID, if it exists.
-	 * 
-	 * @param match
-	 * @param values
-	 * @return Prexisting row ID, if present. Otherwise, return -1.
-	 */
-	private long queryForPrexisting(int match, ContentValues values) {
-		String selection;
-		String[] selectionArgs, projection;
-		Cursor cursor;
-		long id = -1;
-		switch (match) {
-			case SHOUTS:
-				projection = new String[] {
-						ShoutProviderContract.Shouts._ID
-				};
-				selection = ShoutProviderContract.Shouts.HASH + " = ?";
-				selectionArgs = new String[] {
-						values.getAsString(ShoutProviderContract.Shouts.HASH)
-				};
-				cursor = query(ShoutProviderContract.Shouts.CONTENT_URI, projection,
-						selection, selectionArgs, null);
-				if (cursor.moveToFirst()) {
-					int idIndex = cursor.getColumnIndex(ShoutProviderContract.Shouts._ID);
-					id = cursor.getInt(idIndex);
-				}
-				cursor.close();
-				break;
-			case USERS:
-				projection = new String[] {
-						ShoutProviderContract.Users._ID
-				};
-				selection = ShoutProviderContract.Users.PUB_KEY + " = ?";
-				selectionArgs = new String[] {
-						values.getAsString(ShoutProviderContract.Users.PUB_KEY)
-				};
-				cursor = query(ShoutProviderContract.Users.CONTENT_URI, projection, selection,
-						selectionArgs, null);
-				if (cursor.moveToFirst()) {
-					int idIndex = cursor.getColumnIndex(ShoutProviderContract.Users._ID);
-					id = cursor.getInt(idIndex);
-				}
-				cursor.close();
-				break;
-			default:
-				throw new IllegalArgumentException("Invalid or unknown URI");
-		}
-		return id;
 	}
 
 	@Override
@@ -364,7 +367,8 @@ public class ShoutProvider extends ContentProvider {
 				+ " INTEGER PRIMARY KEY ASC AUTOINCREMENT, "
 				+ ShoutProviderContract.Users.USERNAME + " TEXT, "
 				+ ShoutProviderContract.Users.PUB_KEY + " TEXT, "
-				+ "UNIQUE (" + ShoutProviderContract.Users.PUB_KEY + ") " + ");";
+				+ "UNIQUE (" + ShoutProviderContract.Users.PUB_KEY + ", "
+				+ ShoutProviderContract.Users.USERNAME + " ) " + ");";
 
 		private static final String SQL_CREATE_SHOUT = "CREATE TABLE "
 				+ ShoutProviderContract.Shouts.TABLE_NAME + "("
@@ -380,12 +384,13 @@ public class ShoutProvider extends ContentProvider {
 				+ ShoutProviderContract.Shouts.TIME_RECEIVED + " LONG, "
 				+ ShoutProviderContract.Shouts.HASH + " TEXT, "
 				+ ShoutProviderContract.Shouts.SIGNATURE + " TEXT, "
+				+ ShoutProviderContract.Shouts.USER_PK + " INTEGER, "
 				+ ShoutProviderContract.Shouts.COMMENT_COUNT + " INTEGER DEFAULT 0, "
 				+ ShoutProviderContract.Shouts.RESHOUT_COUNT + " INTEGER DEFAULT 0, "
 				+ "UNIQUE (" + ShoutProviderContract.Shouts.HASH + "), "
-				+ "FOREIGN KEY(" + ShoutProviderContract.Shouts.AUTHOR
+				+ "FOREIGN KEY(" + ShoutProviderContract.Shouts.USER_PK
 				+ ") REFERENCES " + ShoutProviderContract.Users.TABLE_NAME
-				+ "(" + ShoutProviderContract.Users.PUB_KEY + "), "
+				+ "(" + ShoutProviderContract.Users._ID + "), "
 				+ "FOREIGN KEY(" + ShoutProviderContract.Shouts.PARENT
 				+ ") REFERENCES " + ShoutProviderContract.Shouts.TABLE_NAME +
 				"(" + ShoutProviderContract.Shouts.HASH + ")" + ");";
@@ -429,6 +434,15 @@ public class ShoutProvider extends ContentProvider {
 				+ ShoutSearchContract.Messages.SHOUT + ", " + ShoutSearchContract.Messages.MESSAGE
 				+ " ) VALUES ( new." + ShoutProviderContract.Shouts._ID + ", new."
 				+ ShoutProviderContract.Shouts.MESSAGE + " );\nEND;";
+
+		private static final String[] USER_UNIQUE_COLS = {
+				ShoutProviderContract.Users.PUB_KEY,
+				ShoutProviderContract.Users.USERNAME
+		};
+
+		private static final String[] SHOUT_UNIQUE_COLS = {
+				ShoutProviderContract.Shouts.HASH
+		};
 
 		public ShoutDatabaseHelper(Context context) {
 			super(context, DBNAME, null, VERSION);

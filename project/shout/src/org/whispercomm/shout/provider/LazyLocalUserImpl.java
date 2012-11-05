@@ -1,70 +1,53 @@
 
 package org.whispercomm.shout.provider;
 
-import java.security.spec.InvalidKeySpecException;
-
 import org.whispercomm.shout.LocalUser;
 import org.whispercomm.shout.crypto.ECPublicKey;
-import org.whispercomm.shout.crypto.KeyGenerator;
 
 import android.content.Context;
-import android.util.Base64;
 
 public class LazyLocalUserImpl implements LocalUser {
 
-	private boolean loaded = false;
-
+	private final int id;
 	private Context context;
-	private String username = null;
-	private ECPublicKey key = null;
+	private LocalUser self;
 
-	public LazyLocalUserImpl(Context context, String encodedAuthor) {
+	public LazyLocalUserImpl(Context context, int userId) {
 		this.context = context;
-		try {
-			this.key = KeyGenerator.generatePublic(Base64.decode(encodedAuthor, Base64.DEFAULT));
-		} catch (InvalidKeySpecException e) {
-			// TODO: Figure out what to do about this
-			throw new RuntimeException(e);
-		}
+		this.id = userId;
+		this.self = null;
 	}
 
 	@Override
 	public String getUsername() {
-		if (!loaded) {
-			loadSelf();
-		}
-		return username;
+		loadSelf();
+		return self.getUsername();
 	}
 
 	@Override
 	public ECPublicKey getPublicKey() {
-		return key;
+		loadSelf();
+		return self.getPublicKey();
 	}
 
 	private void loadSelf() {
-		LocalUser self = ShoutProviderContract.retrieveUserByKey(context, key);
-		username = self.getUsername();
-		loaded = true;
+		if (self == null)
+			self = ShoutProviderContract.retrieveUserById(context, id);
 	}
 
 	@Override
 	public int hashCode() {
-		if (!loaded) {
-			loadSelf();
-		}
-
+		loadSelf();
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((key == null) ? 0 : key.hashCode());
-		result = prime * result + ((username == null) ? 0 : username.hashCode());
+		result = prime * result + ((getPublicKey() == null) ? 0 : getPublicKey().hashCode());
+		result = prime * result + ((getUsername() == null) ? 0 : getUsername().hashCode());
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (!loaded) {
-			loadSelf();
-		}
+		loadSelf();
 
 		if (this == obj)
 			return true;
@@ -73,15 +56,15 @@ public class LazyLocalUserImpl implements LocalUser {
 		if (getClass() != obj.getClass())
 			return false;
 		LazyLocalUserImpl other = (LazyLocalUserImpl) obj;
-		if (key == null) {
-			if (other.key != null)
+		if (getPublicKey() == null) {
+			if (other.getPublicKey() != null)
 				return false;
-		} else if (!key.equals(other.key))
+		} else if (!getPublicKey().equals(other.getPublicKey()))
 			return false;
-		if (username == null) {
-			if (other.username != null)
+		if (getUsername() == null) {
+			if (other.getUsername() != null)
 				return false;
-		} else if (!username.equals(other.username))
+		} else if (!getUsername().equals(other.getUsername()))
 			return false;
 		return true;
 	}

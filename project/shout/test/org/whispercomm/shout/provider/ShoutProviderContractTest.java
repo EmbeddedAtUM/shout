@@ -45,7 +45,7 @@ public class ShoutProviderContractTest {
 		assertNotNull(localUser);
 		TestUtility.testEqualUserFields(testUser, localUser);
 		LocalUser fromDb = ShoutProviderContract
-				.retrieveUserByKey(context, testUser.getPublicKey());
+				.retrieveUserByTuple(context, testUser.getPublicKey(), testUser.getUsername());
 		assertNotNull(fromDb);
 		TestUtility.testEqualUserFields(testUser, fromDb);
 		TestUtility.testEqualUserFields(localUser, fromDb);
@@ -105,7 +105,7 @@ public class ShoutProviderContractTest {
 		LocalUser second = ShoutProviderContract.saveUser(context, testUser);
 		TestUtility.testEqualUserFields(first, second);
 		LocalUser search = ShoutProviderContract
-				.retrieveUserByKey(context, testUser.getPublicKey());
+				.retrieveUserByTuple(context, testUser.getPublicKey(), testUser.getUsername());
 		TestUtility.testEqualUserFields(testUser, search);
 	}
 
