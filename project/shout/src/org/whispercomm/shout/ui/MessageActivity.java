@@ -24,7 +24,6 @@ import org.whispercomm.shout.tasks.SendResult;
 import org.whispercomm.shout.tasks.SendShoutTask;
 import org.whispercomm.shout.tasks.ShoutTask;
 import org.whispercomm.shout.thirdparty.Utf8ByteLengthFilter;
-import org.whispercomm.shout.ui.widget.ShoutView;
 
 import android.content.Context;
 import android.content.Intent;
@@ -40,6 +39,9 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MessageActivity extends AbstractShoutActivity {
@@ -78,9 +80,13 @@ public class MessageActivity extends AbstractShoutActivity {
 	private Button btnSend;
 	private EditText edtMessage;
 	private FrameLayout frmProgressBar;
-	private FrameLayout frmTxtParent;
-	private ShoutView shoutParent;
-
+	private RelativeLayout frmTxtParent;
+	// We don't use a shout to show the original sender while commenting anymore
+	// To change it back un-comment the shoutParent below and remove sender,
+	// message, and avatar.
+	// private ShoutView shoutParent;
+	private TextView sender, message;
+	private ImageView avatar;
 	private LocalShout parent = null;
 
 	@Override
@@ -112,8 +118,11 @@ public class MessageActivity extends AbstractShoutActivity {
 
 		btnSend = (Button) findViewById(R.id.send);
 		frmProgressBar = (FrameLayout) findViewById(R.id.frmProgressBar);
-		shoutParent = (ShoutView) findViewById(R.id.shoutParent);
-		frmTxtParent = (FrameLayout) findViewById(R.id.frmParent);
+		// shoutParent = (ShoutView) findViewById(R.id.shoutParent);
+		avatar = (ImageView) findViewById(R.id.commentAvatar);
+		message = (TextView) findViewById(R.id.commentMessage);
+		sender = (TextView) findViewById(R.id.commentOrigsender);
+		frmTxtParent = (RelativeLayout) findViewById(R.id.frmParent);
 		edtMessage = (EditText) findViewById(R.id.compose);
 
 		edtMessage.setFilters(new InputFilter[] {
@@ -123,8 +132,12 @@ public class MessageActivity extends AbstractShoutActivity {
 		edtMessage.addTextChangedListener(new EditMessageWatcher());
 		btnSend.setEnabled(false);
 		if (parent != null) {
-			shoutParent.bindShout(parent);
-			frmTxtParent.setVisibility(FrameLayout.VISIBLE);
+			// shoutParent.bindShout(parent);
+			LocalShout shout = (LocalShout) parent;
+			message.setText(shout.getMessage());
+			avatar.setImageResource(R.drawable.defaultavatar);
+			sender.setText(shout.getSender().getUsername());
+			frmTxtParent.setVisibility(RelativeLayout.VISIBLE);
 		}
 
 		initializeAttachLocation();
