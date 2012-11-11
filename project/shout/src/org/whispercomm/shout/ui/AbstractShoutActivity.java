@@ -17,7 +17,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.FragmentActivity;
+
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 /**
  * Base class for Shout {@code Activity Activities} that takes care of:
@@ -35,7 +36,7 @@ import android.support.v4.app.FragmentActivity;
  * 
  * @author David R. Bild
  */
-public class AbstractShoutActivity extends FragmentActivity {
+public class AbstractShoutActivity extends SherlockFragmentActivity {
 
 	/** True if the activity is in the resumed state, false otherwise */
 	private static boolean visible = false;

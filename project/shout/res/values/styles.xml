@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="AppTheme" parent="@android:style/Theme.NoTitleBar">
+    <style name="AppTheme" parent="Theme.Sherlock">
         <item name="@attr/bitmapPreferenceStyle">@style/BitmapPreference</item>
         <item name="@attr/delegatedPreferenceStyle">@style/DelegatedPreference</item>
     </style>
@@ -35,8 +35,6 @@
     </style>
 
     <style name="TitleBarLogo">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">fill_parent</item>
         <item name="android:paddingLeft">20dip</item>
         <item name="android:src">@drawable/shoutlogo</item>
     </style>
@@ -48,8 +46,6 @@
     </style>
 
     <style name="PageTitle">
-        <item name="android:layout_height">40dip</item>
-        <item name="android:layout_width">fill_parent</item>
         <item name="android:gravity">top|left</item>
         <item name="android:paddingLeft">10dip</item>
         <item name="android:paddingTop">10dip</item>
