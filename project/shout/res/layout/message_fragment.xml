@@ -7,8 +7,8 @@
     
    <RelativeLayout
            android:id="@+id/frmParent"
-           android:layout_width="wrap_content"
-           android:layout_height="1dip"
+           android:layout_width="fill_parent"
+           android:layout_height="wrap_content"
            android:layout_weight="1"
            android:gravity="center_vertical"
            android:background="@android:color/white"
@@ -18,7 +18,7 @@
 	       android:id="@+id/commentAvatar"
 	       android:layout_width="wrap_content"
 	       android:layout_height="wrap_content"
-		   android:layout_marginLeft="5dip"
+		   android:layout_marginLeft="10dip"
 	       android:layout_marginTop="10dip"
 	       android:contentDescription="@string/avatarDesc" />
 	
@@ -40,6 +40,7 @@
 	        android:layout_below="@+id/commentOrigsender"
 	        android:layout_toRightOf="@+id/commentAvatar"
 	        android:layout_marginLeft="10dip"
+	        android:layout_marginRight="10dip"
 	        android:layout_marginBottom="10dip"
 			android:gravity="left"
 	        android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque quis purus id dolor laoreet tristique. Vivamus lacus felis, pulvinar nec vestibulum ut, rutrum nec felis. Fusce ac sapien quis est viverra iaculis at ac enim. Cras dictum mi id arcu tincidunt varius. Proin id lacus tortor, sed dictum elit. Nam."

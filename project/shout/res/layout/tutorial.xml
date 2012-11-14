@@ -105,16 +105,20 @@
         android:text="Interesting messages have the potential to travel long distances!"
         android:scaleType="fitXY"
         android:textColor="#000000"/>
-	    
-	    <LinearLayout
+	    	    
+	   	<ImageView 
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
-	        <Button
-		     android:layout_height="wrap_content"
-		     android:layout_width="wrap_content"
-		     android:text="Continue to Shout"
-		     android:onClick="continueToShout" />
-	    </LinearLayout>
+        android:layout_height="fill_parent"
+        android:padding="10dp"
+        android:src="@drawable/image8"
+        android:contentDescription="test"
+        android:layout_gravity="center"
+        android:scaleType="fitXY"
+        android:textSize="15.5dp"
+        android:textStyle="bold"
+        android:text="Click anywhere to continue"
+		android:onClick="continueToShout"
+        android:textColor="#000000"/>
 	    
 	    
 	</ViewFlipper>
