@@ -8,7 +8,8 @@
    <RelativeLayout
            android:id="@+id/frmParent"
            android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
+           android:layout_height="1dip"
+           android:layout_weight="1"
            android:gravity="center_vertical"
            android:background="@android:color/white"
            android:visibility="gone">
@@ -18,7 +19,7 @@
 	       android:layout_width="wrap_content"
 	       android:layout_height="wrap_content"
 		   android:layout_marginLeft="5dip"
-	       android:layout_marginTop="5dip"
+	       android:layout_marginTop="10dip"
 	       android:contentDescription="@string/avatarDesc" />
 	
 	   <TextView
@@ -50,7 +51,8 @@
    <FrameLayout
         android:id="@+id/frmCompose"
         android:layout_width="match_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="1dip"
+        android:layout_weight="3"
         android:gravity="top" >
 
         <EditText
