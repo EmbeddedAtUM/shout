@@ -2,6 +2,7 @@
 package org.whispercomm.shout.test.util;
 
 import org.joda.time.DateTime;
+import org.whispercomm.shout.Location;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.User;
 import org.whispercomm.shout.crypto.DsaSignature;
@@ -13,8 +14,8 @@ public class TestShout extends TestUnsignedShout implements Shout {
 	public DsaSignature signature = null;
 
 	public TestShout(User sender, Shout parent, String message,
-			DateTime timestamp, DsaSignature signature, byte[] hash) {
-		super(sender, parent, message, null, timestamp);
+			DateTime timestamp, DsaSignature signature, byte[] hash, Location location) {
+		super(sender, parent, message, location, timestamp);
 		this.signature = signature;
 		this.hash = hash;
 	}

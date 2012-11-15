@@ -49,13 +49,13 @@ public class ShoutSearchContractTest {
 			byte[] hash = TestFactory.genByteArray(32);
 			DsaSignature sig = new DsaSignature(BigInteger.valueOf(i * 10000),
 					BigInteger.valueOf(i * 10000000 + 123523554));
-			TestShout test = new TestShout(sender, null, MESSAGE, DateTime.now(), sig, hash);
+			TestShout test = new TestShout(sender, null, MESSAGE, DateTime.now(), sig, hash, null);
 			ShoutProviderContract.saveShout(context, test);
 			shouts.add(test);
 		}
 		unique = new TestShout(sender, null, "Imma firin mah lazor!", DateTime.now(),
 				new DsaSignature(BigInteger.valueOf(1030239349), BigInteger.valueOf(234834934)),
-				TestFactory.genByteArray(8));
+				TestFactory.genByteArray(8), null);
 		ShoutProviderContract.saveShout(context, unique);
 	}
 
@@ -108,7 +108,7 @@ public class ShoutSearchContractTest {
 		TestShout similar = new TestShout(sender, null,
 				"I am firing my employees because they spend too much time on Reddit",
 				new DateTime(), new DsaSignature(BigInteger.valueOf(2389239),
-						BigInteger.valueOf(23923939)), TestFactory.genByteArray(9));
+						BigInteger.valueOf(23923939)), TestFactory.genByteArray(9), null);
 		ShoutProviderContract.saveShout(context, similar);
 		List<Shout> result = ShoutSearchContract.searchShoutMessage(context, "firin*");
 		assertNotNull(result);
