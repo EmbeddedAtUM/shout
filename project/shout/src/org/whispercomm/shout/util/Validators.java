@@ -30,8 +30,9 @@ public class Validators {
 
 	public static String removeTrailingSpaces(String string) {
 		/*
-		 * TODO Implement
+		 * Replace a sequence white space characters (\s+) at the end of a line
+		 * (+) with nothing
 		 */
-		return string;
+		return string.replaceAll("\\s+$", "");
 	}
 }
