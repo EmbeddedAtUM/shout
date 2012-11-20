@@ -51,8 +51,8 @@ public class ProviderTestFactory {
 		ROOT_SHOUT_VALUES = buildShout(
 				TestFactory.ROOT_SHOUT.getMessage(),
 				TestFactory.ROOT_SHOUT.getTimestamp().getMillis(),
-				0,
-				0,
+				TestFactory.ROOT_SHOUT.getLocation().getLatitude(),
+				TestFactory.ROOT_SHOUT.getLocation().getLongitude(),
 				KeyGenerator.encodePublic(TestFactory.ROOT_SHOUT.getSender().getPublicKey()),
 				TestFactory.ROOT_SHOUT.getHash(),
 				DsaSignature.encode(TestFactory.ROOT_SHOUT.getSignature()),
@@ -61,8 +61,8 @@ public class ProviderTestFactory {
 		RESHOUT_SHOUT_VALUES = buildShout(
 				TestFactory.RESHOUT_SHOUT.getMessage(),
 				TestFactory.RESHOUT_SHOUT.getTimestamp().getMillis(),
-				0,
-				0,
+				TestFactory.RESHOUT_SHOUT.getLocation().getLatitude(),
+				TestFactory.RESHOUT_SHOUT.getLocation().getLongitude(),
 				KeyGenerator.encodePublic(TestFactory.RESHOUT_SHOUT.getSender().getPublicKey()),
 				TestFactory.RESHOUT_SHOUT.getHash(),
 				DsaSignature.encode(TestFactory.RESHOUT_SHOUT.getSignature()),
@@ -71,8 +71,8 @@ public class ProviderTestFactory {
 		COMMENT_SHOUT_VALUES = buildShout(
 				TestFactory.COMMENT_SHOUT.getMessage(),
 				TestFactory.COMMENT_SHOUT.getTimestamp().getMillis(),
-				0,
-				0,
+				TestFactory.COMMENT_SHOUT.getLocation().getLatitude(),
+				TestFactory.COMMENT_SHOUT.getLocation().getLongitude(),
 				KeyGenerator.encodePublic(TestFactory.COMMENT_SHOUT.getSender().getPublicKey()),
 				TestFactory.COMMENT_SHOUT.getHash(),
 				DsaSignature.encode(TestFactory.COMMENT_SHOUT.getSignature()),
@@ -81,8 +81,8 @@ public class ProviderTestFactory {
 		RECOMMENT_SHOUT_VALUES = buildShout(
 				TestFactory.RECOMMENT_SHOUT.getMessage(),
 				TestFactory.RECOMMENT_SHOUT.getTimestamp().getMillis(),
-				0,
-				0,
+				TestFactory.RECOMMENT_SHOUT.getLocation().getLatitude(),
+				TestFactory.RECOMMENT_SHOUT.getLocation().getLongitude(),
 				KeyGenerator.encodePublic(TestFactory.RECOMMENT_SHOUT.getSender().getPublicKey()),
 				TestFactory.RECOMMENT_SHOUT.getHash(),
 				DsaSignature.encode(TestFactory.RECOMMENT_SHOUT.getSignature()),
