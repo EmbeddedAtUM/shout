@@ -367,8 +367,10 @@ public class ShoutProvider extends ContentProvider {
 				+ " INTEGER PRIMARY KEY ASC AUTOINCREMENT, "
 				+ ShoutProviderContract.Users.USERNAME + " TEXT, "
 				+ ShoutProviderContract.Users.PUB_KEY + " TEXT, "
+				+ ShoutProviderContract.Users.AVATAR + " TEXT, "
 				+ "UNIQUE (" + ShoutProviderContract.Users.PUB_KEY + ", "
-				+ ShoutProviderContract.Users.USERNAME + " ) " + ");";
+				+ ShoutProviderContract.Users.USERNAME + ", "
+				+ ShoutProviderContract.Users.AVATAR + " ) " + ");";
 
 		private static final String SQL_CREATE_SHOUT = "CREATE TABLE "
 				+ ShoutProviderContract.Shouts.TABLE_NAME + "("
