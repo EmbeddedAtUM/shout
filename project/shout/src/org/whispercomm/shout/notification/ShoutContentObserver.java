@@ -15,11 +15,12 @@ import android.os.Handler;
 public class ShoutContentObserver extends ContentObserver {
 
 	private Context context;
-	private ShoutNotificationManager notificationManager;
+	private NotificationSender notificationSender;
 
 	public ShoutContentObserver(Handler h, Context context) {
 		super(h);
 		this.context = context;
+		this.notificationSender = new NotificationSender(context);
 		context.getContentResolver().registerContentObserver(Shouts.CONTENT_URI, true, this);
 	}
 
@@ -45,7 +46,7 @@ public class ShoutContentObserver extends ContentObserver {
 			Shout shout = ShoutProviderContract.retrieveShoutFromCursor(context, cursor);
 			// Only notify if it is not a reshout
 			if (shout.getMessage() != null) {
-				notificationManager.sendNotification(shout);
+				notificationSender.sendNotification(shout);
 			}
 			cursor.close();
 		}

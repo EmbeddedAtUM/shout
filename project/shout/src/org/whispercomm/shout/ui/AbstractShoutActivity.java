@@ -5,11 +5,13 @@ import org.whispercomm.manes.client.maclib.ManesActivityHelper;
 import org.whispercomm.shout.expiry.ExpiryManager;
 import org.whispercomm.shout.network.service.BootReceiver;
 import org.whispercomm.shout.network.service.NetworkInterface;
-import org.whispercomm.shout.network.service.NetworkService;
 import org.whispercomm.shout.network.service.NetworkInterface.ShoutServiceConnection;
+import org.whispercomm.shout.network.service.NetworkService;
+import org.whispercomm.shout.notification.NotificationSender;
 import org.whispercomm.shout.terms.AgreementListener;
 import org.whispercomm.shout.terms.AgreementManager;
 
+import android.app.NotificationManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -105,6 +107,8 @@ public class AbstractShoutActivity extends FragmentActivity {
 	protected void onResume() {
 		super.onResume();
 		visible = true;
+		NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+		nm.cancel(NotificationSender.SHOUT_RECEIVED_NOTIFICATION_ID);
 	}
 
 	@Override

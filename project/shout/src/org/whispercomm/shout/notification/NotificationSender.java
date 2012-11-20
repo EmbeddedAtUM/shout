@@ -11,7 +11,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 
-public class ShoutNotificationManager {
+public class NotificationSender {
 	private NotificationManager notificationManager;
 	private Context context;
 	public static final int SHOUT_RECEIVED_NOTIFICATION_ID = 1;
@@ -20,7 +20,7 @@ public class ShoutNotificationManager {
 
 	private static final CharSequence contentTitle = "Shout Received";
 
-	public ShoutNotificationManager(Context context) {
+	public NotificationSender(Context context) {
 		this.context = context;
 		notificationManager = (NotificationManager) context
 				.getSystemService(Context.NOTIFICATION_SERVICE);
