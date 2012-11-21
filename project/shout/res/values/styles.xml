@@ -21,6 +21,12 @@
 
     <style name="ActionBar" parent="Widget.Sherlock.ActionBar">
         <item name="android:background">@drawable/navgradient</item>
+        <item name="android:titleTextStyle">@style/NoTitleText</item>
+    </style>
+    
+    <style name="NoTitleText">
+        <item name="android:textSize">0sp</item>
+        <item name="android:textColor">#00000000</item>
     </style>
     
     <style name="ListSeparatorView" parent="@android:attr/textViewStyle">
