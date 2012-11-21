@@ -28,4 +28,12 @@ public interface User {
 	 */
 	public ECPublicKey getPublicKey();
 
+	/**
+	 * The avatar for the Shout user. The avatar is retrieved asynchronously and
+	 * may not be available locally.
+	 * 
+	 * @return the avatar
+	 */
+	public HashReference<Avatar> getAvatar();
+
 }

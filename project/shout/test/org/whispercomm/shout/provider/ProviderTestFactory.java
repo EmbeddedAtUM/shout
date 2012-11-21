@@ -36,11 +36,14 @@ public class ProviderTestFactory {
 	 */
 	public static void initUserContentValues() {
 		USER_1_VALUES = buildUser(TestFactory.TEST_USER_1.getUsername(),
-				TestFactory.USER1_PUBKEY_BYTES);
+				TestFactory.USER1_PUBKEY_BYTES, TestFactory.TEST_USER_1.getAvatar().getHash()
+						.toByteArray());
 		USER_2_VALUES = buildUser(TestFactory.TEST_USER_2.getUsername(),
-				TestFactory.USER2_PUBKEY_BYTES);
+				TestFactory.USER2_PUBKEY_BYTES, TestFactory.TEST_USER_2.getAvatar().getHash()
+						.toByteArray());
 		USER_3_VALUES = buildUser(TestFactory.TEST_USER_3.getUsername(),
-				TestFactory.USER3_PUBKEY_BYTES);
+				TestFactory.USER3_PUBKEY_BYTES, TestFactory.TEST_USER_3.getAvatar().getHash()
+						.toByteArray());
 	}
 
 	/**
@@ -114,11 +117,13 @@ public class ProviderTestFactory {
 	/*
 	 * Helper functions
 	 */
-	private static ContentValues buildUser(String name, byte[] publicKey) {
+	private static ContentValues buildUser(String name, byte[] publicKey, byte[] avatarHash) {
 		ContentValues values = new ContentValues();
 		values.put(ShoutProviderContract.Users.USERNAME, name);
 		values.put(ShoutProviderContract.Users.PUB_KEY,
 				Base64.encodeToString(publicKey, Base64.DEFAULT));
+		values.put(ShoutProviderContract.Users.AVATAR,
+				Base64.encodeToString(avatarHash, Base64.DEFAULT));
 		return values;
 	}
 

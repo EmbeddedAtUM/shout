@@ -19,9 +19,13 @@ import java.nio.charset.CharacterCodingException;
 
 import org.joda.time.DateTime;
 import org.spongycastle.math.ec.ECPoint;
+import org.whispercomm.shout.Avatar;
+import org.whispercomm.shout.Hash;
+import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.Location;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.ShoutType;
+import org.whispercomm.shout.SimpleHashReference;
 import org.whispercomm.shout.UnsignedShout;
 import org.whispercomm.shout.User;
 import org.whispercomm.shout.crypto.DsaSignature;
@@ -197,8 +201,7 @@ public class SerializeUtility {
 
 		// Add User Fields
 		putPublicKey(buffer, shout.getSender().getPublicKey());
-		buffer.put(new byte[AVATAR_HASH_SIZE]); // TODO: Get real hash from
-												// User object
+		buffer.put(shout.getSender().getAvatar().getHash().toByteArray());
 		putVArray(buffer, encodeUtf8(shout.getSender().getUsername()),
 				LengthType.BYTE);
 
@@ -324,7 +327,8 @@ public class SerializeUtility {
 			user.publicKey = getPublicKey(buffer);
 
 			// Avatar hash
-			user.avatarHash = getArray(buffer, AVATAR_HASH_SIZE);
+			user.avatar = new SimpleHashReference<Avatar>(new Hash(getArray(buffer,
+					AVATAR_HASH_SIZE)));
 
 			// Username
 			try {
@@ -469,8 +473,7 @@ public class SerializeUtility {
 
 		String username;
 		ECPublicKey publicKey;
-		@SuppressWarnings("unused")
-		byte[] avatarHash;
+		HashReference<Avatar> avatar;
 
 		@Override
 		public String getUsername() {
@@ -480,6 +483,11 @@ public class SerializeUtility {
 		@Override
 		public ECPublicKey getPublicKey() {
 			return publicKey;
+		}
+
+		@Override
+		public HashReference<Avatar> getAvatar() {
+			return avatar;
 		}
 
 	}

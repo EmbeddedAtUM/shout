@@ -7,9 +7,13 @@ import java.util.Random;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.spongycastle.util.encoders.Hex;
+import org.whispercomm.shout.Avatar;
+import org.whispercomm.shout.Hash;
+import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.Location;
 import org.whispercomm.shout.Me;
 import org.whispercomm.shout.Shout;
+import org.whispercomm.shout.SimpleHashReference;
 import org.whispercomm.shout.User;
 import org.whispercomm.shout.crypto.ECPrivateKey;
 import org.whispercomm.shout.crypto.ECPublicKey;
@@ -69,14 +73,24 @@ public class TestFactory {
 			.encodePublic(generatePublic(USER3_PUBLIC_KEY));
 
 	/*
+	 * Avatars
+	 */
+	public static final HashReference<Avatar> TEST_AVATAR_1 = new SimpleHashReference<Avatar>(
+			new Hash(Hex.decode("316216ECC384213EDCC34ABDE19A8271ED84E9ED869624D00A4875F363A45B58")));
+	public static final HashReference<Avatar> TEST_AVATAR_2 = new SimpleHashReference<Avatar>(
+			new Hash(Hex.decode("752D08E18906B7B2318E9C6B14AB61434C3EE06706E1919E3018017E66A1929F")));
+	public static final HashReference<Avatar> TEST_AVATAR_3 = new SimpleHashReference<Avatar>(
+			new Hash(Hex.decode("5D507BA1730FB5CC0640BD7D869D4828B61ECD2F7241CFEB85A0085FB090FBC5")));
+
+	/*
 	 * Users
 	 */
 	public static final Me TEST_ME_1 = new TestMe("Me 1 ٩(͡๏̯͡๏)۶",
-			generatePublic(USER1_PUBLIC_KEY), generatePrivate(USER1_PRIVATE_KEY));
+			generatePublic(USER1_PUBLIC_KEY), generatePrivate(USER1_PRIVATE_KEY), TEST_AVATAR_1);
 	public static final Me TEST_ME_2 = new TestMe("Me 2 ٩(-̮̮̃•̃)",
-			generatePublic(USER2_PUBLIC_KEY), generatePrivate(USER2_PRIVATE_KEY));
+			generatePublic(USER2_PUBLIC_KEY), generatePrivate(USER2_PRIVATE_KEY), TEST_AVATAR_2);
 	public static final Me TEST_ME_3 = new TestMe("Me 3 ٩(-̮̮̃-̃)۶",
-			generatePublic(USER3_PUBLIC_KEY), generatePrivate(USER3_PRIVATE_KEY));
+			generatePublic(USER3_PUBLIC_KEY), generatePrivate(USER3_PRIVATE_KEY), TEST_AVATAR_3);
 
 	/*
 	 * Downcast Me to User

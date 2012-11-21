@@ -7,6 +7,7 @@ public class SimpleUser implements User {
 
 	String username;
 	ECPublicKey publicKey;
+	HashReference<Avatar> avatar;
 
 	public SimpleUser(String username, ECPublicKey publickey) {
 		this.username = username;
@@ -21,6 +22,11 @@ public class SimpleUser implements User {
 	@Override
 	public ECPublicKey getPublicKey() {
 		return publicKey;
+	}
+
+	@Override
+	public HashReference<Avatar> getAvatar() {
+		return avatar;
 	}
 
 }

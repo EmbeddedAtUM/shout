@@ -167,7 +167,7 @@ public class ShoutProviderContract {
 		public static final String PUB_KEY = "Key";
 
 		/**
-		 * Hash of the avatar, stored as a Base64 string encoding of the key
+		 * Hash of the avatar, stored as a Base64 string encoding of the hash
 		 * represented as a byte array.
 		 */
 		public static final String AVATAR = "Avatar";
@@ -351,11 +351,8 @@ public class ShoutProviderContract {
 		int avatarIndex = cursor.getColumnIndex(Users.AVATAR);
 		String encodedKey = cursor.getString(keyIndex);
 		String name = cursor.getString(nameIndex);
-		// TODO: pass the retrieved avatar to the new user object, when
-		// supported
 		String encodedAvatarHash = cursor.getString(avatarIndex);
-
-		return new LocalUserImpl(context, name, encodedKey);
+		return new LocalUserImpl(context, name, encodedKey, encodedAvatarHash);
 	}
 
 	public static LocalUser saveUser(Context context, User user) {
@@ -491,13 +488,8 @@ public class ShoutProviderContract {
 			String encodedKey = Base64.encodeToString(
 					KeyGenerator.encodePublic(user.getPublicKey()),
 					Base64.DEFAULT);
-			// TODO: Store real hash once it is available from User object
-			String encodedAvatarHash = Base64.encodeToString(
-					new byte[] {
-							0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-							0, 0,
-							0, 0, 0, 0, 0, 0
-					}, Base64.DEFAULT);
+			String encodedAvatarHash = Base64.encodeToString(user.getAvatar().getHash()
+					.toByteArray(), Base64.DEFAULT);
 			values.put(Users.USERNAME, user.getUsername());
 			values.put(Users.PUB_KEY, encodedKey);
 			values.put(Users.AVATAR, encodedAvatarHash);

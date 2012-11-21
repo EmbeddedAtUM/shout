@@ -1,6 +1,8 @@
 
 package org.whispercomm.shout.id;
 
+import org.whispercomm.shout.Avatar;
+import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.Me;
 import org.whispercomm.shout.crypto.ECKeyPair;
 import org.whispercomm.shout.crypto.ECPrivateKey;
@@ -13,14 +15,18 @@ public class MeImpl implements Me {
 
 	private String username;
 
-	public MeImpl(String username, ECPublicKey publicKey, ECPrivateKey privateKey) {
+	private HashReference<Avatar> avatar;
+
+	public MeImpl(String username, ECPublicKey publicKey, ECPrivateKey privateKey,
+			HashReference<Avatar> avatar) {
 		this.username = username;
 		this.publicKey = publicKey;
 		this.privateKey = privateKey;
+		this.avatar = avatar;
 	}
 
-	public MeImpl(String username, ECKeyPair keyPair) {
-		this(username, keyPair.getPublicKey(), keyPair.getPrivateKey());
+	public MeImpl(String username, ECKeyPair keyPair, HashReference<Avatar> avatar) {
+		this(username, keyPair.getPublicKey(), keyPair.getPrivateKey(), avatar);
 	}
 
 	@Override
@@ -36,6 +42,11 @@ public class MeImpl implements Me {
 	@Override
 	public String getUsername() {
 		return this.username;
+	}
+
+	@Override
+	public HashReference<Avatar> getAvatar() {
+		return this.avatar;
 	}
 
 }

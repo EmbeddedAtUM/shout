@@ -3,9 +3,14 @@ package org.whispercomm.shout.provider;
 
 import java.security.spec.InvalidKeySpecException;
 
+import org.whispercomm.shout.Avatar;
+import org.whispercomm.shout.Hash;
+import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.LocalUser;
+import org.whispercomm.shout.SimpleHashReference;
 import org.whispercomm.shout.crypto.ECPublicKey;
 import org.whispercomm.shout.crypto.KeyGenerator;
+import org.whispercomm.shout.errors.InvalidEncodingException;
 
 import android.content.Context;
 import android.util.Base64;
@@ -17,14 +22,23 @@ public class LocalUserImpl implements LocalUser {
 
 	private String username;
 	private ECPublicKey publicKey;
+	private HashReference<Avatar> avatar;
 
-	public LocalUserImpl(Context context, String username, String encodedKey) {
+	public LocalUserImpl(Context context, String username, String encodedKey,
+			String encodedAvatarHash) {
 		this.username = username;
 		try {
 			this.publicKey = KeyGenerator.generatePublic(Base64.decode(encodedKey, Base64.DEFAULT));
 		} catch (InvalidKeySpecException e) {
 			// TODO: Figure out what to do about this
 			throw new RuntimeException(e);
+		}
+		try {
+			this.avatar = new SimpleHashReference<Avatar>(new Hash(Base64.decode(encodedAvatarHash,
+					Base64.DEFAULT)));
+		} catch (InvalidEncodingException e) {
+			// TODO: Figure out what to do about this
+			throw e;
 		}
 		this.context = context;
 	}
@@ -37,6 +51,11 @@ public class LocalUserImpl implements LocalUser {
 	@Override
 	public ECPublicKey getPublicKey() {
 		return publicKey;
+	}
+
+	@Override
+	public HashReference<Avatar> getAvatar() {
+		return avatar;
 	}
 
 	@Override

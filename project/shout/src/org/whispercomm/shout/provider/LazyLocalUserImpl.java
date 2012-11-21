@@ -1,6 +1,8 @@
 
 package org.whispercomm.shout.provider;
 
+import org.whispercomm.shout.Avatar;
+import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.LocalUser;
 import org.whispercomm.shout.crypto.ECPublicKey;
 
@@ -30,6 +32,11 @@ public class LazyLocalUserImpl implements LocalUser {
 		return self.getPublicKey();
 	}
 
+	@Override
+	public HashReference<Avatar> getAvatar() {
+		return self.getAvatar();
+	}
+
 	private void loadSelf() {
 		if (self == null)
 			self = ShoutProviderContract.retrieveUserById(context, id);
@@ -42,6 +49,7 @@ public class LazyLocalUserImpl implements LocalUser {
 		int result = 1;
 		result = prime * result + ((getPublicKey() == null) ? 0 : getPublicKey().hashCode());
 		result = prime * result + ((getUsername() == null) ? 0 : getUsername().hashCode());
+		result = prime * result + ((getAvatar() == null) ? 0 : getAvatar().hashCode());
 		return result;
 	}
 
@@ -65,6 +73,11 @@ public class LazyLocalUserImpl implements LocalUser {
 			if (other.getUsername() != null)
 				return false;
 		} else if (!getUsername().equals(other.getUsername()))
+			return false;
+		if (getAvatar() == null) {
+			if (other.getAvatar() != null)
+				return false;
+		} else if (!getAvatar().equals(other.getAvatar()))
 			return false;
 		return true;
 	}

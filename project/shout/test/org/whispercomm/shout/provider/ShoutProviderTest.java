@@ -2,6 +2,7 @@
 package org.whispercomm.shout.provider;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -63,6 +64,7 @@ public class ShoutProviderTest {
 		int idIndex = cursor.getColumnIndex(ShoutProviderContract.Users._ID);
 		int keyIndex = cursor.getColumnIndex(ShoutProviderContract.Users.PUB_KEY);
 		int nameIndex = cursor.getColumnIndex(ShoutProviderContract.Users.USERNAME);
+		int avatarIndex = cursor.getColumnIndex(ShoutProviderContract.Users.AVATAR);
 
 		int newId = cursor.getInt(idIndex);
 		assertEquals(USER_1_ID, newId);
@@ -76,6 +78,10 @@ public class ShoutProviderTest {
 		assertEquals(
 				USER_1_VALUES.getAsString(ShoutProviderContract.Users.USERNAME),
 				username);
+
+		String encodedAvatarHash = cursor.getString(avatarIndex);
+		assertEquals(USER_1_VALUES.getAsString(ShoutProviderContract.Users.AVATAR),
+				encodedAvatarHash);
 	}
 
 	@Test

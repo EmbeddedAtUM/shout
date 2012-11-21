@@ -41,6 +41,7 @@ public class TestUtility {
 		assertEquals(lhs.getTimestamp().getMillis(), rhs.getTimestamp().getMillis());
 		assertEquals(lhs.getSender().getUsername(), rhs.getSender().getUsername());
 		assertEquals(lhs.getSender().getPublicKey(), rhs.getSender().getPublicKey());
+		assertEquals(lhs.getSender().getAvatar(), rhs.getSender().getAvatar());
 		assertEquals(lhs.getSignature(), rhs.getSignature());
 		assertArrayEquals(lhs.getHash(), rhs.getHash());
 		testEqualShoutFields(lhs.getParent(), rhs.getParent());
