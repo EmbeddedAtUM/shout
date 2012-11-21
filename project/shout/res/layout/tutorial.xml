@@ -18,7 +18,7 @@
         android:layout_gravity="center"
         android:textSize="15.5dp"
         android:textStyle="bold"
-        android:text="Swipe through the following images to view the tutorial"
+        android:text="Shout is a location-based social media application on mobile ad hoc networks. Swipe through the following images to view the tutorial"
         android:scaleType="fitXY"
         android:textColor="#000000"/>
 	    
@@ -42,7 +42,7 @@
         android:layout_gravity="center"
         android:textSize="15.5dp"
         android:textStyle="bold"
-        android:text="Press shout to send your message to everyone around you"
+        android:text="Press shout to send your message"
         android:scaleType="fitXY"
         android:textColor="#000000"/>
 	    
@@ -54,7 +54,7 @@
         android:layout_gravity="center"
         android:textSize="15.5dp"
         android:textStyle="bold"
-        android:text="Everybody around you will recieve the message!"
+        android:text="Everybody around you will recieve the Shout!"
         android:scaleType="fitXY"
         android:textColor="#000000"/>
     
@@ -78,7 +78,7 @@
         android:layout_gravity="center"
         android:textSize="15.5dp"
         android:textStyle="bold"
-        android:text="Reshouting resends the original message to everyone around you"
+        android:text="Reshouting and commenting resends the original message (and your comment) to everyone around you"
         android:scaleType="fitXY"
         android:textColor="#000000"/>
 	    
@@ -90,9 +90,9 @@
         android:layout_gravity="center"
         android:textSize="15.5dp"
         android:textStyle="bold"
-        android:text="The original message then hops to new viewers"
+        android:text="Reshouters relay the message to more people"
         android:scaleType="fitXY"
-        android:textColor="#000000"/>
+        android:textColor="#000000"/>"/home/rpm/Desktop/Shout"
 	    
 	    <TextView 
         android:layout_width="fill_parent"
@@ -105,20 +105,35 @@
         android:text="Interesting messages have the potential to travel long distances!"
         android:scaleType="fitXY"
         android:textColor="#000000"/>
-	    	    
-	   	<ImageView 
+	    	  
+	    <RelativeLayout
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:padding="10dp"
-        android:src="@drawable/image8"
-        android:contentDescription="test"
-        android:layout_gravity="center"
-        android:scaleType="fitXY"
-        android:textSize="15.5dp"
-        android:textStyle="bold"
-        android:text="Click anywhere to continue"
-		android:onClick="continueToShout"
-        android:textColor="#000000"/>
+        android:layout_height="fill_parent">
+		    
+		   	<ImageView 
+	        android:layout_width="fill_parent"
+	        android:layout_height="fill_parent"
+	        android:padding="10dp"
+	        android:src="@drawable/image9"
+	        android:contentDescription="test"
+	        android:layout_gravity="center"
+	        android:scaleType="fitXY"
+	        android:textSize="15.5dp"
+	        android:textStyle="bold"
+			android:onClick="continueToShout"
+	        android:textColor="#000000"/>
+		   			    
+		    <TextView 
+	        android:layout_width="fill_parent"
+	        android:layout_height="fill_parent"
+	        android:padding="10dp"
+	        android:layout_gravity="center"
+	        android:textSize="15.5dp"
+	        android:textStyle="bold"
+	        android:text="Press anywhere to continue to the Shout application"
+	        android:textColor="#000000"/>
+		   			    
+	   	</RelativeLayout>
 	    
 	    
 	</ViewFlipper>
