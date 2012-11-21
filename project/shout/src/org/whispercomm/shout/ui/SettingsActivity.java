@@ -14,11 +14,13 @@ import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-public class SettingsActivity extends PreferenceActivity {
+import com.actionbarsherlock.app.SherlockPreferenceActivity;
+import com.actionbarsherlock.view.MenuItem;
+
+public class SettingsActivity extends SherlockPreferenceActivity {
 	private static final String TAG = SettingsActivity.class.getSimpleName();
 
 	private static final int DIALOG_RUN_IN_BACKGROUND_WARNING_ID = 0;
@@ -54,7 +56,24 @@ public class SettingsActivity extends PreferenceActivity {
 		runInBackgroundPref
 				.setOnPreferenceChangeListener(runInBackgroundListener);
 
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
 		Log.v(TAG, "Finished onCreate");
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case android.R.id.home:
+				Intent intent = new Intent(this, ShoutActivity.class);
+				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				startActivity(intent);
+				break;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
+
+		return true;
 	}
 
 	public void onStart(Bundle savedInstanceState) {

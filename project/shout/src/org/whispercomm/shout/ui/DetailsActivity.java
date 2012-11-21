@@ -53,6 +53,8 @@ public class DetailsActivity extends AbstractShoutViewActivity {
 		ShoutView shoutView = (ShoutView) findViewById(R.id.shoutview);
 		shoutView.bindShout(shout);
 		shoutView.showDetails();
+
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 	}
 
 	private LocalShout getShoutFromBundle(Bundle bundle) {
