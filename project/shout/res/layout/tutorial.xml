@@ -18,7 +18,7 @@
         android:layout_gravity="center"
         android:textSize="15.5dp"
         android:textStyle="bold"
-        android:text="Shout is a location-based social media application on mobile ad hoc networks. Swipe through the following images to view the tutorial"
+        android:text="@string/tutorial_page_1_message"
         android:scaleType="fitXY"
         android:textColor="#000000"/>
 	    
@@ -30,7 +30,7 @@
         android:layout_gravity="center"
         android:textSize="15.5dp"
         android:textStyle="bold"
-        android:text="Author a new shout by clicking the speech bubble icon in the upper right corner"
+        android:text="@string/tutorial_page_2_message"
         android:scaleType="fitXY"
         android:textColor="#000000"/>
 	    
@@ -42,7 +42,7 @@
         android:layout_gravity="center"
         android:textSize="15.5dp"
         android:textStyle="bold"
-        android:text="Press shout to send your message"
+        android:text="@string/tutorial_page_3_message"
         android:scaleType="fitXY"
         android:textColor="#000000"/>
 	    
@@ -54,7 +54,7 @@
         android:layout_gravity="center"
         android:textSize="15.5dp"
         android:textStyle="bold"
-        android:text="Everybody around you will recieve the Shout!"
+        android:text="@string/tutorial_page_4_message"
         android:scaleType="fitXY"
         android:textColor="#000000"/>
     
@@ -66,7 +66,7 @@
         android:layout_gravity="center"
         android:textSize="15.5dp"
         android:textStyle="bold"
-        android:text="When viewing the message you can reshout it, comment on it, or view more details"
+        android:text="@string/tutorial_page_5_message"
         android:scaleType="fitXY"
         android:textColor="#000000"/>
 	    
@@ -78,7 +78,7 @@
         android:layout_gravity="center"
         android:textSize="15.5dp"
         android:textStyle="bold"
-        android:text="Reshouting and commenting resends the original message (and your comment) to everyone around you"
+        android:text="@string/tutorial_page_6_message"
         android:scaleType="fitXY"
         android:textColor="#000000"/>
 	    
@@ -90,7 +90,7 @@
         android:layout_gravity="center"
         android:textSize="15.5dp"
         android:textStyle="bold"
-        android:text="Reshouters relay the message to more people"
+        android:text="@string/tutorial_page_7_message"
         android:scaleType="fitXY"
         android:textColor="#000000"/>"/home/rpm/Desktop/Shout"
 	    
@@ -102,7 +102,7 @@
         android:layout_gravity="center"
         android:textSize="15.5dp"
         android:textStyle="bold"
-        android:text="Interesting messages have the potential to travel long distances!"
+        android:text="@string/tutorial_page_8_message"
         android:scaleType="fitXY"
         android:textColor="#000000"/>
 	    	  
@@ -130,7 +130,7 @@
 	        android:layout_gravity="center"
 	        android:textSize="15.5dp"
 	        android:textStyle="bold"
-	        android:text="Press anywhere to continue to the Shout application"
+	        android:text="@string/tutorial_page_9_message"
 	        android:textColor="#000000"/>
 		   			    
 	   	</RelativeLayout>
