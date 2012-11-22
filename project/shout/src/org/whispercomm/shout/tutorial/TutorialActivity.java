@@ -17,6 +17,8 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.viewpagerindicator.CirclePageIndicator;
+
 /**
  * Tutorial activity that uses a {@link ViewPager} to display a series of
  * instructional images.
@@ -25,6 +27,7 @@ public class TutorialActivity extends FragmentActivity {
 
 	private ViewPager mViewPager;
 	private ViewPagerAdapter mViewPagerAdapter;
+	private CirclePageIndicator mPageIndicator;
 
 	public static void show(Context context)
 	{
@@ -40,6 +43,9 @@ public class TutorialActivity extends FragmentActivity {
 		mViewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mViewPagerAdapter);
+
+		mPageIndicator = (CirclePageIndicator) findViewById(R.id.indicator);
+		mPageIndicator.setViewPager(mViewPager);
 	}
 
 	public void onClick()

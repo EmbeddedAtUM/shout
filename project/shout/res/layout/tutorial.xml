@@ -1,4 +1,5 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/layout_main"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
@@ -8,7 +9,21 @@
     <android.support.v4.view.ViewPager
         android:id="@+id/pager"
         android:layout_width="fill_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_height="fill_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true" />
 
-</LinearLayout>
+    <com.viewpagerindicator.CirclePageIndicator
+        android:id="@+id/indicator"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:padding="10dp"
+        app:snap="true"
+        app:radius="10dp"
+        app:strokeColor="@android:color/black"
+        app:strokeWidth="1dp"
+        app:pageColor="#eeeed3"
+        app:fillColor="#a7a7dd" />
+
+</RelativeLayout>
