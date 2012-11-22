@@ -3,6 +3,7 @@
     style="@style/TitleBar" >
 
         <ImageView
+            android:id="@+id/logo"
             style="@style/TitleBarLogo"
             android:contentDescription="@string/logoDesc" />
 

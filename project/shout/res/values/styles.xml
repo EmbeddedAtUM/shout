@@ -35,7 +35,6 @@
     </style>
 
     <style name="TitleBarLogo">
-        <item name="android:id">@+id/logo</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">fill_parent</item>
         <item name="android:paddingLeft">20dip</item>
@@ -49,7 +48,6 @@
     </style>
 
     <style name="PageTitle">
-        <item name="android:id">@+id/pagetitle</item>
         <item name="android:layout_height">40dip</item>
         <item name="android:layout_width">fill_parent</item>
         <item name="android:gravity">top|left</item>

@@ -8,6 +8,7 @@
     <!-- Title of page -->
 
     <TextView
+        android:id="@+id/pagetitle"
         style="@style/PageTitle"
         android:text="@string/timelineTitle" />
 
