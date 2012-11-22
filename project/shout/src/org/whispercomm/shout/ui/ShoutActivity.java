@@ -9,6 +9,7 @@ import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.R;
 import org.whispercomm.shout.provider.ParcelableShout;
 import org.whispercomm.shout.provider.ShoutProviderContract;
+import org.whispercomm.shout.tutorial.TutorialActivity;
 import org.whispercomm.shout.tutorial.TutorialManager;
 import org.whispercomm.shout.ui.widget.TimelineAdapter;
 
@@ -122,5 +123,9 @@ public class ShoutActivity extends AbstractShoutViewActivity {
 
 	public void onClickSettings(View v) {
 		SettingsActivity.show(this);
+	}
+
+	public void onClickHelp(View v) {
+		TutorialActivity.show(this);
 	}
 }

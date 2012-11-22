@@ -6,6 +6,7 @@
     <string name="no_shouts">You haven\'t received any Shouts.</string>
     <string name="separatorDesc">Separator</string>
     <string name="shoutDesc">Separator</string>
+    <string name="helpDesc">Help</string>
     <string name="settingsDesc">Settings</string>
     <string name="settings">Settings</string>
     <string name="avatarDesc">Avatar</string>

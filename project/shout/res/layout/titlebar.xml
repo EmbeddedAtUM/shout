@@ -15,10 +15,19 @@
             android:src="@drawable/gear" />
 
         <ImageButton
-            android:id="@+id/composeButton"
+            android:id="@+id/helpButton"
             style="@style/TitleBarButton"
             android:layout_toLeftOf="@id/settingsButton"
+            android:contentDescription="@string/helpDesc"
+            android:onClick="onClickHelp"
+            android:src="@drawable/details" />
+
+        <ImageButton
+            android:id="@+id/composeButton"
+            style="@style/TitleBarButton"
+            android:layout_toLeftOf="@id/helpButton"
             android:contentDescription="@string/shoutDesc"
             android:onClick="onClickShout"
             android:src="@drawable/chat" />
+
     </RelativeLayout>
