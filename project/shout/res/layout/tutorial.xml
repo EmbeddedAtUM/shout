@@ -92,7 +92,7 @@
         android:textStyle="bold"
         android:text="@string/tutorial_page_7_message"
         android:scaleType="fitXY"
-        android:textColor="#000000"/>"/home/rpm/Desktop/Shout"
+        android:textColor="#000000"/>
 	    
 	    <TextView 
         android:layout_width="fill_parent"
