@@ -9,10 +9,17 @@ import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.SimpleHashReference;
 import org.whispercomm.shout.errors.NotFoundException;
 
+import android.support.v4.util.LruCache;
 import android.util.Log;
 
 public class AvatarStorage {
 	private static final String TAG = AvatarStorage.class.getSimpleName();
+
+	/**
+	 * TODO: AvatarStorage should be an application singleton and cache an
+	 * instance member, but until that happens, the cache is static.
+	 */
+	private static LruCache<Hash, Avatar> LRU_CACHE = new LruCache<Hash, Avatar>(100);
 
 	private ContentManager mContentManager;
 
@@ -31,21 +38,25 @@ public class AvatarStorage {
 	}
 
 	public HashReference<Avatar> retrieve(Hash avatarHash) throws IOException {
-		Content content;
-		try {
-			content = mContentManager.retrieve(avatarHash);
-		} catch (NotFoundException e) {
-			return new SimpleHashReference<Avatar>(avatarHash, null);
-		}
+		Avatar avatar = LRU_CACHE.get(avatarHash);
 
-		Avatar avatar;
-		try {
-			avatar = new Avatar(content.getData(), content.getMimeType());
-		} catch (IllegalArgumentException e) {
-			Log.w(TAG, "Treating undecodable avatar as missing.", e);
-			return new SimpleHashReference<Avatar>(avatarHash, null);
+		if (avatar == null) {
+			try {
+				avatar = loadAvatar(avatarHash);
+				LRU_CACHE.put(avatarHash, avatar);
+			} catch (IllegalArgumentException e) {
+				Log.w(TAG, "Treating undecodable avatar as missing.", e);
+			} catch (NotFoundException e) {
+				// Ignore.
+			}
 		}
 
 		return new SimpleHashReference<Avatar>(avatarHash, avatar);
+	}
+
+	private Avatar loadAvatar(Hash avatarHash) throws NotFoundException, IllegalArgumentException,
+			IOException {
+		Content content = mContentManager.retrieve(avatarHash);
+		return new Avatar(content.getData(), content.getMimeType());
 	}
 }
