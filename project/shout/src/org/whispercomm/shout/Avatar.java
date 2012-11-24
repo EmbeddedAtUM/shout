@@ -24,6 +24,8 @@ public class Avatar {
 
 	private final Bitmap bitmap;
 
+	private final MimeType mimetype;
+
 	/**
 	 * Constructs an {@code Avatar} from a jpeg-, gif-, or png-encoded image.
 	 * The maximum allowable size of the encoded image is {@link #MAX_LEN}
@@ -31,18 +33,23 @@ public class Avatar {
 	 * 
 	 * @param data the encoded bitmap
 	 * @throws IllegalArgumentException if {@code data} is larger than
-	 *             {@link #MAX_LEN} bytes.
+	 *             {@link #MAX_LEN} bytes or the data is not a jpeg-, gif-, or
+	 *             png-encoded image.
 	 */
-	public Avatar(byte[] data) {
+	public Avatar(byte[] data) throws IllegalArgumentException {
 		if (data.length > MAX_LEN)
 			throw new IllegalArgumentException(String.format(
 					"Avatar data cannot be more than %d bytes.  Got %d.", MAX_LEN, data.length));
 
+		BitmapFactory.Options options = new BitmapFactory.Options();
 		this.data = data;
-		this.bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+		this.bitmap = BitmapFactory.decodeByteArray(data, 0, data.length, options);
 
 		if (bitmap == null)
-			throw new IllegalArgumentException("Stream does not contain a valid image");
+			throw new IllegalArgumentException(
+					"Stream does not contain a valid jpeg, gif, or png image");
+
+		mimetype = MimeType.get(options.outMimeType);
 	}
 
 	/**
@@ -59,12 +66,22 @@ public class Avatar {
 	}
 
 	/**
-	 * Retreives the encoded form of the avatar.
+	 * Retrieves the encoded form of the avatar.
 	 * 
+	 * @see #getMimeType()
 	 * @return the encoded avatar
 	 */
 	public byte[] toByteArray() {
 		return data;
+	}
+
+	/**
+	 * Retrieves the mime type of the byte[] encoding of this avatar
+	 * 
+	 * @return the mime type of the byte[] encoding of this avatar
+	 */
+	public MimeType getMimeType() {
+		return mimetype;
 	}
 
 	/**
