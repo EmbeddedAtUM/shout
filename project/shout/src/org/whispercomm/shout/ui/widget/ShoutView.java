@@ -68,6 +68,16 @@ public class ShoutView extends RelativeLayout {
 		initializeViews();
 	}
 
+	@Override
+	public void onAttachedToWindow() {
+		formattedAge.restart();
+	}
+
+	@Override
+	public void onDetachedFromWindow() {
+		formattedAge.stop();
+	}
+
 	private void initializeViews() {
 		avatar = (ImageView) findViewById(R.id.avatar);
 		sender = (TextView) findViewById(R.id.origsender);

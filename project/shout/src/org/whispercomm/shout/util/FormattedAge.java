@@ -64,6 +64,23 @@ public class FormattedAge {
 		update();
 	}
 
+	/**
+	 * Stops notifying the {@link AgeListener} when the formatted age changes
+	 * and releases any references to the {@code AgeListener} help by the
+	 * {@link Timer}.
+	 */
+	public synchronized void stop() {
+		cancelTimerTask();
+	}
+
+	/**
+	 * Restarts notifying the {@link AgeListener} when the formatted age
+	 * changes.
+	 */
+	public synchronized void restart() {
+		update();
+	}
+
 	private void update() {
 		mAge = new Duration(mDateTime, null);
 		updateNextChange();
