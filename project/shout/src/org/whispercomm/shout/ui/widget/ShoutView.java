@@ -8,9 +8,8 @@ import org.whispercomm.shout.Location;
 import org.whispercomm.shout.R;
 import org.whispercomm.shout.ShoutType;
 import org.whispercomm.shout.util.Encoders;
-import org.whispercomm.shout.util.ShoutMessageUtility;
-import org.whispercomm.shout.util.ShoutMessageUtility.FormattedAge;
-import org.whispercomm.shout.util.ShoutMessageUtility.FormattedAge.AgeListener;
+import org.whispercomm.shout.util.FormattedAge;
+import org.whispercomm.shout.util.FormattedAge.AgeListener;
 
 import android.content.Context;
 import android.os.Handler;
@@ -96,7 +95,7 @@ public class ShoutView extends RelativeLayout {
 			avatar.setImageResource(R.drawable.defaultavatar);
 
 		message.setText(shout.getMessage());
-		formattedAge.setTime(shout.getTimestamp());
+		formattedAge.setDateTime(shout.getTimestamp());
 
 		if (shout.getType() == ShoutType.SHOUT) {
 			commentCount.setText(String.format("Comments (%d)",
@@ -152,13 +151,13 @@ public class ShoutView extends RelativeLayout {
 		// Add the time sent
 		ShoutDetailRow timeSent = new ShoutDetailRow(getContext());
 		timeSent.setTitleText("Time Sent");
-		String sent = ShoutMessageUtility.getReadableDateTime(shout.getTimestamp());
+		String sent = FormattedAge.formatAbsolute(shout.getTimestamp());
 		timeSent.setEntryText(sent);
 		detailsTable.addView(timeSent);
 		// Add the time received
 		ShoutDetailRow timeReceived = new ShoutDetailRow(getContext());
 		timeReceived.setTitleText("Time Received");
-		String received = ShoutMessageUtility.getReadableDateTime(shout.getReceivedTime());
+		String received = FormattedAge.formatAbsolute(shout.getReceivedTime());
 		timeReceived.setEntryText(received);
 		detailsTable.addView(timeReceived);
 		// Add the location
