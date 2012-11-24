@@ -1,6 +1,7 @@
 
 package org.whispercomm.shout.provider;
 
+import java.io.IOException;
 import java.security.spec.InvalidKeySpecException;
 
 import org.whispercomm.shout.Avatar;
@@ -8,16 +9,19 @@ import org.whispercomm.shout.Hash;
 import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.LocalUser;
 import org.whispercomm.shout.SimpleHashReference;
+import org.whispercomm.shout.content.AvatarStorage;
+import org.whispercomm.shout.content.ContentManager;
 import org.whispercomm.shout.crypto.ECPublicKey;
 import org.whispercomm.shout.crypto.KeyGenerator;
 import org.whispercomm.shout.errors.InvalidEncodingException;
 
 import android.content.Context;
 import android.util.Base64;
+import android.util.Log;
 
 public class LocalUserImpl implements LocalUser {
+	private static final String TAG = LocalUserImpl.class.getSimpleName();
 
-	@SuppressWarnings("unused")
 	private Context context;
 
 	private String username;
@@ -26,6 +30,8 @@ public class LocalUserImpl implements LocalUser {
 
 	public LocalUserImpl(Context context, String username, String encodedKey,
 			String encodedAvatarHash) {
+		this.context = context;
+
 		this.username = username;
 		try {
 			this.publicKey = KeyGenerator.generatePublic(Base64.decode(encodedKey, Base64.DEFAULT));
@@ -40,7 +46,16 @@ public class LocalUserImpl implements LocalUser {
 			// TODO: Figure out what to do about this
 			throw e;
 		}
-		this.context = context;
+	}
+
+	private void updateAvatar(Hash avatarHash) {
+		AvatarStorage storage = new AvatarStorage(new ContentManager(context));
+		try {
+			avatar = storage.retrieve(avatarHash);
+		} catch (IOException e) {
+			Log.w(TAG, "Unable to retrieve avatar.  Treating as missing.", e);
+			avatar = new SimpleHashReference<Avatar>(avatarHash);
+		}
 	}
 
 	@Override
@@ -55,6 +70,9 @@ public class LocalUserImpl implements LocalUser {
 
 	@Override
 	public HashReference<Avatar> getAvatar() {
+		if (!avatar.isAvailable()) {
+			updateAvatar(avatar.getHash());
+		}
 		return avatar;
 	}
 
