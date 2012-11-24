@@ -59,7 +59,7 @@ public class FormattedAge {
 		mAgeListener = ageListener;
 	}
 
-	public void setDateTime(DateTime dateTime) {
+	public synchronized void setDateTime(DateTime dateTime) {
 		mDateTime = dateTime;
 		update();
 	}
@@ -70,6 +70,11 @@ public class FormattedAge {
 		if (mAgeListener != null)
 			mAgeListener.update(this.toString());
 		updateTimerTask();
+	}
+
+	private synchronized void updateIfCurrent(TimerTask timerTask) {
+		if (mTimerTask == timerTask)
+			update();
 	}
 
 	private void updateNextChange() {
@@ -102,7 +107,7 @@ public class FormattedAge {
 			mTimerTask = new TimerTask() {
 				@Override
 				public void run() {
-					update();
+					updateIfCurrent(this);
 				}
 			};
 			mTimer.schedule(mTimerTask, mNextChange.toDate());
