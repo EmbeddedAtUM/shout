@@ -439,7 +439,8 @@ public class ShoutProvider extends ContentProvider {
 
 		private static final String[] USER_UNIQUE_COLS = {
 				ShoutProviderContract.Users.PUB_KEY,
-				ShoutProviderContract.Users.USERNAME
+				ShoutProviderContract.Users.USERNAME,
+				ShoutProviderContract.Users.AVATAR
 		};
 
 		private static final String[] SHOUT_UNIQUE_COLS = {
