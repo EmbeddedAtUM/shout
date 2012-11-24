@@ -11,7 +11,7 @@
             android:summary="Your username and associated unique keys are used to authenticate Shouts behind the scenes, so try to pick a good username the first time."
             android:title="Username" />
 
-        <org.whispercomm.shout.ui.preference.BitmapPreference
+        <org.whispercomm.shout.ui.preference.ShoutAvatarPreference
             android:defaultValue="@drawable/defaultavatar"
             android:dialogTitle="@string/delegatepreftitle_Avatar"
             android:key="avatarPref"
