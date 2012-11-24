@@ -1,6 +1,8 @@
 
 package org.whispercomm.shout.ui.widget;
 
+import org.whispercomm.shout.Avatar;
+import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.Location;
 import org.whispercomm.shout.R;
@@ -78,7 +80,11 @@ public class ShoutView extends RelativeLayout {
 		this.shout = shout;
 
 		sender.setText(shout.getSender().getUsername());
-		avatar.setImageResource(R.drawable.defaultavatar);
+		HashReference<Avatar> avatarRef = shout.getSender().getAvatar();
+		if (avatarRef.isAvailable())
+			avatar.setImageBitmap(avatarRef.get().getBitmap());
+		else
+			avatar.setImageResource(R.drawable.defaultavatar);
 
 		message.setText(shout.getMessage());
 		age.setText(ShoutMessageUtility.getDateTimeAge(shout.getTimestamp()));
