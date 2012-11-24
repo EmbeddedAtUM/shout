@@ -75,19 +75,21 @@ public class FormattedAge {
 	private void updateNextChange() {
 		switch (TimeUnit.get(mAge)) {
 			case WEEK:
-				mNextChange = mDateTime.plusDays((int) mAge.getStandardDays() % 7);
+				mNextChange = mDateTime.plus(mAge).plusDays((int) mAge.getStandardDays() % 7);
 				break;
 			case DAY:
-				mNextChange = mDateTime.plusHours((int) mAge.getStandardHours() % 24);
+				mNextChange = mDateTime.plus(mAge).plusHours((int) mAge.getStandardHours() % 24);
 				break;
 			case HOUR:
-				mNextChange = mDateTime.plusMinutes((int) mAge.getStandardMinutes() % 60);
+				mNextChange = mDateTime.plus(mAge)
+						.plusMinutes((int) mAge.getStandardMinutes() % 60);
 				break;
 			case MINUTE:
-				mNextChange = mDateTime.plusSeconds((int) mAge.getStandardSeconds() % 60);
+				mNextChange = mDateTime.plus(mAge)
+						.plusSeconds((int) mAge.getStandardSeconds() % 60);
 				break;
 			case SECOND:
-				mNextChange = mDateTime.plusSeconds(1);
+				mNextChange = mDateTime.plus(mAge).plusSeconds(1);
 				break;
 			default:
 				break;
