@@ -9,8 +9,11 @@ import org.whispercomm.shout.R;
 import org.whispercomm.shout.ShoutType;
 import org.whispercomm.shout.util.Encoders;
 import org.whispercomm.shout.util.ShoutMessageUtility;
+import org.whispercomm.shout.util.ShoutMessageUtility.FormattedAge;
+import org.whispercomm.shout.util.ShoutMessageUtility.FormattedAge.AgeListener;
 
 import android.content.Context;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,12 +47,18 @@ public class ShoutView extends RelativeLayout {
 	 */
 	private LocalShout shout;
 
+	private Handler mHandler;
+
+	private FormattedAge formattedAge;
+
 	public ShoutView(Context context, AttributeSet attributeSet) {
 		super(context, attributeSet);
 		LayoutInflater inflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		inflater.inflate(R.layout.shoutview, this);
 		initializeViews();
+		mHandler = new Handler();
+		formattedAge = FormattedAge.create(new AgeUpdater());
 	}
 
 	public ShoutView(Context context) {
@@ -87,7 +96,7 @@ public class ShoutView extends RelativeLayout {
 			avatar.setImageResource(R.drawable.defaultavatar);
 
 		message.setText(shout.getMessage());
-		age.setText(ShoutMessageUtility.getDateTimeAge(shout.getTimestamp()));
+		formattedAge.setTime(shout.getTimestamp());
 
 		if (shout.getType() == ShoutType.SHOUT) {
 			commentCount.setText(String.format("Comments (%d)",
@@ -109,6 +118,24 @@ public class ShoutView extends RelativeLayout {
 		}
 
 		detailsTable.setVisibility(GONE);
+	}
+
+	private class AgeUpdater implements AgeListener, Runnable {
+
+		private String mAge;
+
+		@Override
+		public void run() {
+			if (age != null)
+				age.setText(mAge);
+		}
+
+		@Override
+		public void update(String age) {
+			this.mAge = age;
+			mHandler.post(this);
+		}
+
 	}
 
 	/**

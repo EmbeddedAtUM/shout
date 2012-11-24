@@ -1,6 +1,9 @@
 
 package org.whispercomm.shout.util;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.format.DateTimeFormat;
@@ -76,7 +79,10 @@ public class ShoutMessageUtility {
 	}
 
 	public static String getDateTimeAge(DateTime dt) {
-		Duration age = new Duration(dt, null);
+		return getFormattedAge(dt, new Duration(dt, null));
+	}
+
+	public static String getFormattedAge(DateTime dt, Duration age) {
 		TimeUnit unit = getAgeUnit(age);
 		long unitsPassed = 0;
 		switch (unit) {
@@ -101,6 +107,103 @@ public class ShoutMessageUtility {
 
 		return String.format("%d %s%s ago.", unitsPassed, unit,
 				unitsPassed == 1 ? "" : "s");
+	}
+
+	public static DateTime getNextChangeDateTimeAge(DateTime dt, Duration age) {
+		switch (getAgeUnit(age)) {
+			case WEEK:
+				return dt.plusDays((int) age.getStandardDays() % 7);
+			case DAY:
+				return dt.plusHours((int) age.getStandardHours() % 24);
+			case HOUR:
+				return dt.plusMinutes((int) age.getStandardMinutes() % 60);
+			case MINUTE:
+				return dt.plusSeconds((int) age.getStandardSeconds() % 60);
+			case SECOND:
+				return dt.plusSeconds(1);
+			default:
+				return null;
+		}
+	}
+
+	/**
+	 * Utility class for displaying formatted ages. One can register with this
+	 * object to be informed when the displayed age has changed.
+	 * 
+	 * @author David R. Bild
+	 */
+	public static class FormattedAge {
+
+		private static Timer DEFAULT_TIMER;
+
+		public static FormattedAge create(AgeListener ageListener) {
+			if (DEFAULT_TIMER == null)
+				DEFAULT_TIMER = new Timer();
+			return new FormattedAge(DEFAULT_TIMER, ageListener);
+		}
+
+		private final Timer mTimer;
+
+		private AgeListener mAgeListener;
+
+		private DateTime mDateTime;
+
+		private Duration mAge;
+
+		private DateTime mNextChange;
+
+		private TimerTask mTimerTask;
+
+		public FormattedAge(Timer timer, AgeListener ageListener) {
+			mTimer = timer;
+			mAgeListener = ageListener;
+		}
+
+		public void setAgeListener(AgeListener ageListener) {
+			mAgeListener = ageListener;
+		}
+
+		public void setTime(DateTime datetime) {
+			mDateTime = datetime;
+			update();
+		}
+
+		public void update() {
+			mAge = new Duration(mDateTime, null);
+			mNextChange = getNextChangeDateTimeAge(mDateTime, mAge);
+			if (mAgeListener != null)
+				mAgeListener.update(getFormattedAge(mDateTime, mAge));
+			updateTimerTask();
+		}
+
+		private void updateTimerTask() {
+			cancelTimerTask();
+			if (mNextChange != null) {
+				mTimerTask = new TimerTask() {
+					@Override
+					public void run() {
+						update();
+					}
+				};
+				mTimer.schedule(mTimerTask, mNextChange.toDate());
+			}
+
+		}
+
+		private void cancelTimerTask() {
+			if (mTimerTask != null) {
+				mTimerTask.cancel();
+				mTimerTask = null;
+			}
+		}
+
+		/**
+		 * Listener called when the formatted age has changed
+		 */
+		public static interface AgeListener {
+			public void update(String age);
+		}
+
 	}
 
 	public static String getCountAsText(int count) {
