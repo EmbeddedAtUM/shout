@@ -1,11 +1,14 @@
 
 package org.whispercomm.shout.id;
 
+import java.io.IOException;
+
 import org.whispercomm.shout.Avatar;
-import org.whispercomm.shout.Hash;
 import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.Me;
 import org.whispercomm.shout.SimpleHashReference;
+import org.whispercomm.shout.content.AvatarStorage;
+import org.whispercomm.shout.content.ContentManager;
 import org.whispercomm.shout.crypto.ECKeyPair;
 import org.whispercomm.shout.crypto.KeyGenerator;
 import org.whispercomm.shout.util.Validators;
@@ -15,26 +18,19 @@ import android.content.Context;
 public class IdManager {
 	public static final String TAG = IdManager.class.getSimpleName();
 
-	/**
-	 * Default avatar reference to use until real avatar support is added. TODO:
-	 * add real avatar support
-	 */
-	private static HashReference<Avatar> DEFAULT_AVATAR = new SimpleHashReference<Avatar>(new Hash(
-			new byte[] {
-					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-					0, 0, 0, 0, 0, 0,
-			}));
-
 	private KeyStorage keyStorage;
 
 	private KeyGenerator keyGenerator;
 
+	private AvatarStorage avatarStorage;
+
 	public IdManager(Context context) {
-		this(new KeyStorageSharedPrefs(context));
+		this(new KeyStorageSharedPrefs(context), new AvatarStorage(new ContentManager(context)));
 	}
 
-	public IdManager(KeyStorage keyStorage) {
+	public IdManager(KeyStorage keyStorage, AvatarStorage avatarStorage) {
 		this.keyStorage = keyStorage;
+		this.avatarStorage = avatarStorage;
 		this.keyGenerator = new KeyGenerator();
 	}
 
@@ -52,10 +48,17 @@ public class IdManager {
 		return;
 	}
 
+	public void setAvatar(Avatar avatar) throws IOException {
+		HashReference<Avatar> ref = avatarStorage.store(avatar);
+		keyStorage.writeAvatarHash(ref.getHash());
+	}
+
 	public Me getMe() throws UserNotInitiatedException {
 		String username = keyStorage.readUsername();
 		ECKeyPair keyPair = keyStorage.readKeyPair();
-		return new MeImpl(username, keyPair, DEFAULT_AVATAR);
+		HashReference<Avatar> avatarRef = new SimpleHashReference<Avatar>(
+				keyStorage.readAvatarHash());
+		return new MeImpl(username, keyPair, avatarRef);
 	}
 
 	public boolean userIsNotSet() {
