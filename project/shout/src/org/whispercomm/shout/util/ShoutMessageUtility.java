@@ -28,51 +28,79 @@ public class ShoutMessageUtility {
 		}
 	}
 
-	public static String getDateTimeAge(DateTime dt) {
-		long timePassed;
-		String unit;
-		Duration age = new Duration(dt, null);
-		if (dt.isAfterNow()) {
-			if (age.getStandardDays() <= -7) {
-				timePassed = age.getStandardDays() / 7;
-				unit = "week";
-			} else if (age.getStandardHours() <= -24) {
-				timePassed = age.getStandardDays();
-				unit = "day";
-			} else if (age.getStandardMinutes() <= -60) {
-				timePassed = age.getStandardHours();
-				unit = "hour";
-			} else if (age.getStandardSeconds() <= -60) {
-				timePassed = age.getStandardMinutes();
-				unit = "minute";
-			} else {
-				timePassed = age.getStandardSeconds();
-				unit = "second";
-			}
-		} else {
-			if (age.getStandardDays() >= 14) {
-				return getReadableDateTime(dt);
-			}
-			else if (age.getStandardDays() >= 7) {
-				timePassed = age.getStandardDays() / 7;
-				unit = "week";
-			} else if (age.getStandardHours() >= 24) {
-				timePassed = age.getStandardDays();
-				unit = "day";
-			} else if (age.getStandardMinutes() >= 60) {
-				timePassed = age.getStandardHours();
-				unit = "hour";
-			} else if (age.getStandardSeconds() >= 60) {
-				timePassed = age.getStandardMinutes();
-				unit = "minute";
-			} else {
-				timePassed = age.getStandardSeconds();
-				unit = "second";
-			}
+	public static enum TimeUnit {
+		SECOND("second"), MINUTE("minute"), HOUR("hour"), DAY("day"), WEEK("week"), ABSOLUTE;
+
+		private String label;
+
+		private TimeUnit() {
+			this.label = null;
 		}
 
-		return String.format("%d %s%s ago.", timePassed, unit,
-				timePassed == 1 ? "" : "s");
+		private TimeUnit(String label) {
+			this.label = label;
+		}
+
+		@Override
+		public String toString() {
+			if (label != null)
+				return label;
+			else
+				return super.toString();
+		}
+
+	}
+
+	public static TimeUnit getAgeUnit(DateTime dt) {
+		return getAgeUnit(new Duration(dt, null));
+	}
+
+	public static TimeUnit getAgeUnit(Duration age) {
+		long days = age.getStandardDays();
+		long hours = age.getStandardHours();
+		long mins = age.getStandardMinutes();
+		long secs = age.getStandardSeconds();
+
+		if (days <= -14 || days >= 14)
+			return TimeUnit.ABSOLUTE;
+		else if (days <= -7 || days >= 7)
+			return TimeUnit.WEEK;
+		else if (hours <= -24 || hours >= 24)
+			return TimeUnit.DAY;
+		else if (mins <= -60 || mins >= 60)
+			return TimeUnit.HOUR;
+		else if (secs <= -60 || secs >= 60)
+			return TimeUnit.MINUTE;
+		else
+			return TimeUnit.SECOND;
+	}
+
+	public static String getDateTimeAge(DateTime dt) {
+		Duration age = new Duration(dt, null);
+		TimeUnit unit = getAgeUnit(age);
+		long unitsPassed = 0;
+		switch (unit) {
+			case ABSOLUTE:
+				return getReadableDateTime(dt);
+			case WEEK:
+				unitsPassed = age.getStandardDays() / 7;
+				break;
+			case HOUR:
+				unitsPassed = age.getStandardHours();
+				break;
+			case DAY:
+				unitsPassed = age.getStandardDays();
+				break;
+			case MINUTE:
+				unitsPassed = age.getStandardMinutes();
+				break;
+			case SECOND:
+				unitsPassed = age.getStandardSeconds();
+				break;
+		}
+
+		return String.format("%d %s%s ago.", unitsPassed, unit,
+				unitsPassed == 1 ? "" : "s");
 	}
 
 	public static String getCountAsText(int count) {
