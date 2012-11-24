@@ -1,6 +1,7 @@
 
 package org.whispercomm.shout.id;
 
+import org.whispercomm.shout.Hash;
 import org.whispercomm.shout.crypto.ECKeyPair;
 
 /**
@@ -23,6 +24,14 @@ interface KeyStorage {
 	public boolean writeMe(String username, ECKeyPair keyPair);
 
 	/**
+	 * Write the hash of the avatar for this user.
+	 * 
+	 * @param avatar the avatar hash for this user
+	 * @return {@code true} if the write was successful
+	 */
+	public boolean writeAvatarHash(Hash avatarHash);
+
+	/**
 	 * Read the key pair
 	 * 
 	 * @return {@code null} on failure
@@ -35,6 +44,13 @@ interface KeyStorage {
 	 * @return {@code null} on failure
 	 */
 	public String readUsername() throws UserNotInitiatedException;
+
+	/**
+	 * Read the avatar hash from storage.
+	 * 
+	 * @return {@code null} on failure
+	 */
+	public Hash readAvatarHash();
 
 	/**
 	 * Check whether any values are stored in this key storage.

@@ -3,6 +3,7 @@ package org.whispercomm.shout.id;
 
 import java.security.spec.InvalidKeySpecException;
 
+import org.whispercomm.shout.Hash;
 import org.whispercomm.shout.crypto.ECKeyPair;
 import org.whispercomm.shout.crypto.ECPrivateKey;
 import org.whispercomm.shout.crypto.ECPublicKey;
@@ -22,7 +23,16 @@ public class KeyStorageSharedPrefs implements KeyStorage {
 	private static final String KEY_PUBLIC = "base64_public_key";
 	private static final String KEY_PRIVATE = "base64_private_key";
 	private static final String KEY_USERNAME = "username";
+	private static final String KEY_AVATAR_HASH = "avatar_hash";
 	private static final String KEY_VALID = "valid";
+
+	/**
+	 * Returned when an actual hash has not been set.
+	 */
+	private static final String DEFAULT_AVATAR_HASH_STRING = Base64.encodeToString(new byte[] {
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0,
+	}, Base64.DEFAULT);
 
 	public KeyStorageSharedPrefs(Context context) {
 		this.sharedPrefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
@@ -42,6 +52,14 @@ public class KeyStorageSharedPrefs implements KeyStorage {
 		editor.putString(KEY_PRIVATE, encodedPrivateKey);
 		editor.putBoolean(KEY_VALID, true);
 
+		return editor.commit();
+	}
+
+	@Override
+	public boolean writeAvatarHash(Hash avatarHash) {
+		Editor editor = sharedPrefs.edit();
+		editor.putString(KEY_AVATAR_HASH,
+				Base64.encodeToString(avatarHash.toByteArray(), Base64.DEFAULT));
 		return editor.commit();
 	}
 
@@ -87,6 +105,12 @@ public class KeyStorageSharedPrefs implements KeyStorage {
 		}
 		String username = sharedPrefs.getString(KEY_USERNAME, null);
 		return username;
+	}
+
+	@Override
+	public Hash readAvatarHash() {
+		String encoded = sharedPrefs.getString(KEY_AVATAR_HASH, DEFAULT_AVATAR_HASH_STRING);
+		return new Hash(Base64.decode(encoded, Base64.DEFAULT));
 	}
 
 	@Override
