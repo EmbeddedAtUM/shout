@@ -156,15 +156,18 @@ public class PacketProtocol {
 				return;
 			}
 
-			if (id > protocols.length) {
+			ObjectType type;
+			try {
+				type = ObjectType.fromId(id);
+			} catch (IllegalArgumentException e) {
 				// Drop object if no protocol for type
-				Log.v(TAG, "Dropping packet with unrecognized object type: " + id);
+				Log.v(TAG, "Dropping object with unrecognized object type: " + id);
 				continue;
 			}
 
 			for (ObjectProtocol receiver : protocols[id]) {
 				try {
-					receiver.receive(objBuffer);
+					receiver.receive(type, objBuffer);
 				} catch (RuntimeException e) {
 					Log.w(TAG, "Ignoring exception thrown by " + receiver, e);
 					// Ignore bad protocol

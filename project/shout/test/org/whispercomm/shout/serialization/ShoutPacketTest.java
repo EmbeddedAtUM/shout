@@ -35,7 +35,7 @@ public class ShoutPacketTest implements ObjectProtocol {
 	}
 
 	@Override
-	public void receive(ByteBuffer data) {
+	public void receive(ObjectType type, ByteBuffer data) {
 		// TODO Auto-generated method stub
 
 	}

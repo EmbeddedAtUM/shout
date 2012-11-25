@@ -10,6 +10,7 @@ import org.whispercomm.manes.client.maclib.ManesFrameTooLargeException;
 import org.whispercomm.manes.client.maclib.ManesNotRegisteredException;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.network.ObjectProtocol;
+import org.whispercomm.shout.network.ObjectType;
 import org.whispercomm.shout.network.PacketProtocol;
 import org.whispercomm.shout.network.UnsupportedVersionException;
 import org.whispercomm.shout.serialization.SerializeUtility;
@@ -59,7 +60,7 @@ public class ShoutProtocol implements ObjectProtocol {
 	}
 
 	@Override
-	public void receive(ByteBuffer data) {
+	public void receive(ObjectType type, ByteBuffer data) {
 		Shout shout = null;
 		try {
 			shout = reconstructor.processShout(SerializeUtility.deserializeShout(data));

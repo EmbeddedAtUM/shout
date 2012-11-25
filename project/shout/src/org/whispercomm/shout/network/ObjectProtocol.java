@@ -15,8 +15,9 @@ public interface ObjectProtocol {
 	 * the buffer position set just past the end of the serialized object and
 	 * the limit unchanged.
 	 * 
+	 * @param type the type of the object serialized in {@code data}
 	 * @param data the buffer containing the serialized object.
 	 */
-	public void receive(ByteBuffer data);
+	public void receive(ObjectType type, ByteBuffer data);
 
 }
