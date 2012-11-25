@@ -214,7 +214,8 @@ public class LocationProvider {
 		public void getLastKnownLocation() {
 			if (enabled) {
 				Location location = mLocationManager.getLastKnownLocation(provider);
-				processUpdate(location);
+				if (location != null)
+					processUpdate(location);
 			}
 		}
 
