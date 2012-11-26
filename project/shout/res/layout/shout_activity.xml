@@ -4,9 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-    
-    <include layout="@layout/titlebar" />
-    
+        
 	<fragment android:name="org.whispercomm.shout.ui.fragment.ShoutListFragment"
 		android:id="@+id/shout_fragment"
 		android:layout_width="match_parent"
