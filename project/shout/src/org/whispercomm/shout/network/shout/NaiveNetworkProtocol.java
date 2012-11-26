@@ -4,6 +4,7 @@ package org.whispercomm.shout.network.shout;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.joda.time.DateTime;
 import org.whispercomm.manes.client.maclib.ManesNotRegisteredException;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.provider.ShoutProviderContract;
@@ -30,7 +31,7 @@ public class NaiveNetworkProtocol implements NetworkProtocol {
 	/**
 	 * rebroadcast period in millisecond
 	 */
-	public static long PERIOD = 30 * 60 * 1000;
+	public static int PERIOD = 30 * 60 * 1000;
 
 	/**
 	 * total number of re-sends for each message
@@ -63,31 +64,43 @@ public class NaiveNetworkProtocol implements NetworkProtocol {
 	}
 
 	@Override
-	public void sendShout(final Shout shout) throws ShoutChainTooLongException,
+	public void sendShout(final Shout shout) throws
 			ManesNotRegisteredException {
 		// Send once now, and then queue for further deliveries
-		shoutProtocol.send(shout);
+		send(shout);
 
 		// schedule periodic re-broadcast up to RESEND_NUM times.
-		long delay = PERIOD;
-		for (int i = 1; i < RESEND_NUM; i++) {
-			sendScheduler.schedule(new TimerTask() {
-				@Override
-				public void run() {
-					try {
-						shoutProtocol.send(shout);
-					} catch (ManesNotRegisteredException e) {
-						Log.e(TAG, "send() failed because not registered.", e);
-					}
-				}
-			}, delay);
-			delay += PERIOD;
+		DateTime now = DateTime.now();
+		for (int i = 0; i < RESEND_NUM; ++i) {
+			sendScheduler.schedule(new SendShoutTask(shout), now.plusMillis(PERIOD).toDate());
 		}
+	}
+
+	private void send(Shout shout) throws ManesNotRegisteredException {
+		shoutProtocol.send(shout);
 	}
 
 	@Override
 	public void receive(Shout shout) {
 		ShoutProviderContract.saveShout(context, shout);
+	}
+
+	private class SendShoutTask extends TimerTask {
+
+		private final Shout shout;
+
+		public SendShoutTask(Shout shout) {
+			this.shout = shout;
+		}
+
+		@Override
+		public void run() {
+			try {
+				send(shout);
+			} catch (ManesNotRegisteredException e) {
+				Log.w(TAG, "send() failed because not registered.", e);
+			}
+		}
 	}
 
 }
