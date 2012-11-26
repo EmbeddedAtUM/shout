@@ -40,10 +40,24 @@ public enum ObjectType {
 	 * Returns the identifier for this type. Identifiers are in the range
 	 * [0,256) and thus will fit in an unsigned byte.
 	 * 
+	 * @see #getIdAsByte()
 	 * @return the identifier
 	 */
 	public int getId() {
 		return id;
+	}
+
+	/**
+	 * Returns the identifier for this type as a byte. The 8 bits of the return
+	 * value should be interpreted as unsigned, although Java does not support
+	 * this. This method is useful when the id must be serialized into a byte
+	 * array.
+	 * 
+	 * @see #getId()
+	 * @return the id as a byte
+	 */
+	public byte getIdAsByte() {
+		return (byte) id;
 	}
 
 	public static ObjectType fromId(int id) throws IllegalArgumentException {

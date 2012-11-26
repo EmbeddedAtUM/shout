@@ -1,7 +1,6 @@
 
 package org.whispercomm.shout.network;
 
-import java.nio.BufferOverflowException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -26,6 +25,8 @@ public class PacketProtocol {
 	private static final String TAG = PacketProtocol.class.getSimpleName();
 
 	public static int MAX_PACKET_LEN = ManesInterface.MANES_MTU;
+
+	public static int OBJECT_HEADER_LEN = 3;
 
 	private final ManesInterface manes;
 
@@ -105,56 +106,6 @@ public class PacketProtocol {
 		return buffer;
 	}
 
-	/**
-	 * Reserves space in the buffer for an object header. After the object
-	 * contents have been written and the length is known, the object header can
-	 * be set with {@link #setObjectHeader(ByteBuffer, ObjectType, short)}.
-	 * <p>
-	 * N.B., this method sets the buffer's mark to record the position of the
-	 * object header for the
-	 * {@link #setObjectHeader(ByteBuffer, ObjectType, short)} method. Do not
-	 * change the mark.
-	 * 
-	 * @param buffer the buffer in which to reserve the header space
-	 * @return the buffer
-	 * @throws BufferOverflowException if the buffer does not have room for the
-	 *             header
-	 */
-	public static ByteBuffer reserveObjectHeader(ByteBuffer buffer) throws BufferOverflowException {
-		// Set mark at start of header
-		buffer.mark();
-
-		buffer.position(buffer.position() + 3);
-		return buffer;
-	}
-
-	/**
-	 * Sets the header previously reserved by
-	 * {@link #reserveObjectHeader(ByteBuffer)}.
-	 * <p>
-	 * N.B., this method relies on the mark set by the
-	 * {@link #reserveObjectHeader(ByteBuffer)}. Do not change the mark.
-	 * 
-	 * @param buffer the buffer in which to set the ehader
-	 * @param type the type of the object
-	 * @param len the length of the object
-	 * @return the buffer
-	 * @throws BufferOverflowException if the buffer does not have room for the
-	 *             claimed length
-	 */
-	public static ByteBuffer setObjectHeader(ByteBuffer buffer, ObjectType type, short len)
-			throws BufferOverflowException {
-		// Reset position to marked start of header
-		buffer.reset();
-
-		buffer.put((byte) type.getId());
-		buffer.putShort(len);
-
-		// Fast-forward past object contents
-		buffer.position(buffer.position() + len);
-		return buffer;
-	}
-
 	/*
 	 * ---------------------------- Implementation ----------------------------
 	 */
@@ -185,21 +136,23 @@ public class PacketProtocol {
 		byte flags = buffer.get();
 
 		while (buffer.hasRemaining()) {
-			int id = 0xFF & buffer.get();
-			int length = buffer.getShort();
+			// Peek at object header
+			int id = 0xFF & buffer.get(buffer.position());
+			int contentLength = buffer.getShort(buffer.position() + 1);
+			int length = OBJECT_HEADER_LEN + contentLength;
 
 			ByteBuffer objBuffer;
 			try {
 				// Create sliced view for receiver
 				objBuffer = buffer.slice();
-				objBuffer.limit(length);
+				// objBuffer.limit(length);
 
 				// Advance the main buffer by the sliced view
 				buffer.position(buffer.position() + length);
 			} catch (IllegalArgumentException e) {
 				// Drop rest of packet. We have no way to find the next object,
 				// if the specified length is invalid.
-				Log.v(TAG, "Dropping packet with invalid object length field: " + length, e);
+				Log.v(TAG, "Dropping packet with invalid object length field: " + contentLength, e);
 				return;
 			}
 

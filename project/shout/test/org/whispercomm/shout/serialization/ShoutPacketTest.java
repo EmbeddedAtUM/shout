@@ -46,14 +46,11 @@ public class ShoutPacketTest implements ObjectProtocol {
 		ByteBuffer buffer = PacketProtocol.createPacket();
 
 		while (shout != null) {
-			PacketProtocol.reserveObjectHeader(buffer);
-			int pos = buffer.position();
 			SerializeUtility.serializeShout(buffer, shout);
-			PacketProtocol.setObjectHeader(buffer, ObjectType.Shout,
-					(short) (buffer.position() - pos));
 			shout = shout.getParent();
 		}
 
+		buffer.flip();
 		packetProtocol.receive(buffer);
 
 		TestUtility.testEqualShoutFields(shout, received);

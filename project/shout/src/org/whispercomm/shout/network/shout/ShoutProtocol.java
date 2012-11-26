@@ -10,7 +10,6 @@ import org.whispercomm.manes.client.maclib.ManesFrameTooLargeException;
 import org.whispercomm.manes.client.maclib.ManesNotRegisteredException;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.network.ObjectProtocol;
-import org.whispercomm.shout.network.ObjectType;
 import org.whispercomm.shout.network.PacketProtocol;
 import org.whispercomm.shout.network.UnsupportedVersionException;
 import org.whispercomm.shout.serialization.SerializeUtility;
@@ -95,11 +94,7 @@ public class ShoutProtocol implements ObjectProtocol {
 	public void send(Shout shout) throws ManesFrameTooLargeException, ManesNotRegisteredException {
 		ByteBuffer buffer = PacketProtocol.createPacket();
 		while (shout != null) {
-			PacketProtocol.reserveObjectHeader(buffer);
-			int pos = buffer.position();
 			SerializeUtility.serializeShout(buffer, shout);
-			PacketProtocol.setObjectHeader(buffer, ObjectType.Shout,
-					(short) (buffer.position() - pos));
 			shout = shout.getParent();
 		}
 		packetProtocol.send(buffer);

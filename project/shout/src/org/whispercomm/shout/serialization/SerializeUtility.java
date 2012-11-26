@@ -32,6 +32,7 @@ import org.whispercomm.shout.crypto.DsaSignature;
 import org.whispercomm.shout.crypto.ECPublicKey;
 import org.whispercomm.shout.crypto.EcdsaWithSha256;
 import org.whispercomm.shout.crypto.KeyGenerator;
+import org.whispercomm.shout.network.ObjectType;
 import org.whispercomm.shout.network.UnsupportedVersionException;
 import org.whispercomm.shout.network.shout.InvalidShoutSignatureException;
 import org.whispercomm.shout.util.Arrays;
@@ -50,8 +51,13 @@ public class SerializeUtility {
 	@SuppressWarnings("unused")
 	private static final String TAG = SerializeUtility.class.getSimpleName();
 
+	public static final ObjectType TYPE = ObjectType.Shout;
+
 	public static final String HASH_ALGORITHM = "SHA-256";
 	public static final int HASH_SIZE = 256 / 8;
+
+	// Object Header fields sizes
+	public static final int OBJECT_HEADER_SIZE = 1 + 2;
 
 	// Header fields sizes
 	public static final int SHOUT_FLAG_SIZE = 1;
@@ -86,7 +92,7 @@ public class SerializeUtility {
 	public static final int SHOUT_PARENT_FIELDS_SIZE = PARENT_HASH_SIZE;
 	public static final int SHOUT_SIGNATURE_FIELDS_SIZE_MAX = SIGNATURE_R_SIZE + SIGNATURE_S_SIZE;
 
-	public static final int SHOUT_UNSIGNED_SIZE_MAX = SHOUT_HEADER_FIELDS_SIZE
+	public static final int SHOUT_UNSIGNED_SIZE_MAX = OBJECT_HEADER_SIZE + SHOUT_HEADER_FIELDS_SIZE
 			+ SHOUT_USER_FIELDS_SIZE_MAX + SHOUT_MESSAGE_FIELDS_SIZE_MAX + SHOUT_PARENT_FIELDS_SIZE;
 
 	public static final int SHOUT_SIGNED_SIZE_MAX = SHOUT_UNSIGNED_SIZE_MAX
@@ -195,6 +201,12 @@ public class SerializeUtility {
 		// Build the packet
 		buffer.order(ByteOrder.BIG_ENDIAN); // network byte order;
 
+		// Add Object Header Fields
+		buffer.put(TYPE.getIdAsByte());
+		int lengthPos = buffer.position(); // Reserve space for length
+		buffer.putShort((short) 0);
+		int startPos = buffer.position();
+
 		// Add Header Fields
 		buffer.put(flags);
 		buffer.putLong(shout.getTimestamp().getMillis());
@@ -221,6 +233,11 @@ public class SerializeUtility {
 		if (parent != null) {
 			buffer.put(parent.getHash());
 		}
+
+		// Set length field, including signature that has not yet been added to
+		// the buffer yet
+		short size = (short) ((buffer.position() - startPos) + SHOUT_SIGNATURE_FIELDS_SIZE_MAX);
+		buffer.putShort(lengthPos, size);
 
 		return buffer;
 	}
@@ -276,7 +293,12 @@ public class SerializeUtility {
 			throws UnsupportedVersionException,
 			ShoutPacketException, InvalidShoutSignatureException {
 		try {
-			byte flags = buffer.get(buffer.position());
+			int type = 0xFF & buffer.get(buffer.position());
+			if (type != TYPE.getIdAsByte())
+				throw new ShoutPacketException(String.format(
+						"Invalid type in shout packet. Got %d. Expected %d.", type, TYPE.getId()));
+
+			byte flags = buffer.get(buffer.position() + 3);
 			switch (VERSION(flags)) {
 				case 0:
 					return deserializeVersion0Shout(buffer);
@@ -318,6 +340,15 @@ public class SerializeUtility {
 			 * correct starting position.
 			 */
 			buffer.mark();
+
+			// Object header fields
+			@SuppressWarnings("unused")
+			// already verified
+			byte type = buffer.get();
+			short contentLength = buffer.getShort();
+
+			// Recording starting position of content, to later verify length
+			int startPos = buffer.position();
 
 			// Header fields
 			byte flags = buffer.get();
@@ -376,6 +407,12 @@ public class SerializeUtility {
 			if (!EcdsaWithSha256.verify(shout.signature, signedData, user.publicKey)) {
 				throw new InvalidShoutSignatureException();
 			}
+
+			// Verify length
+			if (contentLength != buffer.position() - startPos)
+				throw new ShoutPacketException(String.format(
+						"Incorrect length specified. Header said %d. Data was %d.", contentLength,
+						buffer.position() - startPos));
 
 			// Compute hash
 			ByteBuffer clone = flipToMark(buffer.asReadOnlyBuffer());

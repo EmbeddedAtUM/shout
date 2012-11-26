@@ -1,27 +1,57 @@
 ================================================================================
-Network Packet
+Hashable Objects
 --------------------------------------------------------------------------------
-Version 0:
-(max 1500 bytes)  ||====================||
-                  || version || flags   || |   0-3   | 4 | 5 | 6 | 7 |
-                  || (1 byte)           || | version |   |   |   |   |
-                  ||====================||
-                  || Object type id     || 
-                  || (1 byte)           ||
-                  ||--------------------||
-                  || Object length      ||
-                  || (2 bytes)          ||
-                  ||--------------------||
-                  || Object             ||
-                  || (variable)         ||
-                  ||====================||
+Hashable objects (e.g., shouts and some content objects) can be
+uniquely refererenced by hash. However, two objects of different types
+could have the same serialization and thus the same hash.  In order to
+disambiguate between objects of different type, the serialized form
+contains a type identifer, preventing two objects of differing types
+from sharing the same hash.
+
+Consequently, all objects for shout are prefaced by a header
+consisting of the type and the length of the object contents.
+
+================================================================================
+Object Header
+--------------------------------------------------------------------------------
+(3 bytes)         ||====================||
                   || Object type        ||
                   || (1 byte)           ||
                   ||--------------------||
-                  || Object length      ||
-                  || (2 bytes)          ||
-                  ||--------------------||
-                  || Object             ||
+                  || Content length     || Big endian.
+                  || (2 bytes)          || Does not include header length.
+                  ||====================||
+
+================================================================================
+Object Types
+--------------------------------------------------------------------------------
+0x00 - Shout object
+0x01 - Content object (merkle-tree addressed)
+
+================================================================================
+Network Packet
+--------------------------------------------------------------------------------
+Multiple shout objects may be packed into one network packet for
+transmission by simple concatenation.
+
+The maximum size of one network packet is currently set to 1500, to
+fit the common ethernet MTU.
+
+Version 0:
+(max 1500 bytes)  ||====================||
+                  || version || flags   || |   0-3   | 4-7 |
+                  || (1 byte)           || | version |     |
+                  ||====================||
+                  || Object header      ||
+                  || (3 bytes)          ||
+                  ||....................||
+                  || Object data        ||
+                  || (variable)         ||
+                  ||====================||
+                  || Object header      ||
+                  || (3 bytes)          ||
+                  ||....................||
+                  || Object data        ||
                   || (variable)         ||
                   ||====================||
                            etc
@@ -29,19 +59,17 @@ Version 0:
                             .
                             .
 
-
-================================================================================
-Object Type Identifiers
---------------------------------------------------------------------------------
-0x00 - Shout object
-0x01 - Content object (merkle-tree addressed)
-
-
 ================================================================================
 Shout Object
 --------------------------------------------------------------------------------
 Version O:
-(max 467 bytes)   ||====================||
+(max 517 bytes)   ||====================||
+                  || Object type        || 0x00
+                  || (1 byte)           ||
+                  ||--------------------||
+                  || Content length     || max 514
+                  || (2 bytes)          ||
+                  ||====================||
                   || version || flags   || |   0-3   |     4        | 5          | 6 | 7 | 
                   || (1 byte)           || | version | has_location | has_parent |   |   |
                   ||====================||
@@ -67,7 +95,7 @@ Version O:
                   || (1 byte)           ||
                   ||--------------------||
                   || message            || UTF-8
-                  || (max 240 bytes)    ||
+                  || (max 255 bytes)    ||
                   ||--------------------||
                   || longitude          || IEEE-754 double
                   || (8 or 0 bytes)     ||
@@ -84,6 +112,3 @@ Version O:
                   || signature s value  || unsigned, big endian
                   || (32 bytes)         ||
                   ||====================||
-
-
-
