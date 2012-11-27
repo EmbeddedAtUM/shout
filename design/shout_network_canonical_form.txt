@@ -28,6 +28,7 @@ Object Types
 0x00 - Shout object
 0x01 - Content Descriptor object
 0x02 - Merkle Node object
+0x03 - Content Request
 
 ================================================================================
 Network Packet
@@ -266,3 +267,21 @@ Byte  0: 0x01
      37: mime_type first letter
         ...
    36+n: mime_type last letter
+
+================================================================================
+Content Request object
+--------------------------------------------------------------------------------
+Version 0:        ||====================||
+                  || Object type        || 0x03
+                  || (1 byte)           ||
+                  ||--------------------||
+                  || Content length     || 33
+                  || (2 bytes)          ||
+                  ||====================||
+                  ||====================||
+                  || version || flags   || |   0-3   | 4-7 |
+                  || (1 byte)           || | version |     |
+                  ||====================||
+                  || object hash        ||
+                  || (32 bytes)         ||
+                  ||====================||
