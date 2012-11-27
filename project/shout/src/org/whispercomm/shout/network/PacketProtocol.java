@@ -85,10 +85,11 @@ public class PacketProtocol {
 		buffer = buffer.duplicate();
 		buffer.flip();
 
-		byte[] data = new byte[buffer.remaining()];
-		buffer.get(data);
-
-		manes.send(data);
+		if (buffer.remaining() > 0) {
+			byte[] data = new byte[buffer.remaining()];
+			buffer.get(data);
+			manes.send(data);
+		}
 	}
 
 	/**
