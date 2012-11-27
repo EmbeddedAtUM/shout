@@ -51,8 +51,8 @@ public class NotificationSender {
 
 	private PendingIntent createIntent(Shout shout) {
 		Intent intent = new Intent(context, DetailsActivity.class);
-		intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 		intent.putExtra(DetailsActivity.SHOUT_ID, shout.getHash());
-		return PendingIntent.getActivity(context, 0, intent, 0);
+		return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 	}
 }
