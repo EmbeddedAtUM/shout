@@ -41,6 +41,7 @@
         </activity>
         <activity
             android:name=".ui.MessageActivity"
+            android:theme="@style/AppTheme.MessageActivity"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.SettingsActivity"
