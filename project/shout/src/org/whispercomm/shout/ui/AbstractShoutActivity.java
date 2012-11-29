@@ -11,6 +11,7 @@ import org.whispercomm.shout.network.service.NetworkService;
 import org.whispercomm.shout.notification.NotificationSender;
 import org.whispercomm.shout.terms.AgreementListener;
 import org.whispercomm.shout.terms.AgreementManager;
+import org.whispercomm.shout.tutorial.TutorialActivity;
 
 import android.app.NotificationManager;
 import android.content.DialogInterface;
@@ -119,6 +120,9 @@ public class AbstractShoutActivity extends SherlockFragmentActivity {
 				break;
 			case R.id.compose:
 				intent = new Intent(this, MessageActivity.class);
+				break;
+			case R.id.help:
+				intent = new Intent(this, TutorialActivity.class);
 				break;
 			default:
 				return super.onOptionsItemSelected(item);
