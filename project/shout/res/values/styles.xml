@@ -23,7 +23,8 @@
     </style>
     
     <style name="EditTextStyle" parent="android:Widget.EditText">
-        <item name="android:background">@android:drawable/edit_text</item>        
+        <item name="android:background">@android:drawable/edit_text</item>  
+        <item name="android:textColor">@android:color/black</item>      
     </style>
 
     <style name="ActionBar" parent="Widget.Sherlock.ActionBar">
