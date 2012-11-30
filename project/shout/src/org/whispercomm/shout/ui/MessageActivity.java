@@ -95,6 +95,8 @@ public class MessageActivity extends AbstractShoutActivity {
 	private ImageView avatar;
 	private LocalShout parent = null;
 
+	private Toast toast;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -192,7 +194,9 @@ public class MessageActivity extends AbstractShoutActivity {
 			toastResid = R.string.toast_tag_location;
 			setAttachLocationChecked(true);
 		}
-		Toast toast = Toast.makeText(this, toastResid, Toast.LENGTH_SHORT);
+		if (toast != null)
+			toast.cancel();
+		toast = Toast.makeText(this, toastResid, Toast.LENGTH_SHORT);
 		toast.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, toast.getYOffset());
 		toast.show();
 	}
