@@ -41,10 +41,17 @@ public class IdManager {
 			throw new UserNameInvalidException();
 		}
 		newUsername = Validators.removeTrailingSpaces(newUsername);
-		// Generate a new key pair
-		ECKeyPair newKeyPair = keyGenerator.generateKeyPair();
+
+		// Generate a new key pair if needed
+		ECKeyPair keyPair;
+		try {
+			keyPair = keyStorage.readKeyPair();
+		} catch (UserNotInitiatedException e) {
+			keyPair = keyGenerator.generateKeyPair();
+		}
+
 		// Write the username, key pair tuple
-		keyStorage.writeMe(newUsername, newKeyPair);
+		keyStorage.writeMe(newUsername, keyPair);
 		return;
 	}
 
