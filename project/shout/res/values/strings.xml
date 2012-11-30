@@ -78,5 +78,6 @@
     <string name="tutorial_page_9_message">Press anywhere to continue to the Shout application</string>
     <string name="menu_include_location">Include Location</string>
     <string name="menu_send">Send</string>
-
+	<string name="toast_tag_location">Location added to shout</string>
+	<string name="toast_untag_location">Location removed from shout</string>
 </resources>

@@ -36,6 +36,7 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Gravity;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -183,11 +184,17 @@ public class MessageActivity extends AbstractShoutActivity {
 	}
 
 	private void toggleAttachLocation() {
+		int toastResid;
 		if (isLocationAttached) {
+			toastResid = R.string.toast_untag_location;
 			setAttachLocationChecked(false);
 		} else {
+			toastResid = R.string.toast_tag_location;
 			setAttachLocationChecked(true);
 		}
+		Toast toast = Toast.makeText(this, toastResid, Toast.LENGTH_SHORT);
+		toast.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, toast.getYOffset());
+		toast.show();
 	}
 
 	private void initializeAttachLocation() {
