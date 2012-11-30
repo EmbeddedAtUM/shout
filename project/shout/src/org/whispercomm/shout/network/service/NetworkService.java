@@ -116,7 +116,7 @@ public class NetworkService extends Service implements ManesConnection, ManesIns
 				contentRequestHandler = new SimpleContentRequestHandler(new AlarmExecutorService(
 						this, Executors.newSingleThreadExecutor(), "SHOUT_CONTENT_PROTOCOL"),
 						packetProtocol,
-						contentProtocol, contentManager.getObjectStorage());
+						contentProtocol, contentManager.getObjectStorage(), contentManager);
 				contentProtocol.setContentRequestHandler(contentRequestHandler);
 
 				packetProtocol.register(ObjectType.ContentDescriptor, contentProtocol);
@@ -125,6 +125,7 @@ public class NetworkService extends Service implements ManesConnection, ManesIns
 
 				networkProtocol = new NaiveNetworkProtocol(shoutProtocol, getApplicationContext());
 				shoutProtocol.register(networkProtocol);
+				shoutProtocol.register(contentRequestHandler);
 
 				this.networkProtocol.initialize();
 				this.networkReceiver.initialize();
