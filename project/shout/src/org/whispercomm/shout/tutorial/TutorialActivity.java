@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -17,20 +16,20 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.viewpagerindicator.CirclePageIndicator;
 
 /**
  * Tutorial activity that uses a {@link ViewPager} to display a series of
  * instructional images.
  */
-public class TutorialActivity extends FragmentActivity {
+public class TutorialActivity extends SherlockFragmentActivity {
 
 	private ViewPager mViewPager;
 	private ViewPagerAdapter mViewPagerAdapter;
 	private CirclePageIndicator mPageIndicator;
 
-	public static void show(Context context)
-	{
+	public static void show(Context context) {
 		Intent intent = new Intent(context, TutorialActivity.class);
 		context.startActivity(intent);
 	}
@@ -46,6 +45,8 @@ public class TutorialActivity extends FragmentActivity {
 
 		mPageIndicator = (CirclePageIndicator) findViewById(R.id.indicator);
 		mPageIndicator.setViewPager(mViewPager);
+
+		getSupportActionBar().hide();
 	}
 
 	public void onClick()
