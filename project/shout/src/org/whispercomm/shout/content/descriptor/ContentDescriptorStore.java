@@ -22,22 +22,20 @@ public class ContentDescriptorStore {
 	}
 
 	public ContentDescriptorReference retrieve(Hash hash) {
-		if (storage.exists(hash)) {
-			try {
-				ContentDescriptor descriptor = ContentDescriptorSerializer.deserialize(storage
-						.retrieve(hash));
-				return new ContentDescriptorReference(descriptor, this);
-			} catch (NotFoundException e) {
-				// TODO: For all exceptions, figure out if anyone should be
-				// notified or if the bad file should be removed.
-				Log.w(TAG, "Failed to retrieve content descriptor that supposedly exists.", e);
-			} catch (IOException e) {
-				Log.w(TAG, "Failed to retrieve content descriptor.", e);
-			} catch (UnsupportedVersionException e) {
-				Log.w(TAG, "Unable to retrieve content descriptor due to bad version.", e);
-			} catch (InvalidFormatException e) {
-				Log.w(TAG, "Unable to retrieve content descriptor due to bad encoding.", e);
-			}
+		try {
+			ContentDescriptor descriptor = ContentDescriptorSerializer.deserialize(storage
+					.retrieve(hash));
+			return new ContentDescriptorReference(descriptor, this);
+		} catch (NotFoundException e) {
+			// TODO: For all exceptions, figure out if anyone should be
+			// notified or if the bad file should be removed.
+			// Ignore, we may just not have it.
+		} catch (IOException e) {
+			Log.w(TAG, "Failed to retrieve content descriptor.", e);
+		} catch (UnsupportedVersionException e) {
+			Log.w(TAG, "Unable to retrieve content descriptor due to bad version.", e);
+		} catch (InvalidFormatException e) {
+			Log.w(TAG, "Unable to retrieve content descriptor due to bad encoding.", e);
 		}
 
 		return new ContentDescriptorReference(hash, this);
