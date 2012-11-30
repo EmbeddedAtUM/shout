@@ -2,7 +2,7 @@
 package org.whispercomm.shout.network;
 
 public enum ObjectType {
-	Shout(0x00), ContentDescriptor(0x01), MerkleNode(0x02);
+	Shout(0x00), ContentDescriptor(0x01), MerkleNode(0x02), ContentRequest(0x03);
 
 	/**
 	 * Maximum value of the object type identifier.
