@@ -106,7 +106,10 @@ public class MessageActivity extends AbstractShoutActivity {
 		inflator.inflate(R.menu.activity_message, menu);
 		menuItemAttachLocation = menu.findItem(R.id.menu_include_location);
 		menuItemSend = menu.findItem(R.id.menu_send);
-		menuItemSend.setEnabled(false);
+
+		if (edtMessage.getText().toString().equals(""))
+			menuItemSend.setEnabled(false);
+
 		initializeAttachLocation();
 		return true;
 	}
@@ -162,6 +165,7 @@ public class MessageActivity extends AbstractShoutActivity {
 						SerializeUtility.MESSAGE_SIZE_MAX)
 		});
 		edtMessage.addTextChangedListener(new EditMessageWatcher());
+
 		if (parent != null) {
 			// shoutParent.bindShout(parent);
 			LocalShout shout = (LocalShout) parent;
@@ -339,9 +343,11 @@ public class MessageActivity extends AbstractShoutActivity {
 		@Override
 		public void afterTextChanged(Editable s) {
 			if (!edtMessage.getText().toString().equals("")) {
-				menuItemSend.setEnabled(true);
+				if (menuItemSend != null)
+					menuItemSend.setEnabled(true);
 			} else {
-				menuItemSend.setEnabled(false);
+				if (menuItemSend != null)
+					menuItemSend.setEnabled(false);
 			}
 		}
 
