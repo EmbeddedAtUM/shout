@@ -86,7 +86,12 @@ public class FormattedAge {
 		updateNextChange();
 		if (mAgeListener != null)
 			mAgeListener.update(this.toString());
-		updateTimerTask();
+		/*
+		 * The interaction between the main thread, the timer thread, and the
+		 * locks are leading to all sorts of freezes in the UI. Don't schedule
+		 * update tasks for now.
+		 */
+		// updateTimerTask();
 	}
 
 	private synchronized void updateIfCurrent(TimerTask timerTask) {
