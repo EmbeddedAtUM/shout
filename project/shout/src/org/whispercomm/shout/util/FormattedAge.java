@@ -123,6 +123,7 @@ public class FormattedAge {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private void updateTimerTask() {
 		cancelTimerTask();
 		if (mNextChange != null) {

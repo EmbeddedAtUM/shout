@@ -21,8 +21,6 @@ import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 
 public class FileObjectStorage implements ObjectStorage {
-	private static final String TAG = FileObjectStorage.class.getSimpleName();
-
 	/*
 	 * This broadcast manager stuff will be removed when avatar access is moved
 	 * into the content provider.
