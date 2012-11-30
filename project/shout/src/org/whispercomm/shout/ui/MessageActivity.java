@@ -200,9 +200,9 @@ public class MessageActivity extends AbstractShoutActivity {
 	private void setAttachLocationChecked(boolean bool) {
 		isLocationAttached = bool;
 		if (bool) {
-			menuItemAttachLocation.setIcon(android.R.drawable.checkbox_on_background);
+			menuItemAttachLocation.setIcon(R.drawable.ic_menu_pin_white);
 		} else {
-			menuItemAttachLocation.setIcon(android.R.drawable.checkbox_off_background);
+			menuItemAttachLocation.setIcon(R.drawable.ic_menu_pin_rotated_white);
 		}
 	}
 
