@@ -77,10 +77,6 @@ public class NetworkService extends Service implements ManesConnection, ManesIns
 		callbacks = new CopyOnWriteArrayList<ManesStatusCallback>();
 		manesInstallReceiver = ManesInstallationReceiver.start(this, this);
 		shoutContentObserver = new ShoutContentObserver(new Handler(), this);
-		localBroadcastManager = LocalBroadcastManager.getInstance(getApplicationContext());
-		contentHashReceiver = new ContentHashReceiver();
-		localBroadcastManager.registerReceiver(contentHashReceiver, new IntentFilter(
-				ACTION_REQUEST_CONTENT));
 		getApplicationContext().getContentResolver().registerContentObserver(Shouts.CONTENT_URI,
 				true, shoutContentObserver);
 		initialize();
@@ -118,6 +114,11 @@ public class NetworkService extends Service implements ManesConnection, ManesIns
 						packetProtocol,
 						contentProtocol, contentManager.getObjectStorage(), contentManager);
 				contentProtocol.setContentRequestHandler(contentRequestHandler);
+
+				localBroadcastManager = LocalBroadcastManager.getInstance(getApplicationContext());
+				contentHashReceiver = new ContentHashReceiver();
+				localBroadcastManager.registerReceiver(contentHashReceiver, new IntentFilter(
+						ACTION_REQUEST_CONTENT));
 
 				packetProtocol.register(ObjectType.ContentDescriptor, contentProtocol);
 				packetProtocol.register(ObjectType.MerkleNode, contentProtocol);
