@@ -5,6 +5,8 @@ import java.io.IOException;
 
 import org.whispercomm.manes.client.maclib.ManesNotInstalledException;
 import org.whispercomm.manes.client.maclib.ManesNotRegisteredException;
+import org.whispercomm.shout.Avatar;
+import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.Location;
 import org.whispercomm.shout.Me;
@@ -170,7 +172,11 @@ public class MessageActivity extends AbstractShoutActivity {
 			// shoutParent.bindShout(parent);
 			LocalShout shout = (LocalShout) parent;
 			message.setText(shout.getMessage());
-			avatar.setImageResource(R.drawable.defaultavatar);
+			HashReference<Avatar> avatarRef = shout.getSender().getAvatar();
+			if (avatarRef.isAvailable())
+				avatar.setImageBitmap(avatarRef.get().getBitmap());
+			else
+				avatar.setImageResource(R.drawable.defaultavatar);
 			sender.setText(shout.getSender().getUsername());
 			frmTxtParent.setVisibility(RelativeLayout.VISIBLE);
 		}
