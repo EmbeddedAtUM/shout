@@ -3,8 +3,8 @@
 
     <ImageView
         android:id="@+id/avatar"
-        android:layout_width="48dp"
-        android:layout_height="48dip"
+        android:layout_width="72dp"
+        android:layout_height="72dip"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_below="@+id/origsender"
