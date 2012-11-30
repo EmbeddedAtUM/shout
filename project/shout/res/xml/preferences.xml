@@ -8,7 +8,7 @@
             android:name="Username Custom Preference"
             android:defaultValue="@string/defaultUsername"
             android:key="usernamePref"
-            android:summary="Your username and associated unique keys are used to authenticate Shouts behind the scenes, so try to pick a good username the first time."
+            android:summary="@string/prefsummary_Username"
             android:title="Username" />
 
         <org.whispercomm.shout.ui.preference.ShoutAvatarPreference

@@ -44,11 +44,15 @@ public class ShoutUsernamePreference extends EditTextPreference {
 	}
 
 	private void configurePreference(Context context) {
-		this.setOnPreferenceClickListener(preListener);
 		this.setOnPreferenceChangeListener(postListener);
 		this.idManager = new IdManager(context);
 	}
 
+	/*
+	 * We no longer change the key on a username change. This can be reenabled
+	 * by registering this listener in configurePrefence().
+	 */
+	@SuppressWarnings("unused")
 	private OnPreferenceClickListener preListener = new OnPreferenceClickListener() {
 
 		private OnClickListener positive = new OnClickListener() {

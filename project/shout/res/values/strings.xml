@@ -54,6 +54,7 @@
     <string name="permgroupdesc_Shout">Read and send shouts.</string>
     <string name="preftitle_Avatar">Avatar</string>
     <string name="prefsummary_Avatar">Profile image displayed with your shouts.</string>
+    <string name="prefsummary_Username">Set the username displayed with your shouts.</string>
     <string name="delegatepreftitle_Avatar">Get Avatar From</string>
     <string name="delegateprefcancel_Avatar">Avatar change canceled.</string>
     <string name="delegateprompt_Camera">Camera</string>
