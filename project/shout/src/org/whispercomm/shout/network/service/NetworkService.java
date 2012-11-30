@@ -2,6 +2,7 @@
 package org.whispercomm.shout.network.service;
 
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executors;
 
 import org.whispercomm.manes.client.maclib.ManesInstallationListener;
 import org.whispercomm.manes.client.maclib.ManesInstallationReceiver;
@@ -9,10 +10,14 @@ import org.whispercomm.manes.client.maclib.ManesInterface;
 import org.whispercomm.manes.client.maclib.ManesInterface.ManesConnection;
 import org.whispercomm.manes.client.maclib.ManesNotInstalledException;
 import org.whispercomm.manes.client.maclib.ManesNotRegisteredException;
+import org.whispercomm.shout.Hash;
 import org.whispercomm.shout.Shout;
+import org.whispercomm.shout.content.ContentManager;
 import org.whispercomm.shout.network.NetworkReceiver;
 import org.whispercomm.shout.network.ObjectType;
 import org.whispercomm.shout.network.PacketProtocol;
+import org.whispercomm.shout.network.content.ContentProtocol;
+import org.whispercomm.shout.network.content.SimpleContentRequestHandler;
 import org.whispercomm.shout.network.shout.NaiveNetworkProtocol;
 import org.whispercomm.shout.network.shout.NetworkProtocol;
 import org.whispercomm.shout.network.shout.ShoutChainTooLongException;
@@ -20,18 +25,26 @@ import org.whispercomm.shout.network.shout.ShoutProtocol;
 import org.whispercomm.shout.notification.ShoutContentObserver;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.provider.ShoutProviderContract.Shouts;
+import org.whispercomm.shout.util.AlarmExecutorService;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 public class NetworkService extends Service implements ManesConnection, ManesInstallationListener {
 	public static final String TAG = NetworkService.class.getSimpleName();
 
 	public static final int APP_ID = 74688;// "shout" on a phone keyboard
+
+	public static final String ACTION_REQUEST_CONTENT = "org.whispercomm.shout.REQUEST_CONTENT";
+	public static final String EXTRA_HASH = "hash";
 
 	private ManesInterface manes;
 
@@ -40,7 +53,13 @@ public class NetworkService extends Service implements ManesConnection, ManesIns
 	private NetworkReceiver networkReceiver;
 	private PacketProtocol packetProtocol;
 	private ShoutProtocol shoutProtocol;
+	private ContentProtocol contentProtocol;
+	private SimpleContentRequestHandler contentRequestHandler;
 	private NetworkProtocol networkProtocol;
+
+	private LocalBroadcastManager localBroadcastManager;
+	private ContentHashReceiver contentHashReceiver;
+	private ContentManager contentManager;
 
 	// Starts the service once MANES client is installed.
 	private ManesInstallationReceiver manesInstallReceiver;
@@ -58,6 +77,10 @@ public class NetworkService extends Service implements ManesConnection, ManesIns
 		callbacks = new CopyOnWriteArrayList<ManesStatusCallback>();
 		manesInstallReceiver = ManesInstallationReceiver.start(this, this);
 		shoutContentObserver = new ShoutContentObserver(new Handler(), this);
+		localBroadcastManager = LocalBroadcastManager.getInstance(getApplicationContext());
+		contentHashReceiver = new ContentHashReceiver();
+		localBroadcastManager.registerReceiver(contentHashReceiver, new IntentFilter(
+				ACTION_REQUEST_CONTENT));
 		getApplicationContext().getContentResolver().registerContentObserver(Shouts.CONTENT_URI,
 				true, shoutContentObserver);
 		initialize();
@@ -88,11 +111,24 @@ public class NetworkService extends Service implements ManesConnection, ManesIns
 				shoutProtocol = new ShoutProtocol(packetProtocol);
 				packetProtocol.register(ObjectType.Shout, shoutProtocol);
 
+				contentManager = new ContentManager(this);
+				contentProtocol = new ContentProtocol(packetProtocol, contentManager);
+				contentRequestHandler = new SimpleContentRequestHandler(new AlarmExecutorService(
+						this, Executors.newSingleThreadExecutor(), "SHOUT_CONTENT_PROTOCOL"),
+						packetProtocol,
+						contentProtocol, contentManager.getObjectStorage());
+				contentProtocol.setContentRequestHandler(contentRequestHandler);
+
+				packetProtocol.register(ObjectType.ContentDescriptor, contentProtocol);
+				packetProtocol.register(ObjectType.MerkleNode, contentProtocol);
+				packetProtocol.register(ObjectType.ContentRequest, contentProtocol);
+
 				networkProtocol = new NaiveNetworkProtocol(shoutProtocol, getApplicationContext());
 				shoutProtocol.register(networkProtocol);
 
 				this.networkProtocol.initialize();
 				this.networkReceiver.initialize();
+				this.contentRequestHandler.initialize();
 
 				notifyInstalled(true);
 				Log.i(TAG, "Finishing initialization.");
@@ -107,6 +143,9 @@ public class NetworkService extends Service implements ManesConnection, ManesIns
 	private synchronized void uninitialize() {
 		if (manes != null) {
 			manes.disconnect();
+		}
+		if (contentRequestHandler != null) {
+			contentRequestHandler.cleanup();
 		}
 		if (networkProtocol != null) {
 			networkProtocol.cleanup();
@@ -218,5 +257,15 @@ public class NetworkService extends Service implements ManesConnection, ManesIns
 					removeCallback(callback);
 				}
 			};
+
+	private class ContentHashReceiver extends BroadcastReceiver {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Hash hash = new Hash(intent.getByteArrayExtra(EXTRA_HASH));
+			contentRequestHandler.request(hash);
+		}
+
+	}
 
 }

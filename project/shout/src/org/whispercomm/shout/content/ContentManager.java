@@ -37,7 +37,7 @@ public class ContentManager {
 		if (!mObjectDir.exists())
 			mObjectDir.mkdir();
 
-		mObjectStorage = new FileObjectStorage(mObjectDir);
+		mObjectStorage = new FileObjectStorage(mObjectDir, context);
 
 		mMerkleStore = new MerkleStore(mObjectStorage);
 		mContentDescriptorStore = new ContentDescriptorStore(mObjectStorage);
@@ -62,6 +62,18 @@ public class ContentManager {
 		byte[] data = mMerkleStore.getObject(descriptor.getObjectRoot());
 
 		return new Content(data, descriptor.getMimeType());
+	}
+
+	public ObjectStorage getObjectStorage() {
+		return mObjectStorage;
+	}
+
+	public MerkleStore getMerkleStore() {
+		return mMerkleStore;
+	}
+
+	public ContentDescriptorStore getDescriptorStore() {
+		return mContentDescriptorStore;
 	}
 
 }

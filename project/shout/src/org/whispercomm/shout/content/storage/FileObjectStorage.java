@@ -14,8 +14,29 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.commons.io.FileUtils;
 import org.whispercomm.shout.Hash;
 import org.whispercomm.shout.errors.NotFoundException;
+import org.whispercomm.shout.network.service.NetworkService;
+
+import android.content.Context;
+import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 
 public class FileObjectStorage implements ObjectStorage {
+	private static final String TAG = FileObjectStorage.class.getSimpleName();
+
+	/*
+	 * This broadcast manager stuff will be removed when avatar access is moved
+	 * into the content provider.
+	 */
+	private static LocalBroadcastManager localBroadcastManager;
+
+	private LocalBroadcastManager getLocalBroadcastManager(Context context) {
+		if (localBroadcastManager == null)
+			localBroadcastManager = LocalBroadcastManager.getInstance(context
+					.getApplicationContext());
+		return localBroadcastManager;
+	}
+
+	private final LocalBroadcastManager mLocalBroadcastManager;
 
 	private final File root;
 
@@ -23,7 +44,8 @@ public class FileObjectStorage implements ObjectStorage {
 
 	private final Lock listenersLock;
 
-	public FileObjectStorage(File root) {
+	public FileObjectStorage(File root, Context context) {
+		mLocalBroadcastManager = getLocalBroadcastManager(context);
 		this.root = root;
 		this.listeners = new HashMap<Hash, List<ObjectListener>>();
 		this.listenersLock = new ReentrantLock();
@@ -44,6 +66,7 @@ public class FileObjectStorage implements ObjectStorage {
 				throw new NotFoundException("The file contents do not match the hash.");
 			}
 		} catch (FileNotFoundException e) {
+			request(hash);
 			throw new NotFoundException(String.format("File '%s' not found.", hash));
 		}
 	}
@@ -114,5 +137,12 @@ public class FileObjectStorage implements ObjectStorage {
 		} finally {
 			listenersLock.unlock();
 		}
+	}
+
+	/* Removed when avatar access is put into ContentProvider */
+	private void request(Hash hash) {
+		Intent i = new Intent(NetworkService.ACTION_REQUEST_CONTENT);
+		i.putExtra(NetworkService.EXTRA_HASH, hash.toByteArray());
+		mLocalBroadcastManager.sendBroadcast(i);
 	}
 }
