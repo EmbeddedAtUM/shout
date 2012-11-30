@@ -83,25 +83,4 @@
 
 
     </FrameLayout>
-
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
-
-        <CheckBox android:id="@+id/attachLocation"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="10dip"
-            android:text="@string/attachLocation"/>
-
-        <Button
-            android:id="@+id/send"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="10dip"
-            android:onClick="onClickSend"
-            android:text="@string/shout" />
-    </RelativeLayout>
 </LinearLayout>

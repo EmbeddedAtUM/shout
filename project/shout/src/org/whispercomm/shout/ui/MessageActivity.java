@@ -34,15 +34,17 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 
 public class MessageActivity extends AbstractShoutActivity {
 	private static final String TAG = MessageActivity.class.getSimpleName();
@@ -75,9 +77,10 @@ public class MessageActivity extends AbstractShoutActivity {
 	private IdManager idManager;
 
 	private LocationProvider mLocation;
+	private boolean isLocationAttached;
 
-	private CheckBox chkAttachLocation;
-	private Button btnSend;
+	private MenuItem menuItemAttachLocation;
+	private MenuItem menuItemSend;
 	private EditText edtMessage;
 	private FrameLayout frmProgressBar;
 	private RelativeLayout frmTxtParent;
@@ -92,7 +95,36 @@ public class MessageActivity extends AbstractShoutActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		ActionBar actionBar = getSupportActionBar();
+		actionBar.setDisplayHomeAsUpEnabled(true);
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		super.onCreateOptionsMenu(menu);
+		MenuInflater inflator = getSupportMenuInflater();
+		inflator.inflate(R.menu.activity_message, menu);
+		menuItemAttachLocation = menu.findItem(R.id.menu_include_location);
+		menuItemSend = menu.findItem(R.id.menu_send);
+		menuItemSend.setEnabled(false);
+		initializeAttachLocation();
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		int id = item.getItemId();
+		switch (id) {
+			case R.id.menu_include_location:
+				toggleAttachLocation();
+				break;
+			case R.id.menu_send:
+				send();
+				break;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
+		return true;
 	}
 
 	@Override
@@ -117,7 +149,6 @@ public class MessageActivity extends AbstractShoutActivity {
 	private void initializeViews() {
 		setContentView(R.layout.message_activity);
 
-		btnSend = (Button) findViewById(R.id.send);
 		frmProgressBar = (FrameLayout) findViewById(R.id.frmProgressBar);
 		// shoutParent = (ShoutView) findViewById(R.id.shoutParent);
 		avatar = (ImageView) findViewById(R.id.commentAvatar);
@@ -131,7 +162,6 @@ public class MessageActivity extends AbstractShoutActivity {
 						SerializeUtility.MESSAGE_SIZE_MAX)
 		});
 		edtMessage.addTextChangedListener(new EditMessageWatcher());
-		btnSend.setEnabled(false);
 		if (parent != null) {
 			// shoutParent.bindShout(parent);
 			LocalShout shout = (LocalShout) parent;
@@ -140,15 +170,30 @@ public class MessageActivity extends AbstractShoutActivity {
 			sender.setText(shout.getSender().getUsername());
 			frmTxtParent.setVisibility(RelativeLayout.VISIBLE);
 		}
+	}
 
-		initializeAttachLocation();
+	private void toggleAttachLocation() {
+		if (isLocationAttached) {
+			setAttachLocationChecked(false);
+		} else {
+			setAttachLocationChecked(true);
+		}
 	}
 
 	private void initializeAttachLocation() {
-		chkAttachLocation = (CheckBox) findViewById(R.id.attachLocation);
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(getBaseContext());
-		chkAttachLocation.setChecked(prefs.getBoolean("attachLocation", true));
+		isLocationAttached = prefs.getBoolean("attachLocation", true);
+		setAttachLocationChecked(isLocationAttached);
+	}
+
+	private void setAttachLocationChecked(boolean bool) {
+		isLocationAttached = bool;
+		if (bool) {
+			menuItemAttachLocation.setIcon(android.R.drawable.checkbox_on_background);
+		} else {
+			menuItemAttachLocation.setIcon(android.R.drawable.checkbox_off_background);
+		}
 	}
 
 	private LocalShout getParent(Bundle extras) {
@@ -195,19 +240,19 @@ public class MessageActivity extends AbstractShoutActivity {
 
 	private void showProgressBar() {
 		frmProgressBar.setVisibility(FrameLayout.VISIBLE);
-		btnSend.setEnabled(false);
+		menuItemSend.setEnabled(false);
 	}
 
 	private void hideProgressBar() {
 		frmProgressBar.setVisibility(FrameLayout.GONE);
-		btnSend.setEnabled(true);
+		menuItemSend.setEnabled(true);
 	}
 
-	public void onClickSend(View v) {
+	public void send() {
 		showProgressBar();
 		String content = edtMessage.getText().toString();
 		Location location = null;
-		if (chkAttachLocation.isChecked()) {
+		if (isLocationAttached) {
 			location = SimpleLocation.create(mLocation.getLocation());
 		}
 		Me me;
@@ -285,7 +330,7 @@ public class MessageActivity extends AbstractShoutActivity {
 
 	/**
 	 * A textwatcher, listen to the textchange event of edtMessage Enable the
-	 * btnSend when the text field is not empty.
+	 * menuItemSend when the text field is not empty.
 	 * 
 	 * @author Junzhe Zhang
 	 */
@@ -294,9 +339,9 @@ public class MessageActivity extends AbstractShoutActivity {
 		@Override
 		public void afterTextChanged(Editable s) {
 			if (!edtMessage.getText().toString().equals("")) {
-				btnSend.setEnabled(true);
+				menuItemSend.setEnabled(true);
 			} else {
-				btnSend.setEnabled(false);
+				menuItemSend.setEnabled(false);
 			}
 		}
 
