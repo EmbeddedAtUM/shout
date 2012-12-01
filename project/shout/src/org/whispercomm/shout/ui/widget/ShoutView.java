@@ -31,11 +31,9 @@ public class ShoutView extends RelativeLayout {
 	private TextView sender;
 	private ImageView avatar;
 
-	private ImageView reshoutIcon;
-	private TextView reshouters;
-
 	private TextView message;
 
+	private TextView reshoutCount;
 	private TextView commentCount;
 	private TextView age;
 
@@ -80,12 +78,11 @@ public class ShoutView extends RelativeLayout {
 
 	private void initializeViews() {
 		avatar = (ImageView) findViewById(R.id.avatar);
-		sender = (TextView) findViewById(R.id.origsender);
-		reshouters = (TextView) this.findViewById(R.id.sender);
+		sender = (TextView) findViewById(R.id.sender);
 		age = (TextView) findViewById(R.id.age);
 		message = (TextView) findViewById(R.id.message);
-		reshoutIcon = (ImageView) findViewById(R.id.reshoutIcon);
 		commentCount = (TextView) findViewById(R.id.commentCount);
+		reshoutCount = (TextView) this.findViewById(R.id.reshoutCount);
 		detailsTable = (TableLayout) findViewById(R.id.shoutDetails);
 	}
 
@@ -97,7 +94,12 @@ public class ShoutView extends RelativeLayout {
 	public void bindShout(LocalShout shout) {
 		this.shout = shout;
 
-		sender.setText(shout.getSender().getUsername());
+		/*
+		 * Space is placed after username because when the text is ellipsized,
+		 * the TextView adds one space. Thus, the layout is set up to assume a
+		 * space after the username.
+		 */
+		sender.setText(String.format("%s ", shout.getSender().getUsername()));
 		HashReference<Avatar> avatarRef = shout.getSender().getAvatar();
 		if (avatarRef.isAvailable())
 			avatar.setImageBitmap(avatarRef.get().getBitmap());
@@ -115,15 +117,12 @@ public class ShoutView extends RelativeLayout {
 		}
 
 		if (shout.getReshoutCount() > 0) {
-			reshoutIcon.setVisibility(View.VISIBLE);
-			reshouters.setVisibility(View.VISIBLE);
+			reshoutCount.setVisibility(View.VISIBLE);
 			int count = shout.getReshouters().size();
-			reshouters.setText(String.format("Reshouted by %d %s.", count, count == 1 ? "user"
-					: "users"));
-
+			reshoutCount.setText(String.format("and %d %s", count, count == 1 ? "reshouter"
+					: "reshouters"));
 		} else {
-			reshoutIcon.setVisibility(View.GONE);
-			reshouters.setVisibility(View.GONE);
+			reshoutCount.setVisibility(View.GONE);
 		}
 
 		detailsTable.setVisibility(GONE);

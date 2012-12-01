@@ -2,7 +2,6 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
     android:padding="10dip"
     android:paddingBottom="20dip"
     android:background="@drawable/messageviewgradient" >
@@ -13,20 +12,21 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_gravity="center_horizontal"
-        android:paddingTop="10dip"
         android:background="@drawable/settingslistshape" >
 
         <org.whispercomm.shout.ui.widget.ShoutView
             android:id="@+id/shoutview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dip"
+            android:layout_margin="10dp"
             android:background="@color/white" />
 
         <org.whispercomm.shout.ui.widget.ShoutChainView
             android:id="@+id/commentsview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
             android:orientation="vertical" />
     </LinearLayout>
 
