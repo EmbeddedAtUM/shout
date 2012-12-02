@@ -204,8 +204,8 @@ public class AlarmExecutorService {
 	 */
 	private void cancelAllTasks() {
 		synchronized (tasks) {
-			for (int i = 0; i < tasks.size(); i++) {
-				TaskImpl task = tasks.valueAt(i);
+			while (tasks.size() > 0) {
+				TaskImpl task = tasks.valueAt(0);
 				alarmManager.cancel(task.getAlarm().getIntent());
 				removeTask(task);
 			}
