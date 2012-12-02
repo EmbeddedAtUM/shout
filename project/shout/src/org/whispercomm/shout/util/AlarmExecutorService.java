@@ -3,6 +3,7 @@ package org.whispercomm.shout.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
@@ -42,7 +43,6 @@ public class AlarmExecutorService {
 
 	private final ExecutorService executor;
 	private final Receiver receiver;
-	private final PowerManager.WakeLock wakeLock;
 	private final AlarmCache cache;
 	private final SparseArray<TaskImpl> tasks;
 
@@ -63,8 +63,6 @@ public class AlarmExecutorService {
 		this.tasks = new SparseArray<TaskImpl>();
 		this.alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		this.powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-		this.wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, tag);
-		this.wakeLock.setReferenceCounted(true);
 		this.running = true;
 	}
 
@@ -80,24 +78,10 @@ public class AlarmExecutorService {
 	 * @param command the task to execute
 	 * @throws RejectedExecutionException if the executor has been shutdown
 	 */
-	@SuppressLint("Wakelock")
 	public void execute(Runnable command) {
 		if (!running)
 			throw new RejectedExecutionException("Cannot schedule new command after shutdown.");
-		try {
-			// Use timeout so the phone won't stay awake forever if code is
-			// buggy or the app is destroyed.
-			// TODO: All tasks must complete faster than 1 minute or the
-			// wakelock will be double-released. Fix this.
-			wakeLock.acquire(1000 * 60); // 1 minute
-			executor.execute(new Worker(command));
-		} catch (RejectedExecutionException e) {
-			wakeLock.release();
-			throw e;
-		} catch (RuntimeException e) {
-			wakeLock.release();
-			throw e;
-		}
+		executor.execute(command);
 	}
 
 	/**
@@ -115,15 +99,15 @@ public class AlarmExecutorService {
 
 	/**
 	 * Swallows the RejectedExceptionException if this
-	 * {@code AlarmExecutorService} is stopped. With this, locks would be needed
-	 * to ensure that all alarmmanager-scheduled tasks are successfully canceled
-	 * before shutting down the executor service.
+	 * {@code AlarmExecutorService} is stopped. Without this, locks would be
+	 * needed to ensure that all AlarmManager-scheduled tasks are successfully
+	 * canceled before shutting down the executor service.
 	 * 
-	 * @param command
+	 * @param task the task to execute
 	 */
-	private void safeExecute(Runnable command) {
+	private void safeExecute(TaskImpl task) {
 		try {
-			execute(command);
+			task.execute(executor);
 		} catch (RejectedExecutionException e) {
 			if (!running)
 				Log.d(TAG, "Ignoring RejectedExecutionException after shutdown");
@@ -132,12 +116,11 @@ public class AlarmExecutorService {
 		}
 	}
 
-	@SuppressLint("Wakelock")
 	private void onReceive(Context context, Intent intent) {
 		int id = (int) ContentUris.parseId(intent.getData());
 		TaskImpl task = tasks.get(id);
 		if (task != null)
-			safeExecute(task.getCommand());
+			safeExecute(task);
 	}
 
 	private Task schedule(Runnable command, long delay) {
@@ -254,20 +237,20 @@ public class AlarmExecutorService {
 
 		private final Runnable command;
 
+		private final PowerManager.WakeLock wakelock;
+
 		private boolean scheduled;
 
 		public TaskImpl(Alarm alarm, Runnable command) {
 			this.alarm = alarm;
 			this.command = command;
+			this.wakelock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, tag);
+			this.wakelock.setReferenceCounted(false);
 			this.scheduled = true;
 		}
 
 		public int getId() {
 			return alarm.getId();
-		}
-
-		public Runnable getCommand() {
-			return command;
 		}
 
 		public Alarm getAlarm() {
@@ -280,6 +263,30 @@ public class AlarmExecutorService {
 				unschedule(this);
 		}
 
+		/**
+		 * Schedule the task to run on the given executor by calling
+		 * {@code executor.executor(this);}. This method ensures that the device
+		 * stays awake until the task finishes executing or one minute has
+		 * passed, which ever comes first.
+		 * 
+		 * @param executor the executor on which to run this task
+		 * @throws RejectedExecutionException if the executor rejects the task
+		 */
+		@SuppressLint("Wakelock")
+		public void execute(Executor executor) {
+			/*
+			 * Don't keep phone awake longer than minute, even if code is buggy
+			 * and release() never called
+			 */
+			wakelock.acquire(60 * 1000);
+			try {
+				executor.execute(this);
+			} catch (RuntimeException e) {
+				wakelock.release();
+				throw e;
+			}
+		}
+
 		@Override
 		public void run() {
 			try {
@@ -287,7 +294,8 @@ public class AlarmExecutorService {
 					command.run();
 				removeTask(this);
 			} finally {
-				wakeLock.release();
+				if (wakelock.isHeld()) // Races with timeout, but not fixable
+					wakelock.release();
 			}
 		}
 
@@ -305,29 +313,6 @@ public class AlarmExecutorService {
 				scheduled = false;
 			}
 			return wasScheduled;
-		}
-	}
-
-	/**
-	 * Wrapper for task execution that ensures the wakelock is released.
-	 * 
-	 * @author David R. Bild
-	 */
-	private class Worker implements Runnable {
-
-		public Runnable command;
-
-		public Worker(Runnable command) {
-			this.command = command;
-		}
-
-		@Override
-		public void run() {
-			try {
-				command.run();
-			} finally {
-				wakeLock.release();
-			}
 		}
 	}
 
