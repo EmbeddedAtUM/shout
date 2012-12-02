@@ -206,10 +206,9 @@ public class AlarmExecutorService {
 		synchronized (tasks) {
 			for (int i = 0; i < tasks.size(); i++) {
 				TaskImpl task = tasks.valueAt(i);
-				tasks.remove(i);
 				alarmManager.cancel(task.getAlarm().getIntent());
+				removeTask(task);
 			}
-			unregisterReceiver();
 		}
 	}
 
