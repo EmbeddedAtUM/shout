@@ -7,7 +7,6 @@ import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.Location;
 import org.whispercomm.shout.R;
 import org.whispercomm.shout.ShoutType;
-import org.whispercomm.shout.util.Encoders;
 import org.whispercomm.shout.util.FormattedAge;
 import org.whispercomm.shout.util.FormattedAge.AgeListener;
 
@@ -183,18 +182,18 @@ public class ShoutView extends RelativeLayout {
 			detailsTable.addView(latitude);
 		}
 
-		// Add the signature
-		ShoutDetailRow signature = new ShoutDetailRow(getContext());
-		signature.setTitleText("Signature");
-		signature.setEntryText(String.format("R<%s> S<%s>",
-				Encoders.toHexString(shout.getSignature().getS().toByteArray()),
-				Encoders.toHexString(shout.getSignature().getS().toByteArray())));
-		detailsTable.addView(signature);
-		// Add the hash
-		ShoutDetailRow hash = new ShoutDetailRow(getContext());
-		hash.setTitleText("Hash");
-		hash.setEntryText(Encoders.toHexString(shout.getHash()));
-		detailsTable.addView(hash);
+		// // Add the signature
+		// ShoutDetailRow signature = new ShoutDetailRow(getContext());
+		// signature.setTitleText("Signature");
+		// signature.setEntryText(String.format("R<%s> S<%s>",
+		// Encoders.toHexString(shout.getSignature().getS().toByteArray()),
+		// Encoders.toHexString(shout.getSignature().getS().toByteArray())));
+		// detailsTable.addView(signature);
+		// // Add the hash
+		// ShoutDetailRow hash = new ShoutDetailRow(getContext());
+		// hash.setTitleText("Hash");
+		// hash.setEntryText(Encoders.toHexString(shout.getHash()));
+		// detailsTable.addView(hash);
 	}
 
 	public void hideDetails() {
