@@ -47,6 +47,13 @@ public class ShoutUsernamePreference extends EditTextPreference {
 
 	private void configurePreference(Context context) {
 		this.context = context;
+		this.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+			@Override
+			public boolean onPreferenceClick(Preference preference) {
+				getEditText().setSelection(getEditText().getText().length());
+				return true;
+			}
+		});
 		this.setOnPreferenceChangeListener(postListener);
 		this.idManager = new IdManager(context);
 	}
