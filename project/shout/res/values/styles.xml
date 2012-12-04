@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="AppTheme" parent="Theme.Sherlock">
+    <style name="AppTheme" parent="Theme.Sherlock.Light.DarkActionBar">
         <item name="@attr/bitmapPreferenceStyle">@style/BitmapPreference</item>
         <item name="@attr/delegatedPreferenceStyle">@style/DelegatedPreference</item>
         <item name="actionBarStyle">@style/ActionBar</item>
@@ -11,11 +11,9 @@
     <style name="AppTheme.ShoutActivity">
         <item name="@android:attr/windowBackground">@color/BackgroundGray</item>
     </style>
-    <style name="AppTheme.Settings" parent="Theme.Sherlock.Light">
+    <style name="AppTheme.Settings">
         <item name="@attr/bitmapPreferenceStyle">@style/BitmapPreference</item>
         <item name="@attr/delegatedPreferenceStyle">@style/DelegatedPreference</item>
-        <item name="actionBarStyle">@style/ActionBar</item>
-        <item name="android:actionBarStyle">@style/ActionBar</item>
 
         <!-- These color overrides should be removed when the main theme is fixed. -->
         <!-- Override bad text colors that propagate through to preferences title and summary fields -->
