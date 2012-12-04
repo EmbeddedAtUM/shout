@@ -11,6 +11,7 @@
     <style name="AppTheme.ShoutActivity">
         <item name="@android:attr/windowBackground">@color/BackgroundGray</item>
     </style>
+
     <style name="AppTheme.Settings">
         <item name="@attr/bitmapPreferenceStyle">@style/BitmapPreference</item>
         <item name="@attr/delegatedPreferenceStyle">@style/DelegatedPreference</item>
