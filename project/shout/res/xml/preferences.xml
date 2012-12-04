@@ -17,12 +17,12 @@
             android:key="avatarPref"
             android:summary="@string/prefsummary_Avatar"
             android:title="@string/preftitle_Avatar"
+            shout:cancelText="@string/delegateprefcancel_Avatar"
             shout:compressionFormat="PNG"
             shout:compressionQuality="100"
             shout:maxCompressedSize="20480"
             shout:maxScaledHeight="73"
-            shout:maxScaledWidth="73"
-            shout:cancelText="@string/delegateprefcancel_Avatar" />
+            shout:maxScaledWidth="73" />
     </org.whispercomm.shout.ui.preference.ShoutPreferenceCategory>
 
     <PreferenceCategory android:title="Background Service" >

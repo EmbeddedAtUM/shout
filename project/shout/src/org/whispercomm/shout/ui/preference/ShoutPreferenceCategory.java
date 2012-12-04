@@ -9,6 +9,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 
+// TODO Someone please get rid of this class. I couldn't find another way to curve the top preference category
 public class ShoutPreferenceCategory extends PreferenceCategory {
 
 	public ShoutPreferenceCategory(Context context) {
