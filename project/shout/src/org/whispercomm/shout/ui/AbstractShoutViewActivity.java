@@ -30,11 +30,10 @@ public class AbstractShoutViewActivity extends AbstractShoutActivity {
 		idManager = new IdManager(this);
 	}
 
-	public void onClickReshout(LocalShout shout) {
+	public void onClickReshout(LocalShout shout, AsyncTaskCompleteListener<LocalShout> listener) {
 		try {
-			new ReshoutTask(getApplicationContext(),
-					new ShoutCreationCompleteListener(), idManager.getMe(),
-					shout).execute();
+			new ReshoutTask(getApplicationContext(), listener,
+					idManager.getMe(), shout).execute();
 		} catch (UserNotInitiatedException e) {
 			Toast.makeText(this, "Please set a username before shouting.",
 					Toast.LENGTH_LONG).show();

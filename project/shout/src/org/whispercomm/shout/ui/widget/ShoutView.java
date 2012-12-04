@@ -156,6 +156,7 @@ public class ShoutView extends RelativeLayout {
 	}
 
 	public void showDetails() {
+		detailsTable.removeAllViews();
 		detailsTable.setVisibility(VISIBLE);
 		// Add the time sent
 		ShoutDetailRow timeSent = new ShoutDetailRow(getContext());

@@ -5,6 +5,7 @@ import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.R;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.provider.ShoutProviderContract;
+import org.whispercomm.shout.tasks.AsyncTaskCallback.AsyncTaskCompleteListener;
 import org.whispercomm.shout.ui.widget.ShoutChainView;
 import org.whispercomm.shout.ui.widget.ShoutView;
 
@@ -13,6 +14,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 
 public class DetailsActivity extends AbstractShoutViewActivity {
 	private static final String TAG = DetailsActivity.class.getSimpleName();
@@ -38,6 +42,11 @@ public class DetailsActivity extends AbstractShoutViewActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.details);
+
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+	}
+
+	private void bindShout() {
 		Bundle extras = getIntent().getExtras();
 		shout = getShoutFromBundle(extras);
 		switch (shout.getType()) {
@@ -53,8 +62,42 @@ public class DetailsActivity extends AbstractShoutViewActivity {
 		ShoutView shoutView = (ShoutView) findViewById(R.id.shoutview);
 		shoutView.bindShout(shout);
 		shoutView.showDetails();
+	}
 
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// If this is a comment
+		if (shout.getParent() != null) {
+			getSupportMenuInflater().inflate(R.menu.activity_details_comment, menu);
+		} else {
+			getSupportMenuInflater().inflate(R.menu.activity_details_shout, menu);
+		}
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		int id = item.getItemId();
+		switch (id) {
+			case R.id.menu_comment:
+				onClickComment(shout);
+				bindShout();
+				break;
+			case R.id.menu_reshout:
+				onClickReshout(shout, new ShoutCreatedListener());
+				bindShout();
+				break;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
+		return false;
+	}
+
+	private class ShoutCreatedListener implements AsyncTaskCompleteListener<LocalShout> {
+		@Override
+		public void onComplete(LocalShout result) {
+			bindShout();
+		}
 	}
 
 	private LocalShout getShoutFromBundle(Bundle bundle) {
@@ -72,6 +115,7 @@ public class DetailsActivity extends AbstractShoutViewActivity {
 	@Override
 	public void onResume() {
 		super.onResume();
+		bindShout();
 	}
 
 	@Override
