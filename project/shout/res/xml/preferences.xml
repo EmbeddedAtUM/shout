@@ -8,6 +8,9 @@
             android:name="Username Custom Preference"
             android:defaultValue="@string/defaultUsername"
             android:key="usernamePref"
+            android:maxLines="1"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
             android:summary="@string/prefsummary_Username"
             android:title="Username" />
 
