@@ -1,0 +1,53 @@
+Coding Conventions
+
+- Activities
+
+ * All XML activity layouts should begin with "activity_", i.e. activity_details
+
+- Widgets/Layouts
+
+  * Prefix the layout name with a description of what type of layout it is, i.e.
+    row_shout_details
+  * // TODO: We should have a standard naming convention for widget ids. There are
+    multiple ways of doing this, and I don't really have a preference of which one.
+    For example, you could have an EditText widget id by edit_text_username, or
+    just username. Android doesn't favor either of the two.
+
+- Menus/ActionBar
+
+ * No two activities should use the same menu XML file.
+ * Menu XML files should be named the same name as the activity they are used for.
+ * If an activity has two different menus, append the state that chooses the menu
+   at the end of the file name, i.e. activity_details_state1, activity_details_state2
+ * The ID of each menu item should begin with menu_ and be followed by the description
+   of the item
+
+- Themes and Styles
+
+  * All styles should go in styles.xml and themes shoud go in themes.xml
+  * All style and theme names should be title case
+
+- Strings
+
+  * All string resources should begin with a descriptive identifier of their function,
+    i.e. label_username, desc_avatar, title_activity_shout.
+  * It's usually a good idea to split string files into multiple files based on context.
+    For example, strings_activity_details.xml will contain all strings used only in the
+    DetailsActivity. strings.xml will contain strings that are used globally or that do
+    not fit anywhere else.
+  * For menu item labels, the prefix should be menu_
+
+- Drawables
+
+  * Provide a drawable for each screen resolution.
+  * Prefix all icon names with ic_, i.e. ic_launcher
+  * Prefix all menu/ActionBar icon names with ic_menu_, i.e. ic_menu_save
+
+- Miscellaneous
+
+* Prefer match_parent over fill_parent. Fill_parent is deprecated.
+
+- Tips
+
+  * Pay attention to lint warnings. They're helpful
+  * Use Eclipse's auto format tool (SHIFT+CTRL+F), especially with XML files
