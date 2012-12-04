@@ -6,10 +6,15 @@ import org.whispercomm.shout.serialization.SerializeUtility;
 public class Validators {
 
 	public static boolean validateUsername(String username) {
+		if (username.length() == 0) {
+			return false;
+		}
+
 		byte[] bytes = username.getBytes();
 		if (bytes.length > SerializeUtility.USERNAME_SIZE_MAX) {
 			return false;
 		}
+
 		char c;
 		for (int i = 0; i < username.length(); i++) {
 			c = username.charAt(i);
