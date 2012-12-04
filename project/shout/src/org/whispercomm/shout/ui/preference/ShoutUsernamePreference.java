@@ -13,6 +13,7 @@ import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.widget.Toast;
 
 public class ShoutUsernamePreference extends EditTextPreference {
 
@@ -20,6 +21,7 @@ public class ShoutUsernamePreference extends EditTextPreference {
 			.getSimpleName();
 
 	private IdManager idManager;
+	private Context context;
 
 	public ShoutUsernamePreference(Context context, AttributeSet attrs,
 			int defStyle) {
@@ -44,6 +46,7 @@ public class ShoutUsernamePreference extends EditTextPreference {
 	}
 
 	private void configurePreference(Context context) {
+		this.context = context;
 		this.setOnPreferenceChangeListener(postListener);
 		this.idManager = new IdManager(context);
 	}
@@ -85,6 +88,8 @@ public class ShoutUsernamePreference extends EditTextPreference {
 			try {
 				idManager.resetUser(newUsername);
 			} catch (UserNameInvalidException e) {
+				Toast.makeText(context, "Invalid username. Username not changed.",
+						Toast.LENGTH_SHORT).show();
 				return false;
 			}
 			return true;
