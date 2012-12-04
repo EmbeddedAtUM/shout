@@ -51,3 +51,7 @@ Coding Conventions
 
   * Pay attention to lint warnings. They're helpful
   * Use Eclipse's auto format tool (SHIFT+CTRL+F), especially with XML files
+
+- Spacing
+  * Use tabs for indentation in code, spaces for alignment. Using spaces in text files,
+    such as these is usually a good idea as well.
