@@ -71,8 +71,8 @@ public class NaiveNetworkProtocol implements NetworkProtocol {
 
 		// schedule periodic re-broadcast up to RESEND_NUM times.
 		DateTime now = DateTime.now();
-		for (int i = 0; i < RESEND_NUM; ++i) {
-			sendScheduler.schedule(new SendShoutTask(shout), now.plusMillis(PERIOD).toDate());
+		for (int i = 1; i <= RESEND_NUM; ++i) {
+			sendScheduler.schedule(new SendShoutTask(shout), now.plusMillis(i * PERIOD).toDate());
 		}
 	}
 
