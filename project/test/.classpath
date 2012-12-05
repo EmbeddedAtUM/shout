@@ -3,7 +3,7 @@
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ShoutActivity"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Shout"/>
 	<classpathentry kind="lib" path="libs/robolectric-1.2-20120509.221515-54-jar-with-dependencies.jar" sourcepath="/home/dadrian/SourceCode/robolectric/src"/>
 	<classpathentry kind="lib" path="libs/mockito-all-1.8.5.jar">
 		<attributes>
