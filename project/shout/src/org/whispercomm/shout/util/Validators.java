@@ -18,7 +18,7 @@ public class Validators {
 		char c;
 		for (int i = 0; i < username.length(); i++) {
 			c = username.charAt(i);
-			if (c == '\n') {
+			if (c == '\n' || c == '\t') {
 				return false;
 			}
 		}
