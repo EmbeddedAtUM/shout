@@ -39,7 +39,7 @@ public class HexLiteral implements SqlLiteral {
 	}
 
 	public String toString() {
-		return new String("x'" + hex + "'");
+		return new String(" x'" + hex + "' ");
 	}
 
 	public static boolean isStringHex(String str) {

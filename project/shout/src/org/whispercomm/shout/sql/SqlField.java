@@ -1,10 +1,9 @@
 
 package org.whispercomm.shout.sql;
 
-public interface SqlConjunction {
+public interface SqlField extends SqlExpression {
 
-	public String getConjunction();
-
+	@Override
 	public String toString();
 
 }

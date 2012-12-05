@@ -14,7 +14,7 @@ public class NumericLiteral<N extends Number> implements SqlLiteral {
 	}
 
 	public String toString() {
-		return value.toString();
+		return " " + value.toString() + " ";
 	}
 
 }
