@@ -4,6 +4,7 @@ package org.whispercomm.shout.ui.preference;
 import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.id.UserNameInvalidException;
 import org.whispercomm.shout.serialization.SerializeUtility;
+import org.whispercomm.shout.thirdparty.Utf8ByteLengthFilter;
 import org.whispercomm.shout.ui.DialogFactory;
 
 import android.app.AlertDialog;
@@ -13,7 +14,6 @@ import android.content.DialogInterface.OnClickListener;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.text.InputFilter;
-import android.text.Spanned;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.EditText;
@@ -49,43 +49,11 @@ public class ShoutUsernamePreference extends EditTextPreference {
 		super.setOnPreferenceClickListener(onPreferenceClickListener);
 	}
 
-	/**
-	 * This filter will constrain edits not to make the number of bytes of the
-	 * text greater than the specified length.
-	 */
-	private class MaxByteFilter implements InputFilter {
-		private int max;
-
-		public MaxByteFilter(int max) {
-			this.max = max;
-		}
-
-		public CharSequence filter(CharSequence source, int start, int end,
-				Spanned dest, int dstart, int dend) {
-			int keep = max - (dest.toString().getBytes().length - (dend - dstart));
-
-			if (keep <= 0) {
-				return "";
-			} else if (keep >= end - start) {
-				return null;
-			} else {
-				keep += start;
-				if (Character.isHighSurrogate(source.charAt(keep - 1))) {
-					--keep;
-					if (keep == start) {
-						return "";
-					}
-				}
-				return source.subSequence(start, keep);
-			}
-		}
-	}
-
 	private void configurePreference(Context context) {
 		this.context = context;
 		final EditText editText = getEditText();
 		editText.setFilters(new InputFilter[] {
-				new MaxByteFilter(SerializeUtility.USERNAME_SIZE_MAX)
+				new Utf8ByteLengthFilter(SerializeUtility.USERNAME_SIZE_MAX)
 		});
 		this.setOnPreferenceChangeListener(postListener);
 		this.idManager = new IdManager(context);
