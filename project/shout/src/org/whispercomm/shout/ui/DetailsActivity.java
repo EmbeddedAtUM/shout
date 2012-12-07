@@ -84,7 +84,7 @@ public class DetailsActivity extends AbstractShoutViewActivity {
 				bindShout();
 				break;
 			case R.id.menu_reshout:
-				onClickReshout(shout, new ShoutCreatedListener());
+				onClickReshout(shout);
 				bindShout();
 				break;
 			default:

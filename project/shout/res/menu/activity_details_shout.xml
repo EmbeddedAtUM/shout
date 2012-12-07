@@ -6,10 +6,10 @@
         android:icon="@drawable/chat"
         android:showAsAction="always"
         android:title="@string/menu_comment"/>
-    <item
+<!--     <item
         android:id="@+id/menu_reshout"
         android:icon="@drawable/reshout"
         android:showAsAction="always"
-        android:title="@string/menu_reshout"/>
+        android:title="@string/menu_reshout"/> -->
 
 </menu>
