@@ -1,6 +1,8 @@
 
 package org.whispercomm.shout.util;
 
+import java.io.UnsupportedEncodingException;
+
 import org.whispercomm.shout.serialization.SerializeUtility;
 
 public class Validators {
@@ -10,7 +12,13 @@ public class Validators {
 			return false;
 		}
 
-		byte[] bytes = username.getBytes();
+		byte[] bytes = null;
+		try {
+			bytes = username.getBytes("UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			return false; // TODO
+		}
 		if (bytes.length > SerializeUtility.USERNAME_SIZE_MAX) {
 			return false;
 		}
