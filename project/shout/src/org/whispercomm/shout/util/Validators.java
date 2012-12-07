@@ -34,7 +34,13 @@ public class Validators {
 	}
 
 	public static boolean validateShoutMessage(String message) {
-		byte[] bytes = message.getBytes();
+		byte[] bytes;
+		try {
+			bytes = message.getBytes("UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			return false; // TODO
+		}
 		if (bytes.length > SerializeUtility.MESSAGE_SIZE_MAX) {
 			return false;
 		}
