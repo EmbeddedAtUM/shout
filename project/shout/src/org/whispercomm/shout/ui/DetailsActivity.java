@@ -81,11 +81,9 @@ public class DetailsActivity extends AbstractShoutViewActivity {
 		switch (id) {
 			case R.id.menu_comment:
 				onClickComment(shout);
-				bindShout();
 				break;
 			case R.id.menu_reshout:
 				onClickReshout(shout);
-				bindShout();
 				break;
 			default:
 				return super.onOptionsItemSelected(item);
