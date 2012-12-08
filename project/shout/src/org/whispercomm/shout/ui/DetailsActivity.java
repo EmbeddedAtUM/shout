@@ -12,8 +12,10 @@ import org.whispercomm.shout.ui.widget.ShoutView;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
@@ -62,6 +64,8 @@ public class DetailsActivity extends AbstractShoutViewActivity {
 		ShoutView shoutView = (ShoutView) findViewById(R.id.shoutview);
 		shoutView.bindShout(shout);
 		shoutView.showDetails();
+		TextView message = (TextView) shoutView.findViewById(R.id.message);
+		Linkify.addLinks(message, Linkify.ALL);
 	}
 
 	@Override
