@@ -10,7 +10,9 @@ import org.whispercomm.shout.ShoutType;
 import org.whispercomm.shout.util.FormattedAge;
 import org.whispercomm.shout.util.FormattedAge.AgeListener;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Build;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -75,6 +77,7 @@ public class ShoutView extends RelativeLayout {
 		formattedAge.stop();
 	}
 
+	@SuppressLint("NewApi")
 	private void initializeViews() {
 		avatar = (ImageView) findViewById(R.id.avatar);
 		sender = (TextView) findViewById(R.id.sender);
@@ -83,6 +86,10 @@ public class ShoutView extends RelativeLayout {
 		commentCount = (TextView) findViewById(R.id.commentCount);
 		reshoutCount = (TextView) this.findViewById(R.id.reshoutCount);
 		detailsTable = (TableLayout) findViewById(R.id.shoutDetails);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			message.setTextIsSelectable(true);
+		}
 	}
 
 	/**
