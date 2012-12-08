@@ -184,12 +184,14 @@ public class ActionShoutView extends LinearLayout {
 	 */
 	public void setToggleActionBarOnClick(boolean toggle) {
 		if (toggle) {
-			this.setOnClickListener(new View.OnClickListener() {
+			View.OnClickListener clickListener = new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					toggleActionBarVisibility();
 				}
-			});
+			};
+			shoutView.findViewById(R.id.message).setOnClickListener(clickListener);
+			this.setOnClickListener(clickListener);
 		} else {
 			this.setOnClickListener(null);
 		}
