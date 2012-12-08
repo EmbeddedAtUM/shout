@@ -46,7 +46,13 @@
         <activity
             android:name=".ui.MessageActivity"
             android:theme="@style/AppTheme.MessageActivity"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="adjustResize" >
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".ui.SettingsActivity"
             android:theme="@style/AppTheme.Settings" />

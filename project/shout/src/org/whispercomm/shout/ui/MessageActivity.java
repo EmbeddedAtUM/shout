@@ -171,6 +171,12 @@ public class MessageActivity extends AbstractShoutActivity {
 		});
 		edtMessage.addTextChangedListener(new EditMessageWatcher());
 
+		Intent intent = getIntent();
+		if (intent.getAction() == Intent.ACTION_SEND) {
+			String text = intent.getExtras().getString(Intent.EXTRA_TEXT);
+			edtMessage.setText(text);
+		}
+
 		if (parent != null) {
 			// shoutParent.bindShout(parent);
 			LocalShout shout = (LocalShout) parent;
