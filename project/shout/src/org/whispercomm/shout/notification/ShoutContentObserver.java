@@ -7,10 +7,12 @@ import org.whispercomm.shout.provider.ShoutProviderContract.Shouts;
 import org.whispercomm.shout.ui.AbstractShoutActivity;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 
 public class ShoutContentObserver extends ContentObserver {
 
@@ -41,14 +43,18 @@ public class ShoutContentObserver extends ContentObserver {
 	@Override
 	public void onChange(boolean selfChange) {
 		if (!selfChange && !AbstractShoutActivity.isVisible()) {
-			Cursor cursor = getShoutCursor();
-			cursor.moveToFirst();
-			Shout shout = ShoutProviderContract.retrieveShoutFromCursor(context, cursor);
-			// Only notify if it is not a reshout
-			if (shout.getMessage() != null) {
-				notificationSender.sendNotification(shout);
+			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+			boolean showNotification = preferences.getBoolean("show_notification", true);
+			if (showNotification) {
+				Cursor cursor = getShoutCursor();
+				cursor.moveToFirst();
+				Shout shout = ShoutProviderContract.retrieveShoutFromCursor(context, cursor);
+				// Only notify if it is not a reshout
+				if (shout.getMessage() != null) {
+					notificationSender.sendNotification(shout);
+				}
+				cursor.close();
 			}
-			cursor.close();
 		}
 	}
 }
