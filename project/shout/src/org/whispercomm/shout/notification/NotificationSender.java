@@ -10,6 +10,8 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.media.RingtoneManager;
 import android.support.v4.app.NotificationCompat;
 
 public class NotificationSender {
@@ -51,6 +53,8 @@ public class NotificationSender {
 				.setSmallIcon(icon)
 				.setWhen(when)
 				.setContentIntent(pIntent)
+				.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+				.setLights(Color.GREEN, 1000, 4000)
 				.getNotification();
 		// @formatter: on
 
