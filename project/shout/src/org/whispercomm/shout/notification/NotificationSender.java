@@ -10,8 +10,10 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.RingtoneManager;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 
 public class NotificationSender {
@@ -47,16 +49,27 @@ public class NotificationSender {
 		NotificationCompat.Builder nb = new NotificationCompat.Builder(context);
 
 		// @formatter: off
-		Notification notification = nb.setContentText(contentText)
+		nb.setContentText(contentText)
 				.setContentTitle(contentTitle)
 				.setTicker(tickerText)
 				.setSmallIcon(icon)
 				.setWhen(when)
 				.setContentIntent(pIntent)
-				.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-				.setLights(Color.GREEN, 1000, 4000)
 				.getNotification();
 		// @formatter: on
+
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+		boolean notificationSound = preferences.getBoolean("notification_sound", false);
+		boolean notificationLed = preferences.getBoolean("notification_led", true);
+
+		if (notificationSound) {
+			nb.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
+		}
+		if (notificationLed) {
+			nb.setLights(Color.GREEN, 1000, 4000);
+		}
+
+		Notification notification = nb.getNotification();
 
 		// Remove the notification after it is clicked
 		notification.flags |= Notification.FLAG_AUTO_CANCEL;
