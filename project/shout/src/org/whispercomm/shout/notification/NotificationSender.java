@@ -10,6 +10,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.app.NotificationCompat;
 
 public class NotificationSender {
 	private NotificationManager notificationManager;
@@ -30,7 +31,8 @@ public class NotificationSender {
 		String author = shout.getSender().getUsername();
 		String message = shout.getMessage();
 		String shoutText = author + ": " + message;
-		Notification notification = constructNotification(shoutText, shoutText, createIntent(shout));
+		Notification notification = constructNotification(shoutText, shoutText,
+				createIntent(shout));
 		notificationManager.notify(SHOUT_RECEIVED_NOTIFICATION_ID, notification);
 	}
 
@@ -40,8 +42,17 @@ public class NotificationSender {
 		long when = System.currentTimeMillis();
 
 		// Construct the notification
-		Notification notification = new Notification(icon, tickerText, when);
-		notification.setLatestEventInfo(context, contentTitle, contentText, pIntent);
+		NotificationCompat.Builder nb = new NotificationCompat.Builder(context);
+
+		// @formatter: off
+		Notification notification = nb.setContentText(contentText)
+				.setContentTitle(contentTitle)
+				.setTicker(tickerText)
+				.setSmallIcon(icon)
+				.setWhen(when)
+				.setContentIntent(pIntent)
+				.getNotification();
+		// @formatter: on
 
 		// Remove the notification after it is clicked
 		notification.flags |= Notification.FLAG_AUTO_CANCEL;
