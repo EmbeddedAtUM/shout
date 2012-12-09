@@ -2,7 +2,6 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:shout="http://schemas.android.com/apk/res/org.whispercomm.shout" >
 
-    <!-- defaultValue should be changed to default username, i.e. user123 -->
     <org.whispercomm.shout.ui.preference.ShoutPreferenceCategory android:title="Identity Settings" >
         <org.whispercomm.shout.ui.preference.ShoutUsernamePreference
             android:name="Username Custom Preference"
@@ -41,6 +40,23 @@
             android:key="attachLocation"
             android:summary="If checked, your current location will be included with your shouts and reshouts."
             android:title="Include Location" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Notification Settings" >
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="show_notifications"
+            android:title="Enable Notifications"
+            android:summary="If checked, you will receive a notification when you get a Shout" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="notification_sound"
+            android:title="Notification Sound"
+            android:summary="If checked, the default notification ringtone will be played when a notification is received" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="notification_led"
+            android:title="Blink LED"
+            android:summary="If checked, the LED (if present) will blink when there are unread notifications" />
     </PreferenceCategory>
 
 </PreferenceScreen>
