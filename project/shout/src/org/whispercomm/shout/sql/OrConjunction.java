@@ -1,16 +1,11 @@
 
 package org.whispercomm.shout.sql;
 
-public class OrConjunction implements SqlConjunction {
-
-	@Override
-	public String getConjunction() {
-		return " OR ";
-	}
+public class OrConjunction implements SqlOperator {
 
 	@Override
 	public String toString() {
-		return getConjunction();
+		return " OR ";
 	}
 
 }

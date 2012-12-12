@@ -1,16 +1,11 @@
 
 package org.whispercomm.shout.sql;
 
-public class AndConjunction implements SqlConjunction {
-
-	@Override
-	public String getConjunction() {
-		return " AND ";
-	}
+public class AndConjunction implements SqlOperator {
 
 	@Override
 	public String toString() {
-		return getConjunction();
+		return " AND ";
 	}
 
 }
