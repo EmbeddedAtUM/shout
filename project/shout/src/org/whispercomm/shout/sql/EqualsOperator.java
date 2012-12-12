@@ -1,7 +1,7 @@
 
 package org.whispercomm.shout.sql;
 
-public class OperatorEquals implements SqlOperator {
+public class EqualsOperator implements SqlOperator {
 
 	public String toString() {
 		return "=";
