@@ -44,7 +44,7 @@ public class ShoutContentObserver extends ContentObserver {
 	public void onChange(boolean selfChange) {
 		if (!selfChange && !AbstractShoutActivity.isVisible()) {
 			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-			boolean showNotification = preferences.getBoolean("show_notification", true);
+			boolean showNotification = preferences.getBoolean("show_notifications", true);
 			if (showNotification) {
 				Cursor cursor = getShoutCursor();
 				cursor.moveToFirst();
