@@ -14,6 +14,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
+import android.text.util.Linkify;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -113,6 +114,8 @@ public class ShoutView extends RelativeLayout {
 			avatar.setImageResource(R.drawable.defaultavatar);
 
 		message.setText(shout.getMessage());
+		Linkify.addLinks(message, Linkify.ALL);
+
 		formattedAge.setDateTime(shout.getTimestamp());
 
 		if (shout.getType() == ShoutType.SHOUT) {
