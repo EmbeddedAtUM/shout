@@ -11,8 +11,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.media.RingtoneManager;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 
@@ -62,12 +60,14 @@ public class NotificationSender {
 		boolean notificationSound = preferences.getBoolean("notification_sound", false);
 		boolean notificationLed = preferences.getBoolean("notification_led", true);
 
+		int defaultFlags = 0;
 		if (notificationSound) {
-			nb.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
+			defaultFlags |= Notification.DEFAULT_SOUND;
 		}
 		if (notificationLed) {
-			nb.setLights(Color.GREEN, 1000, 4000);
+			defaultFlags |= Notification.DEFAULT_LIGHTS;
 		}
+		nb.setDefaults(defaultFlags);
 
 		Notification notification = nb.getNotification();
 
