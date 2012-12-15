@@ -15,7 +15,6 @@ import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.actionbarsherlock.view.MenuItem;
@@ -57,8 +56,6 @@ public class SettingsActivity extends SherlockPreferenceActivity {
 				.setOnPreferenceChangeListener(runInBackgroundListener);
 
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-		Log.v(TAG, "Finished onCreate");
 	}
 
 	@Override

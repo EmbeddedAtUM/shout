@@ -13,7 +13,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.util.Linkify;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -123,6 +122,5 @@ public class DetailsActivity extends AbstractShoutViewActivity {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		Log.v(TAG, "Finished onDestroy");
 	}
 }
