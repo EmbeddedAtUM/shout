@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
+import android.preference.Preference.OnPreferenceClickListener;
 
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.actionbarsherlock.view.MenuItem;
@@ -49,6 +50,13 @@ public class SettingsActivity extends SherlockPreferenceActivity {
 		runInBackgroundPref = (CheckBoxPreference) findPreference("runInBackground");
 		runInBackgroundPref
 				.setOnPreferenceChangeListener(runInBackgroundListener);
+		runInBackgroundPref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+			@Override
+			public boolean onPreferenceClick(Preference preference) {
+				((CheckBoxPreference) preference).setChecked(true);
+				return true;
+			}
+		});
 
 		CheckBoxPreference notificationsPref = (CheckBoxPreference) findPreference("show_notifications");
 		setPreferenceEnabled(notificationsPref.isChecked());
@@ -118,12 +126,11 @@ public class SettingsActivity extends SherlockPreferenceActivity {
 					.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							// Do nothing.
+							runInBackgroundPref.setChecked(false);
 						}
 					}).setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							runInBackgroundPref.setChecked(true);
 							/*
 							 * onPreferenceChangeListener() is not called, so
 							 * enable service here.
