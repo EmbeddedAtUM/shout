@@ -9,12 +9,10 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
-import android.preference.PreferenceManager;
 
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.actionbarsherlock.view.MenuItem;
@@ -34,9 +32,6 @@ public class SettingsActivity extends SherlockPreferenceActivity {
 		context.startActivity(intent);
 	}
 
-	boolean autoRotatePreference;
-	String usernamePreference;
-
 	private Intent networkServiceIntent;
 	private RunInBackgroundListener runInBackgroundListener;
 	private CheckBoxPreference runInBackgroundPref;
@@ -55,7 +50,31 @@ public class SettingsActivity extends SherlockPreferenceActivity {
 		runInBackgroundPref
 				.setOnPreferenceChangeListener(runInBackgroundListener);
 
+		CheckBoxPreference notificationsPref = (CheckBoxPreference) findPreference("show_notifications");
+		setPreferenceEnabled(notificationsPref.isChecked());
+		notificationsPref.setOnPreferenceChangeListener(
+				new OnPreferenceChangeListener() {
+					@Override
+					public boolean onPreferenceChange(Preference preference, Object newValue) {
+						setPreferenceEnabled((Boolean) newValue);
+						return true;
+					}
+				});
+
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+	}
+
+	private void setPreferenceEnabled(Boolean bool) {
+		Preference ledPref = findPreference("notification_led");
+		Preference soundPref = findPreference("notification_sound");
+
+		if (bool) {
+			ledPref.setEnabled(true);
+			soundPref.setEnabled(true);
+		} else {
+			ledPref.setEnabled(false);
+			soundPref.setEnabled(false);
+		}
 	}
 
 	@Override
@@ -73,18 +92,6 @@ public class SettingsActivity extends SherlockPreferenceActivity {
 		return true;
 	}
 
-	public void onStart(Bundle savedInstanceState) {
-		getPrefs();
-	}
-
-	private void getPrefs() {
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(getBaseContext());
-		autoRotatePreference = prefs.getBoolean("rotatePref", true);
-		usernamePreference = prefs.getString("usernamePref",
-				"Nothing has been entered");
-	}
-
 	private class RunInBackgroundListener implements OnPreferenceChangeListener {
 		@Override
 		public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -100,6 +107,7 @@ public class SettingsActivity extends SherlockPreferenceActivity {
 		}
 	}
 
+	@Override
 	protected Dialog onCreateDialog(int id) {
 		if (id == DIALOG_RUN_IN_BACKGROUND_WARNING_ID) {
 			AlertDialog.Builder builder = new AlertDialog.Builder(this)
