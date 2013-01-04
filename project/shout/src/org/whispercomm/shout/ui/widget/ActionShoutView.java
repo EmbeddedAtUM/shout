@@ -74,6 +74,9 @@ public class ActionShoutView extends LinearLayout {
 		btnReshout = (ImageButton) findViewById(R.id.reshoutButton);
 		btnComment = (ImageButton) findViewById(R.id.commentButton);
 		btnDetails = (ImageButton) findViewById(R.id.detailsButton);
+
+		ToggleTextView message = (ToggleTextView) shoutView.findViewById(R.id.message);
+		message.setToggleView(this);
 	}
 
 	private void initializeActionBar() {
@@ -190,7 +193,6 @@ public class ActionShoutView extends LinearLayout {
 					toggleActionBarVisibility();
 				}
 			};
-			shoutView.findViewById(R.id.message).setOnClickListener(clickListener);
 			this.setOnClickListener(clickListener);
 		} else {
 			this.setOnClickListener(null);
