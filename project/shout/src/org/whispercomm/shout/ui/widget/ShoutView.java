@@ -116,7 +116,13 @@ public class ShoutView extends RelativeLayout {
 		message.setText(shout.getMessage());
 		Linkify.addLinks(message, Linkify.ALL);
 
-		formattedAge.setDateTime(shout.getTimestamp());
+		/* If the sent time is after the received time, base the
+		 * duration period on the time received.
+		 */
+		if (shout.getTimestamp().isAfter(shout.getReceivedTime()))
+			formattedAge.setDateTime(shout.getReceivedTime());
+		else
+			formattedAge.setDateTime(shout.getTimestamp());
 
 		if (shout.getType() == ShoutType.SHOUT) {
 			commentCount.setText(String.format("Comments (%d)",
