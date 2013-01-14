@@ -27,13 +27,13 @@ public class ShoutActivity extends AbstractShoutViewActivity {
 	protected void initialize() {
 		super.initialize();
 		TutorialManager.showHelp(this);
-		setContentView(R.layout.shout_activity);
+		setContentView(R.layout.activity_shout);
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getSupportMenuInflater();
-		inflater.inflate(R.menu.menu, menu);
+		inflater.inflate(R.menu.activity_shout, menu);
 		return true;
 	}
 

@@ -160,7 +160,7 @@ public class MessageActivity extends AbstractShoutActivity {
 	}
 
 	private void initializeViews() {
-		setContentView(R.layout.message_activity);
+		setContentView(R.layout.activity_message);
 
 		frmProgressBar = (FrameLayout) findViewById(R.id.frmProgressBar);
 		// shoutParent = (ShoutView) findViewById(R.id.shoutParent);
@@ -386,6 +386,5 @@ public class MessageActivity extends AbstractShoutActivity {
 		@Override
 		public void onTextChanged(CharSequence s, int start, int before, int count) {
 		}
-
 	}
 }

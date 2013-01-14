@@ -37,7 +37,7 @@ public class TutorialActivity extends SherlockFragmentActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.tutorial);
+		setContentView(R.layout.activity_tutorial);
 
 		mViewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
 		mViewPager = (ViewPager) findViewById(R.id.pager);
@@ -190,7 +190,7 @@ public class TutorialActivity extends SherlockFragmentActivity {
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
 				Bundle savedInstanceState) {
-			mRoot = (ViewGroup) inflater.inflate(R.layout.tutorial_page_fragment, null);
+			mRoot = (ViewGroup) inflater.inflate(R.layout.fragment_tutorial_page, null);
 			initTextView();
 			return mRoot;
 		}

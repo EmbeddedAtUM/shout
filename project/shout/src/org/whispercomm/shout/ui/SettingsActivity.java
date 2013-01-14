@@ -40,7 +40,7 @@ public class SettingsActivity extends SherlockPreferenceActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.settings);
+		setContentView(R.layout.activity_settings);
 		addPreferencesFromResource(R.xml.preferences);
 
 		networkServiceIntent = new Intent(this, NetworkService.class);

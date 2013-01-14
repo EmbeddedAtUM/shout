@@ -42,7 +42,7 @@ public class DetailsActivity extends AbstractShoutViewActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.details);
+		setContentView(R.layout.activity_details);
 
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 	}
@@ -90,9 +90,9 @@ public class DetailsActivity extends AbstractShoutViewActivity {
 			case R.id.menu_comment:
 				onClickComment(shout);
 				break;
-			case R.id.menu_reshout:
-				onClickReshout(shout);
-				break;
+			// case R.id.menu_reshout:
+			// onClickReshout(shout);
+			// break;
 			default:
 				return super.onOptionsItemSelected(item);
 		}
