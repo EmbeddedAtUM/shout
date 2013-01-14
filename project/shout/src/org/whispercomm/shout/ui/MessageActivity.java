@@ -123,6 +123,11 @@ public class MessageActivity extends AbstractShoutActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int id = item.getItemId();
 		switch (id) {
+			case android.R.id.home:
+				Intent intent = new Intent(this, ShoutActivity.class);
+				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				startActivity(intent);
+				break;
 			case R.id.menu_include_location:
 				toggleAttachLocation();
 				break;

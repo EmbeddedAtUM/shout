@@ -2,7 +2,6 @@
 package org.whispercomm.shout.ui;
 
 import org.whispercomm.manes.client.maclib.ManesActivityHelper;
-import org.whispercomm.shout.R;
 import org.whispercomm.shout.expiry.ExpiryManager;
 import org.whispercomm.shout.network.service.BootReceiver;
 import org.whispercomm.shout.network.service.NetworkInterface;
@@ -11,7 +10,6 @@ import org.whispercomm.shout.network.service.NetworkService;
 import org.whispercomm.shout.notification.NotificationSender;
 import org.whispercomm.shout.terms.AgreementListener;
 import org.whispercomm.shout.terms.AgreementManager;
-import org.whispercomm.shout.tutorial.TutorialActivity;
 
 import android.app.NotificationManager;
 import android.content.DialogInterface;
@@ -21,7 +19,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.MenuItem;
 
 /**
  * Base class for Shout {@code Activity Activities} that takes care of:
@@ -105,31 +102,6 @@ public class AbstractShoutActivity extends SherlockFragmentActivity {
 		}
 
 		AgreementManager.getConsent(this, agreementListener);
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		Intent intent;
-		switch (item.getItemId()) {
-			case android.R.id.home:
-				intent = new Intent(this, ShoutActivity.class);
-				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				break;
-			case R.id.settings:
-				intent = new Intent(this, SettingsActivity.class);
-				break;
-			case R.id.compose:
-				intent = new Intent(this, MessageActivity.class);
-				break;
-			case R.id.help:
-				intent = new Intent(this, TutorialActivity.class);
-				break;
-			default:
-				return super.onOptionsItemSelected(item);
-		}
-
-		startActivity(intent);
-		return true;
 	}
 
 	@Override
