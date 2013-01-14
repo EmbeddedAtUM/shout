@@ -19,7 +19,7 @@ public class NotificationSender {
 	private Context context;
 	public static final int SHOUT_RECEIVED_NOTIFICATION_ID = 1;
 
-	private static final int icon = R.drawable.notification_icon;
+	private static final int icon = R.drawable.ic_notification;
 
 	private static final CharSequence contentTitle = "Shout Received";
 

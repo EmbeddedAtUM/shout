@@ -20,6 +20,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 
 public class DetailsActivity extends AbstractShoutViewActivity {
+	@SuppressWarnings("unused")
 	private static final String TAG = DetailsActivity.class.getSimpleName();
 
 	public static final String SHOUT_ID = "shout_id";

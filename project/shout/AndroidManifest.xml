@@ -30,7 +30,7 @@
     <uses-permission android:name="org.whispercomm.shout.ACCESS_SHOUTS" />
 
     <application
-        android:icon="@drawable/icon"
+        android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:logo="@drawable/shoutlogo"
         android:theme="@style/AppTheme" >

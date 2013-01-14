@@ -50,7 +50,7 @@ public class ExpiryManager {
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		builder.setTitle(R.string.expiry_dialog_title);
-		builder.setIcon(R.drawable.icon);
+		builder.setIcon(R.drawable.ic_dialog);
 		builder.setMessage(msg);
 		builder.setNeutralButton(R.string.expiry_dialog_netural, neutral);
 		builder.setOnCancelListener(cancel);

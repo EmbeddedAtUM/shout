@@ -19,6 +19,8 @@ import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.actionbarsherlock.view.MenuItem;
 
 public class SettingsActivity extends SherlockPreferenceActivity {
+
+	@SuppressWarnings("unused")
 	private static final String TAG = SettingsActivity.class.getSimpleName();
 
 	private static final int DIALOG_RUN_IN_BACKGROUND_WARNING_ID = 0;
@@ -120,7 +122,7 @@ public class SettingsActivity extends SherlockPreferenceActivity {
 		if (id == DIALOG_RUN_IN_BACKGROUND_WARNING_ID) {
 			AlertDialog.Builder builder = new AlertDialog.Builder(this)
 					.setTitle(R.string.settings_runinbackground_warning_title)
-					.setIcon(R.drawable.icon)
+					.setIcon(R.drawable.ic_dialog)
 					.setMessage(R.string.settings_runinbackground_warning_message)
 					.setCancelable(false)
 					.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {

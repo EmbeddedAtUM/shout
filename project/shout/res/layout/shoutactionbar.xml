@@ -22,7 +22,7 @@
         android:layout_gravity="center"
         android:contentDescription="@string/commentDescription"
         android:padding="5dip"
-        android:src="@drawable/chat" />
+        android:src="@drawable/ic_message" />
 
     <ImageButton
         android:id="@+id/detailsButton"
@@ -30,6 +30,6 @@
         android:layout_gravity="center"
         android:contentDescription="@string/detailsDescription"
         android:padding="5dip"
-        android:src="@drawable/details" />
+        android:src="@drawable/ic_details" />
 
 </LinearLayout>

@@ -32,7 +32,7 @@ public class DialogFactory {
 	public static AlertDialog buildRegistrationPromptDialog(final Context context,
 			DialogInterface.OnClickListener neutral, DialogInterface.OnCancelListener cancel) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
-		builder.setIcon(R.drawable.icon).setTitle(R.string.register_manes_dialog_title)
+		builder.setIcon(R.drawable.ic_dialog).setTitle(R.string.register_manes_dialog_title)
 				.setMessage(R.string.register_manes_dialog_message)
 				.setCancelable(true)
 				.setNeutralButton(R.string.register_manes_dialog_neutral, neutral)
@@ -43,7 +43,7 @@ public class DialogFactory {
 	public static AlertDialog buildInstallationPromptDialog(final Context context,
 			DialogInterface.OnClickListener neutral, DialogInterface.OnCancelListener cancel) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
-		builder.setIcon(R.drawable.icon).setTitle(R.string.install_manes_dialog_title)
+		builder.setIcon(R.drawable.ic_dialog).setTitle(R.string.install_manes_dialog_title)
 				.setMessage(R.string.install_manes_dialog_message).setCancelable(true)
 				.setNeutralButton(R.string.install_manes_dialog_neutral, neutral)
 				.setOnCancelListener(cancel);
