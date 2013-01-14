@@ -45,7 +45,9 @@ Coding Conventions
 
 - Miscellaneous
 
-* Prefer match_parent over fill_parent. Fill_parent is deprecated.
+  * Prefer match_parent over fill_parent. Fill_parent is deprecated.
+  * If it is OK for a method or variable to be unused (i.e. TAG variables for logging),
+    then add the annotation @SuppressWarnings("unused") to the method/variable.
 
 - Tips
 
