@@ -9,9 +9,6 @@ import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.R;
 import org.whispercomm.shout.provider.ParcelableShout;
 import org.whispercomm.shout.provider.ShoutProviderContract;
-import org.whispercomm.shout.tutorial.TutorialActivity;
-import org.whispercomm.shout.ui.MessageActivity;
-import org.whispercomm.shout.ui.SettingsActivity;
 import org.whispercomm.shout.ui.widget.TimelineAdapter;
 
 import android.database.Cursor;
@@ -82,17 +79,5 @@ public class ShoutListFragment extends Fragment {
 		}
 
 		super.onActivityCreated(savedInstanceState);
-	}
-
-	public void onClickShout(View v) {
-		MessageActivity.shout(getActivity());
-	}
-
-	public void onClickSettings(View v) {
-		SettingsActivity.show(getActivity());
-	}
-
-	public void onClickHelp(View v) {
-		TutorialActivity.show(getActivity());
 	}
 }
