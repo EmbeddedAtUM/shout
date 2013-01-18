@@ -74,31 +74,31 @@ public class TutorialActivity extends SherlockFragmentActivity {
 		public Fragment getItem(int position) {
 			switch (position) {
 				case 0:
-					return TutorialPageFragment.newInstance(R.drawable.image1,
+					return TutorialPageFragment.newInstance(R.drawable.shout,
 							R.string.tutorial_page_1_message);
 				case 1:
-					return TutorialPageFragment.newInstance(R.drawable.image2,
+					return TutorialPageFragment.newInstance(R.drawable.author,
 							R.string.tutorial_page_2_message);
 				case 2:
-					return TutorialPageFragment.newInstance(R.drawable.image3,
+					return TutorialPageFragment.newInstance(R.drawable.send,
 							R.string.tutorial_page_3_message);
 				case 3:
-					return TutorialPageFragment.newInstance(R.drawable.image4,
+					return TutorialPageFragment.newInstance(R.drawable.recieve,
 							R.string.tutorial_page_4_message);
 				case 4:
-					return TutorialPageFragment.newInstance(R.drawable.image5,
+					return TutorialPageFragment.newInstance(R.drawable.details,
 							R.string.tutorial_page_5_message);
 				case 5:
-					return TutorialPageFragment.newInstance(R.drawable.image6,
+					return TutorialPageFragment.newInstance(R.drawable.reshouting,
 							R.string.tutorial_page_6_message);
 				case 6:
-					return TutorialPageFragment.newInstance(R.drawable.image7,
+					return TutorialPageFragment.newInstance(R.drawable.reshouted,
 							R.string.tutorial_page_7_message);
 				case 7:
-					return TutorialPageFragment.newInstance(R.drawable.image8,
+					return TutorialPageFragment.newInstance(R.drawable.distance,
 							R.string.tutorial_page_8_message);
 				case 8:
-					return TutorialPageFragment.newInstance(R.drawable.image9,
+					return TutorialPageFragment.newInstance(R.drawable.shout,
 							R.string.tutorial_page_9_message, true);
 				default:
 					throw new IllegalArgumentException(String.format(
