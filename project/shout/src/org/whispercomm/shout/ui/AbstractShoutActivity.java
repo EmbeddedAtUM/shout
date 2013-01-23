@@ -43,6 +43,10 @@ public class AbstractShoutActivity extends SherlockFragmentActivity {
 
 	protected NetworkInterface network;
 
+	public NetworkInterface getNetwork() {
+		return network;
+	}
+
 	private final DialogInterface.OnClickListener installClickListener = new DialogInterface.OnClickListener() {
 		@Override
 		public void onClick(DialogInterface dialog, int which) {
