@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <org.whispercomm.shout.ui.widget.ShoutView
+            android:id="@+id/shoutview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+        </org.whispercomm.shout.ui.widget.ShoutView>
+
+        <org.whispercomm.shout.ui.widget.ExpandableView
+            android:id="@+id/expandable_location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            app:expanded="true"
+            app:header="Locations" >
+
+            <View
+                android:id="@id/content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true" >
+            </View>
+        </org.whispercomm.shout.ui.widget.ExpandableView>
+
+        <org.whispercomm.shout.ui.widget.ExpandableView
+            android:id="@+id/expandable_comments"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            app:expanded="false"
+            app:header="Comments" >
+
+            <LinearLayout
+                android:id="@id/content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/trigger"
+                android:orientation="vertical" />
+        </org.whispercomm.shout.ui.widget.ExpandableView>
+
+        <org.whispercomm.shout.ui.widget.ExpandableView
+            android:id="@+id/expandable_reshouts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            app:expanded="false"
+            app:header="Reshouts" >
+
+            <LinearLayout
+                android:id="@id/content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/trigger"
+                android:orientation="vertical" />
+        </org.whispercomm.shout.ui.widget.ExpandableView>
+    </LinearLayout>
+
+</ScrollView>

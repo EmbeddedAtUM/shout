@@ -19,6 +19,7 @@
         <item name="@attr/bitmapPreferenceStyle">@style/BitmapPreference</item>
         <item name="@attr/delegatedPreferenceStyle">@style/DelegatedPreference</item>
         <item name="@attr/expandableViewStyle">@style/ExpandableView</item>
+        <item name="@attr/detailsFragmentReshoutItemStyle">@style/DetailsFragmentReshoutItem</item>
         <item name="actionBarStyle">@style/ActionBar</item>
     </style>
 
@@ -128,6 +129,14 @@
         <item name="headerTextAppearance">?android:attr/textAppearanceLarge</item>
         <item name="subheaderTextAppearance">?android:attr/textAppearanceMedium</item>
         <item name="triggerPadding">5dip</item>
+    </style>
+
+    <style name="DetailsFragmentReshoutItem">
+        <item name="avatarSize">36dip</item>
+        <item name="senderTextAppearance">?android:attr/textAppearanceMedium</item>
+        <item name="timestampTextAppearance">?android:attr/textAppearanceSmall</item>
+        <item name="android:paddingTop">2dip</item>
+        <item name="android:paddingBottom">2dip</item>
     </style>
 
 </resources>

@@ -51,4 +51,10 @@
         <attr name="state_expanded" format="boolean" />
     </declare-styleable>
 
+    <declare-styleable name="DetailsFragmentReshoutItem">
+        <attr name="avatarSize" format="dimension" />
+        <attr name="senderTextAppearance" format="reference" />
+        <attr name="timestampTextAppearance" format="reference" />
+    </declare-styleable>
+
 </resources>
