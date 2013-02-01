@@ -17,7 +17,7 @@ import org.joda.time.format.DateTimeFormatter;
  */
 public class FormattedAge {
 	private static final DateTimeFormatter previousYear = DateTimeFormat
-			.forPattern("MMM d',' yyyy 'at' h:m a");
+			.forPattern("MMM d',' yyyy 'at' h:mm a");
 	private static final DateTimeFormatter thisYear = DateTimeFormat
 			.forPattern("MMM d 'at' h:mm a");
 	private static final DateTimeFormatter today = DateTimeFormat.forPattern("'Today at' h:mm a");
