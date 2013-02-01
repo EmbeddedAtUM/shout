@@ -22,7 +22,7 @@
         android:layout_gravity="center"
         android:contentDescription="@string/commentDescription"
         android:padding="5dip"
-        android:src="@drawable/ic_message" />
+        android:src="@drawable/ic_menu_compose_white" />
 
     <ImageButton
         android:id="@+id/detailsButton"
