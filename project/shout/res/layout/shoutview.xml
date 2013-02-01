@@ -8,7 +8,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_marginRight="5dp"
-        android:contentDescription="@string/avatarDesc" />
+        android:contentDescription="@string/avatarDesc"
+        android:scaleType="centerCrop" />
 
     <!--
     The following layout uses nested weights. If someone can figure out a way
