@@ -70,7 +70,7 @@
     <string name="settings_runinbackground_warning_message">You will not receive new shouts while this option is disabled.</string>
     <string name="tutorial_page_1_message">Shout is a location-based social media application on mobile ad hoc networks. Swipe through the following images to view the tutorial</string>
     <string name="tutorial_page_2_message">Author a new shout by clicking the speech bubble icon in the upper right corner</string>
-    <string name="tutorial_page_3_message">Press the message button to send your message</string>
+    <string name="tutorial_page_3_message">Press shout to send your message</string>
     <string name="tutorial_page_4_message">Everybody around you will receive the Shout!</string>
     <string name="tutorial_page_5_message">When viewing the message you can reshout it, comment on it, or view more details</string>
     <string name="tutorial_page_6_message">Reshouting and commenting resends the original message (and your comment) to everyone around you</string>
