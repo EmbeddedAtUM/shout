@@ -22,6 +22,10 @@ public class FormattedAge {
 			.forPattern("MMM d 'at' h:mm a");
 	private static final DateTimeFormatter today = DateTimeFormat.forPattern("'Today at' h:mm a");
 
+	private static final DateTimeFormatter thisYearNoTime = DateTimeFormat.forPattern("MMM d");
+	private static final DateTimeFormatter previousYearNoTime = DateTimeFormat
+			.forPattern("MMM d',' yyyy");
+
 	private static Timer DEFAULT_TIMER;
 
 	public static String format(DateTime dateTime) {
@@ -50,11 +54,15 @@ public class FormattedAge {
 
 	private DateTime mNextChange;
 
+	private boolean mAbsoluteNoTime;
+
 	private FormattedAge(DateTime dateTime) {
+		mAbsoluteNoTime = false;
 		setDateTime(dateTime);
 	}
 
 	public FormattedAge(Timer timer, AgeListener ageListener) {
+		mAbsoluteNoTime = false;
 		mTimer = timer;
 		mAgeListener = ageListener;
 	}
@@ -62,6 +70,16 @@ public class FormattedAge {
 	public synchronized void setDateTime(DateTime dateTime) {
 		mDateTime = dateTime;
 		update();
+	}
+
+	/**
+	 * If {@code true}, the absolute form will not include time. E.g.,
+	 * "Dec 21, 2012" instead of "Dec 21, 2012 at 3:42PM".
+	 * 
+	 * @param notime
+	 */
+	public void setAbsoluteNoTime(boolean noTime) {
+		mAbsoluteNoTime = noTime;
 	}
 
 	/**
@@ -151,7 +169,11 @@ public class FormattedAge {
 		long unitsPassed = 0;
 		switch (unit) {
 			case ABSOLUTE:
-				return getAbsoluteDateTime(mDateTime);
+				if (mAbsoluteNoTime) {
+					return getAbsoluteDate(mDateTime);
+				} else {
+					return getAbsoluteDateTime(mDateTime);
+				}
 			case WEEK:
 				unitsPassed = mAge.getStandardDays() / 7;
 				break;
@@ -181,6 +203,17 @@ public class FormattedAge {
 			return thisYear.print(time);
 		} else {
 			return previousYear.print(time);
+		}
+	}
+
+	private static String getAbsoluteDate(DateTime time) {
+		DateTime now = DateTime.now();
+		if (time.getDayOfYear() == now.getDayOfYear()) {
+			return "Today";
+		} else if (time.getYear() == now.getYear()) {
+			return thisYearNoTime.print(time);
+		} else {
+			return previousYearNoTime.print(time);
 		}
 	}
 

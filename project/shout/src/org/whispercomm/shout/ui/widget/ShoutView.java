@@ -58,6 +58,7 @@ public class ShoutView extends RelativeLayout {
 		initializeViews();
 		mHandler = new Handler();
 		formattedAge = FormattedAge.create(new AgeUpdater());
+		formattedAge.setAbsoluteNoTime(true);
 	}
 
 	public ShoutView(Context context) {
@@ -116,8 +117,9 @@ public class ShoutView extends RelativeLayout {
 		message.setText(shout.getMessage());
 		Linkify.addLinks(message, Linkify.ALL);
 
-		/* If the sent time is after the received time, base the
-		 * duration period on the time received.
+		/*
+		 * If the sent time is after the received time, base the duration period
+		 * on the time received.
 		 */
 		if (shout.getTimestamp().isAfter(shout.getReceivedTime()))
 			formattedAge.setDateTime(shout.getReceivedTime());
