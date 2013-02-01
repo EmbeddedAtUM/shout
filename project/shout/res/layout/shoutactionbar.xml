@@ -30,6 +30,6 @@
         android:layout_gravity="center"
         android:contentDescription="@string/detailsDescription"
         android:padding="5dip"
-        android:src="@drawable/ic_details" />
+        android:src="@drawable/ic_menu_details_white" />
 
 </LinearLayout>
