@@ -14,7 +14,7 @@
         android:layout_gravity="center"
         android:contentDescription="@string/reshoutDescription"
         android:padding="5dip"
-        android:src="@drawable/reshout" />
+        android:src="@drawable/ic_menu_reshout_white" />
 
     <ImageButton
         android:id="@+id/commentButton"
