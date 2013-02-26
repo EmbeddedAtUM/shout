@@ -68,6 +68,8 @@ public class MessageFragment extends SherlockFragment {
 	private FrameLayout frmProgressBar;
 	private RelativeLayout frmTxtParent;
 
+	private boolean isMessageEmpty = true;
+
 	// We don't use a shout to show the original sender while commenting anymore
 	// To change it back un-comment the shoutParent below and remove sender,
 	// message, and avatar.
@@ -117,7 +119,7 @@ public class MessageFragment extends SherlockFragment {
 		menuItemAttachLocation = menu.findItem(R.id.menu_include_location);
 		menuItemSend = menu.findItem(R.id.menu_send);
 
-		if (edtMessage.getText().toString().equals(""))
+		if (isMessageEmpty)
 			menuItemSend.setEnabled(false);
 		initializeAttachLocation();
 	}
@@ -169,6 +171,11 @@ public class MessageFragment extends SherlockFragment {
 		if (intent.getAction() == Intent.ACTION_SEND) {
 			String text = intent.getExtras().getString(Intent.EXTRA_TEXT);
 			edtMessage.setText(text);
+			if (edtMessage.getText().toString().isEmpty())
+				setIsMessageEmpty(true);
+			else
+				setIsMessageEmpty(false);
+
 		}
 
 		if (parent != null) {
@@ -360,13 +367,10 @@ public class MessageFragment extends SherlockFragment {
 
 		@Override
 		public void afterTextChanged(Editable s) {
-			if (!edtMessage.getText().toString().equals("")) {
-				if (menuItemSend != null)
-					menuItemSend.setEnabled(true);
-			} else {
-				if (menuItemSend != null)
-					menuItemSend.setEnabled(false);
-			}
+			if (!edtMessage.getText().toString().equals(""))
+				setIsMessageEmpty(false);
+			else
+				setIsMessageEmpty(true);
 		}
 
 		@Override
@@ -376,5 +380,11 @@ public class MessageFragment extends SherlockFragment {
 		@Override
 		public void onTextChanged(CharSequence s, int start, int before, int count) {
 		}
+	}
+
+	private void setIsMessageEmpty(boolean isEmpty) {
+		isMessageEmpty = isEmpty;
+		if (menuItemSend != null)
+			menuItemSend.setEnabled(!isEmpty);
 	}
 }
