@@ -12,6 +12,9 @@ import org.whispercomm.shout.util.FormattedAge.AgeListener;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.text.util.Linkify;
@@ -198,6 +201,24 @@ public class ShoutView extends RelativeLayout {
 			latitude.setEntryText(String.format("%f\u00b0", location.getLatitude()));
 			detailsTable.addView(longitude);
 			detailsTable.addView(latitude);
+
+			longitude.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					showInMap();
+				}
+			});
+
+			latitude.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					showInMap();
+				}
+			});
+
+			longitude.entry.setTextColor(Color.BLUE);
+			latitude.entry.setTextColor(Color.BLUE);
+
 		}
 
 		// // Add the signature
@@ -212,6 +233,16 @@ public class ShoutView extends RelativeLayout {
 		// hash.setTitleText("Hash");
 		// hash.setEntryText(Encoders.toHexString(shout.getHash()));
 		// detailsTable.addView(hash);
+	}
+
+	private void showInMap() {
+		Location location = shout.getLocation();
+		if (location != null) {
+			Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(String.format(
+					"geo:%f,%f?q=%f,%f", location.getLatitude(), location.getLongitude(),
+					location.getLatitude(), location.getLongitude())));
+			this.getContext().startActivity(intent);
+		}
 	}
 
 	public void hideDetails() {
