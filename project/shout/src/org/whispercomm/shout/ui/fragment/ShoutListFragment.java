@@ -12,7 +12,6 @@ import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.provider.ShoutProviderContract.SortOrder;
 import org.whispercomm.shout.ui.widget.TimelineAdapter;
 
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -21,11 +20,11 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 public class ShoutListFragment extends Fragment {
-	private Cursor cursor;
-
-	private Set<LocalShout> expandedShouts;
 
 	private static final String BUNDLE_KEY = "parceled_shouts";
+
+	private Set<LocalShout> expandedShouts;
+	private TimelineAdapter adapter;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -33,27 +32,27 @@ public class ShoutListFragment extends Fragment {
 		// Inflate the layout for this fragment
 		View view = inflater.inflate(R.layout.fragment_shout_list, container, false);
 
-		this.cursor = ShoutProviderContract
-				.getCursorOverAllShouts(getActivity(), SortOrder.ReceivedTimeDescending);
 		this.expandedShouts = new HashSet<LocalShout>();
+		this.adapter = new TimelineAdapter(getActivity(), null, expandedShouts);
 
 		ListView listView = (ListView) view.findViewById(android.R.id.list);
 		listView.setEmptyView(view.findViewById(android.R.id.empty));
-		listView.setAdapter(new TimelineAdapter(getActivity(), cursor, expandedShouts));
+		listView.setAdapter(this.adapter);
+
+		loadShouts(SortOrder.ReceivedTimeDescending);
 
 		return view;
 	}
 
 	@Override
 	public void onDestroy() {
-		uninitialize();
+		adapter.changeCursor(null); // to close cursor
 		super.onDestroy();
 	}
 
-	private void uninitialize() {
-		if (this.cursor != null) {
-			this.cursor.close();
-		}
+	private void loadShouts(SortOrder order) {
+		this.adapter.changeCursor(ShoutProviderContract
+				.getCursorOverAllShouts(getActivity(), order));
 	}
 
 	@Override
