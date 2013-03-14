@@ -477,6 +477,33 @@ public class ShoutProviderContract {
 	}
 
 	/**
+	 * Enum specified the sorting order for cursors over shouts.
+	 */
+	public static enum SortOrder {
+
+		/**
+		 * Sort by most recently received first.
+		 */
+		ReceivedTimeDescending(Shouts.TIME_RECEIVED + " DESC"),
+		/**
+		 * Sort by most recently sent first.
+		 */
+		SentTimeDescending(
+				Shouts.TIME_SENT + " DESC");
+
+		private String sql;
+
+		private SortOrder(String sql) {
+			this.sql = sql;
+		}
+
+		private String sql() {
+			return this.sql;
+		}
+
+	}
+
+	/**
 	 * Helper class for storing and retrieving both Shout and User objects
 	 * 
 	 * @author David Adrian
