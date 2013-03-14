@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 
 public class NotificationSender {
 	private NotificationManager notificationManager;
@@ -83,8 +84,13 @@ public class NotificationSender {
 			shout = shout.getParent();
 		}
 		Intent intent = new Intent(context, DetailsActivity.class);
-		intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 		intent.putExtra(DetailsActivity.SHOUT_ID, shout.getHash());
-		return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+		/* Build the history */
+		TaskStackBuilder stackBuilder = TaskStackBuilder.from(context);
+		stackBuilder.addParentStack(DetailsActivity.class);
+		stackBuilder.addNextIntent(intent);
+
+		return stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 	}
 }
