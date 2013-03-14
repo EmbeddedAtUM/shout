@@ -38,8 +38,6 @@ public class ShoutContentObserver extends ContentObserver {
 		return result;
 	}
 
-	// TODO We should probably limit what causes a notification. If a message is
-	// reshouted 100 times, they shouldn't get 100 notifications
 	@Override
 	public void onChange(boolean selfChange) {
 		if (!selfChange && !AbstractShoutActivity.isVisible()) {

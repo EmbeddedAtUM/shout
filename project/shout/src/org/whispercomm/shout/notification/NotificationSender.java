@@ -78,6 +78,10 @@ public class NotificationSender {
 	}
 
 	private PendingIntent createIntent(Shout shout) {
+		// The notification for a comment should go to the parent
+		if (shout.getParent() != null) {
+			shout = shout.getParent();
+		}
 		Intent intent = new Intent(context, DetailsActivity.class);
 		intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 		intent.putExtra(DetailsActivity.SHOUT_ID, shout.getHash());
