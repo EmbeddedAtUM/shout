@@ -13,18 +13,31 @@ import org.whispercomm.shout.provider.ShoutProviderContract.SortOrder;
 import org.whispercomm.shout.ui.widget.TimelineAdapter;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-public class ShoutListFragment extends Fragment {
+import com.actionbarsherlock.app.SherlockFragment;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
+
+public class ShoutListFragment extends SherlockFragment {
 
 	private static final String BUNDLE_KEY = "parceled_shouts";
 
+	private static final String SORT_ORDER_KEY = "sort_order";
+
 	private Set<LocalShout> expandedShouts;
 	private TimelineAdapter adapter;
+	private SortOrder sortOrder;
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setHasOptionsMenu(true);
+	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -39,9 +52,17 @@ public class ShoutListFragment extends Fragment {
 		listView.setEmptyView(view.findViewById(android.R.id.empty));
 		listView.setAdapter(this.adapter);
 
-		loadShouts(SortOrder.ReceivedTimeDescending);
-
+		if (savedInstanceState != null && savedInstanceState.containsKey(SORT_ORDER_KEY))
+			setShoutOrder((SortOrder) savedInstanceState.getSerializable(SORT_ORDER_KEY));
+		else
+			setShoutOrder(SortOrder.ReceivedTimeDescending);
 		return view;
+	}
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflator) {
+		super.onCreateOptionsMenu(menu, inflator);
+		inflator.inflate(R.menu.fragment_shoutlist, menu);
 	}
 
 	@Override
@@ -50,9 +71,31 @@ public class ShoutListFragment extends Fragment {
 		super.onDestroy();
 	}
 
-	private void loadShouts(SortOrder order) {
+	/**
+	 * Reloads all the shouts sorted in the given order.
+	 * 
+	 * @param order the order in which to sort the shouts
+	 */
+	private void setShoutOrder(SortOrder sortOrder) {
+		this.sortOrder = sortOrder;
 		this.adapter.changeCursor(ShoutProviderContract
-				.getCursorOverAllShouts(getActivity(), order));
+				.getCursorOverAllShouts(getActivity(), sortOrder));
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		int id = item.getItemId();
+		switch (id) {
+			case R.id.menu_sort_received_time:
+				setShoutOrder(SortOrder.ReceivedTimeDescending);
+				break;
+			case R.id.menu_sort_sent_time:
+				setShoutOrder(SortOrder.SentTimeDescending);
+				break;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
+		return true;
 	}
 
 	@Override
@@ -66,6 +109,8 @@ public class ShoutListFragment extends Fragment {
 			}
 			outState.putParcelableArrayList(BUNDLE_KEY, parceled);
 		}
+
+		outState.putSerializable(SORT_ORDER_KEY, sortOrder);
 	}
 
 	@Override

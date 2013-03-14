@@ -83,5 +83,7 @@
     <string name="toast_untag_location">Location removed from shout</string>
     <string name="menu_reshout">Reshout</string>
     <string name="menu_comment">Comment</string>
+    <string name="menu_sort_received_time">Sort by received time</string>
+    <string name="menu_sort_sent_time">Sort by sent time</string>
 
 </resources>
