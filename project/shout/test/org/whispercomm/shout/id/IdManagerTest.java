@@ -64,8 +64,6 @@ public class IdManagerTest {
 			idManager.resetUser(newUsername);
 			Me second = idManager.getMe();
 			assertThat(first.getUsername(), is(not(second.getUsername())));
-			assertThat(first.getPrivateKey(), is(not(second.getPrivateKey())));
-			assertThat(first.getPublicKey(), is(not(second.getPublicKey())));
 		} catch (UserNotInitiatedException e) {
 			e.printStackTrace();
 			fail(INIT_EXCEPTION_FAIL);
