@@ -366,12 +366,11 @@ public class ShoutProviderContract {
 	 * @param context
 	 * @return
 	 */
-	public static Cursor getCursorOverAllShouts(Context context) {
-		String sortOrder = Shouts.TIME_RECEIVED + " DESC";
+	public static Cursor getCursorOverAllShouts(Context context, SortOrder sort) {
 		Uri uri = Shouts.CONTENT_URI;
 		String selection = Shouts.PARENT + " IS NULL";
 		Cursor result = context.getContentResolver().query(uri, null,
-				selection, null, sortOrder);
+				selection, null, sort.sql());
 		return result;
 	}
 

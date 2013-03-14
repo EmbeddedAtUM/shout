@@ -9,6 +9,7 @@ import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.R;
 import org.whispercomm.shout.provider.ParcelableShout;
 import org.whispercomm.shout.provider.ShoutProviderContract;
+import org.whispercomm.shout.provider.ShoutProviderContract.SortOrder;
 import org.whispercomm.shout.ui.widget.TimelineAdapter;
 
 import android.database.Cursor;
@@ -33,7 +34,7 @@ public class ShoutListFragment extends Fragment {
 		View view = inflater.inflate(R.layout.fragment_shout_list, container, false);
 
 		this.cursor = ShoutProviderContract
-				.getCursorOverAllShouts(getActivity());
+				.getCursorOverAllShouts(getActivity(), SortOrder.ReceivedTimeDescending);
 		this.expandedShouts = new HashSet<LocalShout>();
 
 		ListView listView = (ListView) view.findViewById(android.R.id.list);
