@@ -9,6 +9,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.whispercomm.manes.client.maclib.ManesFrameTooLargeException;
 import org.whispercomm.manes.client.maclib.ManesNotRegisteredException;
 import org.whispercomm.shout.Shout;
+import org.whispercomm.shout.ShoutType;
 import org.whispercomm.shout.network.ObjectProtocol;
 import org.whispercomm.shout.network.ObjectType;
 import org.whispercomm.shout.network.PacketProtocol;
@@ -194,6 +195,7 @@ public class ShoutProtocol implements ObjectProtocol {
 					throw new ShoutChainTooLongException();
 				} else {
 					state = State.Empty;
+					pruneInvalidChain();
 					return root;
 				}
 			} else {
@@ -203,6 +205,43 @@ public class ShoutProtocol implements ObjectProtocol {
 				return processEmpty(shout);
 			}
 		}
+
+		/**
+		 * Removes any invalid shouts from a length-3 chain of shouts.
+		 * <p>
+		 * The only valid length-3 chain is
+		 * <ul>
+		 * <li>reshout -> comment -> shout</li>
+		 * </ul>
+		 * The invalid chains are
+		 * <ul>
+		 * <li>reshout -> reshout -> shout</li>
+		 * <li>comment -> reshout -> shout</li>
+		 * <li>comment -> comment -> shout</li>
+		 * </ul>
+		 * This method prunes the invalid leaf from these chains, leaving a
+		 * valid length-2 chain
+		 * <ul>
+		 * <li>reshout -> shout</li>
+		 * <li>comment -> shout</li>
+		 * </ul>
+		 */
+		private void pruneInvalidChain() {
+			/* A reshout can only be root */
+			if (root.parent.getType().equals(ShoutType.RESHOUT)) {
+				Log.i(TAG, "Dropping invalid reshout of a reshout.");
+				root = root.parent;
+				return;
+			}
+
+			/* A comment cannot be root of a length-3 chain */
+			if (root.getType().equals(ShoutType.COMMENT)) {
+				Log.i(TAG, "Dropping invalid comment on a comment or reshout.");
+				root = root.parent;
+				return;
+			}
+		}
+
 	}
 
 }
