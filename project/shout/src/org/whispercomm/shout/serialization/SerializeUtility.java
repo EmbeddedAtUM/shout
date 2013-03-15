@@ -414,6 +414,12 @@ public class SerializeUtility {
 						"Incorrect length specified. Header said %d. Data was %d.", contentLength,
 						buffer.position() - startPos));
 
+			// Verify Shout is a valid type
+			if (shout.message == null && !HAS_PARENT(flags)) {
+				throw new ShoutPacketException(
+						"Invalid type.  Shout must have a message or reference a parent.");
+			}
+
 			// Compute hash
 			ByteBuffer clone = flipToMark(buffer.asReadOnlyBuffer());
 			shout.hash = HashUtils.sha256(clone);
