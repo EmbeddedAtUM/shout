@@ -7,8 +7,30 @@ import org.whispercomm.shout.ui.widget.ShoutAgreementView;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.text.SpannableString;
+import android.text.method.LinkMovementMethod;
+import android.text.util.Linkify;
+import android.widget.TextView;
 
 public class DialogFactory {
+
+	public static AlertDialog aboutDialog(Context context) {
+
+		TextView message = new TextView(context);
+		SpannableString s = new SpannableString(
+				"For more information check out http://whispercomm.org/shout/");
+		Linkify.addLinks(s, Linkify.WEB_URLS);
+		message.setText(s);
+		message.setTextSize(18);
+		message.setPadding(10, 0, 10, 0);
+		message.setMovementMethod(LinkMovementMethod.getInstance());
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);
+		builder.setView(message)
+				.setTitle("About")
+				.setPositiveButton("Ok", null);
+		return builder.create();
+	}
 
 	public static AlertDialog buildUsernameChangeDialog(Context context,
 			DialogInterface.OnClickListener positive) {

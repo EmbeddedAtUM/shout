@@ -5,6 +5,7 @@ import org.whispercomm.shout.R;
 import org.whispercomm.shout.tutorial.TutorialActivity;
 import org.whispercomm.shout.tutorial.TutorialManager;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 
 import com.actionbarsherlock.view.Menu;
@@ -48,6 +49,10 @@ public class ShoutActivity extends AbstractShoutViewActivity {
 				break;
 			case R.id.help:
 				TutorialActivity.show(this);
+				break;
+			case R.id.about:
+				AlertDialog dialog = DialogFactory.aboutDialog(this);
+				dialog.show();
 				break;
 			default:
 				return super.onOptionsItemSelected(item);
