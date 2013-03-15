@@ -3,10 +3,10 @@ package org.whispercomm.shout.ui;
 
 import org.whispercomm.manes.client.maclib.ManesActivityHelper;
 import org.whispercomm.shout.expiry.ExpiryManager;
-import org.whispercomm.shout.network.service.BootReceiver;
 import org.whispercomm.shout.network.service.NetworkInterface;
 import org.whispercomm.shout.network.service.NetworkInterface.ShoutServiceConnection;
 import org.whispercomm.shout.network.service.NetworkService;
+import org.whispercomm.shout.network.service.RunInBackgroundReceiver;
 import org.whispercomm.shout.notification.NotificationSender;
 import org.whispercomm.shout.terms.AgreementListener;
 import org.whispercomm.shout.terms.AgreementManager;
@@ -169,7 +169,7 @@ public class AbstractShoutActivity extends SherlockFragmentActivity {
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(this);
 		boolean runInBackground = prefs.getBoolean(
-				BootReceiver.START_SERVICE_ON_BOOT, true);
+				RunInBackgroundReceiver.RUN_IN_BACKGROUND, true);
 		if (runInBackground) {
 			Intent intent = new Intent(this, NetworkService.class);
 			this.startService(intent);

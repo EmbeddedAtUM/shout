@@ -11,22 +11,22 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 /**
- * Starts the Shout network service on system boot, if the user has enabled it.
+ * Starts the Shout network service, if the user has enabled it.
  * 
  * @author David R. Bild
  */
-public class BootReceiver extends BroadcastReceiver {
-	private static final String TAG = BootReceiver.class.getSimpleName();
+public class RunInBackgroundReceiver extends BroadcastReceiver {
+	private static final String TAG = RunInBackgroundReceiver.class.getSimpleName();
 
-	public static final String START_SERVICE_ON_BOOT = "runInBackground";
+	public static final String RUN_IN_BACKGROUND = "runInBackground";
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		Log.i(TAG, "BOOT_COMPLETED received.");
+		Log.i(TAG, String.format("%s received.", intent.getAction()));
 
 		SharedPreferences settings = PreferenceManager
 				.getDefaultSharedPreferences(context);
-		boolean startOnBoot = settings.getBoolean(START_SERVICE_ON_BOOT, true);
+		boolean startOnBoot = settings.getBoolean(RUN_IN_BACKGROUND, true);
 
 		boolean hasAgreed = AgreementManager.hasAgreed(context);
 

@@ -78,7 +78,7 @@
             android:exported="false" >
         </service>
 
-        <receiver android:name=".network.service.BootReceiver" >
+        <receiver android:name="org.whispercomm.shout.network.service.RunInBackgroundReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
