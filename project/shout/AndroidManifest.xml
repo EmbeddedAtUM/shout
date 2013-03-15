@@ -82,6 +82,13 @@
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_REPLACED" />
+
+                <data
+                    android:path="org.whispercomm.shout"
+                    android:scheme="package" />
+            </intent-filter>
         </receiver>
 
         <!-- Inherited from Manes Client MacLib -->
