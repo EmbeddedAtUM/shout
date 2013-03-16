@@ -1,7 +1,7 @@
 
 package org.whispercomm.shout.ui.widget;
 
-import org.whispercomm.shout.Avatar;
+import org.whispercomm.shout.ShoutImage;
 import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.Location;
@@ -115,7 +115,7 @@ public class ShoutView extends RelativeLayout {
 		 * space after the username.
 		 */
 		sender.setText(String.format("%s ", shout.getSender().getUsername()));
-		HashReference<Avatar> avatarRef = shout.getSender().getAvatar();
+		HashReference<ShoutImage> avatarRef = shout.getSender().getAvatar();
 		if (avatarRef.isAvailable())
 			avatar.setImageBitmap(avatarRef.get().getBitmap());
 		else

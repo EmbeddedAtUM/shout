@@ -1,7 +1,7 @@
 
 package org.whispercomm.shout.provider;
 
-import org.whispercomm.shout.Avatar;
+import org.whispercomm.shout.ShoutImage;
 import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.LocalUser;
 import org.whispercomm.shout.crypto.ECPublicKey;
@@ -33,7 +33,7 @@ public class LazyLocalUserImpl implements LocalUser {
 	}
 
 	@Override
-	public HashReference<Avatar> getAvatar() {
+	public HashReference<ShoutImage> getAvatar() {
 		return self.getAvatar();
 	}
 
