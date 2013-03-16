@@ -4,12 +4,13 @@ package org.whispercomm.shout.provider;
 import java.io.IOException;
 import java.security.spec.InvalidKeySpecException;
 
-import org.whispercomm.shout.Avatar;
 import org.whispercomm.shout.Hash;
 import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.LocalUser;
+import org.whispercomm.shout.ShoutImage;
 import org.whispercomm.shout.SimpleHashReference;
-import org.whispercomm.shout.content.AvatarStorage;
+import org.whispercomm.shout.content.ContentManager;
+import org.whispercomm.shout.content.ShoutImageStorage;
 import org.whispercomm.shout.crypto.ECPublicKey;
 import org.whispercomm.shout.crypto.KeyGenerator;
 import org.whispercomm.shout.errors.InvalidEncodingException;
@@ -25,7 +26,7 @@ public class LocalUserImpl implements LocalUser {
 
 	private String username;
 	private ECPublicKey publicKey;
-	private HashReference<Avatar> avatar;
+	private HashReference<ShoutImage> avatar;
 
 	public LocalUserImpl(Context context, String username, String encodedKey,
 			String encodedAvatarHash) {
@@ -39,7 +40,8 @@ public class LocalUserImpl implements LocalUser {
 			throw new RuntimeException(e);
 		}
 		try {
-			this.avatar = new SimpleHashReference<Avatar>(new Hash(Base64.decode(encodedAvatarHash,
+			this.avatar = new SimpleHashReference<ShoutImage>(new Hash(Base64.decode(
+					encodedAvatarHash,
 					Base64.DEFAULT)));
 		} catch (InvalidEncodingException e) {
 			// TODO: Figure out what to do about this
@@ -48,13 +50,12 @@ public class LocalUserImpl implements LocalUser {
 	}
 
 	private void updateAvatar(Hash avatarHash) {
-		AvatarStorage storage = (AvatarStorage) context
-				.getSystemService(AvatarStorage.SHOUT_AVATAR_SERVICE);
+		ShoutImageStorage storage = new ShoutImageStorage(new ContentManager(context));
 		try {
 			avatar = storage.retrieve(avatarHash);
 		} catch (IOException e) {
 			Log.w(TAG, "Unable to retrieve avatar.  Treating as missing.", e);
-			avatar = new SimpleHashReference<Avatar>(avatarHash);
+			avatar = new SimpleHashReference<ShoutImage>(avatarHash);
 		}
 	}
 
@@ -69,7 +70,7 @@ public class LocalUserImpl implements LocalUser {
 	}
 
 	@Override
-	public HashReference<Avatar> getAvatar() {
+	public HashReference<ShoutImage> getAvatar() {
 		if (!avatar.isAvailable()) {
 			updateAvatar(avatar.getHash());
 		}

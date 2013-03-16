@@ -1,12 +1,12 @@
 
 package org.whispercomm.shout.ui.fragment;
 
-import org.whispercomm.shout.Avatar;
 import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.Location;
 import org.whispercomm.shout.R;
 import org.whispercomm.shout.Shout;
+import org.whispercomm.shout.ShoutImage;
 import org.whispercomm.shout.ShoutType;
 import org.whispercomm.shout.provider.CursorLoader;
 import org.whispercomm.shout.provider.ShoutCursorAdapter;
@@ -447,7 +447,7 @@ public class DetailsFragment extends SherlockFragment implements
 
 		public void bindShout(LocalShout shout) {
 
-			HashReference<Avatar> avatarRef = shout.getSender().getAvatar();
+			HashReference<ShoutImage> avatarRef = shout.getSender().getAvatar();
 			if (avatarRef.isAvailable())
 				mAvatar.setImageBitmap(avatarRef.get().getBitmap());
 			else
@@ -578,7 +578,7 @@ public class DetailsFragment extends SherlockFragment implements
 			String message = shout.getMessage();
 			String sender = shout.getSender().getUsername();
 			String timestamp = FormattedAge.formatAbsolute(shout.getTimestamp());
-			HashReference<Avatar> avatarRef = shout.getSender().getAvatar();
+			HashReference<ShoutImage> avatarRef = shout.getSender().getAvatar();
 
 			mMessage.setText(message);
 			mSender.setText(sender);
@@ -697,7 +697,7 @@ public class DetailsFragment extends SherlockFragment implements
 		public ReshoutItem bindShout(LocalShout shout) {
 			String sender = shout.getSender().getUsername();
 			String timestamp = FormattedAge.formatAbsolute(shout.getTimestamp());
-			HashReference<Avatar> avatarRef = shout.getSender().getAvatar();
+			HashReference<ShoutImage> avatarRef = shout.getSender().getAvatar();
 
 			mSender.setText(sender);
 			mTimestamp.setText(timestamp);

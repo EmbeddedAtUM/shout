@@ -19,7 +19,7 @@ import java.nio.charset.CharacterCodingException;
 
 import org.joda.time.DateTime;
 import org.spongycastle.math.ec.ECPoint;
-import org.whispercomm.shout.Avatar;
+import org.whispercomm.shout.ShoutImage;
 import org.whispercomm.shout.Hash;
 import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.Location;
@@ -358,7 +358,7 @@ public class SerializeUtility {
 			user.publicKey = getPublicKey(buffer);
 
 			// Avatar hash
-			user.avatar = new SimpleHashReference<Avatar>(new Hash(getArray(buffer,
+			user.avatar = new SimpleHashReference<ShoutImage>(new Hash(getArray(buffer,
 					AVATAR_HASH_SIZE)));
 
 			// Username
@@ -516,7 +516,7 @@ public class SerializeUtility {
 
 		String username;
 		ECPublicKey publicKey;
-		HashReference<Avatar> avatar;
+		HashReference<ShoutImage> avatar;
 
 		@Override
 		public String getUsername() {
@@ -529,7 +529,7 @@ public class SerializeUtility {
 		}
 
 		@Override
-		public HashReference<Avatar> getAvatar() {
+		public HashReference<ShoutImage> getAvatar() {
 			return avatar;
 		}
 

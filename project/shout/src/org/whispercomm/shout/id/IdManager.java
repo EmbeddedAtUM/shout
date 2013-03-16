@@ -3,11 +3,12 @@ package org.whispercomm.shout.id;
 
 import java.io.IOException;
 
-import org.whispercomm.shout.Avatar;
 import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.Me;
+import org.whispercomm.shout.ShoutImage;
 import org.whispercomm.shout.SimpleHashReference;
-import org.whispercomm.shout.content.AvatarStorage;
+import org.whispercomm.shout.content.ContentManager;
+import org.whispercomm.shout.content.ShoutImageStorage;
 import org.whispercomm.shout.crypto.ECKeyPair;
 import org.whispercomm.shout.crypto.KeyGenerator;
 import org.whispercomm.shout.util.Validators;
@@ -21,14 +22,13 @@ public class IdManager {
 
 	private KeyGenerator keyGenerator;
 
-	private AvatarStorage avatarStorage;
+	private ShoutImageStorage avatarStorage;
 
 	public IdManager(Context context) {
-		this(new KeyStorageSharedPrefs(context), (AvatarStorage) context.getApplicationContext()
-				.getSystemService(AvatarStorage.SHOUT_AVATAR_SERVICE));
+		this(new KeyStorageSharedPrefs(context), new ShoutImageStorage(new ContentManager(context)));
 	}
 
-	public IdManager(KeyStorage keyStorage, AvatarStorage avatarStorage) {
+	public IdManager(KeyStorage keyStorage, ShoutImageStorage avatarStorage) {
 		this.keyStorage = keyStorage;
 		this.avatarStorage = avatarStorage;
 		this.keyGenerator = new KeyGenerator();
@@ -55,15 +55,15 @@ public class IdManager {
 		return;
 	}
 
-	public void setAvatar(Avatar avatar) throws IOException {
-		HashReference<Avatar> ref = avatarStorage.store(avatar);
+	public void setAvatar(ShoutImage avatar) throws IOException {
+		HashReference<ShoutImage> ref = avatarStorage.store(avatar);
 		keyStorage.writeAvatarHash(ref.getHash());
 	}
 
 	public Me getMe() throws UserNotInitiatedException {
 		String username = keyStorage.readUsername();
 		ECKeyPair keyPair = keyStorage.readKeyPair();
-		HashReference<Avatar> avatarRef = new SimpleHashReference<Avatar>(
+		HashReference<ShoutImage> avatarRef = new SimpleHashReference<ShoutImage>(
 				keyStorage.readAvatarHash());
 		return new MeImpl(username, keyPair, avatarRef);
 	}

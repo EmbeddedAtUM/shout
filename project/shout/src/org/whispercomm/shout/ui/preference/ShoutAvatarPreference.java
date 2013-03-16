@@ -3,7 +3,7 @@ package org.whispercomm.shout.ui.preference;
 
 import java.io.IOException;
 
-import org.whispercomm.shout.Avatar;
+import org.whispercomm.shout.ShoutImage;
 import org.whispercomm.shout.id.IdManager;
 
 import android.content.Context;
@@ -40,7 +40,7 @@ public class ShoutAvatarPreference extends BitmapPreference {
 		// TODO Make this be the actual preference, not a listener
 		@Override
 		public boolean onPreferenceChange(Preference preference, Object newValue) {
-			Avatar avatar = new Avatar((Bitmap) newValue);
+			ShoutImage avatar = new ShoutImage((Bitmap) newValue);
 			try {
 				idManager.setAvatar(avatar);
 			} catch (IOException e) {

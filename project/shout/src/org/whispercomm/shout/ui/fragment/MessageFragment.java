@@ -5,7 +5,7 @@ import java.io.IOException;
 
 import org.whispercomm.manes.client.maclib.ManesNotInstalledException;
 import org.whispercomm.manes.client.maclib.ManesNotRegisteredException;
-import org.whispercomm.shout.Avatar;
+import org.whispercomm.shout.ShoutImage;
 import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.Location;
@@ -182,7 +182,7 @@ public class MessageFragment extends SherlockFragment {
 			// shoutParent.bindShout(parent);
 			LocalShout shout = (LocalShout) parent;
 			message.setText(shout.getMessage());
-			HashReference<Avatar> avatarRef = shout.getSender().getAvatar();
+			HashReference<ShoutImage> avatarRef = shout.getSender().getAvatar();
 			if (avatarRef.isAvailable())
 				avatar.setImageBitmap(avatarRef.get().getBitmap());
 			else

@@ -34,6 +34,6 @@ public interface User {
 	 * 
 	 * @return the avatar
 	 */
-	public HashReference<Avatar> getAvatar();
+	public HashReference<ShoutImage> getAvatar();
 
 }
