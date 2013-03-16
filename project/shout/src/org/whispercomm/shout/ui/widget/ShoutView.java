@@ -1,15 +1,16 @@
 
 package org.whispercomm.shout.ui.widget;
 
-import org.whispercomm.shout.ShoutImage;
 import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.Location;
 import org.whispercomm.shout.R;
+import org.whispercomm.shout.ShoutImage;
 import org.whispercomm.shout.ShoutType;
 import org.whispercomm.shout.text.ShoutLinkify;
 import org.whispercomm.shout.util.FormattedAge;
 import org.whispercomm.shout.util.FormattedAge.AgeListener;
+import org.whispercomm.shout.util.ShoutUriUtils;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -124,6 +125,7 @@ public class ShoutView extends RelativeLayout {
 		message.setText(shout.getMessage());
 		ShoutLinkify.addLinks(message);
 		Linkify.addLinks(message, Linkify.ALL);
+		ShoutUriUtils.addLinks(message);
 
 		/*
 		 * If the sent time is after the received time, base the duration period
