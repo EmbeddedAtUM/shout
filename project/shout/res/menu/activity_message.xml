@@ -2,6 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
+        android:id="@+id/menu_include_image_camera"
+        android:icon="@drawable/ic_menu_camera_white"
+        android:showAsAction="always|withText"
+        android:title="@string/menu_include_image_camera"/>
+    <item
         android:id="@+id/menu_include_location"
         android:icon="@android:drawable/checkbox_off_background"
         android:showAsAction="always|withText"

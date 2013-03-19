@@ -1,16 +1,17 @@
 
 package org.whispercomm.shout.ui.fragment;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.whispercomm.manes.client.maclib.ManesNotInstalledException;
 import org.whispercomm.manes.client.maclib.ManesNotRegisteredException;
-import org.whispercomm.shout.ShoutImage;
 import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.Location;
 import org.whispercomm.shout.Me;
 import org.whispercomm.shout.R;
+import org.whispercomm.shout.ShoutImage;
 import org.whispercomm.shout.SimpleLocation;
 import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.id.UserNotInitiatedException;
@@ -29,10 +30,16 @@ import org.whispercomm.shout.ui.AbstractShoutActivity;
 import org.whispercomm.shout.ui.SettingsActivity;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
@@ -59,6 +66,11 @@ public class MessageFragment extends SherlockFragment {
 
 	public static final String PARENT_ID = "parent";
 
+	/**
+	 * Request code used when starting camera activity for result
+	 */
+	private static final int CAMERA_REQUEST = 1;
+
 	private LocationProvider mLocation;
 	private boolean isLocationAttached;
 
@@ -69,6 +81,11 @@ public class MessageFragment extends SherlockFragment {
 	private RelativeLayout frmTxtParent;
 
 	private boolean isMessageEmpty = true;
+
+	/**
+	 * Uri at which the full-size capture from the camera is stored.
+	 */
+	private Uri imageUri;
 
 	// We don't use a shout to show the original sender while commenting anymore
 	// To change it back un-comment the shoutParent below and remove sender,
@@ -128,6 +145,9 @@ public class MessageFragment extends SherlockFragment {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int id = item.getItemId();
 		switch (id) {
+			case R.id.menu_include_image_camera:
+				requestCamera();
+				break;
 			case R.id.menu_include_location:
 				toggleAttachLocation();
 				break;
@@ -150,6 +170,19 @@ public class MessageFragment extends SherlockFragment {
 	public void onStop() {
 		mLocation.stop();
 		super.onStop();
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+			case CAMERA_REQUEST:
+				if (resultCode == Activity.RESULT_OK)
+					onCameraResult(data);
+				break;
+			default:
+				Log.i(TAG,
+						String.format("Ignoring unexpected activity request code: %d", requestCode));
+		}
 	}
 
 	private void initializeViews(View v) {
@@ -190,6 +223,40 @@ public class MessageFragment extends SherlockFragment {
 			sender.setText(shout.getSender().getUsername());
 			frmTxtParent.setVisibility(RelativeLayout.VISIBLE);
 		}
+	}
+
+	private void requestCamera() {
+		try {
+			File pictureDir = Environment
+					.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+			File photo = File.createTempFile("camera", "jpg", pictureDir);
+
+			Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+			imageUri = Uri.fromFile(photo);
+			cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+
+			startActivityForResult(cameraIntent, CAMERA_REQUEST);
+		} catch (IOException e) {
+			Log.w(TAG, "Error creating file for camera image", e);
+			Toast.makeText(activity, "Unable to get image from camera.", Toast.LENGTH_LONG).show();
+		} catch (ActivityNotFoundException e) {
+			Toast.makeText(activity, "Camera not found.", Toast.LENGTH_LONG).show();
+		}
+	}
+
+	private void onCameraResult(Intent data) {
+		BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+		bmOptions.inJustDecodeBounds = true;
+		BitmapFactory.decodeFile(imageUri.getPath(), bmOptions);
+		int photoW = bmOptions.outWidth;
+		int photoH = bmOptions.outHeight;
+
+		Toast.makeText(activity, String.format("Image Received: %dx%d", photoW, photoH),
+				Toast.LENGTH_LONG).show();
+	}
+
+	private void attachImage(Bitmap image) {
+
 	}
 
 	private void toggleAttachLocation() {
