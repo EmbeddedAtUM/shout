@@ -75,6 +75,12 @@ public class ShoutProvider extends ContentProvider {
 	private static final String ENABLE_FK = "PRAGMA foreign_keys = ON";
 
 	@Override
+	public boolean onCreate() {
+		mOpenHelper = new ShoutDatabaseHelper(this.getContext());
+		return true;
+	}
+
+	@Override
 	public String getType(Uri uri) {
 		int match = sUriMatcher.match(uri);
 		switch (match) {
@@ -93,95 +99,6 @@ public class ShoutProvider extends ContentProvider {
 			default:
 				throw new IllegalArgumentException("Unknown or invalid URI " + uri);
 		}
-	}
-
-	private void notifyChange(Uri uri) {
-		List<Uri> uris = new ArrayList<Uri>();
-
-		uris.add(uri);
-
-		// Add other URIs that also match
-		int match = sUriMatcher.match(uri);
-		switch (match) {
-			case SHOUT_ID:
-				uris.add(ShoutProviderContract.Shouts.CONTENT_URI);
-			case ALL_SHOUTS:
-				uris.add(ShoutProviderContract.Shouts.ORIGINAL_CONTENT_URI);
-				uris.add(ShoutProviderContract.Shouts.COMMENT_CONTENT_URI);
-				uris.add(ShoutProviderContract.Shouts.RESHOUT_CONTENT_URI);
-				break;
-			case ORIGINAL_SHOUTS:
-			case COMMENT_SHOUTS:
-			case RESHOUT_SHOUTS:
-				uris.add(ShoutProviderContract.Shouts.CONTENT_URI);
-		}
-
-		for (Uri u : uris) {
-			this.getContext().getContentResolver()
-					.notifyChange(u, null);
-		}
-	}
-
-	@Override
-	public int delete(Uri uri, String selection, String[] selectionArgs) {
-		/*
-		 * This delete implementation is incomplete. The ALL_SHOUTS URI includes
-		 * author information, the following queries do not join against the
-		 * Users table.
-		 */
-		mDB = mOpenHelper.getWritableDatabase();
-		mDB.execSQL(ENABLE_FK);
-		int match = sUriMatcher.match(uri);
-		String id, table, whereClause = null;
-		String[] whereArgs = null;
-		switch (match) {
-			case ALL_SHOUTS:
-				table = ShoutDatabaseHelper.SHOUTS_TABLE;
-				whereClause = selection;
-				whereArgs = selectionArgs;
-				break;
-			case ORIGINAL_SHOUTS:
-			case COMMENT_SHOUTS:
-			case RESHOUT_SHOUTS:
-				/* Use an INSTEAD OF trigger on the views to allow deletion */
-				Log.w(TAG, "Ignoring attempt to delete record via view URI " + uri);
-				throw new IllegalArgumentException("Cannot delete via view URI" +
-						uri);
-			case SHOUT_ID:
-				table = ShoutDatabaseHelper.SHOUTS_TABLE;
-				id = uri.getLastPathSegment();
-				if (TextUtils.isEmpty(selection)) {
-					whereClause = ShoutProviderContract.Shouts._ID + "=" + id;
-					whereArgs = null;
-				} else {
-					whereClause = selection + " and "
-							+ ShoutProviderContract.Shouts._ID + "=" + id;
-					whereArgs = selectionArgs;
-				}
-				break;
-			case USERS:
-				table = ShoutDatabaseHelper.USERS_TABLE;
-				whereClause = selection;
-				whereArgs = selectionArgs;
-				break;
-			case USER_ID:
-				table = ShoutDatabaseHelper.USERS_TABLE;
-				id = uri.getLastPathSegment();
-				if (TextUtils.isEmpty(selection)) {
-					whereClause = ShoutProviderContract.Users._ID + "=" + id;
-					whereArgs = null;
-				} else {
-					whereClause = selection + " and "
-							+ ShoutProviderContract.Users._ID + "=" + id;
-					whereArgs = selectionArgs;
-				}
-				break;
-			default:
-				throw new IllegalArgumentException("Invalid or unknown URI " + uri);
-		}
-		int rowsAffected = mDB.delete(table, whereClause, whereArgs);
-		notifyChange(uri);
-		return rowsAffected;
 	}
 
 	@Override
@@ -290,12 +207,6 @@ public class ShoutProvider extends ContentProvider {
 			notifyChange(insertLocation);
 		}
 		return insertLocation;
-	}
-
-	@Override
-	public boolean onCreate() {
-		mOpenHelper = new ShoutDatabaseHelper(this.getContext());
-		return true;
 	}
 
 	@Override
@@ -454,6 +365,95 @@ public class ShoutProvider extends ContentProvider {
 		int rowsAffected = mDB.update(table, values, whereClause, whereArgs);
 		notifyChange(uri);
 		return rowsAffected;
+	}
+
+	@Override
+	public int delete(Uri uri, String selection, String[] selectionArgs) {
+		/*
+		 * This delete implementation is incomplete. The ALL_SHOUTS URI includes
+		 * author information, the following queries do not join against the
+		 * Users table.
+		 */
+		mDB = mOpenHelper.getWritableDatabase();
+		mDB.execSQL(ENABLE_FK);
+		int match = sUriMatcher.match(uri);
+		String id, table, whereClause = null;
+		String[] whereArgs = null;
+		switch (match) {
+			case ALL_SHOUTS:
+				table = ShoutDatabaseHelper.SHOUTS_TABLE;
+				whereClause = selection;
+				whereArgs = selectionArgs;
+				break;
+			case ORIGINAL_SHOUTS:
+			case COMMENT_SHOUTS:
+			case RESHOUT_SHOUTS:
+				/* Use an INSTEAD OF trigger on the views to allow deletion */
+				Log.w(TAG, "Ignoring attempt to delete record via view URI " + uri);
+				throw new IllegalArgumentException("Cannot delete via view URI" +
+						uri);
+			case SHOUT_ID:
+				table = ShoutDatabaseHelper.SHOUTS_TABLE;
+				id = uri.getLastPathSegment();
+				if (TextUtils.isEmpty(selection)) {
+					whereClause = ShoutProviderContract.Shouts._ID + "=" + id;
+					whereArgs = null;
+				} else {
+					whereClause = selection + " and "
+							+ ShoutProviderContract.Shouts._ID + "=" + id;
+					whereArgs = selectionArgs;
+				}
+				break;
+			case USERS:
+				table = ShoutDatabaseHelper.USERS_TABLE;
+				whereClause = selection;
+				whereArgs = selectionArgs;
+				break;
+			case USER_ID:
+				table = ShoutDatabaseHelper.USERS_TABLE;
+				id = uri.getLastPathSegment();
+				if (TextUtils.isEmpty(selection)) {
+					whereClause = ShoutProviderContract.Users._ID + "=" + id;
+					whereArgs = null;
+				} else {
+					whereClause = selection + " and "
+							+ ShoutProviderContract.Users._ID + "=" + id;
+					whereArgs = selectionArgs;
+				}
+				break;
+			default:
+				throw new IllegalArgumentException("Invalid or unknown URI " + uri);
+		}
+		int rowsAffected = mDB.delete(table, whereClause, whereArgs);
+		notifyChange(uri);
+		return rowsAffected;
+	}
+
+	private void notifyChange(Uri uri) {
+		List<Uri> uris = new ArrayList<Uri>();
+
+		uris.add(uri);
+
+		// Add other URIs that also match
+		int match = sUriMatcher.match(uri);
+		switch (match) {
+			case SHOUT_ID:
+				uris.add(ShoutProviderContract.Shouts.CONTENT_URI);
+			case ALL_SHOUTS:
+				uris.add(ShoutProviderContract.Shouts.ORIGINAL_CONTENT_URI);
+				uris.add(ShoutProviderContract.Shouts.COMMENT_CONTENT_URI);
+				uris.add(ShoutProviderContract.Shouts.RESHOUT_CONTENT_URI);
+				break;
+			case ORIGINAL_SHOUTS:
+			case COMMENT_SHOUTS:
+			case RESHOUT_SHOUTS:
+				uris.add(ShoutProviderContract.Shouts.CONTENT_URI);
+		}
+
+		for (Uri u : uris) {
+			this.getContext().getContentResolver()
+					.notifyChange(u, null);
+		}
 	}
 
 	protected static final class ShoutDatabaseHelper extends SQLiteOpenHelper {
