@@ -7,12 +7,17 @@ import java.util.Set;
 
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.R;
+import org.whispercomm.shout.provider.CursorLoader;
+import org.whispercomm.shout.provider.CursorLoader.CursorLoaderCallbacks;
 import org.whispercomm.shout.provider.ParcelableShout;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.provider.ShoutProviderContract.SortOrder;
 import org.whispercomm.shout.ui.widget.TimelineAdapter;
 
+import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +28,8 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
-public class ShoutListFragment extends SherlockFragment {
+public class ShoutListFragment extends SherlockFragment implements
+		LoaderManager.LoaderCallbacks<Cursor>, CursorLoaderCallbacks {
 
 	private static final String BUNDLE_KEY = "parceled_shouts";
 
@@ -42,20 +48,23 @@ public class ShoutListFragment extends SherlockFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		// Inflate the layout for this fragment
-		View view = inflater.inflate(R.layout.fragment_shout_list, container, false);
 
 		this.expandedShouts = new HashSet<LocalShout>();
+
+		getLoaderManager().initLoader(0, null, this);
 		this.adapter = new TimelineAdapter(getActivity(), null, expandedShouts);
+
+		// Inflate the layout for this fragment
+		View view = inflater.inflate(R.layout.fragment_shout_list, container, false);
 
 		ListView listView = (ListView) view.findViewById(android.R.id.list);
 		listView.setEmptyView(view.findViewById(android.R.id.empty));
 		listView.setAdapter(this.adapter);
 
 		if (savedInstanceState != null && savedInstanceState.containsKey(SORT_ORDER_KEY))
-			setShoutOrder((SortOrder) savedInstanceState.getSerializable(SORT_ORDER_KEY));
+			this.sortOrder = (SortOrder) savedInstanceState.getSerializable(SORT_ORDER_KEY);
 		else
-			setShoutOrder(SortOrder.ReceivedTimeDescending);
+			this.sortOrder = SortOrder.ReceivedTimeDescending;
 		return view;
 	}
 
@@ -67,7 +76,7 @@ public class ShoutListFragment extends SherlockFragment {
 
 	@Override
 	public void onDestroy() {
-		adapter.changeCursor(null); // to close cursor
+		getLoaderManager().destroyLoader(0);
 		super.onDestroy();
 	}
 
@@ -78,8 +87,7 @@ public class ShoutListFragment extends SherlockFragment {
 	 */
 	private void setShoutOrder(SortOrder sortOrder) {
 		this.sortOrder = sortOrder;
-		this.adapter.changeCursor(ShoutProviderContract
-				.getCursorOverAllShouts(getActivity(), sortOrder));
+		getLoaderManager().restartLoader(0, null, this);
 	}
 
 	@Override
@@ -124,5 +132,26 @@ public class ShoutListFragment extends SherlockFragment {
 		}
 
 		super.onActivityCreated(savedInstanceState);
+	}
+
+	@Override
+	public Loader<Cursor> onCreateLoader(int id, Bundle arg1) {
+		return new CursorLoader(getActivity(), this);
+	}
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+		adapter.swapCursor(data);
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> arg0) {
+		adapter.swapCursor(null);
+	}
+
+	@Override
+	public Cursor loadCursor() {
+		return ShoutProviderContract
+				.getCursorOverAllShouts(getActivity(), sortOrder);
 	}
 }

@@ -8,16 +8,16 @@ import org.whispercomm.shout.provider.ShoutProviderContract;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.support.v4.widget.CursorAdapter;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CursorAdapter;
 
 public class TimelineAdapter extends CursorAdapter {
 
 	private Set<LocalShout> expandedShouts;
 
 	public TimelineAdapter(Context context, Cursor c, Set<LocalShout> expandedShouts) {
-		super(context, c);
+		super(context, c, 0);
 		this.expandedShouts = expandedShouts;
 	}
 
