@@ -358,7 +358,7 @@ public class ShoutProvider extends ContentProvider {
 		private static final String TAG = ShoutDatabaseHelper.class
 				.getSimpleName();
 
-		public static final int VERSION = 1;
+		public static final int VERSION = 2;
 		public static final String DBNAME = "shout_base";
 
 		private static final String SQL_CREATE_USER = "CREATE TABLE "
@@ -396,6 +396,11 @@ public class ShoutProvider extends ContentProvider {
 				+ "FOREIGN KEY(" + ShoutProviderContract.Shouts.PARENT
 				+ ") REFERENCES " + ShoutProviderContract.Shouts.TABLE_NAME +
 				"(" + ShoutProviderContract.Shouts.HASH + ")" + ");";
+
+		private static final String SQL_CREATE_INDEX_SHOUT_PARENT = "CREATE INDEX idx_shout_parent ON "
+				+ ShoutProviderContract.Shouts.TABLE_NAME
+				+ " ("
+				+ ShoutProviderContract.Shouts.PARENT + ");";
 
 		private static final String SQL_CREATE_VIRTUAL_MESSAGE = "CREATE VIRTUAL TABLE "
 				+ ShoutSearchContract.Messages.TABLE_NAME
@@ -437,6 +442,29 @@ public class ShoutProvider extends ContentProvider {
 				+ " ) VALUES ( new." + ShoutProviderContract.Shouts._ID + ", new."
 				+ ShoutProviderContract.Shouts.MESSAGE + " );\nEND;";
 
+		private static final String SQL_CREATE_VIEW_ROOT = "CREATE VIEW "
+				+ ShoutProviderContract.Shouts.ROOT_VIEW + " AS SELECT * FROM "
+				+ ShoutProviderContract.Shouts.TABLE_NAME
+				+ " WHERE " + ShoutProviderContract.Shouts.PARENT + " IS NULL AND "
+				+ ShoutProviderContract.Shouts.MESSAGE + " IS NOT NULL;";
+
+		private static final String SQL_CREATE_VIEW_COMMENT = "CREATE VIEW "
+				+ ShoutProviderContract.Shouts.COMMENT_VIEW
+				+ " AS SELECT comment.* FROM "
+				+ ShoutProviderContract.Shouts.ROOT_VIEW
+				+ " AS root INNER JOIN " + ShoutProviderContract.Shouts.TABLE_NAME
+				+ " AS comment ON (comment.Parent=root." + ShoutProviderContract.Shouts.HASH
+				+ " AND comment." + ShoutProviderContract.Shouts.MESSAGE + " IS NOT NULL);";
+
+		private static final String SQL_CREATE_VIEW_RESHOUT = "CREATE VIEW "
+				+ ShoutProviderContract.Shouts.RESHOUT_VIEW
+				+ " AS SELECT reshout.* FROM "
+				+ ShoutProviderContract.Shouts.TABLE_NAME
+				+ " AS parent INNER JOIN " + ShoutProviderContract.Shouts.TABLE_NAME
+				+ " AS reshout ON (reshout." + ShoutProviderContract.Shouts.PARENT + "=parent."
+				+ ShoutProviderContract.Shouts.HASH + " AND reshout."
+				+ ShoutProviderContract.Shouts.MESSAGE + " IS NULL);";
+
 		private static final String[] USER_UNIQUE_COLS = {
 				ShoutProviderContract.Users.PUB_KEY,
 				ShoutProviderContract.Users.USERNAME,
@@ -455,10 +483,14 @@ public class ShoutProvider extends ContentProvider {
 		public void onCreate(SQLiteDatabase db) {
 			db.execSQL(SQL_CREATE_USER);
 			db.execSQL(SQL_CREATE_SHOUT);
+			db.execSQL(SQL_CREATE_INDEX_SHOUT_PARENT);
 			db.execSQL(SQL_CREATE_VIRTUAL_MESSAGE);
 			db.execSQL(SQL_CREATE_TRIGGER_COMMENT);
 			db.execSQL(SQL_CREATE_TRIGGER_RESHOUT);
 			db.execSQL(SQL_CREATE_TRIGGER_MESSAGE);
+			db.execSQL(SQL_CREATE_VIEW_ROOT);
+			db.execSQL(SQL_CREATE_VIEW_COMMENT);
+			db.execSQL(SQL_CREATE_VIEW_RESHOUT);
 		}
 
 		@Override
@@ -469,10 +501,20 @@ public class ShoutProvider extends ContentProvider {
 
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-			Log.e(TAG, String.format(
-					"Unsupported call to onUpgrade. Old Version: %d. New Version: %d.",
-					oldVersion, newVersion));
-			throw new IllegalStateException();
+			switch (oldVersion) {
+				case 1:
+					// Upgrade to version 2
+					db.execSQL(SQL_CREATE_INDEX_SHOUT_PARENT);
+					db.execSQL(SQL_CREATE_VIEW_ROOT);
+					db.execSQL(SQL_CREATE_VIEW_COMMENT);
+					db.execSQL(SQL_CREATE_VIEW_RESHOUT);
+					break;
+				default:
+					Log.e(TAG, String.format(
+							"Unsupported call to onUpgrade. Old Version: %d. New Version: %d.",
+							oldVersion, newVersion));
+					throw new IllegalStateException();
+			}
 		}
 
 	}

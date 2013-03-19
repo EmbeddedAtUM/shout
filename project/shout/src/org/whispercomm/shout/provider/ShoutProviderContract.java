@@ -59,6 +59,21 @@ public class ShoutProviderContract {
 		public static final String TABLE_NAME = "shout";
 
 		/**
+		 * View of {@link #TABLE_NAME} selecting only root shouts.
+		 */
+		public static final String ROOT_VIEW = "root";
+
+		/**
+		 * View of {@link #TABLE_NAME} selecting only comments.
+		 */
+		public static final String COMMENT_VIEW = "comment";
+
+		/**
+		 * View of {@link #TABLE_NAME} selecting only reshouts.
+		 */
+		public static final String RESHOUT_VIEW = "reshout";
+
+		/**
 		 * Base content URI for the table of Shouts
 		 */
 		public static final Uri CONTENT_URI = Uri.withAppendedPath(
