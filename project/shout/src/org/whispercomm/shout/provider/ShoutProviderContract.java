@@ -46,61 +46,39 @@ public class ShoutProviderContract {
 	static final Uri CONTENT_URI_BASE = Uri.parse("content://" + AUTHORITY);
 
 	/**
-	 * Helper class for managing static variables associated with the Shout
-	 * database table
+	 * Helper class for managing static variables associated with the shout
+	 * content URI.
 	 * 
 	 * @author David Adrian
 	 */
 	public static class Shouts implements BaseColumns {
-		/**
-		 * SQLite table name. Not needed for managed queries, and can be ignored
-		 * in most use cases
-		 */
-		public static final String TABLE_NAME = "shout";
-
-		/**
-		 * View of {@link #TABLE_NAME} selecting only root shouts.
-		 */
-		public static final String ROOT_VIEW = "root";
-
-		/**
-		 * View of {@link #TABLE_NAME} selecting only comments.
-		 */
-		public static final String COMMENT_VIEW = "comment";
-
-		/**
-		 * View of {@link #TABLE_NAME} selecting only reshouts.
-		 */
-		public static final String RESHOUT_VIEW = "reshout";
 
 		/**
 		 * Base content URI for the table of Shouts
 		 */
 		public static final Uri CONTENT_URI = Uri.withAppendedPath(
-				CONTENT_URI_BASE, TABLE_NAME);
+				CONTENT_URI_BASE, "shouts");
 
 		/**
 		 * Content URI for root shouts
 		 */
-		public static final Uri ROOT_CONTENT_URI = Uri
-				.withAppendedPath(CONTENT_URI_BASE, ROOT_VIEW);
+		public static final Uri ORIGINAL_CONTENT_URI = Uri
+				.withAppendedPath(CONTENT_URI_BASE, "shouts/filter/original/");
 
 		/**
 		 * Content URI for comments
 		 */
 		public static final Uri COMMENT_CONTENT_URI = Uri.withAppendedPath(CONTENT_URI_BASE,
-				COMMENT_VIEW);
+				"shouts/filter/comment");
 
 		/**
 		 * Content URI for reshouts
 		 */
 		public static final Uri RESHOUT_CONTENT_URI = Uri.withAppendedPath(CONTENT_URI_BASE,
-				RESHOUT_VIEW);
+				"shouts/filter/reshout");
 
 		/**
-		 * Column name of the primary key. This represents the database ID of a
-		 * Shout, which can be used in the {@code Shouts.PARENT} field to
-		 * reference another Shout in the database.
+		 * Column name of the primary key.
 		 */
 		public static final String _ID = BaseColumns._ID;
 
@@ -175,17 +153,12 @@ public class ShoutProviderContract {
 	}
 
 	static class Users implements BaseColumns {
-		/**
-		 * The SQLite table name for the Users table. Not needed for managed
-		 * queries, and can be ignored in most use cases.
-		 */
-		public static final String TABLE_NAME = "user";
 
 		/**
 		 * The base content URI for the Users table.
 		 */
 		public static final Uri CONTENT_URI = Uri.withAppendedPath(
-				CONTENT_URI_BASE, TABLE_NAME);
+				CONTENT_URI_BASE, "users");
 
 		/**
 		 * The column name for the username associated with a User. Stored as
@@ -400,7 +373,7 @@ public class ShoutProviderContract {
 	 * @return
 	 */
 	public static Cursor getCursorOverAllShouts(Context context, SortOrder sort) {
-		Uri uri = Shouts.ROOT_CONTENT_URI;
+		Uri uri = Shouts.ORIGINAL_CONTENT_URI;
 		Cursor result = context.getContentResolver().query(uri, null,
 				null, null, sort.sql());
 		return result;

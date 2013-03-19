@@ -36,27 +36,32 @@ public class ShoutProvider extends ContentProvider {
 	private static final UriMatcher sUriMatcher = new UriMatcher(
 			UriMatcher.NO_MATCH);
 
-	private static final int SHOUTS = 1;
-	private static final int USERS = 2;
-	private static final int MESSAGES = 4;
-	private static final int ROOTS = 5;
-	private static final int COMMENTS = 6;
-	private static final int RESHOUTS = 7;
-	private static final int SHOUT_ID = 10;
-	private static final int USER_ID = 20;
-	private static final int MESSAGE_ID = 40;
-	private static final int SHOUTS_USER_ID = 120;
-	private static final int MESSAGES_SHOUT_ID = 410;
+	private static final int ALL_SHOUTS = 1;
+	private static final int ORIGINAL_SHOUTS = 2;
+	private static final int COMMENT_SHOUTS = 3;
+	private static final int RESHOUT_SHOUTS = 4;
+
+	private static final int USERS = 10;
+	private static final int MESSAGES = 20;
+
+	private static final int SHOUT_ID = 100;
+	private static final int USER_ID = 110;
+	private static final int MESSAGE_ID = 120;
+
+	private static final int SHOUTS_USER_ID = 200;
+	private static final int MESSAGES_SHOUT_ID = 300;
 
 	static {
-		sUriMatcher.addURI(AUTHORITY, "shout", SHOUTS);
-		sUriMatcher.addURI(AUTHORITY, "user", USERS);
-		sUriMatcher.addURI(AUTHORITY, "root", ROOTS);
-		sUriMatcher.addURI(AUTHORITY, "comment", COMMENTS);
-		sUriMatcher.addURI(AUTHORITY, "reshout", RESHOUTS);
-		sUriMatcher.addURI(AUTHORITY, "shout/#", SHOUT_ID);
-		sUriMatcher.addURI(AUTHORITY, "user/#", USER_ID);
-		sUriMatcher.addURI(AUTHORITY, "shout/user/#", SHOUTS_USER_ID);
+		sUriMatcher.addURI(AUTHORITY, "shouts", ALL_SHOUTS);
+		sUriMatcher.addURI(AUTHORITY, "shouts/filter/original", ORIGINAL_SHOUTS);
+		sUriMatcher.addURI(AUTHORITY, "shouts/filter/comment", COMMENT_SHOUTS);
+		sUriMatcher.addURI(AUTHORITY, "shouts/filter/reshout", RESHOUT_SHOUTS);
+
+		sUriMatcher.addURI(AUTHORITY, "users", USERS);
+
+		sUriMatcher.addURI(AUTHORITY, "shouts/#", SHOUT_ID);
+		sUriMatcher.addURI(AUTHORITY, "users/#", USER_ID);
+		sUriMatcher.addURI(AUTHORITY, "shouts/users/#", SHOUTS_USER_ID);
 
 		sUriMatcher.addURI(AUTHORITY, "message", MESSAGES);
 		sUriMatcher.addURI(AUTHORITY, "message/#", MESSAGE_ID);
@@ -69,6 +74,27 @@ public class ShoutProvider extends ContentProvider {
 
 	private static final String ENABLE_FK = "PRAGMA foreign_keys = ON";
 
+	@Override
+	public String getType(Uri uri) {
+		int match = sUriMatcher.match(uri);
+		switch (match) {
+			case ALL_SHOUTS:
+			case ORIGINAL_SHOUTS:
+			case COMMENT_SHOUTS:
+			case RESHOUT_SHOUTS:
+			case SHOUTS_USER_ID:
+				return MIME_SHOUT_MANY;
+			case SHOUT_ID:
+				return MIME_SHOUT;
+			case USERS:
+				return MIME_USER_MANY;
+			case USER_ID:
+				return MIME_USER;
+			default:
+				throw new IllegalArgumentException("Unknown or invalid URI " + uri);
+		}
+	}
+
 	private void notifyChange(Uri uri) {
 		List<Uri> uris = new ArrayList<Uri>();
 
@@ -79,20 +105,15 @@ public class ShoutProvider extends ContentProvider {
 		switch (match) {
 			case SHOUT_ID:
 				uris.add(ShoutProviderContract.Shouts.CONTENT_URI);
-			case SHOUTS:
-				uris.add(ShoutProviderContract.Shouts.ROOT_CONTENT_URI);
+			case ALL_SHOUTS:
+				uris.add(ShoutProviderContract.Shouts.ORIGINAL_CONTENT_URI);
 				uris.add(ShoutProviderContract.Shouts.COMMENT_CONTENT_URI);
 				uris.add(ShoutProviderContract.Shouts.RESHOUT_CONTENT_URI);
 				break;
-			case ROOTS:
+			case ORIGINAL_SHOUTS:
+			case COMMENT_SHOUTS:
+			case RESHOUT_SHOUTS:
 				uris.add(ShoutProviderContract.Shouts.CONTENT_URI);
-				break;
-			case COMMENTS:
-				uris.add(ShoutProviderContract.Shouts.CONTENT_URI);
-				break;
-			case RESHOUTS:
-				uris.add(ShoutProviderContract.Shouts.CONTENT_URI);
-				break;
 		}
 
 		for (Uri u : uris) {
@@ -103,25 +124,31 @@ public class ShoutProvider extends ContentProvider {
 
 	@Override
 	public int delete(Uri uri, String selection, String[] selectionArgs) {
+		/*
+		 * This delete implementation is incomplete. The ALL_SHOUTS URI includes
+		 * author information, the following queries do not join against the
+		 * Users table.
+		 */
 		mDB = mOpenHelper.getWritableDatabase();
 		mDB.execSQL(ENABLE_FK);
 		int match = sUriMatcher.match(uri);
 		String id, table, whereClause = null;
 		String[] whereArgs = null;
 		switch (match) {
-			case SHOUTS:
-				table = ShoutProviderContract.Shouts.TABLE_NAME;
+			case ALL_SHOUTS:
+				table = ShoutDatabaseHelper.SHOUTS_TABLE;
 				whereClause = selection;
 				whereArgs = selectionArgs;
 				break;
-			case ROOTS:
-			case COMMENTS:
-			case RESHOUTS:
+			case ORIGINAL_SHOUTS:
+			case COMMENT_SHOUTS:
+			case RESHOUT_SHOUTS:
 				/* Use an INSTEAD OF trigger on the views to allow deletion */
 				Log.w(TAG, "Ignoring attempt to delete record via view URI " + uri);
-				throw new IllegalArgumentException("Cannot delete via view URI" + uri);
+				throw new IllegalArgumentException("Cannot delete via view URI" +
+						uri);
 			case SHOUT_ID:
-				table = ShoutProviderContract.Shouts.TABLE_NAME;
+				table = ShoutDatabaseHelper.SHOUTS_TABLE;
 				id = uri.getLastPathSegment();
 				if (TextUtils.isEmpty(selection)) {
 					whereClause = ShoutProviderContract.Shouts._ID + "=" + id;
@@ -133,12 +160,12 @@ public class ShoutProvider extends ContentProvider {
 				}
 				break;
 			case USERS:
-				table = ShoutProviderContract.Users.TABLE_NAME;
+				table = ShoutDatabaseHelper.USERS_TABLE;
 				whereClause = selection;
 				whereArgs = selectionArgs;
 				break;
 			case USER_ID:
-				table = ShoutProviderContract.Users.TABLE_NAME;
+				table = ShoutDatabaseHelper.USERS_TABLE;
 				id = uri.getLastPathSegment();
 				if (TextUtils.isEmpty(selection)) {
 					whereClause = ShoutProviderContract.Users._ID + "=" + id;
@@ -158,43 +185,25 @@ public class ShoutProvider extends ContentProvider {
 	}
 
 	@Override
-	public String getType(Uri uri) {
-		int match = sUriMatcher.match(uri);
-		switch (match) {
-			case SHOUTS:
-			case SHOUTS_USER_ID:
-				return MIME_SHOUT_MANY;
-			case SHOUT_ID:
-				return MIME_SHOUT;
-			case USERS:
-				return MIME_USER_MANY;
-			case USER_ID:
-				return MIME_USER;
-			default:
-				throw new IllegalArgumentException("Unknown or invalid URI " + uri);
-		}
-	}
-
-	@Override
 	public Uri insert(Uri uri, ContentValues values) {
 		int match = sUriMatcher.match(uri);
 		String table = null;
 		switch (match) {
-			case SHOUTS:
-				table = ShoutProviderContract.Shouts.TABLE_NAME;
+			case ALL_SHOUTS:
+				table = ShoutDatabaseHelper.SHOUTS_TABLE;
 				break;
-			case ROOTS:
-			case COMMENTS:
-			case RESHOUTS:
-				/* Use an INSTEAD OF trigger on the views to allow insertion */
-				Log.w(TAG, "Ignoring attempt to insert record via view URI " + uri);
-				throw new IllegalArgumentException("Cannot insert record via view URI" + uri);
 			case USERS:
-				table = ShoutProviderContract.Users.TABLE_NAME;
+				table = ShoutDatabaseHelper.USERS_TABLE;
 				break;
 			case MESSAGES:
 				table = ShoutSearchContract.Messages.TABLE_NAME;
 				break;
+			case ORIGINAL_SHOUTS:
+			case COMMENT_SHOUTS:
+			case RESHOUT_SHOUTS:
+				/* Use an INSTEAD OF trigger on the views to allow insertion */
+				Log.w(TAG, "Ignoring attempt to insert record via view URI " + uri);
+				throw new IllegalArgumentException("Cannot insert record via this URI" + uri);
 			default:
 				throw new IllegalArgumentException("Unknown or invalid URI " + uri);
 		}
@@ -245,7 +254,7 @@ public class ShoutProvider extends ContentProvider {
 		String[] uniqueCols;
 		String idColumnName;
 		switch (match) {
-			case SHOUTS:
+			case ALL_SHOUTS:
 				uniqueCols = ShoutDatabaseHelper.SHOUT_UNIQUE_COLS;
 				idColumnName = ShoutProviderContract.Shouts._ID;
 				break;
@@ -296,51 +305,53 @@ public class ShoutProvider extends ContentProvider {
 		SQLiteQueryBuilder qBuilder = new SQLiteQueryBuilder();
 		int match = sUriMatcher.match(uri);
 		switch (match) {
-			case SHOUTS:
-				qBuilder.setTables(ShoutProviderContract.Shouts.TABLE_NAME);
+			case ALL_SHOUTS:
+				qBuilder.setTables(ShoutDatabaseHelper.DENORMED_SHOUT_VIEW);
 				break;
-			case ROOTS:
+			case ORIGINAL_SHOUTS:
 				/*
-				 * Order root shouts by most-recent comment. This special case
-				 * ordering should be built into a better query language, at
-				 * some point.
+				 * Order original shouts by most-recent comment. This special
+				 * case ordering should be built into a better query language,
+				 * at some point.
 				 */
-				String join_tables = ShoutProviderContract.Shouts.ROOT_VIEW + " AS root LEFT JOIN "
-						+ ShoutProviderContract.Shouts.COMMENT_VIEW
-						+ " AS comment ON (root." + ShoutProviderContract.Shouts.HASH + "=comment."
-						+ ShoutProviderContract.Shouts.PARENT + " OR root."
+				String join_tables = ShoutDatabaseHelper.DENORMED_ORIGINAL_VIEW
+						+ " AS original LEFT JOIN "
+						+ ShoutDatabaseHelper.DENORMED_COMMENT_VIEW
+						+ " AS comment ON (original." + ShoutProviderContract.Shouts.HASH
+						+ "=comment."
+						+ ShoutProviderContract.Shouts.PARENT + " OR original."
 						+ ShoutProviderContract.Shouts.HASH + "=comment."
 						+ ShoutProviderContract.Shouts.HASH + ")";
 				qBuilder.setTables(join_tables);
 				qBuilder.setDistinct(true);
 				projection = new String[] {
 						// coalesces must come first, for sortOrder to work
-						"coalesce(comment.Time_received, root.Time_received) AS Time_received, "
-								+ "coalesce(comment.Timestamp, root.Timestamp) AS Timestamp, "
-								+ "root.*"
+						"coalesce(comment.Time_received, original.Time_received) AS Time_received, "
+								+ "coalesce(comment.Timestamp, original.Timestamp) AS Timestamp, "
+								+ "original.*"
 				};
 				break;
-			case COMMENTS:
-				qBuilder.setTables(ShoutProviderContract.Shouts.COMMENT_VIEW);
+			case COMMENT_SHOUTS:
+				qBuilder.setTables(ShoutDatabaseHelper.DENORMED_COMMENT_VIEW);
 				break;
-			case RESHOUTS:
-				qBuilder.setTables(ShoutProviderContract.Shouts.RESHOUT_VIEW);
+			case RESHOUT_SHOUTS:
+				qBuilder.setTables(ShoutDatabaseHelper.DENORMED_RESHOUT_VIEW);
 				break;
 			case SHOUT_ID:
-				qBuilder.setTables(ShoutProviderContract.Shouts.TABLE_NAME);
+				qBuilder.setTables(ShoutDatabaseHelper.DENORMED_SHOUT_VIEW);
 				qBuilder.appendWhere(ShoutProviderContract.Shouts._ID + "="
 						+ uri.getLastPathSegment());
 				break;
 			case SHOUTS_USER_ID:
-				qBuilder.setTables(ShoutProviderContract.Shouts.TABLE_NAME);
+				qBuilder.setTables(ShoutDatabaseHelper.DENORMED_SHOUT_VIEW);
 				qBuilder.appendWhere(ShoutProviderContract.Shouts.AUTHOR + "="
 						+ uri.getLastPathSegment());
 				break;
 			case USERS:
-				qBuilder.setTables(ShoutProviderContract.Users.TABLE_NAME);
+				qBuilder.setTables(ShoutDatabaseHelper.USERS_TABLE);
 				break;
 			case USER_ID:
-				qBuilder.setTables(ShoutProviderContract.Users.TABLE_NAME);
+				qBuilder.setTables(ShoutDatabaseHelper.USERS_TABLE);
 				qBuilder.appendWhere(ShoutProviderContract.Shouts._ID + "="
 						+ uri.getLastPathSegment());
 				break;
@@ -372,6 +383,11 @@ public class ShoutProvider extends ContentProvider {
 	@Override
 	public int update(Uri uri, ContentValues values, String selection,
 			String[] selectionArgs) {
+		/*
+		 * This update implementation is incomplete. The ALL_SHOUTS URI includes
+		 * author information, the following queries do not join against the
+		 * Users table.
+		 */
 		mDB = mOpenHelper.getWritableDatabase();
 		mDB.execSQL(ENABLE_FK);
 		String id, whereClause, table = null;
@@ -379,20 +395,21 @@ public class ShoutProvider extends ContentProvider {
 
 		int match = sUriMatcher.match(uri);
 		switch (match) {
-			case SHOUTS:
-				table = ShoutProviderContract.Shouts.TABLE_NAME;
+			case ALL_SHOUTS:
+				table = ShoutDatabaseHelper.SHOUTS_TABLE;
 				whereClause = selection;
 				whereArgs = selectionArgs;
 				break;
-			case ROOTS:
-			case COMMENTS:
-			case RESHOUTS:
+			case ORIGINAL_SHOUTS:
+			case COMMENT_SHOUTS:
+			case RESHOUT_SHOUTS:
 				/* Use an INSTEAD OF trigger on the views to allow updating */
 				Log.w(TAG, "Ignoring attempt to update record via view URI " + uri);
-				throw new IllegalArgumentException("Cannot update record via view URI" + uri);
+				throw new IllegalArgumentException("Cannot update record via view URI" +
+						uri);
 			case SHOUT_ID:
 				id = uri.getLastPathSegment();
-				table = ShoutProviderContract.Shouts.TABLE_NAME;
+				table = ShoutDatabaseHelper.SHOUTS_TABLE;
 				if (TextUtils.isEmpty(selection)) {
 					whereClause = ShoutProviderContract.Shouts._ID + "=" + id;
 					whereArgs = null;
@@ -404,7 +421,7 @@ public class ShoutProvider extends ContentProvider {
 				break;
 			case SHOUTS_USER_ID:
 				id = uri.getLastPathSegment();
-				table = ShoutProviderContract.Shouts.TABLE_NAME;
+				table = ShoutDatabaseHelper.SHOUTS_TABLE;
 				if (TextUtils.isEmpty(selection)) {
 					whereClause = ShoutProviderContract.Shouts.AUTHOR + "=" + id;
 					whereArgs = null;
@@ -415,13 +432,13 @@ public class ShoutProvider extends ContentProvider {
 				}
 				break;
 			case USERS:
-				table = ShoutProviderContract.Users.TABLE_NAME;
+				table = ShoutDatabaseHelper.USERS_TABLE;
 				whereClause = selection;
 				whereArgs = selectionArgs;
 				break;
 			case USER_ID:
 				id = uri.getLastPathSegment();
-				table = ShoutProviderContract.Users.TABLE_NAME;
+				table = ShoutDatabaseHelper.USERS_TABLE;
 				if (TextUtils.isEmpty(selection)) {
 					whereClause = ShoutProviderContract.Users._ID + "=" + id;
 					whereArgs = null;
@@ -447,8 +464,16 @@ public class ShoutProvider extends ContentProvider {
 		public static final int VERSION = 2;
 		public static final String DBNAME = "shout_base";
 
+		public static final String SHOUTS_TABLE = "shout";
+		public static final String USERS_TABLE = "user";
+
+		public static final String DENORMED_SHOUT_VIEW = "denormed_shout";
+		public static final String DENORMED_ORIGINAL_VIEW = "denormed_original";
+		public static final String DENORMED_COMMENT_VIEW = "denormed_comment";
+		public static final String DENORMED_RESHOUT_VIEW = "denormed_reshout";
+
 		private static final String SQL_CREATE_USER = "CREATE TABLE "
-				+ ShoutProviderContract.Users.TABLE_NAME + "("
+				+ USERS_TABLE + "("
 				+ ShoutProviderContract.Users._ID
 				+ " INTEGER PRIMARY KEY ASC AUTOINCREMENT, "
 				+ ShoutProviderContract.Users.USERNAME + " TEXT, "
@@ -459,7 +484,7 @@ public class ShoutProvider extends ContentProvider {
 				+ ShoutProviderContract.Users.AVATAR + " ) " + ");";
 
 		private static final String SQL_CREATE_SHOUT = "CREATE TABLE "
-				+ ShoutProviderContract.Shouts.TABLE_NAME + "("
+				+ SHOUTS_TABLE + "("
 				+ ShoutProviderContract.Shouts._ID
 				+ " INTEGER PRIMARY KEY ASC AUTOINCREMENT, "
 				+ ShoutProviderContract.Shouts.VERSION + " INTEGER, "
@@ -477,14 +502,14 @@ public class ShoutProvider extends ContentProvider {
 				+ ShoutProviderContract.Shouts.RESHOUT_COUNT + " INTEGER DEFAULT 0, "
 				+ "UNIQUE (" + ShoutProviderContract.Shouts.HASH + "), "
 				+ "FOREIGN KEY(" + ShoutProviderContract.Shouts.USER_PK
-				+ ") REFERENCES " + ShoutProviderContract.Users.TABLE_NAME
+				+ ") REFERENCES " + USERS_TABLE
 				+ "(" + ShoutProviderContract.Users._ID + "), "
 				+ "FOREIGN KEY(" + ShoutProviderContract.Shouts.PARENT
-				+ ") REFERENCES " + ShoutProviderContract.Shouts.TABLE_NAME +
+				+ ") REFERENCES " + SHOUTS_TABLE +
 				"(" + ShoutProviderContract.Shouts.HASH + ")" + ");";
 
 		private static final String SQL_CREATE_INDEX_SHOUT_PARENT = "CREATE INDEX idx_shout_parent ON "
-				+ ShoutProviderContract.Shouts.TABLE_NAME
+				+ SHOUTS_TABLE
 				+ " ("
 				+ ShoutProviderContract.Shouts.PARENT + ");";
 
@@ -497,11 +522,11 @@ public class ShoutProvider extends ContentProvider {
 
 		private static final String SQL_CREATE_TRIGGER_COMMENT = "CREATE TRIGGER "
 				+ "Update_Comment_Count AFTER INSERT ON "
-				+ ShoutProviderContract.Shouts.TABLE_NAME + " WHEN new."
+				+ SHOUTS_TABLE + " WHEN new."
 				+ ShoutProviderContract.Shouts.MESSAGE + " IS NOT NULL AND new."
 				+ ShoutProviderContract.Shouts.PARENT + " IS NOT NULL "
 				+ "\nBEGIN\n" + "UPDATE "
-				+ ShoutProviderContract.Shouts.TABLE_NAME + " SET "
+				+ SHOUTS_TABLE + " SET "
 				+ ShoutProviderContract.Shouts.COMMENT_COUNT + " = "
 				+ ShoutProviderContract.Shouts.COMMENT_COUNT + " + 1 WHERE "
 				+ ShoutProviderContract.Shouts.HASH + " = new."
@@ -509,11 +534,11 @@ public class ShoutProvider extends ContentProvider {
 
 		private static final String SQL_CREATE_TRIGGER_RESHOUT = "CREATE TRIGGER "
 				+ "Update_Reshout_Count AFTER INSERT ON "
-				+ ShoutProviderContract.Shouts.TABLE_NAME + " WHEN new."
+				+ SHOUTS_TABLE + " WHEN new."
 				+ ShoutProviderContract.Shouts.MESSAGE + " IS NULL AND new."
 				+ ShoutProviderContract.Shouts.PARENT + " IS NOT NULL "
 				+ "\nBEGIN\n" + "UPDATE "
-				+ ShoutProviderContract.Shouts.TABLE_NAME + " SET "
+				+ SHOUTS_TABLE + " SET "
 				+ ShoutProviderContract.Shouts.RESHOUT_COUNT + " = "
 				+ ShoutProviderContract.Shouts.RESHOUT_COUNT + " + 1 WHERE "
 				+ ShoutProviderContract.Shouts.HASH + " = new."
@@ -521,35 +546,42 @@ public class ShoutProvider extends ContentProvider {
 
 		private static final String SQL_CREATE_TRIGGER_MESSAGE = "CREATE TRIGGER "
 				+ "Update_FTS3_Message AFTER INSERT ON "
-				+ ShoutProviderContract.Shouts.TABLE_NAME + " WHEN new."
+				+ SHOUTS_TABLE + " WHEN new."
 				+ ShoutProviderContract.Shouts.MESSAGE + " IS NOT NULL "
 				+ "\nBEGIN\n" + "INSERT INTO " + ShoutSearchContract.Messages.TABLE_NAME + "( "
 				+ ShoutSearchContract.Messages.SHOUT + ", " + ShoutSearchContract.Messages.MESSAGE
 				+ " ) VALUES ( new." + ShoutProviderContract.Shouts._ID + ", new."
 				+ ShoutProviderContract.Shouts.MESSAGE + " );\nEND;";
 
-		private static final String SQL_CREATE_VIEW_ROOT = "CREATE VIEW "
-				+ ShoutProviderContract.Shouts.ROOT_VIEW + " AS SELECT * FROM "
-				+ ShoutProviderContract.Shouts.TABLE_NAME
+		private static final String SQL_CREATE_VIEW_DENORMED_SHOUT = "CREATE VIEW "
+				+ DENORMED_SHOUT_VIEW
+				+ " AS SELECT shout.*, user.Name, user.Key, user.Avatar FROM "
+				+ SHOUTS_TABLE + " AS shout JOIN " + USERS_TABLE
+				+ " AS user ON (shout.User_key=user._id);";
+
+		private static final String SQL_CREATE_VIEW_DENORMED_ORIGINAL = "CREATE VIEW "
+				+ DENORMED_ORIGINAL_VIEW + " AS SELECT * FROM "
+				+ DENORMED_SHOUT_VIEW
 				+ " WHERE " + ShoutProviderContract.Shouts.PARENT + " IS NULL AND "
 				+ ShoutProviderContract.Shouts.MESSAGE + " IS NOT NULL;";
 
-		private static final String SQL_CREATE_VIEW_COMMENT = "CREATE VIEW "
-				+ ShoutProviderContract.Shouts.COMMENT_VIEW
+		private static final String SQL_CREATE_VIEW_DENORMED_COMMENT = "CREATE VIEW "
+				+ DENORMED_COMMENT_VIEW
 				+ " AS SELECT comment.* FROM "
-				+ ShoutProviderContract.Shouts.ROOT_VIEW
-				+ " AS root INNER JOIN " + ShoutProviderContract.Shouts.TABLE_NAME
+				+ DENORMED_ORIGINAL_VIEW
+				+ " AS root INNER JOIN " + DENORMED_SHOUT_VIEW
 				+ " AS comment ON (comment.Parent=root." + ShoutProviderContract.Shouts.HASH
 				+ " AND comment." + ShoutProviderContract.Shouts.MESSAGE + " IS NOT NULL);";
 
-		private static final String SQL_CREATE_VIEW_RESHOUT = "CREATE VIEW "
-				+ ShoutProviderContract.Shouts.RESHOUT_VIEW
+		private static final String SQL_CREATE_VIEW_DENORMED_RESHOUT = "CREATE VIEW "
+				+ DENORMED_RESHOUT_VIEW
 				+ " AS SELECT reshout.* FROM "
-				+ ShoutProviderContract.Shouts.TABLE_NAME
-				+ " AS parent INNER JOIN " + ShoutProviderContract.Shouts.TABLE_NAME
+				+ DENORMED_SHOUT_VIEW
+				+ " AS parent INNER JOIN " + DENORMED_SHOUT_VIEW
 				+ " AS reshout ON (reshout." + ShoutProviderContract.Shouts.PARENT + "=parent."
 				+ ShoutProviderContract.Shouts.HASH + " AND reshout."
-				+ ShoutProviderContract.Shouts.MESSAGE + " IS NULL);";
+				+ ShoutProviderContract.Shouts.MESSAGE + " IS NULL AND parent."
+				+ ShoutProviderContract.Shouts.MESSAGE + " IS NOT NULL);";
 
 		private static final String[] USER_UNIQUE_COLS = {
 				ShoutProviderContract.Users.PUB_KEY,
@@ -574,9 +606,10 @@ public class ShoutProvider extends ContentProvider {
 			db.execSQL(SQL_CREATE_TRIGGER_COMMENT);
 			db.execSQL(SQL_CREATE_TRIGGER_RESHOUT);
 			db.execSQL(SQL_CREATE_TRIGGER_MESSAGE);
-			db.execSQL(SQL_CREATE_VIEW_ROOT);
-			db.execSQL(SQL_CREATE_VIEW_COMMENT);
-			db.execSQL(SQL_CREATE_VIEW_RESHOUT);
+			db.execSQL(SQL_CREATE_VIEW_DENORMED_SHOUT);
+			db.execSQL(SQL_CREATE_VIEW_DENORMED_ORIGINAL);
+			db.execSQL(SQL_CREATE_VIEW_DENORMED_COMMENT);
+			db.execSQL(SQL_CREATE_VIEW_DENORMED_RESHOUT);
 		}
 
 		@Override
@@ -591,9 +624,10 @@ public class ShoutProvider extends ContentProvider {
 				case 1:
 					// Upgrade to version 2
 					db.execSQL(SQL_CREATE_INDEX_SHOUT_PARENT);
-					db.execSQL(SQL_CREATE_VIEW_ROOT);
-					db.execSQL(SQL_CREATE_VIEW_COMMENT);
-					db.execSQL(SQL_CREATE_VIEW_RESHOUT);
+					db.execSQL(SQL_CREATE_VIEW_DENORMED_SHOUT);
+					db.execSQL(SQL_CREATE_VIEW_DENORMED_ORIGINAL);
+					db.execSQL(SQL_CREATE_VIEW_DENORMED_COMMENT);
+					db.execSQL(SQL_CREATE_VIEW_DENORMED_RESHOUT);
 					break;
 				default:
 					Log.e(TAG, String.format(
