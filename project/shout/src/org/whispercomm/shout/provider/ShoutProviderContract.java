@@ -95,6 +95,21 @@ public class ShoutProviderContract {
 		public static final String AUTHOR = "Author";
 
 		/**
+		 * Column name for the username of the author of the shout.
+		 */
+		public static final String USERNAME = Users.USERNAME;
+
+		/**
+		 * Column name for the public key of the author of the shout.
+		 */
+		public static final String PUB_KEY = Users.PUB_KEY;
+
+		/**
+		 * Column name for the avatar hash of the author of the shout.
+		 */
+		public static final String AVATAR = Users.AVATAR;
+
+		/**
 		 * Column name for the message in a Shout. Stored as text.
 		 */
 		public static final String MESSAGE = "Message";
@@ -237,6 +252,9 @@ public class ShoutProviderContract {
 			Cursor cursor) {
 		int versionIndex = cursor.getColumnIndex(Shouts.VERSION);
 		int parentIndex = cursor.getColumnIndex(Shouts.PARENT);
+		int usernameIndex = cursor.getColumnIndex(Shouts.USERNAME);
+		int pubkeyIndex = cursor.getColumnIndex(Shouts.PUB_KEY);
+		int avatarIndex = cursor.getColumnIndex(Shouts.AVATAR);
 		int messageIndex = cursor.getColumnIndex(Shouts.MESSAGE);
 		int longitudeIndex = cursor.getColumnIndex(Shouts.LONGITUDE);
 		int latitudeIndex = cursor.getColumnIndex(Shouts.LATITUDE);
@@ -244,12 +262,10 @@ public class ShoutProviderContract {
 		int sigIndex = cursor.getColumnIndex(Shouts.SIGNATURE);
 		int timeIndex = cursor.getColumnIndex(Shouts.TIME_SENT);
 		int revcIndex = cursor.getColumnIndex(Shouts.TIME_RECEIVED);
-		int userIdIndex = cursor.getColumnIndex(Shouts.USER_PK);
 		int commentIndex = cursor.getColumnIndex(Shouts.COMMENT_COUNT);
 		int reshoutIndex = cursor.getColumnIndex(Shouts.RESHOUT_COUNT);
 
 		int version = cursor.getInt(versionIndex);
-		int userId = cursor.getInt(userIdIndex);
 		String encodedParentHash = cursor.isNull(parentIndex) ? null : cursor
 				.getString(parentIndex);
 		String message = cursor.getString(messageIndex);
@@ -277,7 +293,12 @@ public class ShoutProviderContract {
 		if (longitude != null && latitude != null) {
 			location = new SimpleLocation(longitude, latitude);
 		}
-		LocalUser sender = retrieveUserById(context, userId);
+
+		String encodedKey = cursor.getString(pubkeyIndex);
+		String name = cursor.getString(usernameIndex);
+		String encodedAvatarHash = cursor.getString(avatarIndex);
+
+		LocalUser sender = new LocalUserImpl(context, name, encodedKey, encodedAvatarHash);
 		LocalShout shout = new LocalShoutImpl(context, version, sender, message, location,
 				encodedSig, encodedHash, sentTime, receivedTime, numComments,
 				numReshouts, encodedParentHash);
