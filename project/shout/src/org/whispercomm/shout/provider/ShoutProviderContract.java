@@ -80,6 +80,24 @@ public class ShoutProviderContract {
 				CONTENT_URI_BASE, TABLE_NAME);
 
 		/**
+		 * Content URI for root shouts
+		 */
+		public static final Uri ROOT_CONTENT_URI = Uri
+				.withAppendedPath(CONTENT_URI_BASE, ROOT_VIEW);
+
+		/**
+		 * Content URI for comments
+		 */
+		public static final Uri COMMENT_CONTENT_URI = Uri.withAppendedPath(CONTENT_URI_BASE,
+				COMMENT_VIEW);
+
+		/**
+		 * Content URI for reshouts
+		 */
+		public static final Uri RESHOUT_CONTENT_URI = Uri.withAppendedPath(CONTENT_URI_BASE,
+				RESHOUT_VIEW);
+
+		/**
 		 * Column name of the primary key. This represents the database ID of a
 		 * Shout, which can be used in the {@code Shouts.PARENT} field to
 		 * reference another Shout in the database.
@@ -382,10 +400,9 @@ public class ShoutProviderContract {
 	 * @return
 	 */
 	public static Cursor getCursorOverAllShouts(Context context, SortOrder sort) {
-		Uri uri = Shouts.CONTENT_URI;
-		String selection = Shouts.PARENT + " IS NULL";
+		Uri uri = Shouts.ROOT_CONTENT_URI;
 		Cursor result = context.getContentResolver().query(uri, null,
-				selection, null, sort.sql());
+				null, null, sort.sql());
 		return result;
 	}
 
@@ -398,11 +415,12 @@ public class ShoutProviderContract {
 	 */
 	public static Cursor getComments(Context context, byte[] hash) {
 		String sortOrder = Shouts.TIME_RECEIVED + " ASC";
-		String selection = Shouts.PARENT + " = ? AND " + Shouts.MESSAGE + " IS NOT NULL";
+		String selection = Shouts.PARENT + " = ?";
 		String[] selectionArgs = {
 				Base64.encodeToString(hash, Base64.DEFAULT)
 		};
-		Cursor cursor = context.getContentResolver().query(Shouts.CONTENT_URI, null, selection,
+		Cursor cursor = context.getContentResolver().query(Shouts.COMMENT_CONTENT_URI, null,
+				selection,
 				selectionArgs, sortOrder);
 		return cursor;
 	}
@@ -421,13 +439,12 @@ public class ShoutProviderContract {
 
 	public static Cursor getCursorOverReshouts(Context context, byte[] parentHash) {
 		String sortOrder = Shouts.TIME_RECEIVED + " DESC";
-		String selection = Shouts.PARENT + " = ? AND " + Shouts.MESSAGE
-				+ " IS NULL";
+		String selection = Shouts.PARENT + " = ?";
 		String[] selectionArgs = {
 				Base64.encodeToString(parentHash, Base64.DEFAULT)
 		};
 
-		Cursor result = context.getContentResolver().query(Shouts.CONTENT_URI,
+		Cursor result = context.getContentResolver().query(Shouts.RESHOUT_CONTENT_URI,
 				null, selection, selectionArgs, sortOrder);
 		return result;
 	}

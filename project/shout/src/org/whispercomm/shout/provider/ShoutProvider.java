@@ -1,6 +1,9 @@
 
 package org.whispercomm.shout.provider;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -21,6 +24,7 @@ import android.util.Log;
  * @author David Adrian
  */
 public class ShoutProvider extends ContentProvider {
+	private static final String TAG = ShoutProvider.class.getSimpleName();
 
 	private static final String AUTHORITY = ShoutProviderContract.AUTHORITY;
 
@@ -35,6 +39,9 @@ public class ShoutProvider extends ContentProvider {
 	private static final int SHOUTS = 1;
 	private static final int USERS = 2;
 	private static final int MESSAGES = 4;
+	private static final int ROOTS = 5;
+	private static final int COMMENTS = 6;
+	private static final int RESHOUTS = 7;
 	private static final int SHOUT_ID = 10;
 	private static final int USER_ID = 20;
 	private static final int MESSAGE_ID = 40;
@@ -44,6 +51,9 @@ public class ShoutProvider extends ContentProvider {
 	static {
 		sUriMatcher.addURI(AUTHORITY, "shout", SHOUTS);
 		sUriMatcher.addURI(AUTHORITY, "user", USERS);
+		sUriMatcher.addURI(AUTHORITY, "root", ROOTS);
+		sUriMatcher.addURI(AUTHORITY, "comment", COMMENTS);
+		sUriMatcher.addURI(AUTHORITY, "reshout", RESHOUTS);
 		sUriMatcher.addURI(AUTHORITY, "shout/#", SHOUT_ID);
 		sUriMatcher.addURI(AUTHORITY, "user/#", USER_ID);
 		sUriMatcher.addURI(AUTHORITY, "shout/user/#", SHOUTS_USER_ID);
@@ -59,6 +69,38 @@ public class ShoutProvider extends ContentProvider {
 
 	private static final String ENABLE_FK = "PRAGMA foreign_keys = ON";
 
+	private void notifyChange(Uri uri) {
+		List<Uri> uris = new ArrayList<Uri>();
+
+		uris.add(uri);
+
+		// Add other URIs that also match
+		int match = sUriMatcher.match(uri);
+		switch (match) {
+			case SHOUT_ID:
+				uris.add(ShoutProviderContract.Shouts.CONTENT_URI);
+			case SHOUTS:
+				uris.add(ShoutProviderContract.Shouts.ROOT_CONTENT_URI);
+				uris.add(ShoutProviderContract.Shouts.COMMENT_CONTENT_URI);
+				uris.add(ShoutProviderContract.Shouts.RESHOUT_CONTENT_URI);
+				break;
+			case ROOTS:
+				uris.add(ShoutProviderContract.Shouts.CONTENT_URI);
+				break;
+			case COMMENTS:
+				uris.add(ShoutProviderContract.Shouts.CONTENT_URI);
+				break;
+			case RESHOUTS:
+				uris.add(ShoutProviderContract.Shouts.CONTENT_URI);
+				break;
+		}
+
+		for (Uri u : uris) {
+			this.getContext().getContentResolver()
+					.notifyChange(u, null);
+		}
+	}
+
 	@Override
 	public int delete(Uri uri, String selection, String[] selectionArgs) {
 		mDB = mOpenHelper.getWritableDatabase();
@@ -72,6 +114,12 @@ public class ShoutProvider extends ContentProvider {
 				whereClause = selection;
 				whereArgs = selectionArgs;
 				break;
+			case ROOTS:
+			case COMMENTS:
+			case RESHOUTS:
+				/* Use an INSTEAD OF trigger on the views to allow deletion */
+				Log.w(TAG, "Ignoring attempt to delete record via view URI " + uri);
+				throw new IllegalArgumentException("Cannot delete via view URI" + uri);
 			case SHOUT_ID:
 				table = ShoutProviderContract.Shouts.TABLE_NAME;
 				id = uri.getLastPathSegment();
@@ -105,7 +153,7 @@ public class ShoutProvider extends ContentProvider {
 				throw new IllegalArgumentException("Invalid or unknown URI " + uri);
 		}
 		int rowsAffected = mDB.delete(table, whereClause, whereArgs);
-		this.getContext().getContentResolver().notifyChange(uri, null);
+		notifyChange(uri);
 		return rowsAffected;
 	}
 
@@ -135,6 +183,12 @@ public class ShoutProvider extends ContentProvider {
 			case SHOUTS:
 				table = ShoutProviderContract.Shouts.TABLE_NAME;
 				break;
+			case ROOTS:
+			case COMMENTS:
+			case RESHOUTS:
+				/* Use an INSTEAD OF trigger on the views to allow insertion */
+				Log.w(TAG, "Ignoring attempt to insert record via view URI " + uri);
+				throw new IllegalArgumentException("Cannot insert record via view URI" + uri);
 			case USERS:
 				table = ShoutProviderContract.Users.TABLE_NAME;
 				break;
@@ -224,8 +278,7 @@ public class ShoutProvider extends ContentProvider {
 		Uri insertLocation = ContentUris.withAppendedId(uri, id);
 		if (!exists) {
 			// Only notify the observers if this was a new insert
-			this.getContext().getContentResolver()
-					.notifyChange(insertLocation, null);
+			notifyChange(insertLocation);
 		}
 		return insertLocation;
 	}
@@ -245,6 +298,15 @@ public class ShoutProvider extends ContentProvider {
 		switch (match) {
 			case SHOUTS:
 				qBuilder.setTables(ShoutProviderContract.Shouts.TABLE_NAME);
+				break;
+			case ROOTS:
+				qBuilder.setTables(ShoutProviderContract.Shouts.ROOT_VIEW);
+				break;
+			case COMMENTS:
+				qBuilder.setTables(ShoutProviderContract.Shouts.COMMENT_VIEW);
+				break;
+			case RESHOUTS:
+				qBuilder.setTables(ShoutProviderContract.Shouts.RESHOUT_VIEW);
 				break;
 			case SHOUT_ID:
 				qBuilder.setTables(ShoutProviderContract.Shouts.TABLE_NAME);
@@ -304,6 +366,12 @@ public class ShoutProvider extends ContentProvider {
 				whereClause = selection;
 				whereArgs = selectionArgs;
 				break;
+			case ROOTS:
+			case COMMENTS:
+			case RESHOUTS:
+				/* Use an INSTEAD OF trigger on the views to allow updating */
+				Log.w(TAG, "Ignoring attempt to update record via view URI " + uri);
+				throw new IllegalArgumentException("Cannot update record via view URI" + uri);
 			case SHOUT_ID:
 				id = uri.getLastPathSegment();
 				table = ShoutProviderContract.Shouts.TABLE_NAME;
@@ -349,7 +417,7 @@ public class ShoutProvider extends ContentProvider {
 				throw new IllegalArgumentException("Unknown or invalid URI " + uri);
 		}
 		int rowsAffected = mDB.update(table, values, whereClause, whereArgs);
-		this.getContext().getContentResolver().notifyChange(uri, null);
+		notifyChange(uri);
 		return rowsAffected;
 	}
 
