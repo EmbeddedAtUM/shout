@@ -300,7 +300,25 @@ public class ShoutProvider extends ContentProvider {
 				qBuilder.setTables(ShoutProviderContract.Shouts.TABLE_NAME);
 				break;
 			case ROOTS:
-				qBuilder.setTables(ShoutProviderContract.Shouts.ROOT_VIEW);
+				/*
+				 * Order root shouts by most-recent comment. This special case
+				 * ordering should be built into a better query language, at
+				 * some point.
+				 */
+				String join_tables = ShoutProviderContract.Shouts.ROOT_VIEW + " AS root LEFT JOIN "
+						+ ShoutProviderContract.Shouts.COMMENT_VIEW
+						+ " AS comment ON (root." + ShoutProviderContract.Shouts.HASH + "=comment."
+						+ ShoutProviderContract.Shouts.PARENT + " OR root."
+						+ ShoutProviderContract.Shouts.HASH + "=comment."
+						+ ShoutProviderContract.Shouts.HASH + ")";
+				qBuilder.setTables(join_tables);
+				qBuilder.setDistinct(true);
+				projection = new String[] {
+						// coalesces must come first, for sortOrder to work
+						"coalesce(comment.Time_received, root.Time_received) AS Time_received, "
+								+ "coalesce(comment.Timestamp, root.Timestamp) AS Timestamp, "
+								+ "root.*"
+				};
 				break;
 			case COMMENTS:
 				qBuilder.setTables(ShoutProviderContract.Shouts.COMMENT_VIEW);
