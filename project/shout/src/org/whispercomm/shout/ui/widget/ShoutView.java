@@ -138,7 +138,7 @@ public class ShoutView extends RelativeLayout {
 
 		if (shout.getReshoutCount() > 0) {
 			reshoutCount.setVisibility(View.VISIBLE);
-			int count = shout.getReshouters().size();
+			int count = shout.getReshoutCount();
 			reshoutCount.setText(String.format("and %d %s", count, count == 1 ? "reshouter"
 					: "reshouters"));
 		} else {
