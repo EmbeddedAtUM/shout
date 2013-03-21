@@ -6,15 +6,23 @@ Shout for Android
 Compiling
 ---------
 
-Shout uses MANES libraries, so you should have cloned the MANES repository and 
-imported the MacLib and MacEntity into your Eclipse before executing the
-following steps.
+1. Shout requires some 3rd-party API keys, specified in the
+   shout-release repository.  Ensure that a copy of it is in the same
+   parent directory as this repo.
 
-1. Import the Shout and ShoutTest projects located in project/ as existing
-Eclipse projects
+   1.1 Follow the instructions in the shout-release README to
+       configure it.
 
-2. Set up a run configuration to run the unit tests by following the 
-instructions at [here](http://pivotal.github.com/robolectric/eclipse-quick-start.html).
+2. Shout uses MANES libraries, so clone the MANES repository and
+   imported the MacLib and MacEntity into your Eclipse before
+   executing the following steps.
 
-3. If you want to run Shout on an emulator, have an AVD with the 2.2 platform
-or newer
+   2.1 Import the Shout and ShoutTest projects located in project/ as
+       existing Eclipse projects
+
+   2.2 Set up a run configuration to run the unit tests by following
+       the instructions at
+       [here](http://pivotal.github.com/robolectric/eclipse-quick-start.html).
+
+3. To run Shout on an emulator, use an AVD with the 2.2 platform or
+   newer.
