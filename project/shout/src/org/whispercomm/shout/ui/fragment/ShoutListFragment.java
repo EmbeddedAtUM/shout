@@ -74,12 +74,6 @@ public class ShoutListFragment extends SherlockFragment implements
 		inflator.inflate(R.menu.fragment_shoutlist, menu);
 	}
 
-	@Override
-	public void onDestroy() {
-		getLoaderManager().destroyLoader(0);
-		super.onDestroy();
-	}
-
 	/**
 	 * Reloads all the shouts sorted in the given order.
 	 * 
