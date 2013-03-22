@@ -18,6 +18,7 @@
     <style name="AppTheme" parent="AppThemeBase">
         <item name="@attr/bitmapPreferenceStyle">@style/BitmapPreference</item>
         <item name="@attr/delegatedPreferenceStyle">@style/DelegatedPreference</item>
+        <item name="@attr/expandableViewStyle">@style/ExpandableView</item>
         <item name="actionBarStyle">@style/ActionBar</item>
     </style>
 
@@ -118,6 +119,15 @@
 
     <style name="DelegatedPreference">
         <!-- No special style to set here -->
+    </style>
+
+    <style name="ExpandableView">
+        <item name="expanded">false</item>
+        <item name="android:padding">5dip</item>
+        <item name="icon">@drawable/widget_expandable_view_trigger_icon</item>
+        <item name="headerTextAppearance">?android:attr/textAppearanceLarge</item>
+        <item name="subheaderTextAppearance">?android:attr/textAppearanceMedium</item>
+        <item name="triggerPadding">5dip</item>
     </style>
 
 </resources>

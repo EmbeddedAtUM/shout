@@ -29,5 +29,26 @@
 
     <attr name="delegatedPreferenceStyle" format="reference" />
     <attr name="bitmapPreferenceStyle" format="reference" />
+    <attr name="expandableViewStyle" format="reference" />
+    <attr name="expandableViewTriggerStyle" format="reference" />
+    <attr name="detailsFragmentReshoutItemStyle" format="reference" />
+
+    <declare-styleable name="ExpandableView">
+        <attr name="expanded" format="boolean" />
+        <attr name="icon" />
+        <attr name="header" format="string" />
+        <attr name="headerTextAppearance" format="reference" />
+        <attr name="subheader" format="string" />
+        <attr name="subheaderTextAppearance" format="reference" />
+        <attr name="triggerPadding" format="dimension" />
+        <attr name="triggerPaddingTop" format="dimension" />
+        <attr name="triggerPaddingRight" format="dimension" />
+        <attr name="triggerPaddingBottom" format="dimension" />
+        <attr name="triggerPaddingLeft" format="dimension" />
+        <attr name="triggerBackground" format="reference" />
+    </declare-styleable>
+    <declare-styleable name="ExpandableViewState">
+        <attr name="state_expanded" format="boolean" />
+    </declare-styleable>
 
 </resources>
