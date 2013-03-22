@@ -9,11 +9,24 @@ import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.SimpleHashReference;
 import org.whispercomm.shout.errors.NotFoundException;
 
+import android.app.Application;
+import android.content.Context;
 import android.support.v4.util.LruCache;
 import android.util.Log;
 
 public class AvatarStorage {
 	private static final String TAG = AvatarStorage.class.getSimpleName();
+
+	/**
+	 * Use with {@link Context#getSystemService(String)} to retrieve an
+	 * {@link AvatarStorage} for accessing content.
+	 * <p>
+	 * Since {@link AvatarStorage} is not a standard system service, you must
+	 * create a custom {@link Application} subclass implementing
+	 * {@link Application#getSystemService(String)} and add it to your
+	 * {@code AndroidManifest.xml}.
+	 */
+	public static final String SHOUT_AVATAR_SERVICE = "org.whispercomm.shout.content.AvatarStorage";
 
 	/**
 	 * TODO: AvatarStorage should be an application singleton and cache an

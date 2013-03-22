@@ -10,7 +10,6 @@ import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.LocalUser;
 import org.whispercomm.shout.SimpleHashReference;
 import org.whispercomm.shout.content.AvatarStorage;
-import org.whispercomm.shout.content.ContentManager;
 import org.whispercomm.shout.crypto.ECPublicKey;
 import org.whispercomm.shout.crypto.KeyGenerator;
 import org.whispercomm.shout.errors.InvalidEncodingException;
@@ -30,7 +29,7 @@ public class LocalUserImpl implements LocalUser {
 
 	public LocalUserImpl(Context context, String username, String encodedKey,
 			String encodedAvatarHash) {
-		this.context = context;
+		this.context = context.getApplicationContext();
 
 		this.username = username;
 		try {
@@ -49,7 +48,8 @@ public class LocalUserImpl implements LocalUser {
 	}
 
 	private void updateAvatar(Hash avatarHash) {
-		AvatarStorage storage = new AvatarStorage(new ContentManager(context));
+		AvatarStorage storage = (AvatarStorage) context
+				.getSystemService(AvatarStorage.SHOUT_AVATAR_SERVICE);
 		try {
 			avatar = storage.retrieve(avatarHash);
 		} catch (IOException e) {

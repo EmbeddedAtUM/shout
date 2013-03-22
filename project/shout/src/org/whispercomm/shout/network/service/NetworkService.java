@@ -107,7 +107,8 @@ public class NetworkService extends Service implements ManesConnection, ManesIns
 				shoutProtocol = new ShoutProtocol(packetProtocol);
 				packetProtocol.register(ObjectType.Shout, shoutProtocol);
 
-				contentManager = new ContentManager(this);
+				contentManager = (ContentManager) this.getApplicationContext()
+						.getSystemService(ContentManager.SHOUT_CONTENT_SERVICE);
 				contentProtocol = new ContentProtocol(packetProtocol, contentManager);
 				contentRequestHandler = new SimpleContentRequestHandler(new AlarmExecutorService(
 						this, Executors.newSingleThreadExecutor(), "SHOUT_CONTENT_PROTOCOL"),

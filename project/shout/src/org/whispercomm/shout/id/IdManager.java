@@ -8,7 +8,6 @@ import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.Me;
 import org.whispercomm.shout.SimpleHashReference;
 import org.whispercomm.shout.content.AvatarStorage;
-import org.whispercomm.shout.content.ContentManager;
 import org.whispercomm.shout.crypto.ECKeyPair;
 import org.whispercomm.shout.crypto.KeyGenerator;
 import org.whispercomm.shout.util.Validators;
@@ -25,7 +24,8 @@ public class IdManager {
 	private AvatarStorage avatarStorage;
 
 	public IdManager(Context context) {
-		this(new KeyStorageSharedPrefs(context), new AvatarStorage(new ContentManager(context)));
+		this(new KeyStorageSharedPrefs(context), (AvatarStorage) context
+				.getSystemService(AvatarStorage.SHOUT_AVATAR_SERVICE));
 	}
 
 	public IdManager(KeyStorage keyStorage, AvatarStorage avatarStorage) {

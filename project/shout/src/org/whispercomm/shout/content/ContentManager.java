@@ -14,6 +14,7 @@ import org.whispercomm.shout.content.storage.FileObjectStorage;
 import org.whispercomm.shout.content.storage.ObjectStorage;
 import org.whispercomm.shout.errors.NotFoundException;
 
+import android.app.Application;
 import android.content.ContentProvider;
 import android.content.Context;
 
@@ -24,6 +25,17 @@ import android.content.Context;
  * @author David R. Bild
  */
 public class ContentManager {
+
+	/**
+	 * Use with {@link Context#getSystemService(String)} to retrieve a
+	 * {@link ContentManager} for accessing content.
+	 * <p>
+	 * Since {@link ContentManager} is not a standard system service, you must
+	 * create a custom {@link Application} subclass implementing
+	 * {@link Application#getSystemService(String)} and add it to your
+	 * {@code AndroidManifest.xml}.
+	 */
+	public static final String SHOUT_CONTENT_SERVICE = "org.whispercomm.shout.content.ContentManager";
 
 	private static final String OBJECT_ROOT_DIR = "objects";
 
