@@ -15,24 +15,28 @@ import android.support.v4.content.AsyncTaskLoader;
  * 
  * @author David R. Bild
  */
-public class CursorLoader extends AsyncTaskLoader<Cursor> {
+public abstract class CursorLoader extends AsyncTaskLoader<Cursor> {
 
 	final ForceLoadContentObserver mObserver;
 
-	private CursorLoaderCallbacks mCallbacks;
-
 	private Cursor mCursor;
 
-	public CursorLoader(Context context, CursorLoaderCallbacks callbacks) {
+	public CursorLoader(Context context) {
 		super(context);
 		mObserver = new ForceLoadContentObserver();
-		mCallbacks = callbacks;
 	}
+
+	/**
+	 * Called on a worker thread to load the {@link Cursor}.
+	 * 
+	 * @return the loaded {@code Cursor}
+	 */
+	public abstract Cursor onLoadCursor();
 
 	/* Runs on a worker thread */
 	@Override
 	public Cursor loadInBackground() {
-		Cursor cursor = mCallbacks.loadCursor();
+		Cursor cursor = onLoadCursor();
 		if (cursor != null) {
 			// Ensure cursor window is filled
 			cursor.getCount();
@@ -114,10 +118,6 @@ public class CursorLoader extends AsyncTaskLoader<Cursor> {
 			mCursor.close();
 		}
 		mCursor = null;
-	}
-
-	public interface CursorLoaderCallbacks {
-		public Cursor loadCursor();
 	}
 
 }

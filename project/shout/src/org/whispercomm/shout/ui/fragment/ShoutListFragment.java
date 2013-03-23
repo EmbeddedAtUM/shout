@@ -8,7 +8,6 @@ import java.util.Set;
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.R;
 import org.whispercomm.shout.provider.CursorLoader;
-import org.whispercomm.shout.provider.CursorLoader.CursorLoaderCallbacks;
 import org.whispercomm.shout.provider.ParcelableShout;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.provider.ShoutProviderContract.SortOrder;
@@ -29,7 +28,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
 public class ShoutListFragment extends SherlockFragment implements
-		LoaderManager.LoaderCallbacks<Cursor>, CursorLoaderCallbacks {
+		LoaderManager.LoaderCallbacks<Cursor> {
 
 	private static final String BUNDLE_KEY = "parceled_shouts";
 
@@ -130,7 +129,13 @@ public class ShoutListFragment extends SherlockFragment implements
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle arg1) {
-		return new CursorLoader(getActivity(), this);
+		return new CursorLoader(getActivity()) {
+			@Override
+			public Cursor onLoadCursor() {
+				return ShoutProviderContract
+						.getCursorOverAllShouts(getActivity(), sortOrder);
+			}
+		};
 	}
 
 	@Override
@@ -143,9 +148,4 @@ public class ShoutListFragment extends SherlockFragment implements
 		adapter.swapCursor(null);
 	}
 
-	@Override
-	public Cursor loadCursor() {
-		return ShoutProviderContract
-				.getCursorOverAllShouts(getActivity(), sortOrder);
-	}
 }
