@@ -8,19 +8,23 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:orientation="vertical"
+        android:padding="5dp" >
 
         <org.whispercomm.shout.ui.widget.ShoutView
             android:id="@+id/shoutview"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:background="@android:color/white" >
         </org.whispercomm.shout.ui.widget.ShoutView>
 
         <org.whispercomm.shout.ui.widget.ExpandableView
             android:id="@+id/expandable_location"
+            style="@style/ExpandableView.White"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
+            android:layout_marginBottom="5dp"
             app:expanded="true"
             app:header="Locations" >
 
@@ -34,9 +38,10 @@
 
         <org.whispercomm.shout.ui.widget.ExpandableView
             android:id="@+id/expandable_comments"
+            style="@style/ExpandableView.White"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
+            android:layout_marginBottom="5dp"
             app:expanded="false"
             app:header="Comments" >
 
@@ -50,9 +55,9 @@
 
         <org.whispercomm.shout.ui.widget.ExpandableView
             android:id="@+id/expandable_reshouts"
+            style="@style/ExpandableView.White"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
             app:expanded="false"
             app:header="Reshouts" >
 

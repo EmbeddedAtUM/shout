@@ -130,6 +130,10 @@
         <item name="triggerPadding">5dip</item>
     </style>
 
+    <style name="ExpandableView.White">
+        <item name="android:background">@drawable/rounded</item>
+    </style>
+
     <style name="DetailsFragmentReshoutItem">
         <item name="avatarSize">36dip</item>
         <item name="senderTextAppearance">?android:attr/textAppearanceMedium</item>
