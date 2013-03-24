@@ -67,7 +67,20 @@ public class DelegatedPreference<T> extends Preference implements OnActivityResu
 	}
 
 	public DelegatedPreference(Context context, AttributeSet attrs, int defStyle) {
-		super(context, attrs, defStyle);
+		/*
+		 * Custom styles cannot inherit from the platform Preference style (it's
+		 * not exposed in android:styles/). Thus, passing the provided custom
+		 * defStyle to the superclass will prevent the intended platform-default
+		 * styling from happening. Consequently, we do not pass the custom style
+		 * on.
+		 */
+		/*
+		 * The only styleable attribute from the Preference superclass that we
+		 * care about is the widget layout reference. Thus, we declare it
+		 * expicity it in the DelegatePreference styleable, extract it manually,
+		 * and pass it on.
+		 */
+		super(context, attrs);
 
 		mState = State.IDLE;
 		mDelegates = new ArrayList<DelegateInterface<T>>();
@@ -78,6 +91,9 @@ public class DelegatedPreference<T> extends Preference implements OnActivityResu
 
 		TypedArray a = context.obtainStyledAttributes(attrs,
 				R.styleable.DelegatedPreference, defStyle, 0);
+		// pass the provided widgetLayout id to the parent class
+		setWidgetLayoutResource(a.getResourceId(
+				R.styleable.DelegatedPreference_android_widgetLayout, 0));
 		mCancelText = a.getString(R.styleable.DelegatedPreference_cancelText);
 		mDialogTitle = a.getString(R.styleable.DelegatedPreference_android_dialogTitle);
 		if (mDialogTitle == null)
