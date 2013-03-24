@@ -70,6 +70,9 @@ public class ShoutView extends RelativeLayout {
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		inflater.inflate(R.layout.shoutview, this);
 		initializeViews();
+		mHandler = new Handler();
+		formattedAge = FormattedAge.create(new AgeUpdater());
+		formattedAge.setAbsoluteNoTime(true);
 	}
 
 	@Override
