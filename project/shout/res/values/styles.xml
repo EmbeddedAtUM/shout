@@ -10,8 +10,7 @@
 			In general, this entry specifies attributes related to the actionbar that 
 			are not available in the min API version. The backwards-compatible attributes 
 			defined by ActionBarSherlock and used on min API devices are. The equivalent 
-			attributes in the android namespace, added in API 11, are specified in values-v11/styles.xml.
-        -->
+			attributes in the android namespace, added in API 11, are specified in values-v11/styles.xml. -->
         <item name="actionBarStyle">@style/ActionBar</item>
     </style>
 
@@ -20,14 +19,14 @@
         <item name="@attr/delegatedPreferenceStyle">@style/DelegatedPreference</item>
         <item name="@attr/expandableViewStyle">@style/ExpandableView</item>
         <item name="@attr/detailsFragmentReshoutItemStyle">@style/DetailsFragmentReshoutItem</item>
-        <item name="actionBarStyle">@style/ActionBar</item>
+        <item name="@android:attr/windowBackground">@drawable/messageviewgradient</item>
     </style>
 
     <style name="ActionBarBase" parent="Widget.Sherlock.ActionBar">
 
         <!--
              See the comments for AppThemeBase to understand the purpose of "Base" 
-			themes.
+			themes.
         -->
         <item name="titleTextStyle">@style/NoTitleText</item>
     </style>
@@ -53,14 +52,14 @@
         <!-- These color overrides should be removed when the main theme is fixed. -->
         <!--
              Override bad text colors that propagate through to preferences title 
-			and summary fields
+			and summary fields
         -->
         <item name="@android:attr/textColorPrimary">@android:color/primary_text_light</item>
         <item name="@android:attr/textColorSecondary">@android:color/secondary_text_light</item>
 
         <!--
              Override bad text and background colors in PreferenceCategory title 
-			display.
+			display.
         -->
         <item name="@android:attr/listSeparatorTextViewStyle">@style/ListSeparatorView</item>
     </style>
