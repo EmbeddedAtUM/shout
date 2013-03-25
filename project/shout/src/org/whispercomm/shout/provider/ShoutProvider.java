@@ -215,6 +215,7 @@ public class ShoutProvider extends ContentProvider {
 		mDB = mOpenHelper.getReadableDatabase();
 		SQLiteQueryBuilder qBuilder = new SQLiteQueryBuilder();
 		int match = sUriMatcher.match(uri);
+		String groupBy = null;
 		switch (match) {
 			case ALL_SHOUTS:
 				qBuilder.setTables(ShoutDatabaseHelper.DENORMED_SHOUT_VIEW);
@@ -234,13 +235,13 @@ public class ShoutProvider extends ContentProvider {
 						+ ShoutProviderContract.Shouts.HASH + "=comment."
 						+ ShoutProviderContract.Shouts.HASH + ")";
 				qBuilder.setTables(join_tables);
-				qBuilder.setDistinct(true);
 				projection = new String[] {
 						// coalesces must come first, for sortOrder to work
 						"coalesce(comment.Time_received, original.Time_received) AS Time_received, "
 								+ "coalesce(comment.Timestamp, original.Timestamp) AS Timestamp, "
 								+ "original.*"
 				};
+				groupBy = "original.Hash";
 				break;
 			case COMMENT_SHOUTS:
 				qBuilder.setTables(ShoutDatabaseHelper.DENORMED_COMMENT_VIEW);
@@ -284,7 +285,7 @@ public class ShoutProvider extends ContentProvider {
 		}
 
 		Cursor resultCursor = qBuilder.query(mDB, projection, selection,
-				selectionArgs, null, null, sortOrder);
+				selectionArgs, groupBy, null, sortOrder);
 		resultCursor.setNotificationUri(this.getContext().getContentResolver(),
 				uri);
 
