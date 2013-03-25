@@ -126,11 +126,12 @@
     </style>
 
     <style name="DetailsFragmentReshoutItem">
-        <item name="avatarSize">36dip</item>
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="avatarSize">40dip</item>
         <item name="senderTextAppearance">?android:attr/textAppearanceMedium</item>
         <item name="timestampTextAppearance">?android:attr/textAppearanceSmall</item>
-        <item name="android:paddingTop">2dip</item>
-        <item name="android:paddingBottom">2dip</item>
+        <item name="android:padding">4dip</item>
     </style>
 
     <style name="DetailsFragmentCommentItem">
