@@ -19,6 +19,12 @@
         <item name="@attr/expandableViewStyle">@style/ExpandableView</item>
         <item name="@attr/detailsFragmentReshoutItemStyle">@style/DetailsFragmentReshoutItem</item>
         <item name="@attr/detailsFragmentCommentItemStyle">@style/DetailsFragmentCommentItem</item>
+        <item name="detailsFragmentLocationViewStyle">@style/DetailsFragmentLocationView</item>
+        <item name="detailsFragmentCommentViewStyle">@style/DetailsFragmentCommentView</item>
+        <item name="detailsFragmentReshoutViewStyle">@style/DetailsFragmentReshoutView</item>
+        <item name="detailsFragmentLocationViewContentStyle">@style/DetailsFragmentLocationViewContent</item>
+        <item name="detailsFragmentCommentViewContentStyle">@style/DetailsFragmentCommentViewContent</item>
+        <item name="detailsFragmentReshoutViewContentStyle">@style/DetailsFragmentReshoutViewContent</item>
         <item name="@android:attr/windowBackground">@drawable/messageviewgradient</item>
     </style>
 
@@ -114,15 +120,10 @@
 
     <style name="ExpandableView">
         <item name="expanded">false</item>
-        <item name="android:padding">5dip</item>
         <item name="icon">@drawable/widget_expandable_view_trigger_icon</item>
         <item name="headerTextAppearance">?android:attr/textAppearanceLarge</item>
         <item name="subheaderTextAppearance">?android:attr/textAppearanceMedium</item>
         <item name="triggerPadding">5dip</item>
-    </style>
-
-    <style name="ExpandableView.White">
-        <item name="android:background">@drawable/rounded</item>
     </style>
 
     <style name="DetailsFragmentReshoutItem">
@@ -131,7 +132,8 @@
         <item name="avatarSize">40dip</item>
         <item name="senderTextAppearance">?android:attr/textAppearanceMedium</item>
         <item name="timestampTextAppearance">?android:attr/textAppearanceSmall</item>
-        <item name="android:padding">4dip</item>
+        <item name="android:paddingTop">4dip</item>
+        <item name="android:paddingBottom">4dip</item>
     </style>
 
     <style name="DetailsFragmentCommentItem">
@@ -139,8 +141,57 @@
         <item name="senderTextAppearance">?android:attr/textAppearanceMedium</item>
         <item name="timestampTextAppearance">?android:attr/textAppearanceSmall</item>
         <item name="messageTextAppearance">?android:attr/textAppearanceMedium</item>
-        <item name="android:paddingTop">2dip</item>
-        <item name="android:paddingBottom">2dip</item>
+        <item name="android:paddingTop">4dip</item>
+        <item name="android:paddingBottom">4dip</item>
+    </style>
+
+    <style name="DetailsFragmentExpandableView">
+        <item name="android:background">@drawable/rounded</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="DetailsFragmentLocationView" parent="DetailsFragmentExpandableView">
+        <item name="android:layout_marginBottom">4dp</item>
+    </style>
+
+    <style name="DetailsFragmentCommentView" parent="DetailsFragmentExpandableView">
+        <item name="android:layout_marginBottom">4dp</item>
+    </style>
+
+    <style name="DetailsFragmentReshoutView" parent="DetailsFragmentExpandableView"></style>
+
+    <style name="DetailsFragmentExpandableViewContent">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_below">@id/trigger</item>
+        <!-- Cannot override one direction if android:padding is used. -->
+        <item name="android:paddingLeft">4dp</item>
+        <item name="android:paddingRight">4dp</item>
+        <item name="android:paddingTop">4dp</item>
+        <item name="android:paddingBottom">4dp</item>
+    </style>
+
+    <style name="DetailsFragmentLocationViewContent" parent="DetailsFragmentExpandableViewContent"></style>
+
+    <style name="DetailsFragmentCommentViewContent" parent="DetailsFragmentExpandableViewContent">
+
+        <!-- Top/bottom padding on inner list items is sufficient -->
+        <item name="android:paddingBottom">0dp</item>
+        <item name="android:paddingTop">0dp</item>
+        <item name="android:divider">@drawable/divider</item>
+        <item name="android:dividerHeight">1dp</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+
+    <style name="DetailsFragmentReshoutViewContent" parent="DetailsFragmentExpandableViewContent">
+
+        <!-- Top/bottom padding on inner list items is sufficient -->
+        <item name="android:paddingBottom">0dp</item>
+        <item name="android:paddingTop">0dp</item>
+        <item name="android:divider">@drawable/divider</item>
+        <item name="android:dividerHeight">1dp</item>
+        <item name="android:orientation">vertical</item>
     </style>
 
 </resources>

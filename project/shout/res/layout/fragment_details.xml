@@ -21,52 +21,36 @@
 
         <org.whispercomm.shout.ui.widget.ExpandableView
             android:id="@+id/expandable_location"
-            style="@style/ExpandableView.White"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
+            style="?attr/detailsFragmentLocationViewStyle"
             app:expanded="true"
             app:header="Locations" >
 
             <View
                 android:id="@id/content"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true" >
+                style="?attr/detailsFragmentLocationViewContentStyle" >
             </View>
         </org.whispercomm.shout.ui.widget.ExpandableView>
 
         <org.whispercomm.shout.ui.widget.ExpandableView
             android:id="@+id/expandable_comments"
-            style="@style/ExpandableView.White"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
+            style="?attr/detailsFragmentCommentViewStyle"
             app:expanded="false"
             app:header="Comments" >
 
             <org.whispercomm.shout.ui.widget.FullListView
                 android:id="@id/content"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/trigger"
-                android:orientation="vertical" />
+                style="?attr/detailsFragmentCommentViewContentStyle" />
         </org.whispercomm.shout.ui.widget.ExpandableView>
 
         <org.whispercomm.shout.ui.widget.ExpandableView
             android:id="@+id/expandable_reshouts"
-            style="@style/ExpandableView.White"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            style="?attr/detailsFragmentReshoutViewStyle"
             app:expanded="false"
             app:header="Reshouts" >
 
             <org.whispercomm.shout.ui.widget.FullListView
                 android:id="@id/content"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/trigger"
-                android:orientation="vertical" />
+                style="?attr/detailsFragmentReshoutViewContentStyle" />
         </org.whispercomm.shout.ui.widget.ExpandableView>
     </LinearLayout>
 

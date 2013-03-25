@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_alignParentTop="true"
-    android:duplicateParentState="true" >
+    android:duplicateParentState="true"
+    android:minHeight="48dp" >
 
     <ImageView
         android:id="@+id/icon"

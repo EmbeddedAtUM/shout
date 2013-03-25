@@ -33,6 +33,12 @@
     <attr name="expandableViewTriggerStyle" format="reference" />
     <attr name="detailsFragmentReshoutItemStyle" format="reference" />
     <attr name="detailsFragmentCommentItemStyle" format="reference" />
+    <attr name="detailsFragmentReshoutViewStyle" format="reference" />
+    <attr name="detailsFragmentReshoutViewContentStyle" format="reference" />
+    <attr name="detailsFragmentCommentViewStyle" format="reference" />
+    <attr name="detailsFragmentCommentViewContentStyle" format="reference" />
+    <attr name="detailsFragmentLocationViewStyle" format="reference" />
+    <attr name="detailsFragmentLocationViewContentStyle" format="reference" />
 
     <declare-styleable name="ExpandableView">
         <attr name="expanded" format="boolean" />
