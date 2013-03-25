@@ -19,6 +19,7 @@
         <item name="@attr/delegatedPreferenceStyle">@style/DelegatedPreference</item>
         <item name="@attr/expandableViewStyle">@style/ExpandableView</item>
         <item name="@attr/detailsFragmentReshoutItemStyle">@style/DetailsFragmentReshoutItem</item>
+        <item name="@attr/detailsFragmentCommentItemStyle">@style/DetailsFragmentCommentItem</item>
         <item name="@android:attr/windowBackground">@drawable/messageviewgradient</item>
     </style>
 
@@ -138,6 +139,15 @@
         <item name="avatarSize">36dip</item>
         <item name="senderTextAppearance">?android:attr/textAppearanceMedium</item>
         <item name="timestampTextAppearance">?android:attr/textAppearanceSmall</item>
+        <item name="android:paddingTop">2dip</item>
+        <item name="android:paddingBottom">2dip</item>
+    </style>
+
+    <style name="DetailsFragmentCommentItem">
+        <item name="avatarSize">72dip</item>
+        <item name="senderTextAppearance">?android:attr/textAppearanceMedium</item>
+        <item name="timestampTextAppearance">?android:attr/textAppearanceSmall</item>
+        <item name="messageTextAppearance">?android:attr/textAppearanceMedium</item>
         <item name="android:paddingTop">2dip</item>
         <item name="android:paddingBottom">2dip</item>
     </style>

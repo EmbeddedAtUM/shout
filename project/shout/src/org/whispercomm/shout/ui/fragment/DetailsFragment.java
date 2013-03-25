@@ -154,8 +154,7 @@ public class DetailsFragment extends SherlockFragment implements
 		LocalShout shout;
 		while (cursor.moveToNext()) {
 			shout = ShoutProviderContract.retrieveShoutFromCursor(getActivity(), cursor);
-			ShoutView item = new ShoutView(getActivity());
-			item.bindShout(shout);
+			CommentItem item = CommentItem.create(getActivity(), mCommentsList).bindShout(shout);
 			mCommentsList.addView(item, LinearLayout.LayoutParams.MATCH_PARENT,
 					LinearLayout.LayoutParams.WRAP_CONTENT);
 		}
@@ -183,6 +182,124 @@ public class DetailsFragment extends SherlockFragment implements
 
 			mReshoutsList.addView(item, item.getLayoutParams());
 		}
+	}
+
+	public static class CommentItem extends RelativeLayout {
+
+		/**
+		 * Inflates and returns a new {@link CommentItem}. The returned item is
+		 * not attached to the provided {@code root}.
+		 * <p>
+		 * Why a factory method, instead of a constructor?
+		 * <p>
+		 * The layout must be inflated before the constructor is called so that
+		 * attributes specified in the XML are available during construction.
+		 * See the Javadoc for {@link ReshoutItem#create(Context, ViewGroup)}
+		 * for details.
+		 * 
+		 * @param context the context whose {@code LayoutInflater} to use
+		 * @param root the object providing the {@code LayoutParams} for the new
+		 *            view
+		 * @return the new {@code CommentItem}
+		 */
+		public static final CommentItem create(Context context, ViewGroup root) {
+			return (CommentItem) LayoutInflater.from(context).inflate(
+					R.layout.fragment_details_comments_item, root, false);
+		}
+
+		private int mAvatarSize;
+		private int mSenderTextAppearance;
+		private int mTimestampTextAppearance;
+		private int mMessageTextAppearance;
+
+		private TextView mMessage;
+		private TextView mSender;
+		private TextView mTimestamp;
+		private ImageView mAvatar;
+
+		/**
+		 * Use factory method {@link #create(Context, ViewGroup)} instead.
+		 */
+		public CommentItem(Context context) {
+			this(context, null);
+		}
+
+		/**
+		 * Use factory method {@link #create(Context, ViewGroup)} instead.
+		 */
+		public CommentItem(Context context, AttributeSet attrs) {
+			this(context, attrs, R.attr.detailsFragmentCommentItemStyle);
+		}
+
+		/**
+		 * Use factory method {@link #create(Context, ViewGroup)} instead.
+		 */
+		public CommentItem(Context context, AttributeSet attrs, int defStyle) {
+			super(context, attrs, defStyle);
+
+			TypedArray a = context.obtainStyledAttributes(attrs,
+					R.styleable.DetailsFragmentCommentItem, defStyle, 0);
+
+			mMessageTextAppearance = a.getResourceId(
+					R.styleable.DetailsFragmentCommentItem_messageTextAppearance, 0);
+			if (mMessageTextAppearance == 0)
+				throw new IllegalArgumentException(
+						"You must supply a messageTextAppearance attribute.");
+
+			mSenderTextAppearance = a.getResourceId(
+					R.styleable.DetailsFragmentCommentItem_senderTextAppearance, 0);
+			if (mSenderTextAppearance == 0)
+				throw new IllegalArgumentException(
+						"You must supply a senderTextAppearance attribute.");
+
+			mTimestampTextAppearance = a.getResourceId(
+					R.styleable.DetailsFragmentCommentItem_timestampTextAppearance, 0);
+			if (mTimestampTextAppearance == 0)
+				throw new IllegalArgumentException(
+						"You must supply a timestampTextAppearance attribute.");
+
+			mAvatarSize = a.getDimensionPixelSize(
+					R.styleable.DetailsFragmentCommentItem_avatarSize, 0);
+			if (mAvatarSize == 0)
+				throw new IllegalArgumentException("You must supply an avatarSize attribute.");
+
+			a.recycle();
+		}
+
+		@Override
+		public void onFinishInflate() {
+			super.onFinishInflate();
+
+			mMessage = (TextView) findViewById(R.id.message);
+			mSender = (TextView) findViewById(R.id.sender);
+			mTimestamp = (TextView) findViewById(R.id.timestamp);
+			mAvatar = (ImageView) findViewById(R.id.avatar);
+
+			mMessage.setTextAppearance(getContext(), mMessageTextAppearance);
+			mSender.setTextAppearance(getContext(), mSenderTextAppearance);
+			mTimestamp.setTextAppearance(getContext(), mTimestampTextAppearance);
+
+			mAvatar.getLayoutParams().height = mAvatarSize;
+			mAvatar.getLayoutParams().width = mAvatarSize;
+			mAvatar.requestLayout();
+
+		}
+
+		public CommentItem bindShout(LocalShout shout) {
+			String message = shout.getMessage();
+			String sender = shout.getSender().getUsername();
+			String timestamp = FormattedAge.formatAbsolute(shout.getTimestamp());
+			HashReference<Avatar> avatarRef = shout.getSender().getAvatar();
+
+			mMessage.setText(message);
+			mSender.setText(sender);
+			mTimestamp.setText(timestamp);
+			if (avatarRef.isAvailable())
+				mAvatar.setImageBitmap(avatarRef.get().getBitmap());
+
+			return this;
+		}
+
 	}
 
 	public static class ReshoutItem extends RelativeLayout {

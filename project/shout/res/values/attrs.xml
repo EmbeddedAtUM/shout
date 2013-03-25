@@ -32,6 +32,7 @@
     <attr name="expandableViewStyle" format="reference" />
     <attr name="expandableViewTriggerStyle" format="reference" />
     <attr name="detailsFragmentReshoutItemStyle" format="reference" />
+    <attr name="detailsFragmentCommentItemStyle" format="reference" />
 
     <declare-styleable name="ExpandableView">
         <attr name="expanded" format="boolean" />
@@ -51,10 +52,21 @@
         <attr name="state_expanded" format="boolean" />
     </declare-styleable>
 
+    <attr name="avatarSize" format="dimension" />
+    <attr name="senderTextAppearance" format="reference" />
+    <attr name="timestampTextAppearance" format="reference" />
+    <attr name="messageTextAppearance" format="reference" />
+
     <declare-styleable name="DetailsFragmentReshoutItem">
-        <attr name="avatarSize" format="dimension" />
-        <attr name="senderTextAppearance" format="reference" />
-        <attr name="timestampTextAppearance" format="reference" />
+        <attr name="avatarSize" />
+        <attr name="senderTextAppearance" />
+        <attr name="timestampTextAppearance" />
+    </declare-styleable>
+    <declare-styleable name="DetailsFragmentCommentItem">
+        <attr name="avatarSize" />
+        <attr name="senderTextAppearance" />
+        <attr name="timestampTextAppearance" />
+        <attr name="messageTextAppearance" />
     </declare-styleable>
 
 </resources>
