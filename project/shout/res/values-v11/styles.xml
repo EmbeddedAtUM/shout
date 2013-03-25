@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <style name="AppThemeBase" parent="Theme.Sherlock.Light.DarkActionBar">
+
+        <!--
+             See the comments in /res/values/styles.xml#AppThemeBase for
+             a description of the intended contents of this style.
+        -->
+        <item name="android:actionBarStyle">@style/ActionBar</item>
+    </style>
+
+    <style name="ActionBarBase" parent="Widget.Sherlock.ActionBar">
+
+        <!--
+        See the comments in /res/values/styles.xml#AppThemeBase 
+        to understand the purpose of these "Base" themes.
+        -->
+        <item name="android:titleTextStyle">@style/NoTitleText</item>
+    </style>
+
+</resources>

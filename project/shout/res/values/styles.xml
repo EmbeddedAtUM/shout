@@ -1,11 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="AppTheme" parent="Theme.Sherlock.Light.DarkActionBar">
+    <style name="AppThemeBase" parent="Theme.Sherlock.Light.DarkActionBar">
+
+        <!--
+             All customizations specific to a particular API version should go 
+			in the API-specific res/values-vXX/styles.xml file. This instance contains 
+			the values for backward compatibility on the lowest-supported API version. 
+			In general, this entry specifies attributes related to the actionbar that 
+			are not available in the min API version. The backwards-compatible attributes 
+			defined by ActionBarSherlock and used on min API devices are. The equivalent 
+			attributes in the android namespace, added in API 11, are specified in values-v11/styles.xml.
+        -->
+        <item name="actionBarStyle">@style/ActionBar</item>
+    </style>
+
+    <style name="AppTheme" parent="AppThemeBase">
         <item name="@attr/bitmapPreferenceStyle">@style/BitmapPreference</item>
         <item name="@attr/delegatedPreferenceStyle">@style/DelegatedPreference</item>
         <item name="actionBarStyle">@style/ActionBar</item>
-        <item name="android:actionBarStyle">@style/ActionBar</item>
+    </style>
+
+    <style name="ActionBarBase" parent="Widget.Sherlock.ActionBar">
+
+        <!--
+             See the comments for AppThemeBase to understand the purpose of "Base" 
+			themes.
+        -->
+        <item name="titleTextStyle">@style/NoTitleText</item>
+    </style>
+
+    <style name="ActionBar" parent="ActionBarBase">
+        <item name="android:background">@drawable/navgradient</item>
+        <item name="background">@drawable/navgradient</item>
+    </style>
+
+    <style name="NoTitleText">
+        <item name="android:textSize">0sp</item>
+        <item name="android:textColor">#00000000</item>
     </style>
 
     <style name="AppTheme.ShoutActivity">
@@ -17,11 +49,17 @@
         <item name="@attr/delegatedPreferenceStyle">@style/DelegatedPreference</item>
 
         <!-- These color overrides should be removed when the main theme is fixed. -->
-        <!-- Override bad text colors that propagate through to preferences title and summary fields -->
+        <!--
+             Override bad text colors that propagate through to preferences title 
+			and summary fields
+        -->
         <item name="@android:attr/textColorPrimary">@android:color/primary_text_light</item>
         <item name="@android:attr/textColorSecondary">@android:color/secondary_text_light</item>
 
-        <!-- Override bad text and background colors in PreferenceCategory title display. -->
+        <!--
+             Override bad text and background colors in PreferenceCategory title 
+			display.
+        -->
         <item name="@android:attr/listSeparatorTextViewStyle">@style/ListSeparatorView</item>
     </style>
 
@@ -32,18 +70,6 @@
     <style name="EditTextStyle" parent="android:Widget.EditText">
         <item name="android:background">@android:drawable/edit_text</item>
         <item name="android:textColor">@android:color/black</item>
-    </style>
-
-    <style name="ActionBar" parent="Widget.Sherlock.ActionBar">
-        <item name="android:background">@drawable/navgradient</item>
-        <item name="background">@drawable/navgradient</item>
-        <item name="android:titleTextStyle">@style/NoTitleText</item>
-        <item name="titleTextStyle">@style/NoTitleText</item>
-    </style>
-
-    <style name="NoTitleText">
-        <item name="android:textSize">0sp</item>
-        <item name="android:textColor">#00000000</item>
     </style>
 
     <style name="ListSeparatorView" parent="@android:attr/textViewStyle">
