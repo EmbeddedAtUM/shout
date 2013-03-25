@@ -10,21 +10,23 @@ import org.whispercomm.shout.provider.CursorLoader;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.ui.DetailsActivity;
 import org.whispercomm.shout.ui.widget.ExpandableView;
+import org.whispercomm.shout.ui.widget.FullListView;
 import org.whispercomm.shout.ui.widget.ShoutView;
 import org.whispercomm.shout.util.FormattedAge;
 
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.database.Cursor;
+import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.CursorAdapter;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -43,15 +45,30 @@ public class DetailsFragment extends SherlockFragment implements
 	private ExpandableView mCommentsView;
 	private ExpandableView mReshoutsView;
 
-	private LinearLayout mCommentsList;
-	private LinearLayout mReshoutsList;
+	private FullListView mCommentsList;
+	private FullListView mReshoutsList;
 
 	private LocalShout mShout;
+
+	private CommentAdapter mCommentAdapter;
+	private ReshoutAdapter mReshoutAdapter;
+
+	private CommentObserver mCommentObserver;
+	private ReshoutObserver mReshoutObserver;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mShout = getShoutFromBundle(getActivity().getIntent().getExtras());
+
+		mCommentAdapter = new CommentAdapter(getActivity(), null);
+		mReshoutAdapter = new ReshoutAdapter(getActivity(), null);
+
+		mCommentObserver = new CommentObserver();
+		mReshoutObserver = new ReshoutObserver();
+
+		mCommentAdapter.registerDataSetObserver(mCommentObserver);
+		mReshoutAdapter.registerDataSetObserver(mReshoutObserver);
 	}
 
 	@Override
@@ -64,10 +81,13 @@ public class DetailsFragment extends SherlockFragment implements
 		mCommentsView = (ExpandableView) v.findViewById(R.id.expandable_comments);
 		mReshoutsView = (ExpandableView) v.findViewById(R.id.expandable_reshouts);
 
-		mCommentsList = (LinearLayout) mCommentsView.findViewById(
+		mCommentsList = (FullListView) mCommentsView.findViewById(
 				R.id.content);
-		mReshoutsList = (LinearLayout) mReshoutsView.findViewById(
+		mReshoutsList = (FullListView) mReshoutsView.findViewById(
 				R.id.content);
+
+		mCommentsList.setAdapter(mCommentAdapter);
+		mReshoutsList.setAdapter(mReshoutAdapter);
 
 		mShoutView.bindShout(mShout);
 
@@ -94,10 +114,10 @@ public class DetailsFragment extends SherlockFragment implements
 		int id = loader.getId();
 		switch (id) {
 			case LOADER_COMMENTS:
-				displayComments(data);
+				mCommentAdapter.swapCursor(data);
 				break;
 			case LOADER_RESHOUTS:
-				displayReshouts(data);
+				mReshoutAdapter.swapCursor(data);
 				break;
 			default:
 				throw new IllegalArgumentException("Unknown Loader id " + id);
@@ -109,10 +129,10 @@ public class DetailsFragment extends SherlockFragment implements
 		int id = loader.getId();
 		switch (id) {
 			case LOADER_COMMENTS:
-				resetComments();
+				mCommentAdapter.swapCursor(null);
 				break;
 			case LOADER_RESHOUTS:
-				resetReshouts();
+				mReshoutAdapter.swapCursor(null);
 				break;
 			default:
 				throw new IllegalArgumentException("Unknown Loader id " + id);
@@ -132,55 +152,45 @@ public class DetailsFragment extends SherlockFragment implements
 		return shout;
 	}
 
-	private void resetComments() {
-		mCommentsList.removeAllViews();
+	private void onCommentCountChanged(int count) {
+		mCommentsView.setSubheader(String.format("%d", count));
+		if (count == 0)
+			mCommentsView.setVisibility(View.GONE);
+		else
+			mCommentsView.setVisibility(View.VISIBLE);
 	}
 
-	private void resetReshouts() {
-		mReshoutsList.removeAllViews();
+	private void onReshoutCountChanged(int count) {
+		mReshoutsView.setSubheader(String.format("%d", count));
+		if (count == 0)
+			mReshoutsView.setVisibility(View.GONE);
+		else
+			mReshoutsView.setVisibility(View.VISIBLE);
 	}
 
-	private void displayComments(Cursor cursor) {
-		// Set the subheader to count
-		mCommentsView.setSubheader(String.format("%d", cursor.getCount()));
+	private class CommentObserver extends DataSetObserver {
 
-		// Clear any previously-rendered comments
-		resetComments();
+		@Override
+		public void onChanged() {
+			onCommentCountChanged(mCommentAdapter.getCount());
+		}
 
-		// Ensure cursor is at beginning
-		cursor.moveToPosition(-1);
-
-		// Render the comments
-		LocalShout shout;
-		while (cursor.moveToNext()) {
-			shout = ShoutProviderContract.retrieveShoutFromCursor(getActivity(), cursor);
-			CommentItem item = CommentItem.create(getActivity(), mCommentsList).bindShout(shout);
-			mCommentsList.addView(item, LinearLayout.LayoutParams.MATCH_PARENT,
-					LinearLayout.LayoutParams.WRAP_CONTENT);
+		@Override
+		public void onInvalidated() {
+			onCommentCountChanged(0);
 		}
 	}
 
-	private void displayReshouts(Cursor cursor) {
-		// Set the subheader to count
-		mReshoutsView.setSubheader(String.format("%d", cursor.getCount()));
+	private class ReshoutObserver extends DataSetObserver {
 
-		// Clear any previously-rendered reshouts
-		resetReshouts();
+		@Override
+		public void onChanged() {
+			onReshoutCountChanged(mReshoutAdapter.getCount());
+		}
 
-		// Ensure cursor is at beginning
-		cursor.moveToPosition(-1);
-
-		// Render the reshouts
-		LocalShout shout;
-		while (cursor.moveToNext()) {
-			shout = ShoutProviderContract.retrieveShoutFromCursor(getActivity(), cursor);
-
-			ReshoutItem item = ReshoutItem.create(getActivity(), mReshoutsList).bindShout(
-					shout);
-
-			item.bindShout(shout);
-
-			mReshoutsList.addView(item, item.getLayoutParams());
+		@Override
+		public void onInvalidated() {
+			onReshoutCountChanged(0);
 		}
 	}
 
@@ -436,7 +446,7 @@ public class DetailsFragment extends SherlockFragment implements
 	}
 
 	/**
-	 * Loader for the reshouts;
+	 * Loader for the reshouts
 	 */
 	private static class ReshoutLoader extends CursorLoader {
 		/* Android does not allow non-static inner class Loaders */
@@ -455,4 +465,51 @@ public class DetailsFragment extends SherlockFragment implements
 
 	}
 
+	/**
+	 * Adapter for comments
+	 */
+	private static class CommentAdapter extends CursorAdapter {
+
+		public CommentAdapter(Context context, Cursor c) {
+			super(context, c, 0);
+		}
+
+		@Override
+		public void bindView(View view, Context context, Cursor cursor) {
+			CommentItem item = (CommentItem) view;
+			final LocalShout shout = ShoutProviderContract.retrieveShoutFromCursor(
+					context, cursor);
+			item.bindShout(shout);
+		}
+
+		@Override
+		public View newView(final Context context, Cursor cursor,
+				ViewGroup parent) {
+			return CommentItem.create(context, parent);
+		}
+	}
+
+	/**
+	 * Adapter for reshouts
+	 */
+	private static class ReshoutAdapter extends CursorAdapter {
+
+		public ReshoutAdapter(Context context, Cursor c) {
+			super(context, c, 0);
+		}
+
+		@Override
+		public void bindView(View view, Context context, Cursor cursor) {
+			ReshoutItem item = (ReshoutItem) view;
+			final LocalShout shout = ShoutProviderContract.retrieveShoutFromCursor(
+					context, cursor);
+			item.bindShout(shout);
+		}
+
+		@Override
+		public View newView(final Context context, Cursor cursor,
+				ViewGroup parent) {
+			return ReshoutItem.create(context, parent);
+		}
+	}
 }

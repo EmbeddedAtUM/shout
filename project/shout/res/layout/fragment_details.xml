@@ -45,7 +45,7 @@
             app:expanded="false"
             app:header="Comments" >
 
-            <LinearLayout
+            <org.whispercomm.shout.ui.widget.FullListView
                 android:id="@id/content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -61,7 +61,7 @@
             app:expanded="false"
             app:header="Reshouts" >
 
-            <LinearLayout
+            <org.whispercomm.shout.ui.widget.FullListView
                 android:id="@id/content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
