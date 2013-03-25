@@ -68,5 +68,9 @@
         <attr name="timestampTextAppearance" />
         <attr name="messageTextAppearance" />
     </declare-styleable>
+    <declare-styleable name="FullListView">
+        <attr name="android:divider" />
+        <attr name="android:dividerHeight" />
+    </declare-styleable>
 
 </resources>
