@@ -149,6 +149,7 @@ public class ActionShoutView extends LinearLayout {
 					break;
 			}
 		}
+		array.recycle();
 	}
 
 	private OnClickListener createOnClickListener(final String methodName) {
