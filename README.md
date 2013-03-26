@@ -24,5 +24,11 @@ Compiling
        the instructions at
        [here](http://pivotal.github.com/robolectric/eclipse-quick-start.html).
 
-3. To run Shout on an emulator, use an AVD with the 2.2 platform or
+3. Shout requires 3rd party libraries contained as symlinks or
+   submodules in the project/contrib directory.
+  
+   3.1 Follow the the instructions in project/contrib/README to import
+       these libraries into your Eclipse workspace
+
+4. To run Shout on an emulator, use an AVD with the 2.2 platform or
    newer.

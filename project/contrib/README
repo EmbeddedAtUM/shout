@@ -1,7 +1,52 @@
-Shout requires some libraries distributed with Android SDK.  Please
-configure symlinks pointing to your copy of the sdk according to the
-following instructions.
+Third-Party Libraries
+=====================
+Shout requires some third-party libaries to be included in the
+workspace.  Please configure them according to the following
+instructions.
 
-Google Play Services:
-Run
-    ln -s ${YOUR_SDK_LOCATION}/extras/google/google_play_services/libproject/google-play-services_lib GooglePlayServices
+Android SDK Libraries
+=====================
+
+Some Google-provided libraries are provided with the Android SDK.  For
+these libraries, configure symlinks pointing to your local copy of the
+SDK as described in the following subsections.
+
+Google Play Services
+-------------------- 
+
+Google Play Services is distributed with the Android SDK.  Please
+configure a symlink pointing to your local copy and then import the
+library into Eclipse:
+
+ 1. `ln -s ${YOUR_SDK_LOCATION}/extras/google/google_play_services/libproject/google-play-services_lib GooglePlayServices`
+ 2. In Eclipse, File->Import->Existing Android Code and import `../../contrib/GooglePlayServices`
+    2.1  Rename the imported library to `GooglePlayServices`
+
+Git Submodule Libraries
+=======================
+
+Some open-source libraries are included as Git submodules.  Checkout
+these submodules by running:
+
+ 1. `git submodule init`
+ 2. `git submodule update`
+
+Then import each library into your Eclipse workspace.
+
+ActionBarSherlock
+-----------------
+
+ActionBarSherlock brings the ICS Action Bar to the lower version of
+Android.
+
+ 1. In Eclipse, File->Import-Existing Android Code and import `../../contrib/ActionBarSherlock/library`
+    1.1 Rename the imported library to `ActionBarSherlock`
+
+ViewPagerIndicator
+------------------
+
+ViewPagerIndicator provides various page indicator widgets for tabbed
+and paged views.
+
+ 1. In Eclipse, File->Import-Existing Android Code and import `../../contrib/ViewPagerIndicator/library`
+    1.1 Rename the imported library to `ViewPagerIndicator` 
