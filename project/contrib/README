@@ -1,0 +1,7 @@
+Shout requires some libraries distributed with Android SDK.  Please
+configure symlinks pointing to your copy of the sdk according to the
+following instructions.
+
+Google Play Services:
+Run
+    ln -s ${YOUR_SDK_LOCATION}/extras/google/google_play_services/libproject/google-play-services_lib GooglePlayServices
