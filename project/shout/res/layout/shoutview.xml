@@ -27,7 +27,7 @@
     <LinearLayout
         android:id="@+id/toprow"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignTop="@id/avatar"
         android:layout_marginLeft="5dp"
@@ -60,7 +60,7 @@
 
         <View
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="1dp"
             android:layout_weight="1" >
         </View>
     </LinearLayout>
@@ -89,7 +89,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@id/toprow"
-        android:layout_alignParentBottom="true"
         android:layout_below="@id/shoutDetails"
         android:singleLine="true"
         android:textColor="@color/gray" />
@@ -98,7 +97,6 @@
         android:id="@+id/age"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_below="@id/shoutDetails"
         android:textColor="@color/gray" />
