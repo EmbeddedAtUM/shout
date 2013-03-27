@@ -26,6 +26,10 @@
         <attr name="android:dialogTitle" />
         <attr name="android:widgetLayout" />
     </declare-styleable>
+    <declare-styleable name="ViewportLayout">
+        <attr name="viewportWidth" format="reference" />
+        <attr name="viewportHeight" format="reference" />
+    </declare-styleable>
 
     <attr name="delegatedPreferenceStyle" format="reference" />
     <attr name="bitmapPreferenceStyle" format="reference" />
