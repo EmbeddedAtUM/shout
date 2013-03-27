@@ -1,9 +1,13 @@
 
 package org.whispercomm.shout.ui.fragment;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.whispercomm.shout.Avatar;
 import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.LocalShout;
+import org.whispercomm.shout.Location;
 import org.whispercomm.shout.R;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.provider.CursorLoader;
@@ -19,6 +23,8 @@ import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.database.DataSetObserver;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
@@ -31,8 +37,14 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 public class DetailsFragment extends SherlockFragment implements
 		LoaderManager.LoaderCallbacks<Cursor> {
@@ -40,10 +52,19 @@ public class DetailsFragment extends SherlockFragment implements
 	private static final int LOADER_COMMENTS = 0;
 	private static final int LOADER_RESHOUTS = 1;
 
+	/*
+	 * The BitmapDescriptorFactory requires a Context, so these can't be
+	 * configured statically
+	 */
+	private BitmapDescriptor ORIGINAL_MARKER;
+	private BitmapDescriptor COMMENT_MARKER;
+	private BitmapDescriptor RESHOUT_MARKER;
+
 	private ShoutView mShoutView;
 
 	@SuppressWarnings("unused")
 	private ExpandableView mMapView;
+	// Place the sender's marker
 	private ExpandableView mCommentsView;
 	private ExpandableView mReshoutsView;
 
@@ -60,6 +81,12 @@ public class DetailsFragment extends SherlockFragment implements
 	private CommentObserver mCommentObserver;
 	private ReshoutObserver mReshoutObserver;
 
+	private Set<LatLng> mLatLngReshouts = new HashSet<LatLng>();
+	private Set<LatLng> mLatLngComments = new HashSet<LatLng>();
+
+	private boolean mLayout = false;
+	private Handler mHandler;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -73,6 +100,8 @@ public class DetailsFragment extends SherlockFragment implements
 
 		mCommentAdapter.registerDataSetObserver(mCommentObserver);
 		mReshoutAdapter.registerDataSetObserver(mReshoutObserver);
+
+		mHandler = new Handler(Looper.getMainLooper());
 	}
 
 	@Override
@@ -96,12 +125,117 @@ public class DetailsFragment extends SherlockFragment implements
 		mCommentsList.setAdapter(mCommentAdapter);
 		mReshoutsList.setAdapter(mReshoutAdapter);
 
-		mShoutView.bindShout(mShout);
-
 		getLoaderManager().initLoader(LOADER_COMMENTS, null, this);
 		getLoaderManager().initLoader(LOADER_RESHOUTS, null, this);
 
+		ORIGINAL_MARKER = BitmapDescriptorFactory
+				.defaultMarker(BitmapDescriptorFactory.HUE_RED);
+		COMMENT_MARKER = BitmapDescriptorFactory
+				.defaultMarker(BitmapDescriptorFactory.HUE_AZURE);
+		RESHOUT_MARKER = BitmapDescriptorFactory
+				.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);
+
+		mShoutView.bindShout(mShout);
+
 		return v;
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+
+		mLayout = true;
+		onDisplayOriginalLocation();
+
+		// // Place the sender's marker
+		// LatLng latLng = getLatLng(mShout);
+		// if (latLng != null) {
+		// CameraPosition pos = new CameraPosition(latLng, 14, 0, 0);
+		// mMap.addMarker(new MarkerOptions().position(latLng));
+		// mMap.moveCamera(CameraUpdateFactory.newCameraPosition(pos));
+		//
+		// // Add comment markers
+		// for (Shout comment : mShout.getComments()) {
+		// mMap.addMarker(new MarkerOptions().position(getLatLng(comment)).icon(
+		// BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+		// }
+		//
+		// // Add reshouter markers
+		// Cursor c = ShoutProviderContract.getReshouts(getActivity(), mShout);
+		// c.moveToFirst();
+		// while (!c.isAfterLast()) {
+		// mMap.addMarker(new MarkerOptions()
+		// .position(
+		// getLatLng(
+		// ShoutProviderContract.retrieveShoutFromCursor(getActivity(), c)))
+		// .icon(
+		// BitmapDescriptorFactory
+		// .defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+		// c.moveToNext();
+		// }
+		// }
+	}
+
+	private void onDisplayOriginalLocation() {
+		// Show the location, if available
+		LatLng latLng = getLatLng(mShout);
+		if (latLng != null) {
+			CameraPosition pos = new CameraPosition(latLng, 14, 0, 0);
+			mMap.addMarker(new MarkerOptions().position(latLng).icon(ORIGINAL_MARKER));
+			mMap.moveCamera(CameraUpdateFactory.newCameraPosition(pos));
+		}
+	}
+
+	private void onDisplayReshoutLocations(ReshoutAdapter reshouts) {
+		int count = reshouts.getCount();
+		for (int i = 0; i < count; ++i) {
+			LocalShout reshout = reshouts.getItem(i);
+			LatLng latlng = getLatLng(reshout);
+			if (latlng != null && !mLatLngReshouts.contains(latlng)) {
+				mLatLngReshouts.add(latlng);
+				mMap.addMarker(new MarkerOptions().position(latlng).icon(RESHOUT_MARKER)
+						.title(reshout.getSender().getUsername()));
+			}
+		}
+		if (count > 1)
+			zoomMap();
+	}
+
+	private void onDisplayCommentLocations(CommentAdapter comments) {
+		int count = comments.getCount();
+		for (int i = 0; i < count; ++i) {
+			LocalShout comment = comments.getItem(i);
+			LatLng latlng = getLatLng(comment);
+			if (latlng != null && !mLatLngComments.contains(latlng)) {
+				mLatLngComments.add(latlng);
+				mMap.addMarker(new MarkerOptions().position(latlng).icon(COMMENT_MARKER)
+						.title(comment.getSender().getUsername()).snippet(comment.getMessage()));
+			}
+		}
+		if (count > 1)
+			zoomMap();
+	}
+
+	private void zoomMap() {
+		return;
+		// if (mLayout) {
+		// LatLngBounds.Builder bb = new LatLngBounds.Builder();
+		//
+		// LatLng original = getLatLng(mShout);
+		// if (original != null)
+		// bb.include(original);
+		//
+		// for (LatLng loc : mLatLngComments) {
+		// bb.include(loc);
+		// }
+		//
+		// for (LatLng loc : mLatLngReshouts) {
+		// bb.include(loc);
+		// }
+		//
+		// mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bb.build(),
+		// 50));
+		// }
 	}
 
 	@Override
@@ -165,6 +299,7 @@ public class DetailsFragment extends SherlockFragment implements
 			mCommentsView.setVisibility(View.GONE);
 		else
 			mCommentsView.setVisibility(View.VISIBLE);
+		onDisplayCommentLocations(mCommentAdapter);
 	}
 
 	private void onReshoutCountChanged(int count) {
@@ -173,6 +308,22 @@ public class DetailsFragment extends SherlockFragment implements
 			mReshoutsView.setVisibility(View.GONE);
 		else
 			mReshoutsView.setVisibility(View.VISIBLE);
+		onDisplayReshoutLocations(mReshoutAdapter);
+	}
+
+	/**
+	 * Constructs an {@link LatLng} from the location of the provided shout.
+	 * 
+	 * @param shout the shout whose location to return
+	 * @return the location of the shout as a {@code LatLng} or {@code null} if
+	 *         the location is not available
+	 */
+	private static LatLng getLatLng(Shout shout) {
+		Location loc = shout.getLocation();
+		if (loc != null)
+			return new LatLng(loc.getLatitude(), loc.getLongitude());
+		else
+			return null;
 	}
 
 	private class CommentObserver extends DataSetObserver {
@@ -482,6 +633,12 @@ public class DetailsFragment extends SherlockFragment implements
 		}
 
 		@Override
+		public LocalShout getItem(int pos) {
+			Cursor c = (Cursor) super.getItem(pos);
+			return ShoutProviderContract.retrieveShoutFromCursor(mContext, c);
+		}
+
+		@Override
 		public void bindView(View view, Context context, Cursor cursor) {
 			CommentItem item = (CommentItem) view;
 			final LocalShout shout = ShoutProviderContract.retrieveShoutFromCursor(
@@ -503,6 +660,12 @@ public class DetailsFragment extends SherlockFragment implements
 
 		public ReshoutAdapter(Context context, Cursor c) {
 			super(context, c, 0);
+		}
+
+		@Override
+		public LocalShout getItem(int pos) {
+			Cursor c = (Cursor) super.getItem(pos);
+			return ShoutProviderContract.retrieveShoutFromCursor(mContext, c);
 		}
 
 		@Override
