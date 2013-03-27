@@ -153,6 +153,7 @@
 
     <style name="DetailsFragmentLocationView" parent="DetailsFragmentExpandableView">
         <item name="android:layout_marginBottom">4dp</item>
+        <item name="android:layout_height">match_parent</item>
     </style>
 
     <style name="DetailsFragmentCommentView" parent="DetailsFragmentExpandableView">
@@ -172,7 +173,10 @@
         <item name="android:paddingBottom">4dp</item>
     </style>
 
-    <style name="DetailsFragmentLocationViewContent" parent="DetailsFragmentExpandableViewContent"></style>
+    <style name="DetailsFragmentLocationViewContent" parent="DetailsFragmentExpandableViewContent">
+        <item name="android:layout_height">match_parent</item>
+        <item name="minRatio">1.0</item>
+    </style>
 
     <style name="DetailsFragmentCommentViewContent" parent="DetailsFragmentExpandableViewContent">
 
