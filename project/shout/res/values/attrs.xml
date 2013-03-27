@@ -30,6 +30,10 @@
         <attr name="viewportWidth" format="reference" />
         <attr name="viewportHeight" format="reference" />
     </declare-styleable>
+    <declare-styleable name="AspectRatioLayout">
+        <attr name="minRatio" format="float" />
+        <attr name="maxRatio" format="float" />
+    </declare-styleable>
 
     <attr name="delegatedPreferenceStyle" format="reference" />
     <attr name="bitmapPreferenceStyle" format="reference" />
