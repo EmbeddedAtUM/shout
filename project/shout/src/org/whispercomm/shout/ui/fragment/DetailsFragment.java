@@ -31,6 +31,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.SupportMapFragment;
 
 public class DetailsFragment extends SherlockFragment implements
 		LoaderManager.LoaderCallbacks<Cursor> {
@@ -45,6 +47,8 @@ public class DetailsFragment extends SherlockFragment implements
 	private ExpandableView mCommentsView;
 	private ExpandableView mReshoutsView;
 
+	private SupportMapFragment mMapFragment;
+	private GoogleMap mMap;
 	private FullListView mCommentsList;
 	private FullListView mReshoutsList;
 
@@ -80,6 +84,9 @@ public class DetailsFragment extends SherlockFragment implements
 		mMapView = (ExpandableView) v.findViewById(R.id.expandable_location);
 		mCommentsView = (ExpandableView) v.findViewById(R.id.expandable_comments);
 		mReshoutsView = (ExpandableView) v.findViewById(R.id.expandable_reshouts);
+
+		mMapFragment = (SupportMapFragment) this.getFragmentManager().findFragmentById(R.id.map);
+		mMap = mMapFragment.getMap();
 
 		mCommentsList = (FullListView) mCommentsView.findViewById(
 				R.id.content);
