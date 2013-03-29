@@ -7,9 +7,11 @@ import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.Location;
 import org.whispercomm.shout.R;
 import org.whispercomm.shout.Shout;
+import org.whispercomm.shout.ShoutType;
 import org.whispercomm.shout.provider.CursorLoader;
 import org.whispercomm.shout.provider.ShoutCursorAdapter;
 import org.whispercomm.shout.provider.ShoutProviderContract;
+import org.whispercomm.shout.ui.AbstractShoutViewActivity;
 import org.whispercomm.shout.ui.DetailsActivity;
 import org.whispercomm.shout.ui.widget.ExpandableView;
 import org.whispercomm.shout.ui.widget.FullListView;
@@ -35,6 +37,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
@@ -91,6 +96,8 @@ public class DetailsFragment extends SherlockFragment implements
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setHasOptionsMenu(true);
+
 		mShout = getShoutFromBundle(getActivity().getIntent().getExtras());
 
 		mCommentAdapter = new CommentAdapter(getActivity(), null);
@@ -156,6 +163,33 @@ public class DetailsFragment extends SherlockFragment implements
 		onDisplayOriginalLocation();
 
 		return v;
+	}
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflator) {
+		super.onCreateOptionsMenu(menu, inflator);
+
+		inflator.inflate(R.menu.fragment_details, menu);
+
+		// If this isn't an original shout, hide the comment button
+		if (!mShout.getType().equals(ShoutType.SHOUT))
+			menu.findItem(R.id.menu_comment).setVisible(false);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		int id = item.getItemId();
+		switch (id) {
+			case R.id.menu_comment:
+				((AbstractShoutViewActivity) getActivity()).onClickComment(mShout);
+				break;
+			case R.id.menu_reshout:
+				((AbstractShoutViewActivity) getActivity()).onClickReshout(mShout);
+				break;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
+		return false;
 	}
 
 	private void onDisplayOriginalLocation() {

@@ -6,10 +6,10 @@
         android:icon="@drawable/ic_menu_compose_white"
         android:showAsAction="always"
         android:title="@string/menu_comment"/>
-<!--     <item
+    <item
         android:id="@+id/menu_reshout"
-        android:icon="@drawable/reshout"
+        android:icon="@drawable/ic_menu_reshout_white"
         android:showAsAction="always"
-        android:title="@string/menu_reshout"/> -->
+        android:title="@string/menu_reshout"/>
 
 </menu>

@@ -8,7 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-public class DetailsActivity extends AbstractShoutActivity {
+public class DetailsActivity extends AbstractShoutViewActivity {
 	@SuppressWarnings("unused")
 	private static final String TAG = DetailsActivity.class.getSimpleName();
 
