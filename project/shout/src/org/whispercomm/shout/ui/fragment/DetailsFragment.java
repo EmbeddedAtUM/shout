@@ -59,7 +59,6 @@ public class DetailsFragment extends SherlockFragment implements
 
 	private ShoutView mShoutView;
 
-	@SuppressWarnings("unused")
 	private ExpandableView mMapView;
 
 	private ExpandableView mCommentsView;
