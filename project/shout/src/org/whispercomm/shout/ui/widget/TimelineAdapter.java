@@ -4,15 +4,14 @@ package org.whispercomm.shout.ui.widget;
 import java.util.Set;
 
 import org.whispercomm.shout.LocalShout;
-import org.whispercomm.shout.provider.ShoutProviderContract;
+import org.whispercomm.shout.provider.ShoutCursorAdapter;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.support.v4.widget.CursorAdapter;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class TimelineAdapter extends CursorAdapter {
+public class TimelineAdapter extends ShoutCursorAdapter {
 
 	private Set<LocalShout> expandedShouts;
 
@@ -22,12 +21,8 @@ public class TimelineAdapter extends CursorAdapter {
 	}
 
 	@Override
-	public void bindView(View view, Context context, Cursor cursor) {
+	public void bindView(View view, Context context, final LocalShout shout) {
 		ShoutListViewRow row = (ShoutListViewRow) view;
-
-		// Get the shout
-		final LocalShout shout = ShoutProviderContract.retrieveShoutFromCursor(
-				context, cursor);
 
 		row.clearExpandedStateChangeListeners();
 		row.registerExpandedStateChangeListener(new ShoutListViewRow.ExpandedStateChangeListener() {
@@ -45,7 +40,7 @@ public class TimelineAdapter extends CursorAdapter {
 	}
 
 	@Override
-	public View newView(final Context context, Cursor cursor,
+	public View newView(final Context context, LocalShout shout,
 			ViewGroup parent) {
 		return new ShoutListViewRow(context);
 	}

@@ -11,6 +11,7 @@ import org.whispercomm.shout.Location;
 import org.whispercomm.shout.R;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.provider.CursorLoader;
+import org.whispercomm.shout.provider.ShoutCursorAdapter;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.ui.DetailsActivity;
 import org.whispercomm.shout.ui.widget.ExpandableView;
@@ -27,7 +28,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.support.v4.widget.CursorAdapter;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -626,28 +626,20 @@ public class DetailsFragment extends SherlockFragment implements
 	/**
 	 * Adapter for comments
 	 */
-	private static class CommentAdapter extends CursorAdapter {
+	private static class CommentAdapter extends ShoutCursorAdapter {
 
 		public CommentAdapter(Context context, Cursor c) {
 			super(context, c, 0);
 		}
 
 		@Override
-		public LocalShout getItem(int pos) {
-			Cursor c = (Cursor) super.getItem(pos);
-			return ShoutProviderContract.retrieveShoutFromCursor(mContext, c);
-		}
-
-		@Override
-		public void bindView(View view, Context context, Cursor cursor) {
+		public void bindView(View view, Context context, LocalShout shout) {
 			CommentItem item = (CommentItem) view;
-			final LocalShout shout = ShoutProviderContract.retrieveShoutFromCursor(
-					context, cursor);
 			item.bindShout(shout);
 		}
 
 		@Override
-		public View newView(final Context context, Cursor cursor,
+		public View newView(final Context context, LocalShout shout,
 				ViewGroup parent) {
 			return CommentItem.create(context, parent);
 		}
@@ -656,28 +648,20 @@ public class DetailsFragment extends SherlockFragment implements
 	/**
 	 * Adapter for reshouts
 	 */
-	private static class ReshoutAdapter extends CursorAdapter {
+	private static class ReshoutAdapter extends ShoutCursorAdapter {
 
 		public ReshoutAdapter(Context context, Cursor c) {
 			super(context, c, 0);
 		}
 
 		@Override
-		public LocalShout getItem(int pos) {
-			Cursor c = (Cursor) super.getItem(pos);
-			return ShoutProviderContract.retrieveShoutFromCursor(mContext, c);
-		}
-
-		@Override
-		public void bindView(View view, Context context, Cursor cursor) {
+		public void bindView(View view, Context context, LocalShout shout) {
 			ReshoutItem item = (ReshoutItem) view;
-			final LocalShout shout = ShoutProviderContract.retrieveShoutFromCursor(
-					context, cursor);
 			item.bindShout(shout);
 		}
 
 		@Override
-		public View newView(final Context context, Cursor cursor,
+		public View newView(final Context context, LocalShout shou,
 				ViewGroup parent) {
 			return ReshoutItem.create(context, parent);
 		}
