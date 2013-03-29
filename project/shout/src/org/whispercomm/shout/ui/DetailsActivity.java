@@ -7,6 +7,10 @@ import org.whispercomm.shout.Shout;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
+import android.support.v4.app.TaskStackBuilder;
+
+import com.actionbarsherlock.view.MenuItem;
 
 public class DetailsActivity extends AbstractShoutViewActivity {
 	@SuppressWarnings("unused")
@@ -29,7 +33,34 @@ public class DetailsActivity extends AbstractShoutViewActivity {
 	@Override
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		setContentView(R.layout.activity_details);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		int id = item.getItemId();
+		switch (id) {
+			case android.R.id.home:
+				Intent upIntent = new Intent(this, ShoutActivity.class);
+				if (NavUtils.shouldUpRecreateTask(this, upIntent)) {
+					// This activity is not part of the application's task, so
+					// create a new task
+					// with a synthesized back stack.
+					TaskStackBuilder.from(this)
+							.addNextIntent(upIntent)
+							.startActivities();
+					finish();
+				} else {
+					// This activity is part of the application's task, so
+					// simply
+					// navigate up to the hierarchical parent activity.
+					NavUtils.navigateUpTo(this, upIntent);
+				}
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
 	}
 
 }
