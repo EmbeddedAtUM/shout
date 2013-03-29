@@ -1,9 +1,6 @@
 
 package org.whispercomm.shout.ui.fragment;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.whispercomm.shout.Avatar;
 import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.LocalShout;
@@ -16,7 +13,9 @@ import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.ui.DetailsActivity;
 import org.whispercomm.shout.ui.widget.ExpandableView;
 import org.whispercomm.shout.ui.widget.FullListView;
+import org.whispercomm.shout.ui.widget.MarkerMapLayer;
 import org.whispercomm.shout.ui.widget.ShoutView;
+import org.whispercomm.shout.ui.widget.WrappingItemAdapter;
 import org.whispercomm.shout.util.FormattedAge;
 
 import android.content.Context;
@@ -24,8 +23,6 @@ import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.database.DataSetObserver;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.util.AttributeSet;
@@ -56,9 +53,9 @@ public class DetailsFragment extends SherlockFragment implements
 	 * The BitmapDescriptorFactory requires a Context, so these can't be
 	 * configured statically
 	 */
-	private BitmapDescriptor ORIGINAL_MARKER;
-	private BitmapDescriptor COMMENT_MARKER;
-	private BitmapDescriptor RESHOUT_MARKER;
+	private static BitmapDescriptor ORIGINAL_MARKER;
+	private static BitmapDescriptor COMMENT_MARKER;
+	private static BitmapDescriptor RESHOUT_MARKER;
 
 	private ShoutView mShoutView;
 
@@ -78,14 +75,14 @@ public class DetailsFragment extends SherlockFragment implements
 	private CommentAdapter mCommentAdapter;
 	private ReshoutAdapter mReshoutAdapter;
 
+	private CommentMarkerAdapter mCommentMarkerAdapter;
+	private ReshoutMarkerAdapter mReshoutMarkerAdapter;
+
 	private CommentObserver mCommentObserver;
 	private ReshoutObserver mReshoutObserver;
 
-	private Set<LatLng> mLatLngReshouts = new HashSet<LatLng>();
-	private Set<LatLng> mLatLngComments = new HashSet<LatLng>();
-
-	private boolean mLayout = false;
-	private Handler mHandler;
+	private MarkerMapLayer mCommentMarkerLayer;
+	private MarkerMapLayer mReshoutMarkerLayer;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -95,13 +92,15 @@ public class DetailsFragment extends SherlockFragment implements
 		mCommentAdapter = new CommentAdapter(getActivity(), null);
 		mReshoutAdapter = new ReshoutAdapter(getActivity(), null);
 
+		mCommentMarkerAdapter = new CommentMarkerAdapter(mCommentAdapter);
+		mReshoutMarkerAdapter = new ReshoutMarkerAdapter(mReshoutAdapter);
+
 		mCommentObserver = new CommentObserver();
 		mReshoutObserver = new ReshoutObserver();
 
 		mCommentAdapter.registerDataSetObserver(mCommentObserver);
 		mReshoutAdapter.registerDataSetObserver(mReshoutObserver);
 
-		mHandler = new Handler(Looper.getMainLooper());
 	}
 
 	@Override
@@ -125,6 +124,12 @@ public class DetailsFragment extends SherlockFragment implements
 		mCommentsList.setAdapter(mCommentAdapter);
 		mReshoutsList.setAdapter(mReshoutAdapter);
 
+		mReshoutMarkerLayer = new MarkerMapLayer(mMap);
+		mReshoutMarkerLayer.setAdapter(mReshoutMarkerAdapter);
+
+		mCommentMarkerLayer = new MarkerMapLayer(mMap);
+		mCommentMarkerLayer.setAdapter(mCommentMarkerAdapter);
+
 		getLoaderManager().initLoader(LOADER_COMMENTS, null, this);
 		getLoaderManager().initLoader(LOADER_RESHOUTS, null, this);
 
@@ -144,36 +149,7 @@ public class DetailsFragment extends SherlockFragment implements
 	public void onResume() {
 		super.onResume();
 
-		mLayout = true;
 		onDisplayOriginalLocation();
-
-		// // Place the sender's marker
-		// LatLng latLng = getLatLng(mShout);
-		// if (latLng != null) {
-		// CameraPosition pos = new CameraPosition(latLng, 14, 0, 0);
-		// mMap.addMarker(new MarkerOptions().position(latLng));
-		// mMap.moveCamera(CameraUpdateFactory.newCameraPosition(pos));
-		//
-		// // Add comment markers
-		// for (Shout comment : mShout.getComments()) {
-		// mMap.addMarker(new MarkerOptions().position(getLatLng(comment)).icon(
-		// BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
-		// }
-		//
-		// // Add reshouter markers
-		// Cursor c = ShoutProviderContract.getReshouts(getActivity(), mShout);
-		// c.moveToFirst();
-		// while (!c.isAfterLast()) {
-		// mMap.addMarker(new MarkerOptions()
-		// .position(
-		// getLatLng(
-		// ShoutProviderContract.retrieveShoutFromCursor(getActivity(), c)))
-		// .icon(
-		// BitmapDescriptorFactory
-		// .defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
-		// c.moveToNext();
-		// }
-		// }
 	}
 
 	private void onDisplayOriginalLocation() {
@@ -181,61 +157,10 @@ public class DetailsFragment extends SherlockFragment implements
 		LatLng latLng = getLatLng(mShout);
 		if (latLng != null) {
 			CameraPosition pos = new CameraPosition(latLng, 14, 0, 0);
-			mMap.addMarker(new MarkerOptions().position(latLng).icon(ORIGINAL_MARKER));
+			mMap.addMarker(new
+					MarkerOptions().position(latLng).icon(ORIGINAL_MARKER));
 			mMap.moveCamera(CameraUpdateFactory.newCameraPosition(pos));
 		}
-	}
-
-	private void onDisplayReshoutLocations(ReshoutAdapter reshouts) {
-		int count = reshouts.getCount();
-		for (int i = 0; i < count; ++i) {
-			LocalShout reshout = reshouts.getItem(i);
-			LatLng latlng = getLatLng(reshout);
-			if (latlng != null && !mLatLngReshouts.contains(latlng)) {
-				mLatLngReshouts.add(latlng);
-				mMap.addMarker(new MarkerOptions().position(latlng).icon(RESHOUT_MARKER)
-						.title(reshout.getSender().getUsername()));
-			}
-		}
-		if (count > 1)
-			zoomMap();
-	}
-
-	private void onDisplayCommentLocations(CommentAdapter comments) {
-		int count = comments.getCount();
-		for (int i = 0; i < count; ++i) {
-			LocalShout comment = comments.getItem(i);
-			LatLng latlng = getLatLng(comment);
-			if (latlng != null && !mLatLngComments.contains(latlng)) {
-				mLatLngComments.add(latlng);
-				mMap.addMarker(new MarkerOptions().position(latlng).icon(COMMENT_MARKER)
-						.title(comment.getSender().getUsername()).snippet(comment.getMessage()));
-			}
-		}
-		if (count > 1)
-			zoomMap();
-	}
-
-	private void zoomMap() {
-		return;
-		// if (mLayout) {
-		// LatLngBounds.Builder bb = new LatLngBounds.Builder();
-		//
-		// LatLng original = getLatLng(mShout);
-		// if (original != null)
-		// bb.include(original);
-		//
-		// for (LatLng loc : mLatLngComments) {
-		// bb.include(loc);
-		// }
-		//
-		// for (LatLng loc : mLatLngReshouts) {
-		// bb.include(loc);
-		// }
-		//
-		// mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bb.build(),
-		// 50));
-		// }
 	}
 
 	@Override
@@ -299,7 +224,6 @@ public class DetailsFragment extends SherlockFragment implements
 			mCommentsView.setVisibility(View.GONE);
 		else
 			mCommentsView.setVisibility(View.VISIBLE);
-		onDisplayCommentLocations(mCommentAdapter);
 	}
 
 	private void onReshoutCountChanged(int count) {
@@ -308,7 +232,6 @@ public class DetailsFragment extends SherlockFragment implements
 			mReshoutsView.setVisibility(View.GONE);
 		else
 			mReshoutsView.setVisibility(View.VISIBLE);
-		onDisplayReshoutLocations(mReshoutAdapter);
 	}
 
 	/**
@@ -664,6 +587,58 @@ public class DetailsFragment extends SherlockFragment implements
 		public View newView(final Context context, LocalShout shou,
 				ViewGroup parent) {
 			return ReshoutItem.create(context, parent);
+		}
+	}
+
+	private static class ReshoutMarkerAdapter extends WrappingItemAdapter<MarkerOptions> {
+
+		private ShoutCursorAdapter mWrappedAdapter;
+
+		public ReshoutMarkerAdapter(ShoutCursorAdapter adapter) {
+			super(adapter);
+			mWrappedAdapter = adapter;
+		}
+
+		@Override
+		public LocalShout getItem(int position) {
+			return mWrappedAdapter.getItem(position);
+		}
+
+		@Override
+		public MarkerOptions get(int position) {
+			LocalShout shout = getItem(position);
+			LatLng latlng = getLatLng(shout);
+			if (latlng != null)
+				return new MarkerOptions().position(latlng).icon(RESHOUT_MARKER)
+						.title(shout.getSender().getUsername());
+			else
+				return null;
+		}
+	}
+
+	private static class CommentMarkerAdapter extends WrappingItemAdapter<MarkerOptions> {
+
+		private ShoutCursorAdapter mWrappedAdapter;
+
+		public CommentMarkerAdapter(ShoutCursorAdapter adapter) {
+			super(adapter);
+			mWrappedAdapter = adapter;
+		}
+
+		@Override
+		public LocalShout getItem(int position) {
+			return mWrappedAdapter.getItem(position);
+		}
+
+		@Override
+		public MarkerOptions get(int position) {
+			LocalShout shout = getItem(position);
+			LatLng latlng = getLatLng(shout);
+			if (latlng != null)
+				return new MarkerOptions().position(latlng).icon(COMMENT_MARKER)
+						.title(shout.getSender().getUsername()).snippet(shout.getMessage());
+			else
+				return null;
 		}
 	}
 }
