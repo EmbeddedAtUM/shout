@@ -42,7 +42,7 @@
                         class="com.google.android.gms.maps.SupportMapFragment"
                         app:uiRotateGestures="false"
                         app:uiScrollGestures="false"
-                        app:uiZoomControls="false"
+                        app:uiZoomControls="true"
                         app:uiZoomGestures="false" />
                 </org.whispercomm.shout.ui.widget.AspectRatioLayout>
             </org.whispercomm.shout.ui.widget.ExpandableView>
