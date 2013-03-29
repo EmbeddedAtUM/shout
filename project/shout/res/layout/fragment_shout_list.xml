@@ -13,27 +13,42 @@
         android:layout_height="40dip"
         android:text="@string/timelineTitle" />
 
-    <!-- ListView displaying the shouts -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
 
-    <ListView
-        android:id="@android:id/list"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:cacheColorHint="#00000000"
-        android:clickable="false"
-        android:divider="@null"
-        android:dividerHeight="0dp" />
+        <!-- Progress bar shows while loading cursor -->
 
-    <!-- TextView displayed if the ListView is empty -->
+        <ProgressBar
+            android:id="@+id/loading"
+            style="@android:style/Widget.ProgressBar.Large"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:indeterminate="true" />
 
-    <TextView
-        android:id="@android:id/empty"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:background="@drawable/titlegradient"
-        android:gravity="center|center_horizontal"
-        android:text="@string/no_shouts"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@android:color/black" />
+        <!-- ListView displaying the shouts -->
+
+        <ListView
+            android:id="@android:id/list"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:cacheColorHint="#00000000"
+            android:clickable="false"
+            android:divider="@null"
+            android:dividerHeight="0dp" />
+
+        <!-- TextView displayed if the ListView is empty -->
+
+        <TextView
+            android:id="@android:id/empty"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:background="@drawable/titlegradient"
+            android:gravity="center|center_horizontal"
+            android:text="@string/no_shouts"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black" />
+    </FrameLayout>
 
 </LinearLayout>
