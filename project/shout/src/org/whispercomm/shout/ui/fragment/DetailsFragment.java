@@ -14,6 +14,7 @@ import org.whispercomm.shout.ui.DetailsActivity;
 import org.whispercomm.shout.ui.widget.ExpandableView;
 import org.whispercomm.shout.ui.widget.FullListView;
 import org.whispercomm.shout.ui.widget.MarkerMapLayer;
+import org.whispercomm.shout.ui.widget.MarkerMapSizer;
 import org.whispercomm.shout.ui.widget.ShoutView;
 import org.whispercomm.shout.ui.widget.WrappingItemAdapter;
 import org.whispercomm.shout.util.FormattedAge;
@@ -34,13 +35,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class DetailsFragment extends SherlockFragment implements
@@ -61,7 +61,7 @@ public class DetailsFragment extends SherlockFragment implements
 
 	@SuppressWarnings("unused")
 	private ExpandableView mMapView;
-	// Place the sender's marker
+
 	private ExpandableView mCommentsView;
 	private ExpandableView mReshoutsView;
 
@@ -80,9 +80,14 @@ public class DetailsFragment extends SherlockFragment implements
 
 	private CommentObserver mCommentObserver;
 	private ReshoutObserver mReshoutObserver;
+	private MarkerObserver mMarkerObserver;
 
 	private MarkerMapLayer mCommentMarkerLayer;
 	private MarkerMapLayer mReshoutMarkerLayer;
+
+	private boolean mOriginalHasLocation;
+
+	private MarkerMapSizer mMapSizer;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -97,6 +102,7 @@ public class DetailsFragment extends SherlockFragment implements
 
 		mCommentObserver = new CommentObserver();
 		mReshoutObserver = new ReshoutObserver();
+		mMarkerObserver = new MarkerObserver();
 
 		mCommentAdapter.registerDataSetObserver(mCommentObserver);
 		mReshoutAdapter.registerDataSetObserver(mReshoutObserver);
@@ -126,9 +132,15 @@ public class DetailsFragment extends SherlockFragment implements
 
 		mReshoutMarkerLayer = new MarkerMapLayer(mMap);
 		mReshoutMarkerLayer.setAdapter(mReshoutMarkerAdapter);
+		mReshoutMarkerLayer.registerDataSetObserver(mMarkerObserver);
 
 		mCommentMarkerLayer = new MarkerMapLayer(mMap);
 		mCommentMarkerLayer.setAdapter(mCommentMarkerAdapter);
+		mCommentMarkerLayer.registerDataSetObserver(mMarkerObserver);
+
+		mMapSizer = new MarkerMapSizer(mMap);
+		mMapSizer.addMarkerLayer(mCommentMarkerLayer);
+		mMapSizer.addMarkerLayer(mReshoutMarkerLayer);
 
 		getLoaderManager().initLoader(LOADER_COMMENTS, null, this);
 		getLoaderManager().initLoader(LOADER_RESHOUTS, null, this);
@@ -142,25 +154,21 @@ public class DetailsFragment extends SherlockFragment implements
 
 		mShoutView.bindShout(mShout);
 
-		return v;
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-
 		onDisplayOriginalLocation();
+
+		return v;
 	}
 
 	private void onDisplayOriginalLocation() {
 		// Show the location, if available
 		LatLng latLng = getLatLng(mShout);
 		if (latLng != null) {
-			CameraPosition pos = new CameraPosition(latLng, 14, 0, 0);
-			mMap.addMarker(new
+			mOriginalHasLocation = true;
+			Marker marker = mMap.addMarker(new
 					MarkerOptions().position(latLng).icon(ORIGINAL_MARKER));
-			mMap.moveCamera(CameraUpdateFactory.newCameraPosition(pos));
+			mMapSizer.addMarker(marker);
 		}
+		onMarkersChanged();
 	}
 
 	@Override
@@ -234,6 +242,15 @@ public class DetailsFragment extends SherlockFragment implements
 			mReshoutsView.setVisibility(View.VISIBLE);
 	}
 
+	private void onMarkersChanged() {
+		if (!mOriginalHasLocation
+				&& mCommentMarkerLayer.getMarkerCount() + mReshoutMarkerLayer.getMarkerCount() == 0)
+			mMapView.setVisibility(View.GONE);
+		else
+			mMapView.setVisibility(View.VISIBLE);
+
+	}
+
 	/**
 	 * Constructs an {@link LatLng} from the location of the provided shout.
 	 * 
@@ -273,6 +290,20 @@ public class DetailsFragment extends SherlockFragment implements
 		public void onInvalidated() {
 			onReshoutCountChanged(0);
 		}
+	}
+
+	private class MarkerObserver extends DataSetObserver {
+
+		@Override
+		public void onChanged() {
+			onMarkersChanged();
+		}
+
+		@Override
+		public void onInvalidated() {
+			// Ignore
+		}
+
 	}
 
 	public static class CommentItem extends RelativeLayout {
