@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- Style attributes -->
+    <attr name="delegatedPreferenceStyle" format="reference" />
+    <attr name="bitmapPreferenceStyle" format="reference" />
+    <attr name="expandableViewStyle" format="reference" />
+    <attr name="expandableViewTriggerStyle" format="reference" />
+
+    <!-- Other attributes -->
+
+    <attr name="avatarSize" format="dimension" />
+    <attr name="senderTextAppearance" format="reference" />
+    <attr name="timestampTextAppearance" format="reference" />
+    <attr name="messageTextAppearance" format="reference" />
+
+    <!-- Styleables -->
+
     <declare-styleable name="ActionShoutView">
         <attr name="onReshoutClick" format="string" />
         <attr name="onCommentClick" format="string" />
@@ -34,20 +49,6 @@
         <attr name="minRatio" format="float" />
         <attr name="maxRatio" format="float" />
     </declare-styleable>
-
-    <attr name="delegatedPreferenceStyle" format="reference" />
-    <attr name="bitmapPreferenceStyle" format="reference" />
-    <attr name="expandableViewStyle" format="reference" />
-    <attr name="expandableViewTriggerStyle" format="reference" />
-    <attr name="detailsFragmentReshoutItemStyle" format="reference" />
-    <attr name="detailsFragmentCommentItemStyle" format="reference" />
-    <attr name="detailsFragmentReshoutViewStyle" format="reference" />
-    <attr name="detailsFragmentReshoutViewContentStyle" format="reference" />
-    <attr name="detailsFragmentCommentViewStyle" format="reference" />
-    <attr name="detailsFragmentCommentViewContentStyle" format="reference" />
-    <attr name="detailsFragmentLocationViewStyle" format="reference" />
-    <attr name="detailsFragmentLocationViewContentStyle" format="reference" />
-
     <declare-styleable name="ExpandableView">
         <attr name="expanded" format="boolean" />
         <attr name="icon" />
@@ -64,23 +65,6 @@
     </declare-styleable>
     <declare-styleable name="ExpandableViewState">
         <attr name="state_expanded" format="boolean" />
-    </declare-styleable>
-
-    <attr name="avatarSize" format="dimension" />
-    <attr name="senderTextAppearance" format="reference" />
-    <attr name="timestampTextAppearance" format="reference" />
-    <attr name="messageTextAppearance" format="reference" />
-
-    <declare-styleable name="DetailsFragmentReshoutItem">
-        <attr name="avatarSize" />
-        <attr name="senderTextAppearance" />
-        <attr name="timestampTextAppearance" />
-    </declare-styleable>
-    <declare-styleable name="DetailsFragmentCommentItem">
-        <attr name="avatarSize" />
-        <attr name="senderTextAppearance" />
-        <attr name="timestampTextAppearance" />
-        <attr name="messageTextAppearance" />
     </declare-styleable>
     <declare-styleable name="FullListView">
         <attr name="android:divider" />
