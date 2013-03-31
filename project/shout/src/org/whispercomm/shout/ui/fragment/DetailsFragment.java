@@ -13,6 +13,7 @@ import org.whispercomm.shout.provider.ShoutCursorAdapter;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.ui.AbstractShoutViewActivity;
 import org.whispercomm.shout.ui.DetailsActivity;
+import org.whispercomm.shout.ui.MapActivity;
 import org.whispercomm.shout.ui.widget.ExpandableView;
 import org.whispercomm.shout.ui.widget.FullListView;
 import org.whispercomm.shout.ui.widget.MarkerMapLayer;
@@ -31,7 +32,9 @@ import android.text.util.Linkify;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -65,9 +68,10 @@ public class DetailsFragment extends SherlockFragment implements
 	private ShoutView mShoutView;
 
 	private ExpandableView mMapView;
-
 	private ExpandableView mCommentsView;
 	private ExpandableView mReshoutsView;
+
+	private ImageButton mExpandMap;
 
 	private SupportMapFragment mMapFragment;
 	private GoogleMap mMap;
@@ -124,6 +128,14 @@ public class DetailsFragment extends SherlockFragment implements
 		mMapView = (ExpandableView) v.findViewById(R.id.expandable_location);
 		mCommentsView = (ExpandableView) v.findViewById(R.id.expandable_comments);
 		mReshoutsView = (ExpandableView) v.findViewById(R.id.expandable_reshouts);
+
+		mExpandMap = (ImageButton) v.findViewById(R.id.expand_map);
+		mExpandMap.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				expandMap();
+			}
+		});
 
 		mMapFragment = (SupportMapFragment) this.getFragmentManager().findFragmentById(R.id.map);
 		mMap = mMapFragment.getMap();
@@ -282,6 +294,10 @@ public class DetailsFragment extends SherlockFragment implements
 		else
 			mMapView.setVisibility(View.VISIBLE);
 
+	}
+
+	public void expandMap() {
+		MapActivity.show(getActivity(), mShout);
 	}
 
 	/**
