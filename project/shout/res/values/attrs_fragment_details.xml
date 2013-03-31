@@ -10,6 +10,7 @@
     <attr name="detailsFragmentCommentViewContentStyle" format="reference" />
     <attr name="detailsFragmentLocationViewStyle" format="reference" />
     <attr name="detailsFragmentLocationViewContentStyle" format="reference" />
+    <attr name="detailsFragmentShoutViewStyle" format="reference" />
 
     <!-- Other attributes -->
     <!-- attributes not guaranteed to be specific to this fragment should go attrs.xml -->
@@ -27,6 +28,14 @@
         <attr name="senderTextAppearance" />
         <attr name="timestampTextAppearance" />
         <attr name="messageTextAppearance" />
+    </declare-styleable>
+    <declare-styleable name="DetailsFragmentShoutView">
+        <attr name="avatarSize" />
+        <attr name="senderTextAppearance" />
+        <attr name="timestampTextAppearance" />
+        <attr name="messageTextAppearance" />
+        <attr name="timestampLabelTextAppearance" />
+        <attr name="timestampTextAppearance" />
     </declare-styleable>
 
 </resources>

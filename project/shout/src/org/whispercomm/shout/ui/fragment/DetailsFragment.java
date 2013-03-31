@@ -17,7 +17,6 @@ import org.whispercomm.shout.ui.widget.ExpandableView;
 import org.whispercomm.shout.ui.widget.FullListView;
 import org.whispercomm.shout.ui.widget.MarkerMapLayer;
 import org.whispercomm.shout.ui.widget.MarkerMapSizer;
-import org.whispercomm.shout.ui.widget.ShoutView;
 import org.whispercomm.shout.ui.widget.WrappingItemAdapter;
 import org.whispercomm.shout.util.FormattedAge;
 
@@ -28,6 +27,7 @@ import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.text.util.Linkify;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -335,6 +335,116 @@ public class DetailsFragment extends SherlockFragment implements
 		@Override
 		public void onInvalidated() {
 			// Ignore
+		}
+
+	}
+
+	public static class ShoutView extends RelativeLayout {
+
+		private int mAvatarSize;
+		private int mSenderTextAppearance;
+		private int mMessageTextAppearance;
+		private int mTimestampLabelTextAppearance;
+		private int mTimestampTextAppearance;
+
+		private ImageView mAvatar;
+		private TextView mSender;
+		private TextView mMessage;
+		private TextView mSentTimeLabel;
+		private TextView mReceivedTimeLabel;
+		private TextView mSentTime;
+		private TextView mReceivedTime;
+
+		public ShoutView(Context context) {
+			this(context, null);
+		}
+
+		public ShoutView(Context context, AttributeSet attrs) {
+			this(context, attrs, R.attr.detailsFragmentShoutViewStyle);
+		}
+
+		public ShoutView(Context context, AttributeSet attrs, int defStyle) {
+			super(context, attrs, defStyle);
+
+			LayoutInflater inflater = (LayoutInflater) context
+					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			inflater.inflate(R.layout.fragment_details_shout_view, this);
+
+			TypedArray a = context.obtainStyledAttributes(attrs,
+					R.styleable.DetailsFragmentShoutView, defStyle, 0);
+
+			mAvatarSize = a.getDimensionPixelSize(
+					R.styleable.DetailsFragmentShoutView_avatarSize, 0);
+			if (mAvatarSize == 0)
+				throw new IllegalArgumentException("You must supply an avatarSize attribute.");
+
+			mSenderTextAppearance = a.getResourceId(
+					R.styleable.DetailsFragmentShoutView_senderTextAppearance,
+					android.R.style.TextAppearance);
+
+			mMessageTextAppearance = a.getResourceId(
+					R.styleable.DetailsFragmentShoutView_messageTextAppearance,
+					android.R.style.TextAppearance);
+
+			mTimestampLabelTextAppearance = a.getResourceId(
+					R.styleable.DetailsFragmentShoutView_timestampTextAppearance,
+					android.R.style.TextAppearance);
+
+			mTimestampTextAppearance = a.getResourceId(
+					R.styleable.DetailsFragmentShoutView_timestampTextAppearance,
+					android.R.style.TextAppearance);
+
+			a.recycle();
+
+		}
+
+		@Override
+		public void onFinishInflate() {
+			super.onFinishInflate();
+
+			mAvatar = (ImageView) findViewById(R.id.avatar);
+			mSender = (TextView) findViewById(R.id.sender);
+			mMessage = (TextView) findViewById(R.id.message);
+			mSentTimeLabel = (TextView) findViewById(R.id.sentTimeLabel);
+			mReceivedTimeLabel = (TextView) findViewById(R.id.receivedTimeLabel);
+			mSentTime = (TextView) findViewById(R.id.sentTime);
+			mReceivedTime = (TextView) findViewById(R.id.receivedTime);
+
+			mAvatar.getLayoutParams().height = mAvatarSize;
+			mAvatar.getLayoutParams().width = mAvatarSize;
+			mSender.setTextAppearance(getContext(), mSenderTextAppearance);
+			mMessage.setTextAppearance(getContext(), mMessageTextAppearance);
+			mSentTimeLabel.setTextAppearance(getContext(), mTimestampLabelTextAppearance);
+			mReceivedTimeLabel.setTextAppearance(getContext(), mTimestampLabelTextAppearance);
+			mSentTime.setTextAppearance(getContext(), mTimestampTextAppearance);
+			mReceivedTime.setTextAppearance(getContext(), mTimestampTextAppearance);
+
+			mAvatar.requestLayout();
+		}
+
+		public void bindShout(LocalShout shout) {
+
+			HashReference<Avatar> avatarRef = shout.getSender().getAvatar();
+			if (avatarRef.isAvailable())
+				mAvatar.setImageBitmap(avatarRef.get().getBitmap());
+			else
+				mAvatar.setImageResource(R.drawable.defaultavatar);
+
+			mSender.setText(shout.getSender().getUsername());
+
+			mMessage.setText(shout.getMessage());
+			Linkify.addLinks(mMessage, Linkify.ALL);
+
+			String sentTime;
+			if (shout.getTimestamp().isBefore(shout.getReceivedTime())) {
+				sentTime = FormattedAge.formatAbsolute(shout.getTimestamp());
+			} else {
+				sentTime = FormattedAge.formatAbsolute(shout.getReceivedTime());
+
+			}
+			mSentTime.setText(sentTime);
+
+			mReceivedTime.setText(FormattedAge.formatAbsolute(shout.getReceivedTime()));
 		}
 
 	}

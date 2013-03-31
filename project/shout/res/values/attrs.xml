@@ -13,6 +13,7 @@
     <attr name="senderTextAppearance" format="reference" />
     <attr name="timestampTextAppearance" format="reference" />
     <attr name="messageTextAppearance" format="reference" />
+    <attr name="timestampLabelTextAppearance" format="reference" />
 
     <!-- Styleables -->
 

@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <style name="SenderFont" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="MessageFont" parent="@android:style/TextAppearance.Medium"></style>
+
+    <style name="TimestampFont" parent="@android:style/TextAppearance.Small">
+        <item name="android:textColor">#888888</item>
+    </style>
+
+    <style name="TimestampLabelFont" parent="@android:style/TextAppearance.Small">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">#888888</item>
+    </style>
+
     <style name="DetailsFragmentReshoutItem">
         <item name="android:layout_width">48dp</item>
         <item name="android:layout_height">48dp</item>
@@ -71,6 +86,19 @@
         <item name="android:divider">@drawable/divider</item>
         <item name="android:dividerHeight">1dp</item>
         <item name="android:orientation">vertical</item>
+    </style>
+
+    <style name="DetailsFragmentShoutView">
+        <item name="avatarSize">72dip</item>
+        <item name="senderTextAppearance">@style/SenderFont</item>
+        <item name="messageTextAppearance">@style/MessageFont</item>
+        <item name="timestampLabelTextAppearance">@style/TimestampLabelFont</item>
+        <item name="timestampTextAppearance">@style/TimestampFont</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginBottom">5dip</item>
+        <item name="android:padding">5dip</item>
+        <item name="android:background">@drawable/rounded</item>
     </style>
 
 </resources>

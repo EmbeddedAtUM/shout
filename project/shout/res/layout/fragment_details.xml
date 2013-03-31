@@ -12,13 +12,10 @@
         android:orientation="vertical"
         android:padding="5dp" >
 
-        <org.whispercomm.shout.ui.widget.ShoutView
+        <view
             android:id="@+id/shoutview"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:background="@android:color/white" >
-        </org.whispercomm.shout.ui.widget.ShoutView>
+            style="?attr/detailsFragmentShoutViewStyle"
+            class="org.whispercomm.shout.ui.fragment.DetailsFragment$ShoutView" />
 
         <org.whispercomm.shout.ui.widget.ViewportLayout
             android:layout_width="match_parent"

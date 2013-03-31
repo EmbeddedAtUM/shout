@@ -25,6 +25,7 @@
         <item name="detailsFragmentLocationViewContentStyle">@style/DetailsFragmentLocationViewContent</item>
         <item name="detailsFragmentCommentViewContentStyle">@style/DetailsFragmentCommentViewContent</item>
         <item name="detailsFragmentReshoutViewContentStyle">@style/DetailsFragmentReshoutViewContent</item>
+        <item name="detailsFragmentShoutViewStyle">@style/DetailsFragmentShoutView</item>
         <item name="@android:attr/windowBackground">@drawable/messageviewgradient</item>
     </style>
 
