@@ -133,7 +133,7 @@ public class ShoutListFragment extends SherlockFragment implements
 			@Override
 			public Cursor onLoadCursor() {
 				return ShoutProviderContract
-						.getCursorOverAllShouts(getActivity(), sortOrder);
+						.getCursorOverAllShouts(getContext(), sortOrder);
 			}
 		};
 	}
