@@ -12,13 +12,16 @@ import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
 import android.widget.TextView;
 
+import com.google.android.gms.common.GooglePlayServicesUtil;
+
 public class DialogFactory {
 
 	public static AlertDialog aboutDialog(Context context) {
 
 		TextView message = new TextView(context);
 		SpannableString s = new SpannableString(
-				"For more information check out http://whispercomm.org/shout/");
+				"For more information check out http://whispercomm.org/shout/\n\n"
+						+ GooglePlayServicesUtil.getOpenSourceSoftwareLicenseInfo(context));
 		Linkify.addLinks(s, Linkify.WEB_URLS);
 		message.setText(s);
 		message.setTextSize(18);
