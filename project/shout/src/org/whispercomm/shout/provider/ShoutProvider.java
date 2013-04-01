@@ -623,12 +623,7 @@ public class ShoutProvider extends ContentProvider {
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 			switch (oldVersion) {
 				case 1:
-					// Upgrade to version 2
-					db.execSQL(SQL_CREATE_INDEX_SHOUT_PARENT);
-					db.execSQL(SQL_CREATE_VIEW_DENORMED_SHOUT);
-					db.execSQL(SQL_CREATE_VIEW_DENORMED_ORIGINAL);
-					db.execSQL(SQL_CREATE_VIEW_DENORMED_COMMENT);
-					db.execSQL(SQL_CREATE_VIEW_DENORMED_RESHOUT);
+					new Upgrade1to2(db).upgrade();
 					break;
 				default:
 					Log.e(TAG, String.format(
@@ -638,6 +633,21 @@ public class ShoutProvider extends ContentProvider {
 			}
 		}
 
+		private static class Upgrade1to2 {
+			SQLiteDatabase mDb;
+
+			public Upgrade1to2(SQLiteDatabase database) {
+				mDb = database;
+			}
+
+			public void upgrade() {
+				mDb.execSQL(SQL_CREATE_INDEX_SHOUT_PARENT);
+				mDb.execSQL(SQL_CREATE_VIEW_DENORMED_SHOUT);
+				mDb.execSQL(SQL_CREATE_VIEW_DENORMED_ORIGINAL);
+				mDb.execSQL(SQL_CREATE_VIEW_DENORMED_COMMENT);
+				mDb.execSQL(SQL_CREATE_VIEW_DENORMED_RESHOUT);
+			}
+		}
 	}
 
 }
