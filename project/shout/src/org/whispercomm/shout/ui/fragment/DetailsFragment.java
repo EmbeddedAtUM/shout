@@ -100,7 +100,6 @@ public class DetailsFragment extends SherlockFragment implements
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setHasOptionsMenu(true);
 
 		mShout = getShoutFromBundle(getActivity().getIntent().getExtras());
 
@@ -117,6 +116,7 @@ public class DetailsFragment extends SherlockFragment implements
 		mCommentAdapter.registerDataSetObserver(mCommentObserver);
 		mReshoutAdapter.registerDataSetObserver(mReshoutObserver);
 
+		setHasOptionsMenu(true);
 	}
 
 	@Override
@@ -148,31 +148,35 @@ public class DetailsFragment extends SherlockFragment implements
 		mCommentsList.setAdapter(mCommentAdapter);
 		mReshoutsList.setAdapter(mReshoutAdapter);
 
-		mReshoutMarkerLayer = new MarkerMapLayer(mMap);
-		mReshoutMarkerLayer.setAdapter(mReshoutMarkerAdapter);
-		mReshoutMarkerLayer.registerDataSetObserver(mMarkerObserver);
+		if (mMap != null) {
+			mReshoutMarkerLayer = new MarkerMapLayer(mMap);
+			mReshoutMarkerLayer.setAdapter(mReshoutMarkerAdapter);
+			mReshoutMarkerLayer.registerDataSetObserver(mMarkerObserver);
 
-		mCommentMarkerLayer = new MarkerMapLayer(mMap);
-		mCommentMarkerLayer.setAdapter(mCommentMarkerAdapter);
-		mCommentMarkerLayer.registerDataSetObserver(mMarkerObserver);
+			mCommentMarkerLayer = new MarkerMapLayer(mMap);
+			mCommentMarkerLayer.setAdapter(mCommentMarkerAdapter);
+			mCommentMarkerLayer.registerDataSetObserver(mMarkerObserver);
 
-		mMapSizer = new MarkerMapSizer(mMap);
-		mMapSizer.addMarkerLayer(mCommentMarkerLayer);
-		mMapSizer.addMarkerLayer(mReshoutMarkerLayer);
+			mMapSizer = new MarkerMapSizer(mMap);
+			mMapSizer.addMarkerLayer(mCommentMarkerLayer);
+			mMapSizer.addMarkerLayer(mReshoutMarkerLayer);
+
+			ORIGINAL_MARKER = BitmapDescriptorFactory
+					.defaultMarker(BitmapDescriptorFactory.HUE_RED);
+			COMMENT_MARKER = BitmapDescriptorFactory
+					.defaultMarker(BitmapDescriptorFactory.HUE_AZURE);
+			RESHOUT_MARKER = BitmapDescriptorFactory
+					.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);
+
+			onDisplayOriginalLocation();
+		} else {
+			mExpandMap.setVisibility(View.INVISIBLE);
+		}
 
 		getLoaderManager().initLoader(LOADER_COMMENTS, null, this);
 		getLoaderManager().initLoader(LOADER_RESHOUTS, null, this);
 
-		ORIGINAL_MARKER = BitmapDescriptorFactory
-				.defaultMarker(BitmapDescriptorFactory.HUE_RED);
-		COMMENT_MARKER = BitmapDescriptorFactory
-				.defaultMarker(BitmapDescriptorFactory.HUE_AZURE);
-		RESHOUT_MARKER = BitmapDescriptorFactory
-				.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);
-
 		mShoutView.bindShout(mShout);
-
-		onDisplayOriginalLocation();
 
 		return v;
 	}
@@ -260,11 +264,13 @@ public class DetailsFragment extends SherlockFragment implements
 
 	private LocalShout getShoutFromBundle(Bundle bundle) {
 		if (bundle == null) {
-			return null;
+			throw new IllegalArgumentException("must have a bundle");
+			// return null;
 		}
 		byte[] hash = bundle.getByteArray(DetailsActivity.SHOUT_ID);
 		if (hash == null) {
-			return null;
+			throw new IllegalArgumentException("must have a hash in bundle");
+			// return null;
 		}
 		LocalShout shout = ShoutProviderContract.retrieveShoutByHash(getActivity()
 				.getApplicationContext(), hash);
