@@ -462,7 +462,7 @@ public class ShoutProvider extends ContentProvider {
 		private static final String TAG = ShoutDatabaseHelper.class
 				.getSimpleName();
 
-		public static final int VERSION = 2;
+		public static final int VERSION = 3;
 		public static final String DBNAME = "shout_base";
 
 		public static final String SHOUTS_TABLE = "shout";
@@ -501,6 +501,7 @@ public class ShoutProvider extends ContentProvider {
 				+ ShoutProviderContract.Shouts.USER_PK + " INTEGER, "
 				+ ShoutProviderContract.Shouts.COMMENT_COUNT + " INTEGER DEFAULT 0, "
 				+ ShoutProviderContract.Shouts.RESHOUT_COUNT + " INTEGER DEFAULT 0, "
+				+ ShoutProviderContract.Shouts.RESHOUTER_COUNT + " INTEGER DEFAULT 0, "
 				+ "UNIQUE (" + ShoutProviderContract.Shouts.HASH + "), "
 				+ "FOREIGN KEY(" + ShoutProviderContract.Shouts.USER_PK
 				+ ") REFERENCES " + USERS_TABLE
@@ -545,6 +546,22 @@ public class ShoutProvider extends ContentProvider {
 				+ ShoutProviderContract.Shouts.HASH + " = new."
 				+ ShoutProviderContract.Shouts.PARENT + ";\nEND;";
 
+		private static final String SQL_CREATE_TRIGGER_RESHOUTER = "CREATE TRIGGER "
+				+ "Update_Reshouter_Count AFTER INSERT ON "
+				+ SHOUTS_TABLE + " WHEN new."
+				+ ShoutProviderContract.Shouts.MESSAGE + " IS NULL AND new."
+				+ ShoutProviderContract.Shouts.PARENT + " IS NOT NULL"
+				+ "\nBEGIN\n" + "UPDATE "
+				+ SHOUTS_TABLE + " SET "
+				+ ShoutProviderContract.Shouts.RESHOUTER_COUNT + " = "
+				+ "(SELECT COUNT(DISTINCT reshout." + ShoutProviderContract.Shouts.PUB_KEY + ") "
+				+ "FROM " + DENORMED_RESHOUT_VIEW + " AS reshout WHERE "
+				+ "reshout." + ShoutProviderContract.Shouts.PARENT + "=new."
+				+ ShoutProviderContract.Shouts.PARENT
+				+ ") WHERE " + SHOUTS_TABLE + "." + ShoutProviderContract.Shouts.HASH + "=new."
+				+ ShoutProviderContract.Shouts.PARENT
+				+ ";\nEND;";
+
 		private static final String SQL_CREATE_TRIGGER_MESSAGE = "CREATE TRIGGER "
 				+ "Update_FTS3_Message AFTER INSERT ON "
 				+ SHOUTS_TABLE + " WHEN new."
@@ -584,6 +601,17 @@ public class ShoutProvider extends ContentProvider {
 				+ ShoutProviderContract.Shouts.MESSAGE + " IS NULL AND parent."
 				+ ShoutProviderContract.Shouts.MESSAGE + " IS NOT NULL);";
 
+		private static final String UPGRADE_SQL_ADD_RESHOUTERS_COUNT_COLUMN = "ALTER TABLE "
+				+ SHOUTS_TABLE + " ADD COLUMN " + ShoutProviderContract.Shouts.RESHOUTER_COUNT
+				+ " INTEGER DEFAULT 0;";
+
+		private static final String UPGRADE_SQL_INIT_RESHOUTERS_COUNT = "UPDATE " + SHOUTS_TABLE
+				+ " SET " + ShoutProviderContract.Shouts.RESHOUTER_COUNT
+				+ "=(SELECT COUNT(DISTINCT reshout." + ShoutProviderContract.Shouts.PUB_KEY +
+				") FROM " + DENORMED_RESHOUT_VIEW + " AS reshout WHERE reshout."
+				+ ShoutProviderContract.Shouts.PARENT + "=shout."
+				+ ShoutProviderContract.Shouts.HASH + ");";
+
 		private static final String[] USER_UNIQUE_COLS = {
 				ShoutProviderContract.Users.PUB_KEY,
 				ShoutProviderContract.Users.USERNAME,
@@ -611,6 +639,7 @@ public class ShoutProvider extends ContentProvider {
 			db.execSQL(SQL_CREATE_VIEW_DENORMED_ORIGINAL);
 			db.execSQL(SQL_CREATE_VIEW_DENORMED_COMMENT);
 			db.execSQL(SQL_CREATE_VIEW_DENORMED_RESHOUT);
+			db.execSQL(SQL_CREATE_TRIGGER_RESHOUTER);
 		}
 
 		@Override
@@ -624,6 +653,8 @@ public class ShoutProvider extends ContentProvider {
 			switch (oldVersion) {
 				case 1:
 					new Upgrade1to2(db).upgrade();
+				case 2:
+					new Upgrade2to3(db).upgrade();
 					break;
 				default:
 					Log.e(TAG, String.format(
@@ -641,6 +672,7 @@ public class ShoutProvider extends ContentProvider {
 			}
 
 			public void upgrade() {
+				Log.i(TAG, "Upgrading database from version 1 to version 2.");
 				mDb.execSQL(SQL_CREATE_INDEX_SHOUT_PARENT);
 				mDb.execSQL(SQL_CREATE_VIEW_DENORMED_SHOUT);
 				mDb.execSQL(SQL_CREATE_VIEW_DENORMED_ORIGINAL);
@@ -648,6 +680,40 @@ public class ShoutProvider extends ContentProvider {
 				mDb.execSQL(SQL_CREATE_VIEW_DENORMED_RESHOUT);
 			}
 		}
+
+		private static class Upgrade2to3 {
+			SQLiteDatabase mDb;
+
+			public Upgrade2to3(SQLiteDatabase database) {
+				mDb = database;
+			}
+
+			public void upgrade() {
+				Log.i(TAG, "Upgrading database from version 2 to version 3");
+				mDb.execSQL(UPGRADE_SQL_ADD_RESHOUTERS_COUNT_COLUMN);
+				mDb.execSQL(UPGRADE_SQL_INIT_RESHOUTERS_COUNT);
+				mDb.execSQL(SQL_CREATE_TRIGGER_RESHOUTER);
+
+				/*
+				 * The views are defined with a SELECT * evaluated when the
+				 * database is loaded. The new Reshouters_Count column will not
+				 * be automatically added to the views until the database is
+				 * closed and reopened. To force its inclusion now, we drop and
+				 * recreate the views.
+				 */
+				mDb.execSQL("DROP VIEW " + DENORMED_RESHOUT_VIEW + ";");
+				mDb.execSQL("DROP VIEW " + DENORMED_COMMENT_VIEW + ";");
+				mDb.execSQL("DROP VIEW " + DENORMED_ORIGINAL_VIEW + ";");
+				mDb.execSQL("DROP VIEW " + DENORMED_SHOUT_VIEW + ";");
+
+				mDb.execSQL(SQL_CREATE_VIEW_DENORMED_SHOUT);
+				mDb.execSQL(SQL_CREATE_VIEW_DENORMED_ORIGINAL);
+				mDb.execSQL(SQL_CREATE_VIEW_DENORMED_COMMENT);
+				mDb.execSQL(SQL_CREATE_VIEW_DENORMED_RESHOUT);
+
+			}
+		}
+
 	}
 
 }

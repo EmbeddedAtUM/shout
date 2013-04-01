@@ -165,6 +165,8 @@ public class ShoutProviderContract {
 
 		public static final String RESHOUT_COUNT = "Reshout_Count";
 
+		public static final String RESHOUTER_COUNT = "Reshouter_Count";
+
 	}
 
 	static class Users implements BaseColumns {
@@ -264,6 +266,7 @@ public class ShoutProviderContract {
 		int revcIndex = cursor.getColumnIndex(Shouts.TIME_RECEIVED);
 		int commentIndex = cursor.getColumnIndex(Shouts.COMMENT_COUNT);
 		int reshoutIndex = cursor.getColumnIndex(Shouts.RESHOUT_COUNT);
+		int reshouterIndex = cursor.getColumnIndex(Shouts.RESHOUTER_COUNT);
 
 		int version = cursor.getInt(versionIndex);
 		String encodedParentHash = cursor.isNull(parentIndex) ? null : cursor
@@ -288,6 +291,7 @@ public class ShoutProviderContract {
 		Long receivedTime = cursor.getLong(revcIndex);
 		int numComments = cursor.getInt(commentIndex);
 		int numReshouts = cursor.getInt(reshoutIndex);
+		int numReshouters = cursor.getInt(reshouterIndex);
 
 		Location location = null;
 		if (longitude != null && latitude != null) {
