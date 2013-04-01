@@ -139,9 +139,9 @@ public class ShoutView extends RelativeLayout {
 			commentCount.setText("");
 		}
 
-		if (shout.getReshoutCount() > 0) {
+		if (shout.getReshouterCount() > 0) {
 			reshoutCount.setVisibility(View.VISIBLE);
-			int count = shout.getReshoutCount();
+			int count = shout.getReshouterCount();
 			reshoutCount.setText(String.format("and %d %s", count, count == 1 ? "reshouter"
 					: "reshouters"));
 		} else {
