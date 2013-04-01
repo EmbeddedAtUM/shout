@@ -305,7 +305,7 @@ public class ShoutProviderContract {
 		LocalUser sender = new LocalUserImpl(context, name, encodedKey, encodedAvatarHash);
 		LocalShout shout = new LocalShoutImpl(context, version, sender, message, location,
 				encodedSig, encodedHash, sentTime, receivedTime, numComments,
-				numReshouts, encodedParentHash);
+				numReshouts, numReshouters, encodedParentHash);
 		return shout;
 	}
 

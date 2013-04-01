@@ -35,13 +35,14 @@ public class LocalShoutImpl implements LocalShout {
 
 	private int commentCount;
 	private int reshoutCount;
+	private int reshouterCount;
 
 	private Context context;
 
 	public LocalShoutImpl(Context context, int version, LocalUser sender, String message,
 			Location location,
 			String encodedSig, String encodedHash, Long sentTime, Long receivedTime,
-			int commentCount, int reshoutCount, String encodedParentHash) {
+			int commentCount, int reshoutCount, int reshouterCount, String encodedParentHash) {
 		this.version = version;
 		this.context = context;
 		this.sender = sender;
@@ -53,6 +54,7 @@ public class LocalShoutImpl implements LocalShout {
 		this.receivedTime = new DateTime(receivedTime);
 		this.commentCount = commentCount;
 		this.reshoutCount = reshoutCount;
+		this.reshouterCount = reshouterCount;
 		if (encodedParentHash != null) {
 			this.parentHash = Base64.decode(encodedParentHash, Base64.DEFAULT);
 		}
@@ -101,6 +103,11 @@ public class LocalShoutImpl implements LocalShout {
 	@Override
 	public int getReshoutCount() {
 		return this.reshoutCount;
+	}
+
+	@Override
+	public int getReshouterCount() {
+		return this.reshouterCount;
 	}
 
 	@Override
