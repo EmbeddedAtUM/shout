@@ -24,7 +24,7 @@ public class IdManager {
 	private AvatarStorage avatarStorage;
 
 	public IdManager(Context context) {
-		this(new KeyStorageSharedPrefs(context), (AvatarStorage) context
+		this(new KeyStorageSharedPrefs(context), (AvatarStorage) context.getApplicationContext()
 				.getSystemService(AvatarStorage.SHOUT_AVATAR_SERVICE));
 	}
 
