@@ -7,6 +7,7 @@ import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.Location;
 import org.whispercomm.shout.R;
 import org.whispercomm.shout.ShoutType;
+import org.whispercomm.shout.text.ShoutLinkify;
 import org.whispercomm.shout.util.FormattedAge;
 import org.whispercomm.shout.util.FormattedAge.AgeListener;
 
@@ -121,6 +122,7 @@ public class ShoutView extends RelativeLayout {
 			avatar.setImageResource(R.drawable.defaultavatar);
 
 		message.setText(shout.getMessage());
+		ShoutLinkify.addLinks(message);
 		Linkify.addLinks(message, Linkify.ALL);
 
 		/*
