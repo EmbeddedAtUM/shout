@@ -11,6 +11,7 @@ import org.whispercomm.shout.ShoutType;
 import org.whispercomm.shout.provider.CursorLoader;
 import org.whispercomm.shout.provider.ShoutCursorAdapter;
 import org.whispercomm.shout.provider.ShoutProviderContract;
+import org.whispercomm.shout.text.ShoutLinkify;
 import org.whispercomm.shout.ui.AbstractShoutViewActivity;
 import org.whispercomm.shout.ui.DetailsActivity;
 import org.whispercomm.shout.ui.MapActivity;
@@ -455,6 +456,7 @@ public class DetailsFragment extends SherlockFragment implements
 			mSender.setText(shout.getSender().getUsername());
 
 			mMessage.setText(shout.getMessage());
+			ShoutLinkify.addLinks(mMessage);
 			Linkify.addLinks(mMessage, Linkify.ALL);
 
 			String sentTime;
@@ -583,6 +585,9 @@ public class DetailsFragment extends SherlockFragment implements
 			mTimestamp.setText(timestamp);
 			if (avatarRef.isAvailable())
 				mAvatar.setImageBitmap(avatarRef.get().getBitmap());
+
+			ShoutLinkify.addLinks(mMessage);
+			Linkify.addLinks(mMessage, Linkify.ALL);
 
 			return this;
 		}
