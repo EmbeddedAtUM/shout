@@ -25,6 +25,7 @@
     <declare-styleable name="DelegatedPreference">
         <attr name="android:dialogTitle" />
         <attr name="cancelText" format="string" />
+        <attr name="android:widgetLayout" />
     </declare-styleable>
     <declare-styleable name="BitmapPreference">
         <attr name="maxScaledHeight" format="integer" min="1" />
@@ -37,10 +38,6 @@
         -->
         <attr name="compressionFormat" format="string" />
         <attr name="maxCompressedSize" format="integer" min="1" />
-    </declare-styleable>
-    <declare-styleable name="DelegatedPreference">
-        <attr name="android:dialogTitle" />
-        <attr name="android:widgetLayout" />
     </declare-styleable>
     <declare-styleable name="ViewportLayout">
         <attr name="viewportWidth" format="reference" />
