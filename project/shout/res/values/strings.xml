@@ -85,5 +85,8 @@
     <string name="menu_comment">Comment</string>
     <string name="menu_sort_received_time">Sort by received time</string>
     <string name="menu_sort_sent_time">Sort by sent time</string>
+    <string name="fragment_details_header_locations">Locations</string>
+    <string name="fragment_details_header_comments">Comments</string>
+    <string name="fragment_details_header_reshouts">Reshouts</string>
 
 </resources>

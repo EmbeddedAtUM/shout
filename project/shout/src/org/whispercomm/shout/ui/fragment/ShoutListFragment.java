@@ -34,6 +34,10 @@ public class ShoutListFragment extends SherlockFragment implements
 
 	private static final String SORT_ORDER_KEY = "sort_order";
 
+	private View mLoading;
+	private View mEmpty;
+	private ListView mListView;
+
 	private Set<LocalShout> expandedShouts;
 	private TimelineAdapter adapter;
 	private SortOrder sortOrder;
@@ -50,20 +54,26 @@ public class ShoutListFragment extends SherlockFragment implements
 
 		this.expandedShouts = new HashSet<LocalShout>();
 
-		getLoaderManager().initLoader(0, null, this);
 		this.adapter = new TimelineAdapter(getActivity(), null, expandedShouts);
 
 		// Inflate the layout for this fragment
 		View view = inflater.inflate(R.layout.fragment_shout_list, container, false);
 
-		ListView listView = (ListView) view.findViewById(android.R.id.list);
-		listView.setEmptyView(view.findViewById(android.R.id.empty));
-		listView.setAdapter(this.adapter);
+		mLoading = view.findViewById(R.id.loading);
+		mEmpty = view.findViewById(android.R.id.empty);
+
+		mListView = (ListView) view.findViewById(android.R.id.list);
+		mListView.setEmptyView(view.findViewById(android.R.id.empty));
+		mListView.setAdapter(this.adapter);
 
 		if (savedInstanceState != null && savedInstanceState.containsKey(SORT_ORDER_KEY))
 			this.sortOrder = (SortOrder) savedInstanceState.getSerializable(SORT_ORDER_KEY);
 		else
 			this.sortOrder = SortOrder.ReceivedTimeDescending;
+
+		// Do this after findViewById, so the view references are available
+		getLoaderManager().initLoader(0, null, this);
+
 		return view;
 	}
 
@@ -129,23 +139,42 @@ public class ShoutListFragment extends SherlockFragment implements
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle arg1) {
+		showLoading(true);
+		showEmpty(false);
+
 		return new CursorLoader(getActivity()) {
 			@Override
 			public Cursor onLoadCursor() {
 				return ShoutProviderContract
-						.getCursorOverAllShouts(getActivity(), sortOrder);
+						.getCursorOverAllShouts(getContext(), sortOrder);
 			}
 		};
 	}
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+		showLoading(false);
 		adapter.swapCursor(data);
 	}
 
 	@Override
 	public void onLoaderReset(Loader<Cursor> arg0) {
+		showLoading(false);
 		adapter.swapCursor(null);
+	}
+
+	private void showEmpty(boolean show) {
+		if (show)
+			mEmpty.setVisibility(View.VISIBLE);
+		else
+			mEmpty.setVisibility(View.INVISIBLE);
+	}
+
+	private void showLoading(boolean show) {
+		if (show)
+			mLoading.setVisibility(View.VISIBLE);
+		else
+			mLoading.setVisibility(View.INVISIBLE);
 	}
 
 }

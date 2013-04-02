@@ -3,30 +3,35 @@
 
     <style name="AppThemeBase" parent="Theme.Sherlock.Light.DarkActionBar">
 
-        <!--
-             All customizations specific to a particular API version should go 
-			in the API-specific res/values-vXX/styles.xml file. This instance contains 
-			the values for backward compatibility on the lowest-supported API version. 
-			In general, this entry specifies attributes related to the actionbar that 
-			are not available in the min API version. The backwards-compatible attributes 
-			defined by ActionBarSherlock and used on min API devices are. The equivalent 
-			attributes in the android namespace, added in API 11, are specified in values-v11/styles.xml.
-        -->
+        <!-- All customizations specific to a particular API version should go in the -->
+        <!-- API-specific res/values-vXX/styles.xml file. This instance contains the values -->
+        <!-- for backward compatibility on the lowest-supported API version. In general, this -->
+        <!-- entry specifies attributes related to the actionbar that are not available in -->
+        <!-- the min API version. The backwards-compatible attributes defined by -->
+        <!-- ActionBarSherlock and used on min API devices are. The equivalent attributes -->
+        <!-- in the android namespace, added in API 11, are specified in values-v11/styles.xml. -->
         <item name="actionBarStyle">@style/ActionBar</item>
     </style>
 
     <style name="AppTheme" parent="AppThemeBase">
         <item name="@attr/bitmapPreferenceStyle">@style/BitmapPreference</item>
         <item name="@attr/delegatedPreferenceStyle">@style/DelegatedPreference</item>
-        <item name="actionBarStyle">@style/ActionBar</item>
+        <item name="@attr/expandableViewStyle">@style/ExpandableView</item>
+        <item name="@attr/detailsFragmentReshoutItemStyle">@style/DetailsFragmentReshoutItem</item>
+        <item name="@attr/detailsFragmentCommentItemStyle">@style/DetailsFragmentCommentItem</item>
+        <item name="detailsFragmentLocationViewStyle">@style/DetailsFragmentLocationView</item>
+        <item name="detailsFragmentCommentViewStyle">@style/DetailsFragmentCommentView</item>
+        <item name="detailsFragmentReshoutViewStyle">@style/DetailsFragmentReshoutView</item>
+        <item name="detailsFragmentLocationViewContentStyle">@style/DetailsFragmentLocationViewContent</item>
+        <item name="detailsFragmentCommentViewContentStyle">@style/DetailsFragmentCommentViewContent</item>
+        <item name="detailsFragmentReshoutViewContentStyle">@style/DetailsFragmentReshoutViewContent</item>
+        <item name="detailsFragmentShoutViewStyle">@style/DetailsFragmentShoutView</item>
+        <item name="@android:attr/windowBackground">@drawable/messageviewgradient</item>
     </style>
 
     <style name="ActionBarBase" parent="Widget.Sherlock.ActionBar">
 
-        <!--
-             See the comments for AppThemeBase to understand the purpose of "Base" 
-			themes.
-        -->
+        <!-- See the comments for AppThemeBase to understand the purpose of "Base" themes. -->
         <item name="titleTextStyle">@style/NoTitleText</item>
     </style>
 
@@ -49,17 +54,11 @@
         <item name="@attr/delegatedPreferenceStyle">@style/DelegatedPreference</item>
 
         <!-- These color overrides should be removed when the main theme is fixed. -->
-        <!--
-             Override bad text colors that propagate through to preferences title 
-			and summary fields
-        -->
+        <!-- Override bad text colors that propagate through to preferences title and summary fields -->
         <item name="@android:attr/textColorPrimary">@android:color/primary_text_light</item>
         <item name="@android:attr/textColorSecondary">@android:color/secondary_text_light</item>
 
-        <!--
-             Override bad text and background colors in PreferenceCategory title 
-			display.
-        -->
+        <!-- Override bad text and background colors in PreferenceCategory title display. -->
         <item name="@android:attr/listSeparatorTextViewStyle">@style/ListSeparatorView</item>
     </style>
 
@@ -118,6 +117,14 @@
 
     <style name="DelegatedPreference">
         <!-- No special style to set here -->
+    </style>
+
+    <style name="ExpandableView">
+        <item name="expanded">false</item>
+        <item name="icon">@drawable/widget_expandable_view_trigger_icon</item>
+        <item name="headerTextAppearance">?android:attr/textAppearanceLarge</item>
+        <item name="subheaderTextAppearance">?android:attr/textAppearanceMedium</item>
+        <item name="triggerPadding">5dip</item>
     </style>
 
 </resources>

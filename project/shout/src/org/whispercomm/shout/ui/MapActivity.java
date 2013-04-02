@@ -12,29 +12,33 @@ import android.support.v4.app.TaskStackBuilder;
 
 import com.actionbarsherlock.view.MenuItem;
 
-public class DetailsActivity extends AbstractShoutViewActivity {
+public class MapActivity extends AbstractShoutViewActivity {
 	@SuppressWarnings("unused")
-	private static final String TAG = DetailsActivity.class.getSimpleName();
+	private static final String TAG = MapActivity.class.getSimpleName();
 
 	public static final String SHOUT_ID = "shout_id";
 
 	/**
-	 * Starts the details activity to display the specified shout.
+	 * Starts the map activity to display the location of the specified and
+	 * related shouts.
 	 * 
 	 * @param context the context used to start the activity
 	 * @param hash the shout to display
 	 */
 	public static void show(Context context, Shout shout) {
-		Intent intent = new Intent(context, DetailsActivity.class);
+		Intent intent = new Intent(context, MapActivity.class);
 		intent.putExtra(SHOUT_ID, shout.getHash());
 		context.startActivity(intent);
 	}
+
+	private byte[] hash;
 
 	@Override
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		setContentView(R.layout.activity_details);
+		setContentView(R.layout.activity_map);
+		hash = getIntent().getExtras().getByteArray(SHOUT_ID);
 	}
 
 	@Override
@@ -42,7 +46,8 @@ public class DetailsActivity extends AbstractShoutViewActivity {
 		int id = item.getItemId();
 		switch (id) {
 			case android.R.id.home:
-				Intent upIntent = new Intent(this, ShoutActivity.class);
+				Intent upIntent = new Intent(this, DetailsActivity.class);
+				upIntent.putExtra(DetailsActivity.SHOUT_ID, hash);
 				if (NavUtils.shouldUpRecreateTask(this, upIntent)) {
 					// This activity is not part of the application's task, so
 					// create a new task

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <style name="SenderFont" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="MessageFont" parent="@android:style/TextAppearance.Medium"></style>
+
+    <style name="TimestampFont" parent="@android:style/TextAppearance.Small">
+        <item name="android:textColor">#888888</item>
+    </style>
+
+    <style name="TimestampLabelFont" parent="@android:style/TextAppearance.Small">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">#888888</item>
+    </style>
+
+    <style name="DetailsFragmentReshoutItem">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="avatarSize">40dip</item>
+        <item name="senderTextAppearance">?android:attr/textAppearanceMedium</item>
+        <item name="timestampTextAppearance">?android:attr/textAppearanceSmall</item>
+        <item name="android:paddingTop">4dip</item>
+        <item name="android:paddingBottom">4dip</item>
+    </style>
+
+    <style name="DetailsFragmentCommentItem">
+        <item name="avatarSize">72dip</item>
+        <item name="senderTextAppearance">?android:attr/textAppearanceMedium</item>
+        <item name="timestampTextAppearance">?android:attr/textAppearanceSmall</item>
+        <item name="messageTextAppearance">?android:attr/textAppearanceMedium</item>
+        <item name="android:paddingTop">4dip</item>
+        <item name="android:paddingBottom">4dip</item>
+    </style>
+
+    <style name="DetailsFragmentExpandableView">
+        <item name="android:background">@drawable/rounded</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="DetailsFragmentLocationView" parent="DetailsFragmentExpandableView">
+        <item name="android:layout_marginBottom">4dp</item>
+        <item name="android:layout_height">match_parent</item>
+    </style>
+
+    <style name="DetailsFragmentCommentView" parent="DetailsFragmentExpandableView">
+        <item name="android:layout_marginBottom">4dp</item>
+    </style>
+
+    <style name="DetailsFragmentReshoutView" parent="DetailsFragmentExpandableView"></style>
+
+    <style name="DetailsFragmentExpandableViewContent">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_below">@id/trigger</item>
+        <!-- Cannot override one direction if android:padding is used. -->
+        <item name="android:paddingLeft">4dp</item>
+        <item name="android:paddingRight">4dp</item>
+        <item name="android:paddingTop">4dp</item>
+        <item name="android:paddingBottom">4dp</item>
+    </style>
+
+    <style name="DetailsFragmentLocationViewContent" parent="DetailsFragmentExpandableViewContent">
+        <item name="android:layout_height">match_parent</item>
+        <item name="minRatio">1.0</item>
+    </style>
+
+    <style name="DetailsFragmentCommentViewContent" parent="DetailsFragmentExpandableViewContent">
+
+        <!-- Top/bottom padding on inner list items is sufficient -->
+        <item name="android:paddingBottom">0dp</item>
+        <item name="android:paddingTop">0dp</item>
+        <item name="android:divider">@drawable/divider</item>
+        <item name="android:dividerHeight">1dp</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+
+    <style name="DetailsFragmentReshoutViewContent" parent="DetailsFragmentExpandableViewContent">
+
+        <!-- Top/bottom padding on inner list items is sufficient -->
+        <item name="android:paddingBottom">0dp</item>
+        <item name="android:paddingTop">0dp</item>
+        <item name="android:divider">@drawable/divider</item>
+        <item name="android:dividerHeight">1dp</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+
+    <style name="DetailsFragmentShoutView">
+        <item name="avatarSize">72dip</item>
+        <item name="senderTextAppearance">@style/SenderFont</item>
+        <item name="messageTextAppearance">@style/MessageFont</item>
+        <item name="timestampLabelTextAppearance">@style/TimestampLabelFont</item>
+        <item name="timestampTextAppearance">@style/TimestampFont</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginBottom">5dip</item>
+        <item name="android:padding">5dip</item>
+        <item name="android:background">@drawable/rounded</item>
+    </style>
+
+</resources>

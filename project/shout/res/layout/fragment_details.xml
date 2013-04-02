@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/viewport"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="5dp" >
+
+        <view
+            android:id="@+id/shoutview"
+            style="?attr/detailsFragmentShoutViewStyle"
+            class="org.whispercomm.shout.ui.fragment.DetailsFragment$ShoutView" />
+
+        <org.whispercomm.shout.ui.widget.ViewportLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:viewportHeight="@id/viewport" >
+
+            <org.whispercomm.shout.ui.widget.ExpandableView
+                android:id="@+id/expandable_location"
+                style="?attr/detailsFragmentLocationViewStyle"
+                app:expanded="true"
+                app:header="@string/fragment_details_header_locations" >
+
+                <!-- Custom trigger to include expand map button -->
+
+                <RelativeLayout
+                    android:id="@id/trigger"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:duplicateParentState="true"
+                    android:minHeight="48dp" >
+
+                    <ImageView
+                        android:id="@+id/icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginRight="20dp"
+                        android:duplicateParentState="true"
+                        tools:ignore="ContentDescription" />
+
+                    <TextView
+                        android:id="@+id/header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toRightOf="@id/icon"
+                        android:duplicateParentState="true"
+                        android:ellipsize="end"
+                        android:singleLine="true"
+                        tools:ignore="SelectableText" />
+
+                    <TextView
+                        android:id="@+id/subheader"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toLeftOf="@+id/expand_map"
+                        android:duplicateParentState="true"
+                        android:singleLine="true"
+                        tools:ignore="SelectableText" />
+
+                    <ImageButton
+                        android:id="@+id/expand_map"
+                        style="@style/TitleBarButton"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginRight="5dp"
+                        android:src="@drawable/ic_menu_popout_gray"
+                        tools:ignore="ContentDescription" />
+                </RelativeLayout>
+
+                <org.whispercomm.shout.ui.widget.AspectRatioLayout
+                    android:id="@id/content"
+                    style="?attr/detailsFragmentLocationViewContentStyle" >
+
+                    <fragment
+                        android:id="@+id/map"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        class="com.google.android.gms.maps.SupportMapFragment"
+                        app:uiRotateGestures="false"
+                        app:uiScrollGestures="false"
+                        app:uiZoomControls="true"
+                        app:uiZoomGestures="false" />
+                </org.whispercomm.shout.ui.widget.AspectRatioLayout>
+            </org.whispercomm.shout.ui.widget.ExpandableView>
+        </org.whispercomm.shout.ui.widget.ViewportLayout>
+
+        <org.whispercomm.shout.ui.widget.ExpandableView
+            android:id="@+id/expandable_comments"
+            style="?attr/detailsFragmentCommentViewStyle"
+            app:expanded="false"
+            app:header="@string/fragment_details_header_comments" >
+
+            <org.whispercomm.shout.ui.widget.FullListView
+                android:id="@id/content"
+                style="?attr/detailsFragmentCommentViewContentStyle" />
+        </org.whispercomm.shout.ui.widget.ExpandableView>
+
+        <org.whispercomm.shout.ui.widget.ExpandableView
+            android:id="@+id/expandable_reshouts"
+            style="?attr/detailsFragmentReshoutViewStyle"
+            app:expanded="false"
+            app:header="@string/fragment_details_header_reshouts" >
+
+            <org.whispercomm.shout.ui.widget.FullListView
+                android:id="@id/content"
+                style="?attr/detailsFragmentReshoutViewContentStyle" />
+        </org.whispercomm.shout.ui.widget.ExpandableView>
+    </LinearLayout>
+
+</ScrollView>

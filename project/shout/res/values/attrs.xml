@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- Style attributes -->
+    <attr name="delegatedPreferenceStyle" format="reference" />
+    <attr name="bitmapPreferenceStyle" format="reference" />
+    <attr name="expandableViewStyle" format="reference" />
+    <attr name="expandableViewTriggerStyle" format="reference" />
+
+    <!-- Other attributes -->
+
+    <attr name="avatarSize" format="dimension" />
+    <attr name="senderTextAppearance" format="reference" />
+    <attr name="timestampTextAppearance" format="reference" />
+    <attr name="messageTextAppearance" format="reference" />
+    <attr name="timestampLabelTextAppearance" format="reference" />
+
+    <!-- Styleables -->
+
     <declare-styleable name="ActionShoutView">
         <attr name="onReshoutClick" format="string" />
         <attr name="onCommentClick" format="string" />
@@ -26,8 +42,34 @@
         <attr name="android:dialogTitle" />
         <attr name="android:widgetLayout" />
     </declare-styleable>
-
-    <attr name="delegatedPreferenceStyle" format="reference" />
-    <attr name="bitmapPreferenceStyle" format="reference" />
+    <declare-styleable name="ViewportLayout">
+        <attr name="viewportWidth" format="reference" />
+        <attr name="viewportHeight" format="reference" />
+    </declare-styleable>
+    <declare-styleable name="AspectRatioLayout">
+        <attr name="minRatio" format="float" />
+        <attr name="maxRatio" format="float" />
+    </declare-styleable>
+    <declare-styleable name="ExpandableView">
+        <attr name="expanded" format="boolean" />
+        <attr name="icon" />
+        <attr name="header" format="string" />
+        <attr name="headerTextAppearance" format="reference" />
+        <attr name="subheader" format="string" />
+        <attr name="subheaderTextAppearance" format="reference" />
+        <attr name="triggerPadding" format="dimension" />
+        <attr name="triggerPaddingTop" format="dimension" />
+        <attr name="triggerPaddingRight" format="dimension" />
+        <attr name="triggerPaddingBottom" format="dimension" />
+        <attr name="triggerPaddingLeft" format="dimension" />
+        <attr name="triggerBackground" format="reference" />
+    </declare-styleable>
+    <declare-styleable name="ExpandableViewState">
+        <attr name="state_expanded" format="boolean" />
+    </declare-styleable>
+    <declare-styleable name="FullListView">
+        <attr name="android:divider" />
+        <attr name="android:dividerHeight" />
+    </declare-styleable>
 
 </resources>

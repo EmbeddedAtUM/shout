@@ -1,33 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="10dip"
-    android:paddingBottom="20dip"
-    android:background="@drawable/messageviewgradient" >
+    android:orientation="vertical" >
 
-    <LinearLayout
-        android:id="@+id/detailsView"
+    <fragment
+        android:id="@+id/fragment_details"
+        android:name="org.whispercomm.shout.ui.fragment.DetailsFragment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_gravity="center_horizontal"
-        android:background="@drawable/settingslistshape" >
+        android:layout_height="match_parent" />
 
-        <org.whispercomm.shout.ui.widget.ShoutView
-            android:id="@+id/shoutview"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:background="@color/white" />
-
-        <org.whispercomm.shout.ui.widget.ShoutChainView
-            android:id="@+id/commentsview"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:orientation="vertical" />
-    </LinearLayout>
-
-</ScrollView>
+</LinearLayout>

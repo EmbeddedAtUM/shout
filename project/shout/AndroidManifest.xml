@@ -78,6 +78,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.ShoutActivity" />
         </activity>
+        <activity android:name=".ui.MapActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.DetailsActivity" />
+        </activity>
         <activity
             android:name=".tutorial.TutorialActivity"
             android:screenOrientation="portrait" />
