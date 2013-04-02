@@ -15,6 +15,8 @@ public interface LocalShout extends Shout {
 
 	public int getReshoutCount();
 
+	public int getReshouterCount();
+
 	public DateTime getReceivedTime();
 
 	public List<LocalUser> getReshouters();
