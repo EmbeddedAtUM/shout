@@ -10,9 +10,12 @@ import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.Location;
 import org.whispercomm.shout.Me;
+import org.whispercomm.shout.MimeType;
 import org.whispercomm.shout.R;
 import org.whispercomm.shout.ShoutImage;
 import org.whispercomm.shout.SimpleLocation;
+import org.whispercomm.shout.content.ContentManager;
+import org.whispercomm.shout.content.ShoutImageStorage;
 import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.id.UserNotInitiatedException;
 import org.whispercomm.shout.location.LocationProvider;
@@ -34,6 +37,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
@@ -76,9 +80,11 @@ public class MessageFragment extends SherlockFragment {
 
 	private MenuItem menuItemAttachLocation;
 	private MenuItem menuItemSend;
-	private EditText edtMessage;
+	private EditText editMessage;
 	private FrameLayout frmProgressBar;
 	private RelativeLayout frmTxtParent;
+
+	private ShoutImageStorage storage;
 
 	private boolean isMessageEmpty = true;
 
@@ -117,6 +123,7 @@ public class MessageFragment extends SherlockFragment {
 
 		parent = getParent(activity.getIntent().getExtras());
 		idManager = new IdManager(activity);
+		storage = new ShoutImageStorage(new ContentManager(getActivity()));
 	}
 
 	@Override
@@ -192,19 +199,19 @@ public class MessageFragment extends SherlockFragment {
 		message = (TextView) v.findViewById(R.id.commentMessage);
 		sender = (TextView) v.findViewById(R.id.commentOrigsender);
 		frmTxtParent = (RelativeLayout) v.findViewById(R.id.frmParent);
-		edtMessage = (EditText) v.findViewById(R.id.compose);
+		editMessage = (EditText) v.findViewById(R.id.compose);
 
-		edtMessage.setFilters(new InputFilter[] {
+		editMessage.setFilters(new InputFilter[] {
 				new Utf8ByteLengthFilter(
 						SerializeUtility.MESSAGE_SIZE_MAX)
 		});
-		edtMessage.addTextChangedListener(new EditMessageWatcher());
+		editMessage.addTextChangedListener(new EditMessageWatcher());
 
 		Intent intent = activity.getIntent();
 		if (intent.getAction() == Intent.ACTION_SEND) {
 			String text = intent.getExtras().getString(Intent.EXTRA_TEXT);
-			edtMessage.setText(text);
-			if (edtMessage.getText().toString().isEmpty())
+			editMessage.setText(text);
+			if (editMessage.getText().toString().isEmpty())
 				setIsMessageEmpty(true);
 			else
 				setIsMessageEmpty(false);
@@ -245,18 +252,54 @@ public class MessageFragment extends SherlockFragment {
 	}
 
 	private void onCameraResult(Intent data) {
-		BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-		bmOptions.inJustDecodeBounds = true;
-		BitmapFactory.decodeFile(imageUri.getPath(), bmOptions);
-		int photoW = bmOptions.outWidth;
-		int photoH = bmOptions.outHeight;
+		Bitmap b = BitmapFactory.decodeFile(imageUri.getPath());
 
-		Toast.makeText(activity, String.format("Image Received: %dx%d", photoW, photoH),
+		b = scaleBitmap(b, 768);
+		attachImage(b);
+
+		Toast.makeText(activity,
+				String.format("Image Received: %dx%d", b.getWidth(), b.getHeight()),
 				Toast.LENGTH_LONG).show();
 	}
 
-	private void attachImage(Bitmap image) {
+	/**
+	 * Scales a bitmap so that the greatest dimension is @{code dim}
+	 */
+	private Bitmap scaleBitmap(Bitmap b, double dim) {
+		// Not sure if the following code is clever or a nasty hack...
+		int width = b.getWidth();
+		int height = b.getHeight();
 
+		int dims[] = {
+				width, height
+		};
+
+		// If the height is greater than 768 px, scale the image
+		int largeIndex = dims[0] > dims[1] ? 0 : 1;
+		int smallIndex = largeIndex == 0 ? 1 : 0;
+
+		if (dims[largeIndex] > dim) {
+			double ratio = dim / dims[largeIndex];
+			dims[smallIndex] *= ratio;
+			dims[largeIndex] = (int) dim;
+		}
+
+		width = dims[0];
+		height = dims[1];
+
+		return Bitmap.createScaledBitmap(b, width, height, false);
+	}
+
+	private void attachImage(Bitmap image) {
+		HashReference<ShoutImage> ref = null;
+		try {
+			ref = storage.store(new ShoutImage(image, CompressFormat.JPEG, 80, MimeType.JPEG));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		String uriStr = "shout://" + ref.getHash().toString();
+		editMessage.append(uriStr);
 	}
 
 	private void toggleAttachLocation() {
@@ -345,7 +388,7 @@ public class MessageFragment extends SherlockFragment {
 
 	public void send() {
 		showProgressBar();
-		String content = edtMessage.getText().toString();
+		String content = editMessage.getText().toString();
 		Location location = null;
 		if (isLocationAttached) {
 			location = SimpleLocation.create(mLocation.getLocation());
@@ -434,7 +477,7 @@ public class MessageFragment extends SherlockFragment {
 
 		@Override
 		public void afterTextChanged(Editable s) {
-			if (!edtMessage.getText().toString().equals(""))
+			if (!editMessage.getText().toString().equals(""))
 				setIsMessageEmpty(false);
 			else
 				setIsMessageEmpty(true);
