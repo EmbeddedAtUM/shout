@@ -6,7 +6,7 @@ import java.util.Queue;
 
 public class MerkleBuilder {
 
-	public static final int MAX_DATA_LEN = 100 * 1024; // 100 kB
+	public static final int MAX_DATA_LEN = 500 * 1024; // 500 kB
 
 	/**
 	 * Build the Merkle tree for the provided data;
@@ -18,7 +18,9 @@ public class MerkleBuilder {
 	 */
 	public static MerkleNode build(byte[] data, int offset, int len) {
 		if (len > MAX_DATA_LEN)
-			throw new IllegalArgumentException("Cannot build tree for data larger than 100 kB.");
+			throw new IllegalArgumentException(String.format(
+					"Cannot build tree for data larger than %d bytes. Got %d bytes.", MAX_DATA_LEN,
+					len));
 
 		// Number of leaves
 		int cnt = divideRoundUp(len, DataBlockNode.MAX_LEN);

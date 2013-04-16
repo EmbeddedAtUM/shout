@@ -20,7 +20,7 @@ import android.graphics.BitmapFactory;
  * @author David R. Bild
  */
 public class ShoutImage {
-	public static final int MAX_LEN = 100 * 1024; // 100 KB
+	public static final int MAX_LEN = 500 * 1024; // 500 kb
 
 	private static final int DEFAULT_COMPRESS_QUALITY = 100;
 	private static final CompressFormat DEFAULT_COMPRESS_FORMAT = CompressFormat.PNG;
@@ -88,10 +88,23 @@ public class ShoutImage {
 	 *             {@link #MAX_LEN} bytes
 	 */
 	public ShoutImage(Bitmap bitmap) {
+		this(bitmap, DEFAULT_COMPRESS_FORMAT, DEFAULT_COMPRESS_QUALITY, DEFAULT_MIME_TYPE);
+	}
+
+	/**
+	 * Constructs an (@code ShoutImage} from the given image using the default
+	 * encoding.
+	 * 
+	 * @param data
+	 * @param mimetype
+	 * @throws IllegalArgumentException if the encoded image is larger than
+	 *             {@link #MAX_LEN} bytes
+	 */
+	public ShoutImage(Bitmap bitmap, CompressFormat compressFormat, int compressQuality,
+			MimeType mimetype) {
 		this.bitmap = bitmap;
-		this.data = ImageUtils.compressBitmap(bitmap, DEFAULT_COMPRESS_FORMAT,
-				DEFAULT_COMPRESS_QUALITY);
-		this.mimetype = DEFAULT_MIME_TYPE;
+		this.data = ImageUtils.compressBitmap(bitmap, compressFormat, compressQuality);
+		this.mimetype = mimetype;
 
 		if (data.length > MAX_LEN)
 			throw new IllegalArgumentException(String.format(
