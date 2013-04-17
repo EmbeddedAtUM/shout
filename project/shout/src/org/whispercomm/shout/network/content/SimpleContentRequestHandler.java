@@ -3,9 +3,12 @@ package org.whispercomm.shout.network.content;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
 
 import org.whispercomm.manes.client.maclib.ManesFrameTooLargeException;
 import org.whispercomm.manes.client.maclib.ManesNotRegisteredException;
@@ -22,7 +25,9 @@ import org.whispercomm.shout.network.PacketProtocol;
 import org.whispercomm.shout.network.shout.NetworkProtocol;
 import org.whispercomm.shout.network.shout.ShoutChainTooLongException;
 import org.whispercomm.shout.util.AlarmExecutorService;
+import org.whispercomm.shout.util.ShoutUriUtils;
 
+import android.net.Uri;
 import android.util.Log;
 
 public class SimpleContentRequestHandler implements ContentRequestHandler, NetworkProtocol {
@@ -243,6 +248,10 @@ public class SimpleContentRequestHandler implements ContentRequestHandler, Netwo
 				// Trigger retrieval of content, if we don't have it.
 				// This is horribly inefficient
 				contentManager.retrieve(shout.getSender().getAvatar().getHash());
+				List<Hash> hashes = extractHashes(shout.getMessage());
+				for (Hash hash : hashes) {
+					contentManager.retrieve(hash);
+				}
 			} catch (NotFoundException e) {
 				// Ignore, we're just triggering retrieval
 			} catch (IOException e) {
@@ -253,4 +262,25 @@ public class SimpleContentRequestHandler implements ContentRequestHandler, Netwo
 		}
 	}
 
+	private List<Hash> extractHashes(String message) {
+		List<Hash> hashes = new ArrayList<Hash>();
+		String needle = "shout://";
+		int index = message.indexOf(needle);
+		while (index >= 0) {
+			// Check if we go out of bounds
+			int endIndex = index + 8 + 64;
+			if (endIndex > message.length()) {
+				break;
+			}
+			String candidate = message.substring(index, endIndex);
+
+			// Check if valid URI
+			Matcher m = ShoutUriUtils.SHOUT_URI_PATTERN.matcher(candidate);
+			if (m.matches()) {
+				hashes.add(ShoutUriUtils.parseUri(Uri.parse(candidate)));
+				index = message.indexOf(needle, index + 1);
+			}
+		}
+		return hashes;
+	}
 }
