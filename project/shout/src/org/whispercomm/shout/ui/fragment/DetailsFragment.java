@@ -585,6 +585,8 @@ public class DetailsFragment extends SherlockFragment implements
 			mTimestamp.setText(timestamp);
 			if (avatarRef.isAvailable())
 				mAvatar.setImageBitmap(avatarRef.get().getBitmap());
+			else
+				mAvatar.setImageResource(R.drawable.defaultavatar);
 
 			ShoutLinkify.addLinks(mMessage);
 			Linkify.addLinks(mMessage, Linkify.ALL);
@@ -701,6 +703,8 @@ public class DetailsFragment extends SherlockFragment implements
 			mTimestamp.setText(timestamp);
 			if (avatarRef.isAvailable())
 				mAvatar.setImageBitmap(avatarRef.get().getBitmap());
+			else
+				mAvatar.setImageResource(R.drawable.defaultavatar);
 
 			return this;
 		}
