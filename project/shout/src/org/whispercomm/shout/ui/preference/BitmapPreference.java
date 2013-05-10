@@ -196,7 +196,7 @@ public class BitmapPreference extends DelegatedPreference<Bitmap> {
 
 		Bitmap persisted = getPersistedBitmap();
 		if (persisted != null)
-			setImageDrawable(new BitmapDrawable(persisted));
+			setImageDrawable(new BitmapDrawable(getContext().getResources(), persisted));
 		else
 			setImageDrawable((Drawable) defaultValue);
 	}
@@ -222,7 +222,7 @@ public class BitmapPreference extends DelegatedPreference<Bitmap> {
 	}
 
 	private void onSaveBitmap(ScaledAndCompressedBitmap bitmap) throws ImageTooLargeException {
-		setImageDrawable(new BitmapDrawable(bitmap.getResized()));
+		setImageDrawable(new BitmapDrawable(getContext().getResources(), bitmap.getResized()));
 		String encoded = Base64.encodeToString(bitmap.getCompressed(), DEFAULT_ORDER);
 		persistString(encoded);
 		notifyChanged();
