@@ -47,15 +47,12 @@ public class NotificationSender {
 		// Construct the notification
 		NotificationCompat.Builder nb = new NotificationCompat.Builder(context);
 
-		// @formatter: off
 		nb.setContentText(contentText)
 				.setContentTitle(contentTitle)
 				.setTicker(tickerText)
 				.setSmallIcon(icon)
 				.setWhen(when)
-				.setContentIntent(pIntent)
-				.getNotification();
-		// @formatter: on
+				.setContentIntent(pIntent);
 
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 		boolean notificationSound = preferences.getBoolean("notification_sound", false);
@@ -70,7 +67,7 @@ public class NotificationSender {
 		}
 		nb.setDefaults(defaultFlags);
 
-		Notification notification = nb.getNotification();
+		Notification notification = nb.build();
 
 		// Remove the notification after it is clicked
 		notification.flags |= Notification.FLAG_AUTO_CANCEL;
