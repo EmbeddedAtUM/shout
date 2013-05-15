@@ -2,14 +2,12 @@
 package org.whispercomm.shout.provider;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.whispercomm.shout.provider.ProviderTestFactory.COMMENT_SHOUT_VALUES;
 import static org.whispercomm.shout.provider.ProviderTestFactory.RECOMMENT_SHOUT_VALUES;
-import static org.whispercomm.shout.provider.ProviderTestFactory.RESHOUT_SHOUT_VALUES;
 import static org.whispercomm.shout.provider.ProviderTestFactory.ROOT_SHOUT_VALUES;
 import static org.whispercomm.shout.provider.ProviderTestFactory.USER_1_ID;
 import static org.whispercomm.shout.provider.ProviderTestFactory.USER_1_VALUES;
