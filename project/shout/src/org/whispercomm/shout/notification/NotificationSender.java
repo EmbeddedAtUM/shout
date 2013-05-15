@@ -84,7 +84,7 @@ public class NotificationSender {
 		intent.putExtra(DetailsActivity.SHOUT_ID, shout.getHash());
 
 		/* Build the history */
-		TaskStackBuilder stackBuilder = TaskStackBuilder.from(context);
+		TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
 		stackBuilder.addParentStack(DetailsActivity.class);
 		stackBuilder.addNextIntent(intent);
 

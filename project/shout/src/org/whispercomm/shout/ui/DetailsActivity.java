@@ -47,7 +47,7 @@ public class DetailsActivity extends AbstractShoutViewActivity {
 					// This activity is not part of the application's task, so
 					// create a new task
 					// with a synthesized back stack.
-					TaskStackBuilder.from(this)
+					TaskStackBuilder.create(this)
 							.addNextIntent(upIntent)
 							.startActivities();
 					finish();
