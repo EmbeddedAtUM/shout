@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.google.analytics.tracking.android.EasyTracker;
 
 /**
  * Base class for Shout {@code Activity Activities} that takes care of:
@@ -28,6 +29,7 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
  * <li>ensuring the user agreement is accepted and prompting if not,</li>
  * <li>prompting for Manes client installation, if needed, and</li>
  * <li>prompting for Manes client registration, if needed.</li>
+ * <li>starting Google Analytics tracking.</li>
  * </ul>
  * <p>
  * The {@link #initialize()} method will be invoked after the user agreement is
@@ -109,6 +111,12 @@ public class AbstractShoutActivity extends SherlockFragmentActivity {
 	}
 
 	@Override
+	protected void onStart() {
+		super.onStart();
+		EasyTracker.getInstance().activityStart(this);
+	}
+
+	@Override
 	protected void onResume() {
 		super.onResume();
 		visible = true;
@@ -120,6 +128,12 @@ public class AbstractShoutActivity extends SherlockFragmentActivity {
 	protected void onPause() {
 		super.onPause();
 		visible = false;
+	}
+
+	@Override
+	protected void onStop() {
+		EasyTracker.getInstance().activityStop(this);
+		super.onStop();
 	}
 
 	@Override
