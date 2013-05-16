@@ -22,6 +22,7 @@ public class MessageActivity extends AbstractShoutActivity implements MessageFra
 	 * 
 	 * @param context the context used to start the activity
 	 */
+
 	public static void shout(Context context) {
 		comment(context, null);
 	}
@@ -32,6 +33,13 @@ public class MessageActivity extends AbstractShoutActivity implements MessageFra
 	 * @param context the context used to start the activity
 	 * @param shout the shout on which to comment
 	 */
+
+	public static void shout(Context context, String photoPath) {
+		Intent intent = new Intent(context, MessageActivity.class);
+		intent.putExtra(MessageFragment.PASS_PHOTO, photoPath);
+		context.startActivity(intent);
+	}
+
 	public static void comment(Context context, Shout shout) {
 		Intent intent = new Intent(context, MessageActivity.class);
 		if (shout != null) {

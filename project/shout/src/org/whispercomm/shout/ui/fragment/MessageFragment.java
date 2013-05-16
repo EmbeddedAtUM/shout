@@ -69,6 +69,7 @@ public class MessageFragment extends SherlockFragment {
 	private static final String TAG = MessageFragment.class.getSimpleName();
 
 	public static final String PARENT_ID = "parent";
+	public static final String PASS_PHOTO = "pass_photo";
 
 	/**
 	 * Request code used when starting camera activity for result
@@ -218,6 +219,11 @@ public class MessageFragment extends SherlockFragment {
 
 		}
 
+		String photoPath = intent.getStringExtra(PASS_PHOTO);
+		if (photoPath != null) {
+			onCameraResult(photoPath);
+		}
+
 		if (parent != null) {
 			// shoutParent.bindShout(parent);
 			LocalShout shout = (LocalShout) parent;
@@ -254,7 +260,18 @@ public class MessageFragment extends SherlockFragment {
 	private void onCameraResult(Intent data) {
 		Bitmap b = BitmapFactory.decodeFile(imageUri.getPath());
 
-		b = scaleBitmap(b, 768);
+		b = scaleBitmap(b, 1024);
+		attachImage(b);
+
+		Toast.makeText(activity,
+				String.format("Image Received: %dx%d", b.getWidth(), b.getHeight()),
+				Toast.LENGTH_LONG).show();
+	}
+
+	private void onCameraResult(String photoPath) {
+		Bitmap b = BitmapFactory.decodeFile(photoPath);
+
+		b = scaleBitmap(b, 1024);
 		attachImage(b);
 
 		Toast.makeText(activity,

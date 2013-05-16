@@ -2,10 +2,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
+        android:id="@+id/menu_include_image_camera" 
+        android:icon="@drawable/ic_menu_camera_white"
+        android:showAsAction="always"
+        android:title="@string/menu_include_image_camera"/>
+    <item
         android:id="@+id/compose"
         android:icon="@drawable/ic_menu_compose_white"
         android:showAsAction="always"
-        android:title="@string/menu_compose"/>
+        android:title="@string/menu_compose"/> 
     <item
         android:id="@+id/settings"
         android:title="@string/menu_settings"/>
