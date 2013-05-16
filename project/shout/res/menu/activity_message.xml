@@ -14,7 +14,7 @@
     <item
         android:id="@+id/menu_send"
         android:icon="@drawable/ic_send"
-        android:showAsAction="ifRoom|withText"
+        android:showAsAction="always|withText"
         android:title="@string/menu_send"/>
 
 </menu>
