@@ -9,7 +9,8 @@
         android:layout_alignParentTop="true"
         android:layout_marginRight="5dp"
         android:contentDescription="@string/avatarDesc"
-        android:scaleType="centerCrop" />
+        android:scaleType="centerCrop"
+        android:background="@drawable/border"/>
 
     <!--
     The following layout uses nested weights. If someone can figure out a way

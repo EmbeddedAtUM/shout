@@ -2,7 +2,9 @@
 package org.whispercomm.shout;
 
 import org.joda.time.DateTime;
+import org.whispercomm.shout.colorstorage.ShoutBorder;
 import org.whispercomm.shout.id.SignatureUtility;
+import org.whispercomm.shout.provider.ShoutColorContract;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 
 import android.content.Context;
@@ -35,6 +37,9 @@ public class ShoutCreator {
 		UnsignedShout unsigned = new SimpleUnsignedShout(timestamp, sender,
 				message, location, null);
 		Shout shout = SignatureUtility.signShout(unsigned, sender);
+		ShoutBorder shoutBorder = new ShoutBorder(shout.getSender().getUsername(), shout
+				.getSender().getPublicKey());
+		ShoutColorContract.saveShoutBorder(context, shoutBorder);
 		return ShoutProviderContract.saveShout(context, shout);
 	}
 

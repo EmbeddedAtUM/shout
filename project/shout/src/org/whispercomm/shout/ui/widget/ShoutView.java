@@ -15,6 +15,8 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
@@ -96,6 +98,11 @@ public class ShoutView extends RelativeLayout {
 		reshoutCount = (TextView) this.findViewById(R.id.reshoutCount);
 		detailsTable = (TableLayout) findViewById(R.id.shoutDetails);
 
+		ImageView borderView = (ImageView) findViewById(R.id.avatar);
+		LayerDrawable border = (LayerDrawable) borderView.getBackground();
+		GradientDrawable borderColor = new GradientDrawable();
+		borderColor.getOpacity();
+		borderColor = (GradientDrawable) border.getDrawable(0).mutate();
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 			message.setTextIsSelectable(true);
 		}

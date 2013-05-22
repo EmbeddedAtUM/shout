@@ -88,5 +88,5 @@
     <string name="fragment_details_header_locations">Locations</string>
     <string name="fragment_details_header_comments">Comments</string>
     <string name="fragment_details_header_reshouts">Reshouts</string>
-
+	<string name="colorAuthority">org.whispercomm.shout.color.provider</string>
 </resources>

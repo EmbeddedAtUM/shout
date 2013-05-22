@@ -116,6 +116,14 @@
             android:name="org.whispercomm.manes.client.maclib.ui.ManesInstaller"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" >
         </activity>
+      <provider 
+            android:name=".provider.ColorProvider"
+            android:authorities="@string/colorAuthority" 
+            android:permission="org.whispercomm.shout.ACCESS_SHOUTS" >
+   
+        </provider>
+        
+        
     </application>
 
 </manifest>
