@@ -26,11 +26,12 @@ public class LocalUserImpl implements LocalUser {
 	private String username;
 	private ECPublicKey publicKey;
 	private HashReference<Avatar> avatar;
+	private int color;
 
+	// add color here so bindview calls it here
 	public LocalUserImpl(Context context, String username, String encodedKey,
 			String encodedAvatarHash) {
 		this.context = context.getApplicationContext();
-
 		this.username = username;
 		try {
 			this.publicKey = KeyGenerator.generatePublic(Base64.decode(encodedKey, Base64.DEFAULT));
@@ -38,6 +39,8 @@ public class LocalUserImpl implements LocalUser {
 			// TODO: Figure out what to do about this
 			throw new RuntimeException(e);
 		}
+		this.color = ShoutColorContract.getShoutBorder(context, username, publicKey)
+				.getBorderColor();
 		try {
 			this.avatar = new SimpleHashReference<Avatar>(new Hash(Base64.decode(encodedAvatarHash,
 					Base64.DEFAULT)));
@@ -105,6 +108,18 @@ public class LocalUserImpl implements LocalUser {
 		} else if (!username.equals(other.username))
 			return false;
 		return true;
+	}
+
+	@Override
+	public int getColor() {
+		return this.color;
+	}
+
+	@Override
+	public int getUserCount() {
+		this.context = context.getApplicationContext();
+		int[] usernames = ShoutColorContract.compareUsernames(context, username);
+		return usernames.length;
 	}
 
 }

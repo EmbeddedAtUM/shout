@@ -74,4 +74,13 @@ public class DialogFactory {
 				.setOnCancelListener(cancel);
 		return builder.create();
 	}
+
+	public static AlertDialog colorCodingExplanation(Context context,
+			DialogInterface.OnClickListener positive) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);
+		builder.setMessage(R.string.colorExplanation).setCancelable(false)
+				.setPositiveButton(R.string.expiry_dialog_netural, positive)
+				.setCancelable(false);
+		return builder.create();
+	}
 }

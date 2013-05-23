@@ -11,6 +11,7 @@ public class TestUser implements User {
 	public String username;
 	public ECPublicKey ecPubKey;
 	public HashReference<Avatar> avatar;
+	public int color;
 
 	public TestUser(String username, ECPublicKey ecPubKey, HashReference<Avatar> avatar) {
 		this.username = username;
@@ -32,4 +33,5 @@ public class TestUser implements User {
 	public HashReference<Avatar> getAvatar() {
 		return avatar;
 	}
+	
 }

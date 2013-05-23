@@ -40,10 +40,13 @@ public class ShoutView extends RelativeLayout {
 	private ImageView avatar;
 
 	private TextView message;
-
 	private TextView reshoutCount;
 	private TextView commentCount;
 	private TextView age;
+
+	private GradientDrawable borderColor;
+	private ImageView borderView;
+	private LayerDrawable border;
 
 	private TableLayout detailsTable;
 
@@ -98,11 +101,10 @@ public class ShoutView extends RelativeLayout {
 		reshoutCount = (TextView) this.findViewById(R.id.reshoutCount);
 		detailsTable = (TableLayout) findViewById(R.id.shoutDetails);
 
-		ImageView borderView = (ImageView) findViewById(R.id.avatar);
-		LayerDrawable border = (LayerDrawable) borderView.getBackground();
-		GradientDrawable borderColor = new GradientDrawable();
-		borderColor.getOpacity();
+		borderView = (ImageView) findViewById(R.id.avatar);
+		border = (LayerDrawable) borderView.getBackground();
 		borderColor = (GradientDrawable) border.getDrawable(0).mutate();
+
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 			message.setTextIsSelectable(true);
 		}
@@ -127,7 +129,7 @@ public class ShoutView extends RelativeLayout {
 			avatar.setImageBitmap(avatarRef.get().getBitmap());
 		else
 			avatar.setImageResource(R.drawable.defaultavatar);
-
+		borderColor.setColor(shout.getSender().getColor());
 		message.setText(shout.getMessage());
 		ShoutLinkify.addLinks(message);
 		Linkify.addLinks(message, Linkify.ALL);

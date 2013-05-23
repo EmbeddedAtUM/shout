@@ -7,6 +7,7 @@ import java.util.TimerTask;
 import org.joda.time.DateTime;
 import org.whispercomm.manes.client.maclib.ManesNotRegisteredException;
 import org.whispercomm.shout.Shout;
+import org.whispercomm.shout.provider.ShoutColorContract;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 
 import android.content.Context;
@@ -82,6 +83,7 @@ public class NaiveNetworkProtocol implements NetworkProtocol {
 
 	@Override
 	public void receive(Shout shout) {
+		ShoutColorContract.saveShoutBorder(context, shout.getSender());
 		ShoutProviderContract.saveShout(context, shout);
 	}
 

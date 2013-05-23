@@ -93,19 +93,31 @@ public class ColorProvider extends ContentProvider {
 	}
 
 	@Override
-	public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-		// TODO Don't worry about this now
-		return 0;
+	public int update(Uri uri, ContentValues values, String selection,
+			String[] selectionArgs) {
+		int uriType = sUriMatcher.match(uri);
+		db = dbOpenHelper.getWritableDatabase();
+		int rowsUpdated = 0;
+		switch (uriType) {
+			case 1:
+				rowsUpdated = db.update(ColorDatabase.DATABASE_NAME, values, selection,
+						selectionArgs);
+				break;
+			default:
+				throw new IllegalArgumentException("Unknown URI: " + uri);
+		}
+		getContext().getContentResolver().notifyChange(uri, null);
+		return rowsUpdated;
+
 	}
 
 	protected static final class ColorDatabase extends SQLiteOpenHelper {
-
-		private static final String TAG = ColorDatabase.class.getSimpleName();
 
 		public static final String KEY_ID = "id";
 		public static final String KEY_USERNAME = "username";
 		public static final String KEY_PUBLIC_KEY = "user_public_key";
 		public static final String KEY_COLOR = "color";
+		public static final String WARNING_SEEN = "warning_status";
 		public static final String DATABASE_NAME = "colordatabase";
 		private static final int DATABASE_VERSION = 1;
 
@@ -117,7 +129,7 @@ public class ColorProvider extends ContentProvider {
 				+ DATABASE_NAME + "(" + KEY_ID + " INTEGER PRIMARY KEY, " + KEY_USERNAME
 				+ " TEXT, "
 				+ KEY_PUBLIC_KEY
-				+ " TEXT, " + KEY_COLOR + " INTEGER NOT NULL);";
+				+ " TEXT, " + KEY_COLOR + " INTEGER NOT NULL, " + WARNING_SEEN + " TEXT" + ")";
 
 		public ColorDatabase(Context context) {
 			super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -125,8 +137,6 @@ public class ColorProvider extends ContentProvider {
 
 		@Override
 		public void onCreate(SQLiteDatabase database) {
-			System.out.println("colordatabase oncreate called");
-			Log.v(TAG, "Created database");
 			database.execSQL(DATABASE_CREATE);
 		}
 

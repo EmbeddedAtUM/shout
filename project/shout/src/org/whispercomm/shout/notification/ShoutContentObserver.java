@@ -2,6 +2,7 @@
 package org.whispercomm.shout.notification;
 
 import org.whispercomm.shout.Shout;
+import org.whispercomm.shout.provider.ShoutColorContract;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.provider.ShoutProviderContract.Shouts;
 import org.whispercomm.shout.ui.AbstractShoutActivity;
@@ -49,6 +50,7 @@ public class ShoutContentObserver extends ContentObserver {
 				Shout shout = ShoutProviderContract.retrieveShoutFromCursor(context, cursor);
 				// Only notify if it is not a reshout
 				if (shout.getMessage() != null) {
+					ShoutColorContract.saveShoutBorder(context, shout.getSender());
 					notificationSender.sendNotification(shout);
 				}
 				cursor.close();

@@ -89,4 +89,5 @@
     <string name="fragment_details_header_comments">Comments</string>
     <string name="fragment_details_header_reshouts">Reshouts</string>
 	<string name="colorAuthority">org.whispercomm.shout.color.provider</string>
+	<string name="colorExplanation">The colors around the avatar are used to distinguish different users with identical usernames. Red borders indicate high username density and possibility of impersonation</string>
 </resources>

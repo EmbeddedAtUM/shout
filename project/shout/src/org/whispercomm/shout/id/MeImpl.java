@@ -12,7 +12,6 @@ public class MeImpl implements Me {
 
 	private ECPublicKey publicKey;
 	private ECPrivateKey privateKey;
-
 	private String username;
 
 	private HashReference<Avatar> avatar;

@@ -13,6 +13,7 @@ public class LazyLocalUserImpl implements LocalUser {
 	private final int id;
 	private Context context;
 	private LocalUser self;
+	private int color;
 
 	public LazyLocalUserImpl(Context context, int userId) {
 		this.context = context;
@@ -80,6 +81,18 @@ public class LazyLocalUserImpl implements LocalUser {
 		} else if (!getAvatar().equals(other.getAvatar()))
 			return false;
 		return true;
+	}
+
+	@Override
+	public int getColor() {
+		return this.color;
+	}
+
+	@Override
+	public int getUserCount() {
+		this.context = context.getApplicationContext();
+		int[] usernames = ShoutColorContract.compareUsernames(context, self.getUsername());
+		return usernames.length;
 	}
 
 }

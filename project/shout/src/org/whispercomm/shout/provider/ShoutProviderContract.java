@@ -301,7 +301,6 @@ public class ShoutProviderContract {
 		String encodedKey = cursor.getString(pubkeyIndex);
 		String name = cursor.getString(usernameIndex);
 		String encodedAvatarHash = cursor.getString(avatarIndex);
-
 		LocalUser sender = new LocalUserImpl(context, name, encodedKey, encodedAvatarHash);
 		LocalShout shout = new LocalShoutImpl(context, version, sender, message, location,
 				encodedSig, encodedHash, sentTime, receivedTime, numComments,

@@ -14,6 +14,8 @@ public class TestMe implements Me {
 	public ECPublicKey publicKey;
 	public ECPrivateKey privateKey;
 	public HashReference<Avatar> avatar;
+	public int color;
+	public int userCount;
 
 	public TestMe(String username, ECPublicKey publicKey, ECPrivateKey privateKey,
 			HashReference<Avatar> avatar) {
@@ -46,5 +48,6 @@ public class TestMe implements Me {
 	public HashReference<Avatar> getAvatar() {
 		return avatar;
 	}
+	
 
 }

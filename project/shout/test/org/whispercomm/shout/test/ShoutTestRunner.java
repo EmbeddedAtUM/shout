@@ -21,6 +21,7 @@ public class ShoutTestRunner extends RobolectricTestRunner {
 		Robolectric.bindShadowClass(ShoutBase64.class);
 		Robolectric.bindShadowClass(ShoutContentResolver.class);
 		Robolectric.bindShadowClass(ShoutSQLiteQueryBuilder.class);
+		Robolectric.bindShadowClass(ShoutColor.class);
 	}
 
 }
