@@ -99,6 +99,7 @@ public class ContentProtocol implements ObjectProtocol {
 			return;
 		} catch (InvalidFormatException e) {
 			Log.v(TAG, "Dropping content descriptor with invalid format", e);
+			return;
 		}
 
 		contentRequestHandler.receiveContentDescriptor(descriptor);
@@ -119,6 +120,7 @@ public class ContentProtocol implements ObjectProtocol {
 			return;
 		} catch (InvalidFormatException e) {
 			Log.v(TAG, "Dropping merkle node with invalid format", e);
+			return;
 		}
 
 		contentRequestHandler.receiveMerkleNode(node);
