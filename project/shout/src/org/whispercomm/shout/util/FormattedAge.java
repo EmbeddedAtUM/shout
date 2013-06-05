@@ -26,7 +26,7 @@ public class FormattedAge {
 	private static final DateTimeFormatter previousYearNoTime = DateTimeFormat
 			.forPattern("MMM d',' yyyy");
 
-	private static Timer DEFAULT_TIMER;
+	private static Timer DEFAULT_TIMER = new Timer();
 
 	public static String format(DateTime dateTime) {
 		return new FormattedAge(dateTime).toString();
@@ -37,8 +37,6 @@ public class FormattedAge {
 	}
 
 	public static FormattedAge create(AgeListener ageListener) {
-		if (DEFAULT_TIMER == null)
-			DEFAULT_TIMER = new Timer();
 		return new FormattedAge(DEFAULT_TIMER, ageListener);
 	}
 
