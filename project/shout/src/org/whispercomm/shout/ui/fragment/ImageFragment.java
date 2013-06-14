@@ -10,6 +10,7 @@ import org.whispercomm.shout.ShoutImage;
 import org.whispercomm.shout.content.ContentManager;
 import org.whispercomm.shout.content.ShoutImageStorage;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -65,7 +66,8 @@ public class ImageFragment extends SherlockFragment {
 		try {
 			HashReference<ShoutImage> ref = storage.retrieve(hash);
 			if (ref.isAvailable()) {
-				viewImage.setImageBitmap(ref.get().getBitmap());
+				viewImage.setImageBitmap(Bitmap.createScaledBitmap(ref.get().getBitmap(), 768,
+						1024, true));
 				viewImage.setVisibility(ImageView.VISIBLE);
 				viewNotAvailable.setVisibility(View.GONE);
 				loaded = true;

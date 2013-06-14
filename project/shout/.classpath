@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="/home/bowen/Desktop/shout/shout/project/shout/libs/picasso-1.0.2.jar" sourcepath="/home/bowen/Desktop/picasso-source/com/squareup/picasso"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen">
 		<attributes>

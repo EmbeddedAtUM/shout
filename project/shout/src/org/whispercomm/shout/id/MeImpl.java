@@ -1,9 +1,9 @@
 
 package org.whispercomm.shout.id;
 
-import org.whispercomm.shout.ShoutImage;
 import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.Me;
+import org.whispercomm.shout.ShoutImage;
 import org.whispercomm.shout.crypto.ECKeyPair;
 import org.whispercomm.shout.crypto.ECPrivateKey;
 import org.whispercomm.shout.crypto.ECPublicKey;

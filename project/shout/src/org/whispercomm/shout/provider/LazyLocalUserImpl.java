@@ -1,9 +1,9 @@
 
 package org.whispercomm.shout.provider;
 
-import org.whispercomm.shout.ShoutImage;
 import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.LocalUser;
+import org.whispercomm.shout.ShoutImage;
 import org.whispercomm.shout.crypto.ECPublicKey;
 
 import android.content.Context;

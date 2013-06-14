@@ -1,12 +1,12 @@
 
 package org.whispercomm.shout.ui.widget;
 
-import org.whispercomm.shout.HashReference;
+import org.whispercomm.shout.Hash;
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.Location;
 import org.whispercomm.shout.R;
-import org.whispercomm.shout.ShoutImage;
 import org.whispercomm.shout.ShoutType;
+import org.whispercomm.shout.image.provider.ImageProviderContract.Avatars;
 import org.whispercomm.shout.text.ShoutLinkify;
 import org.whispercomm.shout.util.FormattedAge;
 import org.whispercomm.shout.util.FormattedAge.AgeListener;
@@ -37,7 +37,6 @@ public class ShoutView extends RelativeLayout {
 
 	private TextView sender;
 	private ImageView avatar;
-
 	private TextView message;
 
 	private TextView reshoutCount;
@@ -116,11 +115,32 @@ public class ShoutView extends RelativeLayout {
 		 * space after the username.
 		 */
 		sender.setText(String.format("%s ", shout.getSender().getUsername()));
-		HashReference<ShoutImage> avatarRef = shout.getSender().getAvatar();
-		if (avatarRef.isAvailable())
-			avatar.setImageBitmap(avatarRef.get().getBitmap());
-		else
-			avatar.setImageResource(R.drawable.defaultavatar);
+
+		// Loading avatars using Picasso library
+		Hash avatarHash = shout.getSender().getAvatarHash();
+		Uri mUri = Uri.withAppendedPath(Avatars.CONTENT_URI, avatarHash.toString());
+		/*
+		 * Picasso.with(this.getContext()) .load(mUri.toString())
+		 * .placeholder(R.drawable.defaultavatar)
+		 * .error(R.drawable.defaultavatar) .into(avatar);
+		 */
+
+		// Test loading actual picture into ImageView which belong to avatars
+		/*
+		 * Matcher matcher = ShoutLinkify.SHOUT_URI.matcher(shout.getMessage());
+		 * Uri mmUri = null; if (matcher.find()) { int start = matcher.start();
+		 * int end = matcher.end(); String uri = matcher.group(); String hashStr
+		 * = uri.substring(8); mmUri =
+		 * Uri.withAppendedPath(Thumbnails.CONTENT_URI, hashStr);
+		 * Picasso.with(this.getContext()) .load(mmUri.toString())
+		 * .placeholder(R.drawable.defaultavatar)
+		 * .error(R.drawable.defaultavatar) .into(avatar); }
+		 */
+		// HashReference<ShoutImage> avatarRef = shout.getSender().getAvatar();
+		// if (avatarRef.isAvailable())
+		// avatar.setImageBitmap(avatarRef.get().getBitmap());
+		// else
+		// avatar.setImageResource(R.drawable.defaultavatar);
 
 		message.setText(shout.getMessage());
 		ShoutLinkify.addLinks(message);

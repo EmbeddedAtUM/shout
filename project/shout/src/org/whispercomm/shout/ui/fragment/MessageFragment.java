@@ -3,6 +3,8 @@ package org.whispercomm.shout.ui.fragment;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.whispercomm.manes.client.maclib.ManesNotInstalledException;
 import org.whispercomm.manes.client.maclib.ManesNotRegisteredException;
@@ -46,7 +48,10 @@ import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.InputFilter;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
+import android.text.style.ImageSpan;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -188,8 +193,9 @@ public class MessageFragment extends SherlockFragment {
 					onCameraResult(data);
 				break;
 			default:
-				Log.i(TAG,
-						String.format("Ignoring unexpected activity request code: %d", requestCode));
+				Log.i(TAG, String.format(
+						"Ignoring unexpected activity request code: %d",
+						requestCode));
 		}
 	}
 
@@ -226,6 +232,9 @@ public class MessageFragment extends SherlockFragment {
 
 		if (parent != null) {
 			// shoutParent.bindShout(parent);
+			// TODO: Images in the parent shout must be shown here.
+			// TODO: Loading images should use Picasso library here.
+
 			LocalShout shout = (LocalShout) parent;
 			message.setText(shout.getMessage());
 			HashReference<ShoutImage> avatarRef = shout.getSender().getAvatar();
@@ -244,39 +253,46 @@ public class MessageFragment extends SherlockFragment {
 					.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
 			File photo = File.createTempFile("camera", "jpg", pictureDir);
 
-			Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+			Intent cameraIntent = new Intent(
+					android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
 			imageUri = Uri.fromFile(photo);
 			cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
 
 			startActivityForResult(cameraIntent, CAMERA_REQUEST);
 		} catch (IOException e) {
 			Log.w(TAG, "Error creating file for camera image", e);
-			Toast.makeText(activity, "Unable to get image from camera.", Toast.LENGTH_LONG).show();
+			Toast.makeText(activity, "Unable to get image from camera.",
+					Toast.LENGTH_LONG).show();
 		} catch (ActivityNotFoundException e) {
-			Toast.makeText(activity, "Camera not found.", Toast.LENGTH_LONG).show();
+			Toast.makeText(activity, "Camera not found.", Toast.LENGTH_LONG)
+					.show();
 		}
 	}
 
 	private void onCameraResult(Intent data) {
 		Bitmap b = BitmapFactory.decodeFile(imageUri.getPath());
 
-		b = scaleBitmap(b, 1024);
+		b = scaleBitmap(b, 256);
 		attachImage(b);
 
-		Toast.makeText(activity,
-				String.format("Image Received: %dx%d", b.getWidth(), b.getHeight()),
-				Toast.LENGTH_LONG).show();
+		Toast.makeText(
+				activity,
+				String.format("Image Received: %dx%d", b.getWidth(),
+						b.getHeight()), Toast.LENGTH_LONG).show();
 	}
 
 	private void onCameraResult(String photoPath) {
 		Bitmap b = BitmapFactory.decodeFile(photoPath);
 
-		b = scaleBitmap(b, 1024);
+		// The size of image was 1024 before.
+		// Try to scale down more.
+		b = scaleBitmap(b, 256);
 		attachImage(b);
 
-		Toast.makeText(activity,
-				String.format("Image Received: %dx%d", b.getWidth(), b.getHeight()),
-				Toast.LENGTH_LONG).show();
+		Toast.makeText(
+				activity,
+				String.format("Image Received: %dx%d", b.getWidth(),
+						b.getHeight()), Toast.LENGTH_LONG).show();
 	}
 
 	/**
@@ -304,19 +320,31 @@ public class MessageFragment extends SherlockFragment {
 		width = dims[0];
 		height = dims[1];
 
-		return Bitmap.createScaledBitmap(b, width, height, false);
+		return Bitmap.createScaledBitmap(b, width, height, true);
 	}
+
+	static Set<String> photoSet = new TreeSet<String>();
 
 	private void attachImage(Bitmap image) {
 		HashReference<ShoutImage> ref = null;
 		try {
-			ref = storage.store(new ShoutImage(image, CompressFormat.JPEG, 80, MimeType.JPEG));
+			ref = storage.store(new ShoutImage(image, CompressFormat.JPEG, 80,
+					MimeType.JPEG));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
 		String uriStr = "shout://" + ref.getHash().toString();
-		editMessage.append(uriStr);
+
+		photoSet.add(uriStr);
+
+		final SpannableStringBuilder sb = new SpannableStringBuilder(uriStr);
+
+		sb.setSpan(new ImageSpan(activity, scaleBitmap(image, 256)), 0, uriStr.length(),
+				Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+		sb.append('\n');
+		editMessage.append(sb);
+
 	}
 
 	private void toggleAttachLocation() {
@@ -331,7 +359,8 @@ public class MessageFragment extends SherlockFragment {
 		if (toast != null)
 			toast.cancel();
 		toast = Toast.makeText(activity, toastResid, Toast.LENGTH_SHORT);
-		toast.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, toast.getYOffset());
+		toast.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0,
+				toast.getYOffset());
 		toast.show();
 	}
 
@@ -347,7 +376,8 @@ public class MessageFragment extends SherlockFragment {
 		if (bool) {
 			menuItemAttachLocation.setIcon(R.drawable.ic_menu_pin_white);
 		} else {
-			menuItemAttachLocation.setIcon(R.drawable.ic_menu_pin_rotated_white);
+			menuItemAttachLocation
+					.setIcon(R.drawable.ic_menu_pin_rotated_white);
 		}
 	}
 
@@ -361,7 +391,8 @@ public class MessageFragment extends SherlockFragment {
 			return null;
 		}
 
-		parent = ShoutProviderContract.retrieveShoutByHash(activity, parentHash);
+		parent = ShoutProviderContract
+				.retrieveShoutByHash(activity, parentHash);
 		switch (parent.getType()) {
 			case COMMENT:
 			case RESHOUT:
@@ -388,8 +419,8 @@ public class MessageFragment extends SherlockFragment {
 	}
 
 	private void promptForUsername() {
-		Toast.makeText(activity,
-				"Set up a user before you Shout!", Toast.LENGTH_LONG).show();
+		Toast.makeText(activity, "Set up a user before you Shout!",
+				Toast.LENGTH_LONG).show();
 		startActivity(new Intent(activity, SettingsActivity.class));
 	}
 
@@ -405,6 +436,7 @@ public class MessageFragment extends SherlockFragment {
 
 	public void send() {
 		showProgressBar();
+
 		String content = editMessage.getText().toString();
 		Location location = null;
 		if (isLocationAttached) {
@@ -419,21 +451,18 @@ public class MessageFragment extends SherlockFragment {
 			return;
 		}
 		if (parent == null) {
-			new ShoutTask(activity,
-					new ShoutCreationCompleteListener(), me, location)
-					.execute(content);
+			new ShoutTask(activity, new ShoutCreationCompleteListener(), me,
+					location).execute(content);
 		} else {
-			new CommentTask(activity,
-					new ShoutCreationCompleteListener(), me, location,
-					parent).execute(content);
+			new CommentTask(activity, new ShoutCreationCompleteListener(), me,
+					location, parent).execute(content);
 		}
 	}
 
 	private void shoutCreated(LocalShout result) {
 		if (result != null) {
 			new SendShoutTask(((AbstractShoutActivity) activity).getNetwork(),
-					new ShoutSendCompleteListener())
-					.execute(result);
+					new ShoutSendCompleteListener()).execute(result);
 		} else {
 			Toast.makeText(activity, R.string.create_shout_failure,
 					Toast.LENGTH_LONG).show();
@@ -445,25 +474,25 @@ public class MessageFragment extends SherlockFragment {
 		MessageFragmentContainer container = (MessageFragmentContainer) activity;
 		try {
 			result.getResultOrThrow();
-			Toast.makeText(activity, R.string.send_shout_success, Toast.LENGTH_SHORT)
-					.show();
+			Toast.makeText(activity, R.string.send_shout_success,
+					Toast.LENGTH_SHORT).show();
 			container.messageFragmentFinished();
 		} catch (NotConnectedException e) {
-			Toast.makeText(activity, R.string.send_shout_failure, Toast.LENGTH_LONG)
-					.show();
+			Toast.makeText(activity, R.string.send_shout_failure,
+					Toast.LENGTH_LONG).show();
 			container.messageFragmentFinished();
 		} catch (ShoutChainTooLongException e) {
 			Log.e(TAG, "SHOUT_CHAIN_TOO_LONG error.  Unable to send shout.");
-			Toast.makeText(activity, R.string.send_shout_failure, Toast.LENGTH_LONG)
-					.show();
+			Toast.makeText(activity, R.string.send_shout_failure,
+					Toast.LENGTH_LONG).show();
 			container.messageFragmentFinished();
 		} catch (ManesNotInstalledException e) {
 			((AbstractShoutActivity) activity).promptForInstallation();
 		} catch (ManesNotRegisteredException e) {
 			((AbstractShoutActivity) activity).promptForRegistration();
 		} catch (IOException e) {
-			Toast.makeText(activity, R.string.send_shout_failure, Toast.LENGTH_LONG)
-					.show();
+			Toast.makeText(activity, R.string.send_shout_failure,
+					Toast.LENGTH_LONG).show();
 			container.messageFragmentFinished();
 		}
 	}
@@ -501,11 +530,13 @@ public class MessageFragment extends SherlockFragment {
 		}
 
 		@Override
-		public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+		public void beforeTextChanged(CharSequence s, int start, int count,
+				int after) {
 		}
 
 		@Override
-		public void onTextChanged(CharSequence s, int start, int before, int count) {
+		public void onTextChanged(CharSequence s, int start, int before,
+				int count) {
 		}
 	}
 

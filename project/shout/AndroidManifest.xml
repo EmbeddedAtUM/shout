@@ -101,6 +101,11 @@
             android:authorities="@string/providerAuthority"
             android:permission="org.whispercomm.shout.ACCESS_SHOUTS" />
 
+        <provider
+            android:name=".image.provider.ImageProvider"
+            android:authorities="@string/imageProviderAuthority"
+            android:permission="org.whispercomm.shout.ACCESS_SHOUTS" />
+        
         <service
             android:name=".network.service.NetworkService"
             android:enabled="true"
