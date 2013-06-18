@@ -5,12 +5,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.whispercomm.shout.R;
-import org.whispercomm.shout.SpannableThumbnail;
+import org.whispercomm.shout.ThumbnailSpan;
 import org.whispercomm.shout.image.provider.ImageProviderContract.Thumbnails;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.method.LinkMovementMethod;
 import android.text.method.MovementMethod;
@@ -76,12 +77,12 @@ public class ShoutLinkify {
 		return Bitmap.createScaledBitmap(b, width, height, false);
 	}
 
-	private static final boolean addLinks(SpannableStringBuilder s, TextView text) {
+	private static final boolean addLinks(SpannableStringBuilder s, TextView view) {
 		boolean match = false;
 
 		Matcher matcher = SHOUT_URI.matcher(s);
-		Context context = text.getContext();
-		SpannableStringBuilder s2 = new SpannableStringBuilder(s);
+		Context context = view.getContext();
+
 		while (matcher.find()) {
 			match = true;
 
@@ -92,15 +93,15 @@ public class ShoutLinkify {
 			String hashStr = uri.substring(8);
 
 			Uri mUri = Uri.withAppendedPath(Thumbnails.CONTENT_URI, hashStr);
-			SpannableThumbnail replacement = new SpannableThumbnail(LINK_TEXT, text, s2, uri,
-					start, end);
+			ThumbnailSpan replacement = new ThumbnailSpan(view, s);
 			Picasso.with(context).load(mUri.toString())
-					.placeholder(R.drawable.defaultavatar)
+					.placeholder(R.drawable.defaultimage)
 					.error(R.drawable.brokenpicture)
 					.into(replacement);
 
-			s.replace(start, end, replacement);
-			matcher = SHOUT_URI.matcher(s);
+			s.setSpan(replacement, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+			s.setSpan(new ShoutUriSpan(uri), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
 		}
 
 		return match;
