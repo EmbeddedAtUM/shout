@@ -30,9 +30,11 @@ import org.whispercomm.shout.tasks.CommentTask;
 import org.whispercomm.shout.tasks.SendResult;
 import org.whispercomm.shout.tasks.SendShoutTask;
 import org.whispercomm.shout.tasks.ShoutTask;
+import org.whispercomm.shout.text.ShoutLinkify;
 import org.whispercomm.shout.thirdparty.Utf8ByteLengthFilter;
 import org.whispercomm.shout.ui.AbstractShoutActivity;
 import org.whispercomm.shout.ui.SettingsActivity;
+import org.whispercomm.shout.util.ShoutUriUtils;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
@@ -52,6 +54,7 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
 import android.text.style.ImageSpan;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -232,11 +235,15 @@ public class MessageFragment extends SherlockFragment {
 
 		if (parent != null) {
 			// shoutParent.bindShout(parent);
-			// TODO: Images in the parent shout must be shown here.
-			// TODO: Loading images should use Picasso library here.
 
 			LocalShout shout = (LocalShout) parent;
+
+			// Images in parent shout are shown, and it is clickable.
 			message.setText(shout.getMessage());
+			ShoutLinkify.addLinks(message);
+			Linkify.addLinks(message, Linkify.ALL);
+			ShoutUriUtils.addLinks(message);
+
 			HashReference<ShoutImage> avatarRef = shout.getSender().getAvatar();
 			if (avatarRef.isAvailable())
 				avatar.setImageBitmap(avatarRef.get().getBitmap());
@@ -269,10 +276,13 @@ public class MessageFragment extends SherlockFragment {
 		}
 	}
 
+	/**
+	 * This method is called when taking images inside message fragment.
+	 */
 	private void onCameraResult(Intent data) {
 		Bitmap b = BitmapFactory.decodeFile(imageUri.getPath());
 
-		b = scaleBitmap(b, 256);
+		b = scaleBitmap(b, 1024);
 		attachImage(b);
 
 		Toast.makeText(
@@ -281,12 +291,13 @@ public class MessageFragment extends SherlockFragment {
 						b.getHeight()), Toast.LENGTH_LONG).show();
 	}
 
+	/**
+	 * This is called when taking image from main view
+	 */
 	private void onCameraResult(String photoPath) {
 		Bitmap b = BitmapFactory.decodeFile(photoPath);
 
-		// The size of image was 1024 before.
-		// Try to scale down more.
-		b = scaleBitmap(b, 256);
+		b = scaleBitmap(b, 1024);
 		attachImage(b);
 
 		Toast.makeText(
