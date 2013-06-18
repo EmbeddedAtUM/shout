@@ -28,6 +28,8 @@ import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 /**
  * A custom component for displaying a single Shout.
  * 
@@ -117,30 +119,13 @@ public class ShoutView extends RelativeLayout {
 		sender.setText(String.format("%s ", shout.getSender().getUsername()));
 
 		// Loading avatars using Picasso library
-		Hash avatarHash = shout.getSender().getAvatarHash();
+		Hash avatarHash = shout.getSender().getAvatar().getHash();
+		// Hash avatarHash = shout.getSender().getAvatarHash();
 		Uri mUri = Uri.withAppendedPath(Avatars.CONTENT_URI, avatarHash.toString());
-		/*
-		 * Picasso.with(this.getContext()) .load(mUri.toString())
-		 * .placeholder(R.drawable.defaultavatar)
-		 * .error(R.drawable.defaultavatar) .into(avatar);
-		 */
 
-		// Test loading actual picture into ImageView which belong to avatars
-		/*
-		 * Matcher matcher = ShoutLinkify.SHOUT_URI.matcher(shout.getMessage());
-		 * Uri mmUri = null; if (matcher.find()) { int start = matcher.start();
-		 * int end = matcher.end(); String uri = matcher.group(); String hashStr
-		 * = uri.substring(8); mmUri =
-		 * Uri.withAppendedPath(Thumbnails.CONTENT_URI, hashStr);
-		 * Picasso.with(this.getContext()) .load(mmUri.toString())
-		 * .placeholder(R.drawable.defaultavatar)
-		 * .error(R.drawable.defaultavatar) .into(avatar); }
-		 */
-		// HashReference<ShoutImage> avatarRef = shout.getSender().getAvatar();
-		// if (avatarRef.isAvailable())
-		// avatar.setImageBitmap(avatarRef.get().getBitmap());
-		// else
-		// avatar.setImageResource(R.drawable.defaultavatar);
+		Picasso.with(this.getContext()).load(mUri.toString())
+				.placeholder(R.drawable.defaultavatar)
+				.error(R.drawable.defaultavatar).into(avatar);
 
 		message.setText(shout.getMessage());
 		ShoutLinkify.addLinks(message);
