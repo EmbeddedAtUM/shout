@@ -37,7 +37,10 @@ import org.whispercomm.shout.ui.SettingsActivity;
 import org.whispercomm.shout.util.ShoutUriUtils;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ActivityNotFoundException;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -162,7 +165,7 @@ public class MessageFragment extends SherlockFragment {
 		int id = item.getItemId();
 		switch (id) {
 			case R.id.menu_include_image_camera:
-				requestCamera();
+				requestImage();
 				break;
 			case R.id.menu_include_location:
 				toggleAttachLocation();
@@ -252,6 +255,31 @@ public class MessageFragment extends SherlockFragment {
 			sender.setText(shout.getSender().getUsername());
 			frmTxtParent.setVisibility(RelativeLayout.VISIBLE);
 		}
+	}
+
+	private void requestImage() {
+		String items[] = {
+				"Camera", "Gallery"
+		};
+		AlertDialog.Builder builder = new AlertDialog.Builder(this.activity);
+		builder.setTitle("Choosing Image From")
+				.setItems(items, new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						switch (which) {
+							case 0:
+								requestCamera();
+								break;
+							case 1:
+								break;
+						}
+
+					}
+				});
+		Dialog dialog = builder.create();
+		dialog.show();
+
 	}
 
 	private void requestCamera() {

@@ -11,7 +11,9 @@ import org.whispercomm.shout.ui.fragment.MessageFragment;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ActivityNotFoundException;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -58,8 +60,8 @@ public class ShoutActivity extends AbstractShoutViewActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.menu_include_image_camera:
-				this.requestCamera();
-
+				this.requestImage();
+				// this.requestCamera();
 				break;
 			case R.id.settings:
 				SettingsActivity.show(this);
@@ -96,6 +98,31 @@ public class ShoutActivity extends AbstractShoutViewActivity {
 
 	private void onCameraResult(Intent data) {
 		MessageActivity.shout(this, imageUri.getPath());
+	}
+
+	private void requestImage() {
+		String items[] = {
+				"Camera", "Gallery"
+		};
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("Choosing Image From")
+				.setItems(items, new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						switch (which) {
+							case 0:
+								requestCamera();
+								break;
+							case 1:
+								break;
+						}
+
+					}
+				});
+		Dialog dialog = builder.create();
+		dialog.show();
+
 	}
 
 	private void requestCamera() {
