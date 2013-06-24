@@ -335,34 +335,42 @@ public class MessageFragment extends SherlockFragment {
 		onImageResult(picturePath);
 	}
 
+	private Bitmap decodeSampleSize(String path, int reqWidth, int reqHeight) {
+
+		// First decode with inJustDecodeBounds=true to check dimensions
+		final BitmapFactory.Options opts = new BitmapFactory.Options();
+		opts.inJustDecodeBounds = true;
+		BitmapFactory.decodeFile(path, opts);
+
+		// calculate inSampleSize
+		final int height = opts.outHeight;
+		final int width = opts.outWidth;
+		opts.inSampleSize = 1;
+		if (height > reqHeight || width > reqWidth) {
+			final int heightRatio = Math.round((float) height / (float) reqHeight);
+			final int widthRatio = Math.round((float) width / (float) reqWidth);
+			opts.inSampleSize = heightRatio < widthRatio ? heightRatio : widthRatio;
+		}
+
+		// Decode the bitmap with insamplesize
+		opts.inJustDecodeBounds = false;
+		return BitmapFactory.decodeFile(path, opts);
+	}
+
 	/**
 	 * This method is called when taking images inside message fragment.
 	 */
 	private void onImageResult(Intent data) {
-		Bitmap b = BitmapFactory.decodeFile(imageUri.getPath());
-
-		b = scaleBitmap(b, 1024);
+		Bitmap b = decodeSampleSize(imageUri.getPath(), 768, 1024);
 		attachImage(b);
-
-		Toast.makeText(
-				activity,
-				String.format("Image Received: %dx%d", b.getWidth(),
-						b.getHeight()), Toast.LENGTH_LONG).show();
 	}
 
 	/**
 	 * This is called when taking image from main view
 	 */
 	private void onImageResult(String photoPath) {
-		Bitmap b = BitmapFactory.decodeFile(photoPath);
-
-		b = scaleBitmap(b, 1024);
+		Bitmap b = decodeSampleSize(photoPath, 768, 1024);
 		attachImage(b);
-
-		Toast.makeText(
-				activity,
-				String.format("Image Received: %dx%d", b.getWidth(),
-						b.getHeight()), Toast.LENGTH_LONG).show();
 	}
 
 	/**
