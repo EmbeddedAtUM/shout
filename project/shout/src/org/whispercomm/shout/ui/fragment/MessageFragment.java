@@ -43,6 +43,7 @@ import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
@@ -85,7 +86,8 @@ public class MessageFragment extends SherlockFragment {
 	/**
 	 * Request code used when starting camera activity for result
 	 */
-	private static final int CAMERA_REQUEST = 1;
+	private static final int CAMERA_REQUEST = 0;
+	private static final int GALLERY_REQUEST = 1;
 
 	private LocationProvider mLocation;
 	private boolean isLocationAttached;
@@ -196,8 +198,12 @@ public class MessageFragment extends SherlockFragment {
 		switch (requestCode) {
 			case CAMERA_REQUEST:
 				if (resultCode == Activity.RESULT_OK)
-					onCameraResult(data);
+					onImageResult(data);
 				break;
+			case GALLERY_REQUEST:
+				if (resultCode == Activity.RESULT_OK)
+					onGalleryResult(data);
+
 			default:
 				Log.i(TAG, String.format(
 						"Ignoring unexpected activity request code: %d",
@@ -233,7 +239,7 @@ public class MessageFragment extends SherlockFragment {
 
 		String photoPath = intent.getStringExtra(PASS_PHOTO);
 		if (photoPath != null) {
-			onCameraResult(photoPath);
+			onImageResult(photoPath);
 		}
 
 		if (parent != null) {
@@ -268,11 +274,14 @@ public class MessageFragment extends SherlockFragment {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						switch (which) {
-							case 0:
+							case CAMERA_REQUEST:
 								requestCamera();
 								break;
-							case 1:
+							case GALLERY_REQUEST:
+								requestGallery();
 								break;
+							default:
+								Log.i(TAG, "Unknown image request.");
 						}
 
 					}
@@ -280,6 +289,12 @@ public class MessageFragment extends SherlockFragment {
 		Dialog dialog = builder.create();
 		dialog.show();
 
+	}
+
+	private void requestGallery() {
+		Intent galleryIntent = new Intent(Intent.ACTION_PICK,
+				android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+		startActivityForResult(galleryIntent, GALLERY_REQUEST);
 	}
 
 	private void requestCamera() {
@@ -304,10 +319,26 @@ public class MessageFragment extends SherlockFragment {
 		}
 	}
 
+	private void onGalleryResult(Intent data) {
+		imageUri = data.getData();
+		String[] filePathColumn = {
+				MediaStore.Images.Media.DATA
+		};
+
+		Cursor cursor = activity.getContentResolver().query(imageUri,
+				filePathColumn, null, null, null);
+		cursor.moveToFirst();
+
+		int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+		String picturePath = cursor.getString(columnIndex);
+		cursor.close();
+		onImageResult(picturePath);
+	}
+
 	/**
 	 * This method is called when taking images inside message fragment.
 	 */
-	private void onCameraResult(Intent data) {
+	private void onImageResult(Intent data) {
 		Bitmap b = BitmapFactory.decodeFile(imageUri.getPath());
 
 		b = scaleBitmap(b, 1024);
@@ -322,7 +353,7 @@ public class MessageFragment extends SherlockFragment {
 	/**
 	 * This is called when taking image from main view
 	 */
-	private void onCameraResult(String photoPath) {
+	private void onImageResult(String photoPath) {
 		Bitmap b = BitmapFactory.decodeFile(photoPath);
 
 		b = scaleBitmap(b, 1024);

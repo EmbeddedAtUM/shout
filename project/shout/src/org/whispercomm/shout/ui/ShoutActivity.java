@@ -15,6 +15,7 @@ import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -35,7 +36,8 @@ import com.actionbarsherlock.view.MenuItem;
 public class ShoutActivity extends AbstractShoutViewActivity {
 
 	private Uri imageUri;
-	private static final int CAMERA_REQUEST = 1;
+	private static final int CAMERA_REQUEST = 0;
+	private static final int GALLERY_REQUEST = 1;
 	private static final String TAG = MessageFragment.class.getSimpleName();
 
 	@Override
@@ -61,7 +63,6 @@ public class ShoutActivity extends AbstractShoutViewActivity {
 		switch (item.getItemId()) {
 			case R.id.menu_include_image_camera:
 				this.requestImage();
-				// this.requestCamera();
 				break;
 			case R.id.settings:
 				SettingsActivity.show(this);
@@ -90,6 +91,10 @@ public class ShoutActivity extends AbstractShoutViewActivity {
 				if (resultCode == Activity.RESULT_OK)
 					onCameraResult(data);
 				break;
+			case GALLERY_REQUEST:
+				if (resultCode == Activity.RESULT_OK)
+					onGalleryResult(data);
+				break;
 			default:
 				Log.i(TAG,
 						String.format("Ignoring unexpected activity request code: %d", requestCode));
@@ -98,6 +103,23 @@ public class ShoutActivity extends AbstractShoutViewActivity {
 
 	private void onCameraResult(Intent data) {
 		MessageActivity.shout(this, imageUri.getPath());
+	}
+
+	private void onGalleryResult(Intent data) {
+		imageUri = data.getData();
+		String[] filePathColumn = {
+				MediaStore.Images.Media.DATA
+		};
+
+		Cursor cursor = getContentResolver().query(imageUri,
+				filePathColumn, null, null, null);
+		cursor.moveToFirst();
+
+		int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+		String picturePath = cursor.getString(columnIndex);
+		MessageActivity.shout(this, picturePath);
+		cursor.close();
+
 	}
 
 	private void requestImage() {
@@ -111,11 +133,14 @@ public class ShoutActivity extends AbstractShoutViewActivity {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						switch (which) {
-							case 0:
+							case CAMERA_REQUEST:
 								requestCamera();
 								break;
-							case 1:
+							case GALLERY_REQUEST:
+								requestGallery();
 								break;
+							default:
+								Log.i(TAG, "Undefined image request");
 						}
 
 					}
@@ -123,6 +148,12 @@ public class ShoutActivity extends AbstractShoutViewActivity {
 		Dialog dialog = builder.create();
 		dialog.show();
 
+	}
+
+	private void requestGallery() {
+		Intent galleryIntent = new Intent(Intent.ACTION_PICK,
+				android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+		startActivityForResult(galleryIntent, GALLERY_REQUEST);
 	}
 
 	private void requestCamera() {
