@@ -4,9 +4,8 @@ package org.whispercomm.shout.ui.widget;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-import android.widget.TextView;
 
-public class ToggleTextView extends TextView {
+public class ToggleTextView extends ClickableLinksTextView {
 
 	private ActionShoutView toggleView = null;
 

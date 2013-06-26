@@ -39,7 +39,7 @@ public class ShoutView extends RelativeLayout {
 
 	private TextView sender;
 	private ImageView avatar;
-	private TextView message;
+	private ToggleTextView message;
 
 	private TextView reshoutCount;
 	private TextView commentCount;
@@ -93,7 +93,7 @@ public class ShoutView extends RelativeLayout {
 		avatar = (ImageView) findViewById(R.id.avatar);
 		sender = (TextView) findViewById(R.id.sender);
 		age = (TextView) findViewById(R.id.age);
-		message = (TextView) findViewById(R.id.message);
+		message = (ToggleTextView) findViewById(R.id.message);
 		commentCount = (TextView) findViewById(R.id.commentCount);
 		reshoutCount = (TextView) this.findViewById(R.id.reshoutCount);
 		detailsTable = (TableLayout) findViewById(R.id.shoutDetails);
@@ -109,6 +109,7 @@ public class ShoutView extends RelativeLayout {
 	 * @param shout the Shout to be displayed
 	 */
 	public void bindShout(LocalShout shout) {
+
 		this.shout = shout;
 
 		/*
@@ -131,6 +132,11 @@ public class ShoutView extends RelativeLayout {
 		ShoutLinkify.addLinks(message);
 		Linkify.addLinks(message, Linkify.ALL);
 		ShoutUriUtils.addLinks(message);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			message.setTextIsSelectable(false);
+			message.setTextIsSelectable(true);
+		}
 
 		/*
 		 * If the sent time is after the received time, base the duration period
