@@ -362,6 +362,13 @@ public class MessageFragment extends SherlockFragment {
 	 */
 	private void onImageResult(Intent data) {
 		Bitmap b = decodeSampleSize(imageUri.getPath(), 768, 1024);
+
+		// Check if bitmap is successfully decoded.
+		if (b == null) {
+			Toast.makeText(getActivity(), "Failed to retrieve image.",
+					Toast.LENGTH_SHORT).show();
+			return;
+		}
 		attachImage(b);
 	}
 
@@ -370,6 +377,12 @@ public class MessageFragment extends SherlockFragment {
 	 */
 	private void onImageResult(String photoPath) {
 		Bitmap b = decodeSampleSize(photoPath, 768, 1024);
+		// Check if bitmap is successfully decoded.
+		if (b == null) {
+			Toast.makeText(getActivity(), "Failed to retrieve image.",
+					Toast.LENGTH_SHORT).show();
+			return;
+		}
 		attachImage(b);
 	}
 
