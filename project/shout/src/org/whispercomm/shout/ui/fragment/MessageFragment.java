@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
 
 import org.whispercomm.manes.client.maclib.ManesNotInstalledException;
 import org.whispercomm.manes.client.maclib.ManesNotRegisteredException;
@@ -16,10 +17,12 @@ import org.whispercomm.shout.MimeType;
 import org.whispercomm.shout.R;
 import org.whispercomm.shout.ShoutImage;
 import org.whispercomm.shout.SimpleLocation;
+import org.whispercomm.shout.ThumbnailSpan;
 import org.whispercomm.shout.content.ContentManager;
 import org.whispercomm.shout.content.ShoutImageStorage;
 import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.id.UserNotInitiatedException;
+import org.whispercomm.shout.image.provider.ImageProviderContract.Thumbnails;
 import org.whispercomm.shout.location.LocationProvider;
 import org.whispercomm.shout.network.service.NetworkInterface.NotConnectedException;
 import org.whispercomm.shout.network.shout.ShoutChainTooLongException;
@@ -75,6 +78,7 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.squareup.picasso.Picasso;
 
 public class MessageFragment extends SherlockFragment {
 
@@ -91,6 +95,7 @@ public class MessageFragment extends SherlockFragment {
 
 	private LocationProvider mLocation;
 	private boolean isLocationAttached;
+	private boolean isImageAttached = false;
 
 	private MenuItem menuItemAttachLocation;
 	private MenuItem menuItemSend;
@@ -428,13 +433,45 @@ public class MessageFragment extends SherlockFragment {
 		String uriStr = "shout://" + ref.getHash().toString();
 
 		photoSet.add(uriStr);
-
 		final SpannableStringBuilder sb = new SpannableStringBuilder(uriStr);
 
-		sb.setSpan(new ImageSpan(activity, scaleBitmap(image, 256)), 0, uriStr.length(),
+		sb.setSpan(new ImageSpan(activity, scaleBitmap(image, 128)), 0,
+				uriStr.length(),
 				Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 		sb.append('\n');
+		isImageAttached = true;
 		editMessage.append(sb);
+
+	}
+
+	private void findAndAttachImage(CharSequence s, int start, int before, int count) {
+
+		boolean match = false;
+		Matcher matcher = ShoutLinkify.SHOUT_URI.matcher(s);
+		final SpannableStringBuilder sb = new SpannableStringBuilder(s);
+
+		while (matcher.find()) {
+			match = true;
+			int begin = matcher.start();
+			int end = matcher.end();
+
+			String uri = matcher.group();
+			String hashStr = uri.substring(8);
+
+			Uri mUri = Uri.withAppendedPath(Thumbnails.CONTENT_URI, hashStr);
+			ThumbnailSpan replacement = new ThumbnailSpan(editMessage, sb);
+			Picasso.with(editMessage.getContext()).load(mUri.toString())
+					.placeholder(R.drawable.defaultimage)
+					.error(R.drawable.brokenpicture)
+					.into(replacement);
+
+			sb.setSpan(replacement, begin, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+		}
+		if (match == true) {
+			isImageAttached = true;
+			editMessage.setText(sb);
+		}
 
 	}
 
@@ -527,7 +564,6 @@ public class MessageFragment extends SherlockFragment {
 
 	public void send() {
 		showProgressBar();
-
 		String content = editMessage.getText().toString();
 		Location location = null;
 		if (isLocationAttached) {
@@ -610,10 +646,12 @@ public class MessageFragment extends SherlockFragment {
 	 * 
 	 * @author Junzhe Zhang
 	 */
+
 	private class EditMessageWatcher implements TextWatcher {
 
 		@Override
 		public void afterTextChanged(Editable s) {
+
 			if (!editMessage.getText().toString().equals(""))
 				setIsMessageEmpty(false);
 			else
@@ -628,6 +666,19 @@ public class MessageFragment extends SherlockFragment {
 		@Override
 		public void onTextChanged(CharSequence s, int start, int before,
 				int count) {
+
+			if (isImageAttached == true) {
+				isImageAttached = false;
+			}
+			else {
+				if (count >= 72) {
+					// TODO: Check if there is enough space left. If space is
+					// not enough
+					// to hold one image, a portion of hash might shown.
+					findAndAttachImage(s, start, before, count);
+				}
+			}
+			return;
 		}
 	}
 
