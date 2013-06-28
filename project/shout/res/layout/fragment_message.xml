@@ -58,6 +58,7 @@
             android:layout_height="match_parent"
             android:ems="10"
             android:gravity="top|left"
+            android:imeOptions="flagNoExtractUi"
             android:inputType="textMultiLine" />
 
         <FrameLayout
