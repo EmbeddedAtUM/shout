@@ -31,5 +31,13 @@
         android:contentDescription="@string/detailsDescription"
         android:padding="5dip"
         android:src="@drawable/ic_menu_details_white" />
+    
+    <ImageButton
+        android:id="@+id/deleteButton"
+        style="@style/TitleBarButton"
+        android:layout_gravity="center"
+        android:contentDescription="@string/deleteDescription"
+        android:padding="5dip"
+        android:src="@drawable/ic_menu_delete_white" />
 
 </LinearLayout>

@@ -21,6 +21,7 @@
         <attr name="onReshoutClick" format="string" />
         <attr name="onCommentClick" format="string" />
         <attr name="onDetailsClick" format="string" />
+        <attr name="onDeleteClick" format="string" />
     </declare-styleable>
     <declare-styleable name="DelegatedPreference">
         <attr name="android:dialogTitle" />

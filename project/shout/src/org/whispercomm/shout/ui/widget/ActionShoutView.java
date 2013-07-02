@@ -18,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 /**
  * Displays a shout with an action bar underneath. The display of the bar can be
@@ -34,6 +35,7 @@ public class ActionShoutView extends LinearLayout {
 	private ImageButton btnReshout;
 	private ImageButton btnComment;
 	private ImageButton btnDetails;
+	private ImageButton btnDelete;
 
 	private boolean actionBarVisibility;
 
@@ -41,6 +43,7 @@ public class ActionShoutView extends LinearLayout {
 	private OnClickListener reshoutListener;
 	private OnClickListener commentListener;
 	private OnClickListener detailsListener;
+	private OnClickListener deleteListener;
 
 	// Listeners called when the action bar is toggled
 	private List<ActionBarStateChangeListener> actionBarStateChangeListeners;
@@ -74,6 +77,7 @@ public class ActionShoutView extends LinearLayout {
 		btnReshout = (ImageButton) findViewById(R.id.reshoutButton);
 		btnComment = (ImageButton) findViewById(R.id.commentButton);
 		btnDetails = (ImageButton) findViewById(R.id.detailsButton);
+		btnDelete = (ImageButton) findViewById(R.id.deleteButton);
 
 		ToggleTextView message = (ToggleTextView) shoutView.findViewById(R.id.message);
 		message.setToggleView(this);
@@ -110,7 +114,20 @@ public class ActionShoutView extends LinearLayout {
 				if (detailsListener != null) {
 					// ActionShoutView.this.toggleDetails();
 					detailsListener.onClick(shoutView.getBoundShout());
+					Toast.makeText(getContext(), "Delete this shout", Toast.LENGTH_SHORT).show();
 				}
+			}
+		});
+
+		btnDelete.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				if (deleteListener != null) {
+					// TODO: DO something here.
+					Toast.makeText(getContext(), "Delete this shout", Toast.LENGTH_SHORT).show();
+				}
+
 			}
 		});
 	}
@@ -145,6 +162,12 @@ public class ActionShoutView extends LinearLayout {
 					methodName = array.getString(attr);
 					if (methodName != null) {
 						this.setDetailsOnClickListener(createOnClickListener(methodName));
+					}
+					break;
+				case R.styleable.ActionShoutView_onDeleteClick:
+					methodName = array.getString(attr);
+					if (methodName != null) {
+						this.setDeleteOnClickListener(createOnClickListener(methodName));
 					}
 					break;
 			}
@@ -276,6 +299,15 @@ public class ActionShoutView extends LinearLayout {
 	 */
 	public void setDetailsOnClickListener(OnClickListener l) {
 		this.detailsListener = l;
+	}
+
+	/**
+	 * Sets the {@link OnClickListener} callback for the reshout button.
+	 * 
+	 * @param l the click listener
+	 */
+	public void setDeleteOnClickListener(OnClickListener l) {
+		this.deleteListener = l;
 	}
 
 	/**

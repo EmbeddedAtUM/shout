@@ -22,7 +22,8 @@
                 android:background="@drawable/rounded"
                 custom:onCommentClick="onClickComment"
                 custom:onDetailsClick="onClickDetails"
-                custom:onReshoutClick="onClickReshout" />
+                custom:onReshoutClick="onClickReshout"
+                custom:onDeleteClick="onClickDelete" />
         </LinearLayout>
 
         <org.whispercomm.shout.ui.widget.ShoutChainView

@@ -14,7 +14,8 @@
             android:layout_height="wrap_content"
             android:background="@drawable/rounded"
             custom:onDetailsClick="onClickDetails"
-            custom:onReshoutClick="onClickReshout" />
+            custom:onReshoutClick="onClickReshout"
+            custom:onDeleteClick="onClickDelete" />
     </LinearLayout>
 
 </merge>

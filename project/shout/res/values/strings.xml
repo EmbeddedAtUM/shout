@@ -25,6 +25,7 @@
     <string name="reshoutDescription">Reshout</string>
     <string name="commentDescription">Comment</string>
     <string name="detailsDescription">Details</string>
+   	<string name="deleteDescription">Delete</string>
     <string name="defaultUsername">ShoutUser</string>
     <string name="reshoutSuccess">Reshout successful!</string>
     <string name="reshoutFail">Reshout unsuccessful…</string>
