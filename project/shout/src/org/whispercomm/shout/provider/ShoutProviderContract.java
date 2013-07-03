@@ -51,6 +51,32 @@ public class ShoutProviderContract {
 	 * 
 	 * @author David Adrian
 	 */
+
+	public static class DeletedShouts implements BaseColumns {
+
+		/**
+		 * Base content URI for the table of Shouts
+		 */
+		public static final Uri CONTENT_URI = Uri.withAppendedPath(
+				CONTENT_URI_BASE, "deletedshouts");
+		/**
+		 * Column name of the primary key.
+		 */
+		public static final String _ID = BaseColumns._ID;
+
+		/**
+		 * Column name for the hash of a Shout. Stored as default Base64 string
+		 * encoding of a byte array.
+		 */
+		public static final String HASH = "Hash";
+		/**
+		 * Column name for the parent Shout. Stored as a reference to another
+		 * Shout hash, Base64 encoded.
+		 */
+		public static final String PARENT = "Parent";
+
+	}
+
 	public static class Shouts implements BaseColumns {
 
 		/**
@@ -331,6 +357,20 @@ public class ShoutProviderContract {
 		return result;
 	}
 
+	public static void deleteShout(Context context, Shout shout) {
+
+		ContentValues values = ContractHelper.buildContentValues(shout);
+		Uri location = context.getContentResolver().insert(DeletedShouts.CONTENT_URI, values);
+		Cursor cursor = context.getContentResolver().query(location, null, null, null, null);
+
+		if (cursor == null) {
+			Log.e(TAG, "Null uri returned when insert into delete table.");
+			return;
+		}
+		cursor.close();
+		return;
+	}
+
 	/**
 	 * Retrieve the User with the given database ID
 	 * 
@@ -550,6 +590,25 @@ public class ShoutProviderContract {
 			values.put(Users.PUB_KEY, encodedKey);
 			values.put(Users.AVATAR, encodedAvatarHash);
 			return values;
+		}
+
+		/**
+		 * Method for building content value for deleted shout.
+		 * 
+		 * @param shout
+		 * @return ContentValuea
+		 */
+		public static ContentValues buildContentValues(Shout shout) {
+			ContentValues values = new ContentValues();
+			String encodedHash = Base64.encodeToString(shout.getHash(), Base64.DEFAULT);
+			values.put(DeletedShouts.HASH, encodedHash);
+			if (shout.getParent() != null) {
+				String encodedParentHash = Base64.encodeToString(shout.getParent().getHash(),
+						Base64.DEFAULT);
+				values.put(DeletedShouts.PARENT, encodedParentHash);
+			}
+			return values;
+
 		}
 
 		public static ContentValues buildContentValues(Shout shout, int authorId) {

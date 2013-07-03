@@ -43,10 +43,14 @@ public class ShoutProvider extends ContentProvider {
 
 	private static final int USERS = 10;
 	private static final int MESSAGES = 20;
+	private static final int DELETED_SHOUTS = 30;
+	private static final int DELETED_ORIGINAL = 31;
+	private static final int DELETED_COMMENT = 32;
 
 	private static final int SHOUT_ID = 100;
 	private static final int USER_ID = 110;
 	private static final int MESSAGE_ID = 120;
+	private static final int DELETED_SHOUT_ID = 130;
 
 	private static final int SHOUTS_USER_ID = 200;
 	private static final int MESSAGES_SHOUT_ID = 300;
@@ -59,9 +63,14 @@ public class ShoutProvider extends ContentProvider {
 
 		sUriMatcher.addURI(AUTHORITY, "users", USERS);
 
+		sUriMatcher.addURI(AUTHORITY, "deletedshouts", DELETED_SHOUTS);
+		sUriMatcher.addURI(AUTHORITY, "deletedshouts/original", DELETED_ORIGINAL);
+		sUriMatcher.addURI(AUTHORITY, "deletedshouts/comment", DELETED_COMMENT);
+
 		sUriMatcher.addURI(AUTHORITY, "shouts/#", SHOUT_ID);
 		sUriMatcher.addURI(AUTHORITY, "users/#", USER_ID);
 		sUriMatcher.addURI(AUTHORITY, "shouts/users/#", SHOUTS_USER_ID);
+		sUriMatcher.addURI(AUTHORITY, "deletedshouts/#", DELETED_SHOUT_ID);
 
 		sUriMatcher.addURI(AUTHORITY, "message", MESSAGES);
 		sUriMatcher.addURI(AUTHORITY, "message/#", MESSAGE_ID);
@@ -80,6 +89,7 @@ public class ShoutProvider extends ContentProvider {
 		return true;
 	}
 
+	// TODO: Check if any change is needed in here.
 	@Override
 	public String getType(Uri uri) {
 		int match = sUriMatcher.match(uri);
@@ -114,6 +124,9 @@ public class ShoutProvider extends ContentProvider {
 				break;
 			case MESSAGES:
 				table = ShoutSearchContract.Messages.TABLE_NAME;
+				break;
+			case DELETED_SHOUTS:
+				table = ShoutDatabaseHelper.DELETED_SHOUTS_TABLE;
 				break;
 			case ORIGINAL_SHOUTS:
 			case COMMENT_SHOUTS:
@@ -179,10 +192,14 @@ public class ShoutProvider extends ContentProvider {
 				uniqueCols = ShoutDatabaseHelper.USER_UNIQUE_COLS;
 				idColumnName = ShoutProviderContract.Users._ID;
 				break;
+			case DELETED_SHOUTS:
+				uniqueCols = ShoutDatabaseHelper.DELETE_SHOUT_UNIQUE_COLS;
+				idColumnName = ShoutProviderContract.DeletedShouts._ID;
+				break;
 			default:
 				throw new SQLException(
 						"There is no unique column constraint, but you are checking for prexisting at uri: "
-								+ uri.toString());
+								+ uri.toString() + " match is " + match);
 		}
 		id = queryForUniqueConflict(uri, values, uniqueCols, idColumnName);
 		// In the database already if the id is not -1
@@ -218,7 +235,7 @@ public class ShoutProvider extends ContentProvider {
 		String groupBy = null;
 		switch (match) {
 			case ALL_SHOUTS:
-				qBuilder.setTables(ShoutDatabaseHelper.DENORMED_SHOUT_VIEW);
+				qBuilder.setTables(ShoutDatabaseHelper.DELETION_FILTER_VIEW);
 				break;
 			case ORIGINAL_SHOUTS:
 				/*
@@ -250,12 +267,12 @@ public class ShoutProvider extends ContentProvider {
 				qBuilder.setTables(ShoutDatabaseHelper.DENORMED_RESHOUT_VIEW);
 				break;
 			case SHOUT_ID:
-				qBuilder.setTables(ShoutDatabaseHelper.DENORMED_SHOUT_VIEW);
+				qBuilder.setTables(ShoutDatabaseHelper.DELETION_FILTER_VIEW);
 				qBuilder.appendWhere(ShoutProviderContract.Shouts._ID + "="
 						+ uri.getLastPathSegment());
 				break;
 			case SHOUTS_USER_ID:
-				qBuilder.setTables(ShoutDatabaseHelper.DENORMED_SHOUT_VIEW);
+				qBuilder.setTables(ShoutDatabaseHelper.DELETION_FILTER_VIEW);
 				qBuilder.appendWhere(ShoutProviderContract.Shouts.AUTHOR + "="
 						+ uri.getLastPathSegment());
 				break;
@@ -280,6 +297,15 @@ public class ShoutProvider extends ContentProvider {
 				qBuilder.appendWhere(ShoutSearchContract.Messages.SHOUT + " MATCH "
 						+ uri.getLastPathSegment());
 				break;
+			case DELETED_SHOUTS:
+				qBuilder.setTables(ShoutDatabaseHelper.DELETED_SHOUTS_TABLE);
+				break;
+			case DELETED_SHOUT_ID:
+				qBuilder.setTables(ShoutDatabaseHelper.DELETED_SHOUTS_TABLE);
+				qBuilder.appendWhere(ShoutProviderContract.DeletedShouts._ID + "="
+						+ uri.getLastPathSegment());
+				break;
+
 			default:
 				throw new IllegalArgumentException("Unknown or invalid URI " + uri);
 		}
@@ -438,6 +464,8 @@ public class ShoutProvider extends ContentProvider {
 		// Add other URIs that also match
 		int match = sUriMatcher.match(uri);
 		switch (match) {
+			case DELETED_SHOUT_ID:
+				uris.add(ShoutProviderContract.DeletedShouts.CONTENT_URI);
 			case SHOUT_ID:
 				uris.add(ShoutProviderContract.Shouts.CONTENT_URI);
 			case ALL_SHOUTS:
@@ -449,6 +477,8 @@ public class ShoutProvider extends ContentProvider {
 			case COMMENT_SHOUTS:
 			case RESHOUT_SHOUTS:
 				uris.add(ShoutProviderContract.Shouts.CONTENT_URI);
+
+
 		}
 
 		for (Uri u : uris) {
@@ -466,9 +496,11 @@ public class ShoutProvider extends ContentProvider {
 		public static final String DBNAME = "shout_base";
 
 		public static final String SHOUTS_TABLE = "shout";
+		public static final String DELETED_SHOUTS_TABLE = "deleted_shout";
 		public static final String USERS_TABLE = "user";
 
 		public static final String DENORMED_SHOUT_VIEW = "denormed_shout";
+		public static final String DELETION_FILTER_VIEW = "deletion_filter";
 		public static final String DENORMED_ORIGINAL_VIEW = "denormed_original";
 		public static final String DENORMED_COMMENT_VIEW = "denormed_comment";
 		public static final String DENORMED_RESHOUT_VIEW = "denormed_reshout";
@@ -510,6 +542,16 @@ public class ShoutProvider extends ContentProvider {
 				+ ") REFERENCES " + SHOUTS_TABLE +
 				"(" + ShoutProviderContract.Shouts.HASH + ")" + ");";
 
+		private static final String SQL_CREATE_DELETED_SHOUT = "CREATE TABLE "
+				+ DELETED_SHOUTS_TABLE + "("
+				+ ShoutProviderContract.DeletedShouts._ID
+				+ " INTEGER PRIMARY KEY ASC AUTOINCREMENT, "
+				+ ShoutProviderContract.DeletedShouts.HASH + " TEXT, "
+				+ ShoutProviderContract.DeletedShouts.PARENT + " TEXT, "
+				+ "UNIQUE (" + ShoutProviderContract.DeletedShouts.HASH + ") "
+				+ "); ";
+
+		// TODO: Unsure if I should change here.
 		private static final String SQL_CREATE_INDEX_SHOUT_PARENT = "CREATE INDEX idx_shout_parent ON "
 				+ SHOUTS_TABLE
 				+ " ("
@@ -523,7 +565,7 @@ public class ShoutProvider extends ContentProvider {
 				+ ShoutSearchContract.Messages.MESSAGE + ");";
 
 		private static final String SQL_CREATE_TRIGGER_COMMENT = "CREATE TRIGGER "
-				+ "Update_Comment_Count AFTER INSERT ON "
+				+ "Increase_Comment_Count AFTER INSERT ON "
 				+ SHOUTS_TABLE + " WHEN new."
 				+ ShoutProviderContract.Shouts.MESSAGE + " IS NOT NULL AND new."
 				+ ShoutProviderContract.Shouts.PARENT + " IS NOT NULL "
@@ -534,6 +576,19 @@ public class ShoutProvider extends ContentProvider {
 				+ ShoutProviderContract.Shouts.HASH + " = new."
 				+ ShoutProviderContract.Shouts.PARENT + ";\nEND;";
 
+		// TODO: Must value>=0 be checked every time count changes here?
+		private static final String SQL_CREATE_TRIGGER_DELETE_COMMENT = "CREATE TRIGGER "
+				+ "Decrease_Comment_Count AFTER INSERT ON "
+				+ DELETED_SHOUTS_TABLE + " WHEN new."
+				+ ShoutProviderContract.DeletedShouts.PARENT + " IS NOT NULL "
+				+ "\nBEGIN\n" + "UPDATE "
+				+ SHOUTS_TABLE + " SET "
+				+ ShoutProviderContract.Shouts.COMMENT_COUNT + " = "
+				+ ShoutProviderContract.Shouts.COMMENT_COUNT + " - 1 WHERE "
+				+ ShoutProviderContract.Shouts.HASH + " = new."
+				+ ShoutProviderContract.DeletedShouts.PARENT + ";\nEND;";
+
+		// TODO: We Can't delete reshout can we?
 		private static final String SQL_CREATE_TRIGGER_RESHOUT = "CREATE TRIGGER "
 				+ "Update_Reshout_Count AFTER INSERT ON "
 				+ SHOUTS_TABLE + " WHEN new."
@@ -577,9 +632,17 @@ public class ShoutProvider extends ContentProvider {
 				+ SHOUTS_TABLE + " AS shout JOIN " + USERS_TABLE
 				+ " AS user ON (shout.User_key=user._id);";
 
+		private static final String SQL_CREATE_VIEW_DELETION_FILTER = "CREATE VIEW "
+				+ DELETION_FILTER_VIEW + " AS SELECT * FROM "
+				+ DENORMED_SHOUT_VIEW
+				+ " WHERE " + ShoutProviderContract.Shouts.HASH + " NOT IN "
+				+ " ( SELECT Hash AS Deleted_hash FROM " +
+				DELETED_SHOUTS_TABLE
+				+ ");";
+
 		private static final String SQL_CREATE_VIEW_DENORMED_ORIGINAL = "CREATE VIEW "
 				+ DENORMED_ORIGINAL_VIEW + " AS SELECT * FROM "
-				+ DENORMED_SHOUT_VIEW
+				+ DELETION_FILTER_VIEW
 				+ " WHERE " + ShoutProviderContract.Shouts.PARENT + " IS NULL AND "
 				+ ShoutProviderContract.Shouts.MESSAGE + " IS NOT NULL;";
 
@@ -587,15 +650,15 @@ public class ShoutProvider extends ContentProvider {
 				+ DENORMED_COMMENT_VIEW
 				+ " AS SELECT comment.* FROM "
 				+ DENORMED_ORIGINAL_VIEW
-				+ " AS root INNER JOIN " + DENORMED_SHOUT_VIEW
+				+ " AS root INNER JOIN " + DELETION_FILTER_VIEW
 				+ " AS comment ON (comment.Parent=root." + ShoutProviderContract.Shouts.HASH
 				+ " AND comment." + ShoutProviderContract.Shouts.MESSAGE + " IS NOT NULL);";
 
 		private static final String SQL_CREATE_VIEW_DENORMED_RESHOUT = "CREATE VIEW "
 				+ DENORMED_RESHOUT_VIEW
 				+ " AS SELECT reshout.* FROM "
-				+ DENORMED_SHOUT_VIEW
-				+ " AS parent INNER JOIN " + DENORMED_SHOUT_VIEW
+				+ DELETION_FILTER_VIEW
+				+ " AS parent INNER JOIN " + DELETION_FILTER_VIEW
 				+ " AS reshout ON (reshout." + ShoutProviderContract.Shouts.PARENT + "=parent."
 				+ ShoutProviderContract.Shouts.HASH + " AND reshout."
 				+ ShoutProviderContract.Shouts.MESSAGE + " IS NULL AND parent."
@@ -622,6 +685,10 @@ public class ShoutProvider extends ContentProvider {
 				ShoutProviderContract.Shouts.HASH
 		};
 
+		private static final String[] DELETE_SHOUT_UNIQUE_COLS = {
+				ShoutProviderContract.DeletedShouts.HASH
+		};
+
 		public ShoutDatabaseHelper(Context context) {
 			super(context, DBNAME, null, VERSION);
 		}
@@ -630,12 +697,15 @@ public class ShoutProvider extends ContentProvider {
 		public void onCreate(SQLiteDatabase db) {
 			db.execSQL(SQL_CREATE_USER);
 			db.execSQL(SQL_CREATE_SHOUT);
+			db.execSQL(SQL_CREATE_DELETED_SHOUT);
 			db.execSQL(SQL_CREATE_INDEX_SHOUT_PARENT);
 			db.execSQL(SQL_CREATE_VIRTUAL_MESSAGE);
 			db.execSQL(SQL_CREATE_TRIGGER_COMMENT);
 			db.execSQL(SQL_CREATE_TRIGGER_RESHOUT);
+			db.execSQL(SQL_CREATE_TRIGGER_DELETE_COMMENT);
 			db.execSQL(SQL_CREATE_TRIGGER_MESSAGE);
 			db.execSQL(SQL_CREATE_VIEW_DENORMED_SHOUT);
+			db.execSQL(SQL_CREATE_VIEW_DELETION_FILTER);
 			db.execSQL(SQL_CREATE_VIEW_DENORMED_ORIGINAL);
 			db.execSQL(SQL_CREATE_VIEW_DENORMED_COMMENT);
 			db.execSQL(SQL_CREATE_VIEW_DENORMED_RESHOUT);
@@ -675,9 +745,11 @@ public class ShoutProvider extends ContentProvider {
 				Log.i(TAG, "Upgrading database from version 1 to version 2.");
 				mDb.execSQL(SQL_CREATE_INDEX_SHOUT_PARENT);
 				mDb.execSQL(SQL_CREATE_VIEW_DENORMED_SHOUT);
+				mDb.execSQL(SQL_CREATE_VIEW_DELETION_FILTER);
 				mDb.execSQL(SQL_CREATE_VIEW_DENORMED_ORIGINAL);
 				mDb.execSQL(SQL_CREATE_VIEW_DENORMED_COMMENT);
 				mDb.execSQL(SQL_CREATE_VIEW_DENORMED_RESHOUT);
+
 			}
 		}
 
@@ -704,9 +776,11 @@ public class ShoutProvider extends ContentProvider {
 				mDb.execSQL("DROP VIEW " + DENORMED_RESHOUT_VIEW + ";");
 				mDb.execSQL("DROP VIEW " + DENORMED_COMMENT_VIEW + ";");
 				mDb.execSQL("DROP VIEW " + DENORMED_ORIGINAL_VIEW + ";");
+				mDb.execSQL("DROP VIEW " + DELETION_FILTER_VIEW + ";");
 				mDb.execSQL("DROP VIEW " + DENORMED_SHOUT_VIEW + ";");
 
 				mDb.execSQL(SQL_CREATE_VIEW_DENORMED_SHOUT);
+				mDb.execSQL(SQL_CREATE_VIEW_DELETION_FILTER);
 				mDb.execSQL(SQL_CREATE_VIEW_DENORMED_ORIGINAL);
 				mDb.execSQL(SQL_CREATE_VIEW_DENORMED_COMMENT);
 				mDb.execSQL(SQL_CREATE_VIEW_DENORMED_RESHOUT);
