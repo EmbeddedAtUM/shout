@@ -18,7 +18,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 /**
  * Displays a shout with an action bar underneath. The display of the bar can be
@@ -114,7 +113,6 @@ public class ActionShoutView extends LinearLayout {
 				if (detailsListener != null) {
 					// ActionShoutView.this.toggleDetails();
 					detailsListener.onClick(shoutView.getBoundShout());
-					Toast.makeText(getContext(), "Delete this shout", Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
@@ -124,8 +122,7 @@ public class ActionShoutView extends LinearLayout {
 			@Override
 			public void onClick(View v) {
 				if (deleteListener != null) {
-					// TODO: DO something here.
-					Toast.makeText(getContext(), "Delete this shout", Toast.LENGTH_SHORT).show();
+					deleteListener.onClick(shoutView.getBoundShout());
 				}
 
 			}
@@ -134,8 +131,8 @@ public class ActionShoutView extends LinearLayout {
 
 	/**
 	 * Autoregisters a callback listener for the methods specified by the
-	 * onReshoutClick, onCommentClick, and onDetailsClick attributes in the
-	 * layout XML, if given.
+	 * onReshoutClick, onCommentClick, onDetailsClick and onDeleteClick
+	 * attributes in the layout XML, if given.
 	 * 
 	 * @param attributeSet
 	 */

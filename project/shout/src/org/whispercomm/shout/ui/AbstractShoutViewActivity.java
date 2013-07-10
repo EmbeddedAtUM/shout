@@ -12,6 +12,7 @@ import org.whispercomm.shout.id.UserNotInitiatedException;
 import org.whispercomm.shout.network.service.NetworkInterface.NotConnectedException;
 import org.whispercomm.shout.network.shout.ShoutChainTooLongException;
 import org.whispercomm.shout.tasks.AsyncTaskCallback.AsyncTaskCompleteListener;
+import org.whispercomm.shout.tasks.DeleteTask;
 import org.whispercomm.shout.tasks.ReshoutTask;
 import org.whispercomm.shout.tasks.SendResult;
 import org.whispercomm.shout.tasks.SendShoutTask;
@@ -43,6 +44,11 @@ public class AbstractShoutViewActivity extends AbstractShoutActivity {
 
 	public void onClickComment(LocalShout shout) {
 		MessageActivity.comment(this, shout);
+	}
+
+	public void onClickDelete(LocalShout shout) {
+		new DeleteTask(getApplicationContext(), new ShoutDeletionCompleteListener(), shout)
+				.execute();
 	}
 
 	public void onClickDetails(LocalShout shout) {
@@ -95,5 +101,17 @@ public class AbstractShoutViewActivity extends AbstractShoutActivity {
 		public void onComplete(SendResult result) {
 			shoutSent(result);
 		}
+	}
+
+	private class ShoutDeletionCompleteListener implements
+			AsyncTaskCompleteListener<Void> {
+
+		@Override
+		public void onComplete(Void result) {
+			// TODO： Right now do nothing.
+			Toast.makeText(getApplicationContext(), "Deletion Succeeded. ", Toast.LENGTH_SHORT)
+					.show();
+		}
+
 	}
 }
