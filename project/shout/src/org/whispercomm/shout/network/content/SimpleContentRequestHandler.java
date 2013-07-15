@@ -67,6 +67,9 @@ public class SimpleContentRequestHandler implements ContentRequestHandler, Netwo
 		if (!running)
 			return;
 
+		if (hash.equals(Hash.ZERO))
+			return;
+
 		OutgoingRequestTask task = new OutgoingRequestTask(hash);
 		enqueueIfAbsent(task);
 	}
