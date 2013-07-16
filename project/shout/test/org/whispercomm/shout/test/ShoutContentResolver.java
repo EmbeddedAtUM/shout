@@ -3,6 +3,8 @@ package org.whispercomm.shout.test;
 
 import java.util.ArrayList;
 
+import org.robolectric.annotation.Implementation;
+import org.robolectric.annotation.Implements;
 import org.whispercomm.shout.provider.ShoutProvider;
 
 import android.content.ContentProvider;
@@ -16,9 +18,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.RemoteException;
-
-import com.xtremelabs.robolectric.internal.Implementation;
-import com.xtremelabs.robolectric.internal.Implements;
 
 @Implements(ContentResolver.class)
 public class ShoutContentResolver {

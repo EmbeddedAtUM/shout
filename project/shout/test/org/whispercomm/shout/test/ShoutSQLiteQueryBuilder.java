@@ -1,13 +1,13 @@
 
 package org.whispercomm.shout.test;
 
+import org.robolectric.annotation.Implementation;
+import org.robolectric.annotation.Implements;
+import org.robolectric.shadows.ShadowSQLiteQueryBuilder;
+
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
-
-import com.xtremelabs.robolectric.internal.Implementation;
-import com.xtremelabs.robolectric.internal.Implements;
-import com.xtremelabs.robolectric.shadows.ShadowSQLiteQueryBuilder;
 
 @Implements(SQLiteQueryBuilder.class)
 public class ShoutSQLiteQueryBuilder {
