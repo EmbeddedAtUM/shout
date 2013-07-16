@@ -2,11 +2,13 @@
 package org.whispercomm.shout.ui.widget;
 
 import org.whispercomm.shout.ShoutImage;
+import org.whispercomm.shout.Hash;
 import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.Location;
 import org.whispercomm.shout.R;
 import org.whispercomm.shout.ShoutType;
+import org.whispercomm.shout.image.provider.ImageProviderContract.Avatars;
 import org.whispercomm.shout.text.ShoutLinkify;
 import org.whispercomm.shout.util.FormattedAge;
 import org.whispercomm.shout.util.FormattedAge.AgeListener;
@@ -26,6 +28,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 /**
  * A custom component for displaying a single Shout.
@@ -120,6 +124,14 @@ public class ShoutView extends RelativeLayout {
 			avatar.setImageBitmap(avatarRef.get().getBitmap());
 		else
 			avatar.setImageResource(R.drawable.defaultavatar);
+
+		// Loading avatars using Picasso library
+		Hash avatarHash = shout.getSender().getAvatar().getHash();
+		Uri mUri = Uri.withAppendedPath(Avatars.CONTENT_URI, avatarHash.toString());
+
+		Picasso.with(this.getContext()).load(mUri.toString())
+				.placeholder(R.drawable.defaultavatar)
+				.error(R.drawable.defaultavatar).into(avatar);
 
 		message.setText(shout.getMessage());
 		ShoutLinkify.addLinks(message);
