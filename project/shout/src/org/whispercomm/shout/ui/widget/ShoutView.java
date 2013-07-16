@@ -1,12 +1,13 @@
 
 package org.whispercomm.shout.ui.widget;
 
-import org.whispercomm.shout.ShoutImage;
 import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.Location;
 import org.whispercomm.shout.R;
+import org.whispercomm.shout.ShoutImage;
 import org.whispercomm.shout.ShoutType;
+import org.whispercomm.shout.provider.image.ImageProviderContract;
 import org.whispercomm.shout.text.ShoutLinkify;
 import org.whispercomm.shout.util.FormattedAge;
 import org.whispercomm.shout.util.FormattedAge.AgeListener;
@@ -26,6 +27,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 /**
  * A custom component for displaying a single Shout.
@@ -115,11 +118,15 @@ public class ShoutView extends RelativeLayout {
 		 * space after the username.
 		 */
 		sender.setText(String.format("%s ", shout.getSender().getUsername()));
+
+		/*
+		 * Load the avatar using Picasso library
+		 */
 		HashReference<ShoutImage> avatarRef = shout.getSender().getAvatar();
-		if (avatarRef.isAvailable())
-			avatar.setImageBitmap(avatarRef.get().getBitmap());
-		else
-			avatar.setImageResource(R.drawable.defaultavatar);
+		Uri mUri = ImageProviderContract.imageUri(avatarRef.getHash());
+		Picasso.with(this.getContext()).load(mUri.toString())
+				.placeholder(R.drawable.defaultavatar)
+				.error(R.drawable.defaultavatar).into(avatar);
 
 		message.setText(shout.getMessage());
 		ShoutLinkify.addLinks(message);
