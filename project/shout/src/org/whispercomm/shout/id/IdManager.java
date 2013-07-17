@@ -3,12 +3,12 @@ package org.whispercomm.shout.id;
 
 import java.io.IOException;
 
+import org.whispercomm.shout.Hash;
 import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.Me;
 import org.whispercomm.shout.ShoutImage;
 import org.whispercomm.shout.SimpleHashReference;
 import org.whispercomm.shout.content.ContentManager;
-import org.whispercomm.shout.content.ShoutImageStorage;
 import org.whispercomm.shout.crypto.ECKeyPair;
 import org.whispercomm.shout.crypto.KeyGenerator;
 import org.whispercomm.shout.util.Validators;
@@ -22,15 +22,15 @@ public class IdManager {
 
 	private KeyGenerator keyGenerator;
 
-	private ShoutImageStorage avatarStorage;
+	private ContentManager contentManager;
 
 	public IdManager(Context context) {
-		this(new KeyStorageSharedPrefs(context), new ShoutImageStorage(new ContentManager(context)));
+		this(new KeyStorageSharedPrefs(context), new ContentManager(context));
 	}
 
-	public IdManager(KeyStorage keyStorage, ShoutImageStorage avatarStorage) {
+	public IdManager(KeyStorage keyStorage, ContentManager contentManager) {
 		this.keyStorage = keyStorage;
-		this.avatarStorage = avatarStorage;
+		this.contentManager = contentManager;
 		this.keyGenerator = new KeyGenerator();
 	}
 
@@ -56,8 +56,9 @@ public class IdManager {
 	}
 
 	public void setAvatar(ShoutImage avatar) throws IOException {
-		HashReference<ShoutImage> ref = avatarStorage.store(avatar);
-		keyStorage.writeAvatarHash(ref.getHash());
+		Hash hash = contentManager.store(avatar.toByteArray(),
+				avatar.getMimeType());
+		keyStorage.writeAvatarHash(hash);
 	}
 
 	public Me getMe() throws UserNotInitiatedException {
