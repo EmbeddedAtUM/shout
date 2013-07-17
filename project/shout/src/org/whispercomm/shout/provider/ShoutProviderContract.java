@@ -302,7 +302,7 @@ public class ShoutProviderContract {
 		String name = cursor.getString(usernameIndex);
 		String encodedAvatarHash = cursor.getString(avatarIndex);
 
-		LocalUser sender = new LocalUserImpl(context, name, encodedKey, encodedAvatarHash);
+		LocalUser sender = new LocalUserImpl(name, encodedKey, encodedAvatarHash);
 		LocalShout shout = new LocalShoutImpl(context, version, sender, message, location,
 				encodedSig, encodedHash, sentTime, receivedTime, numComments,
 				numReshouts, numReshouters, encodedParentHash);
@@ -383,7 +383,7 @@ public class ShoutProviderContract {
 		String encodedKey = cursor.getString(keyIndex);
 		String name = cursor.getString(nameIndex);
 		String encodedAvatarHash = cursor.getString(avatarIndex);
-		return new LocalUserImpl(context, name, encodedKey, encodedAvatarHash);
+		return new LocalUserImpl(name, encodedKey, encodedAvatarHash);
 	}
 
 	public static LocalUser saveUser(Context context, User user) {
