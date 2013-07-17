@@ -55,6 +55,14 @@ public class ImageProvider extends ContentProvider implements PipeDataWriter<byt
 	private static final String MIME_AVATAR = "vnd.android.cursor.item/avatar";
 	private static final String MIME_AVATARS = "vnd.android.cursor.dir/avatars";
 
+	private ContentManager mContentManager;
+
+	@Override
+	public boolean onCreate() {
+		mContentManager = new ContentManager(this.getContext());
+		return true;
+	}
+
 	@Override
 	public int delete(Uri arg0, String arg1, String[] arg2) {
 		throw new UnsupportedOperationException();
@@ -84,11 +92,6 @@ public class ImageProvider extends ContentProvider implements PipeDataWriter<byt
 	}
 
 	@Override
-	public boolean onCreate() {
-		return true;
-	}
-
-	@Override
 	public Cursor query(Uri arg0, String[] arg1, String arg2, String[] arg3, String arg4) {
 		return null;
 	}
@@ -109,7 +112,6 @@ public class ImageProvider extends ContentProvider implements PipeDataWriter<byt
 		String imageType = match == THUMBNAILS_ID ? "image/jpeg" : "image/png";
 
 		// Retrieve data stream of images from content manager
-		ContentManager mContentManager = new ContentManager(this.getContext());
 		String hashStr = uri.getLastPathSegment();
 		Hash hash = new Hash(hashStr);
 		Content content = null;
