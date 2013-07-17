@@ -36,14 +36,14 @@ public class ImageProvider extends ContentProvider {
 
 	private static final int THUMBNAILS_ID = 1;
 	private static final int THUMBNAILS = 2;
-	private static final int AVATARS_ID = 3;
-	private static final int AVATARS = 4;
+	private static final int IMAGES_ID = 3;
+	private static final int IMAGES = 4;
 
 	static {
 		sUriMatcher.addURI(AUTHORITY, "thumbnails", THUMBNAILS);
 		sUriMatcher.addURI(AUTHORITY, "thumbnails/*", THUMBNAILS_ID);
-		sUriMatcher.addURI(AUTHORITY, "avatars", AVATARS);
-		sUriMatcher.addURI(AUTHORITY, "avatars/*", AVATARS_ID);
+		sUriMatcher.addURI(AUTHORITY, "images", IMAGES);
+		sUriMatcher.addURI(AUTHORITY, "images/*", IMAGES_ID);
 	}
 
 	/**
@@ -51,8 +51,8 @@ public class ImageProvider extends ContentProvider {
 	 */
 	private static final String MIME_THUMBNAIL = "vnd.android.cursor.item/thumbnail";
 	private static final String MIME_THUMBNAILS = "vnd.android.cursor.dir/thumbnail";
-	private static final String MIME_AVATAR = "vnd.android.cursor.item/avatar";
-	private static final String MIME_AVATARS = "vnd.android.cursor.dir/avatars";
+	private static final String MIME_IMAGE = "vnd.android.cursor.item/image";
+	private static final String MIME_IMAGES = "vnd.android.cursor.dir/images";
 
 	private ContentManager mContentManager;
 
@@ -78,10 +78,10 @@ public class ImageProvider extends ContentProvider {
 				return MIME_THUMBNAIL;
 			case THUMBNAILS:
 				return MIME_THUMBNAILS;
-			case AVATARS_ID:
-				return MIME_AVATAR;
-			case AVATARS:
-				return MIME_AVATARS;
+			case IMAGES_ID:
+				return MIME_IMAGE;
+			case IMAGES:
+				return MIME_IMAGES;
 			default:
 				throw new IllegalArgumentException("Unknown or invalid URI " + uri);
 
@@ -106,7 +106,7 @@ public class ImageProvider extends ContentProvider {
 	@Override
 	public ParcelFileDescriptor openFile(Uri uri, String mode) throws FileNotFoundException {
 		int match = sUriMatcher.match(uri);
-		if (match != THUMBNAILS_ID && match != AVATARS_ID)
+		if (match != THUMBNAILS_ID && match != IMAGES_ID)
 			throw new IllegalArgumentException("Invalid URI: " + uri);
 
 		try {
