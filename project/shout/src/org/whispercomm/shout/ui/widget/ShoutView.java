@@ -1,7 +1,6 @@
 
 package org.whispercomm.shout.ui.widget;
 
-import org.whispercomm.shout.Hash;
 import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.Location;
@@ -119,16 +118,12 @@ public class ShoutView extends RelativeLayout {
 		 * space after the username.
 		 */
 		sender.setText(String.format("%s ", shout.getSender().getUsername()));
+
+		/*
+		 * Load the avatar using Picasso library
+		 */
 		HashReference<ShoutImage> avatarRef = shout.getSender().getAvatar();
-		if (avatarRef.isAvailable())
-			avatar.setImageBitmap(avatarRef.get().getBitmap());
-		else
-			avatar.setImageResource(R.drawable.defaultavatar);
-
-		// Loading avatars using Picasso library
-		Hash avatarHash = shout.getSender().getAvatar().getHash();
-		Uri mUri = ImageProviderContract.imageUri(avatarHash);
-
+		Uri mUri = ImageProviderContract.imageUri(avatarRef.getHash());
 		Picasso.with(this.getContext()).load(mUri.toString())
 				.placeholder(R.drawable.defaultavatar)
 				.error(R.drawable.defaultavatar).into(avatar);
