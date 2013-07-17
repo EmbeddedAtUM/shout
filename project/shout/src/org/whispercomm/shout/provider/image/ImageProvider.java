@@ -4,6 +4,8 @@ package org.whispercomm.shout.provider.image;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.whispercomm.shout.Hash;
 import org.whispercomm.shout.content.Content;
@@ -12,13 +14,10 @@ import org.whispercomm.shout.errors.NotFoundException;
 import org.whispercomm.shout.provider.ShoutProvider;
 
 import android.content.ContentProvider;
-import android.content.ContentProvider.PipeDataWriter;
 import android.content.ContentValues;
 import android.content.UriMatcher;
-import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
 
@@ -28,7 +27,7 @@ import android.util.Log;
  * @author Bowen Xu
  */
 
-public class ImageProvider extends ContentProvider implements PipeDataWriter<byte[]> {
+public class ImageProvider extends ContentProvider {
 	private static final String TAG = ShoutProvider.class.getSimpleName();
 	private static final String AUTHORITY = ImageProviderContract.AUTHORITY;
 
@@ -57,9 +56,12 @@ public class ImageProvider extends ContentProvider implements PipeDataWriter<byt
 
 	private ContentManager mContentManager;
 
+	private ExecutorService mExecutor;
+
 	@Override
 	public boolean onCreate() {
 		mContentManager = new ContentManager(this.getContext());
+		mExecutor = Executors.newCachedThreadPool();
 		return true;
 	}
 
@@ -102,61 +104,73 @@ public class ImageProvider extends ContentProvider implements PipeDataWriter<byt
 	}
 
 	@Override
-	public AssetFileDescriptor openAssetFile(Uri uri, String mode) throws FileNotFoundException {
-
+	public ParcelFileDescriptor openFile(Uri uri, String mode) throws FileNotFoundException {
 		int match = sUriMatcher.match(uri);
-		if (match != THUMBNAILS_ID && match != AVATARS_ID) {
-			throw new IllegalArgumentException("Can't open file due to unknown or invalid URI "
-					+ uri);
-		}
-		String imageType = match == THUMBNAILS_ID ? "image/jpeg" : "image/png";
+		if (match != THUMBNAILS_ID && match != AVATARS_ID)
+			throw new IllegalArgumentException("Invalid URI: " + uri);
 
-		// Retrieve data stream of images from content manager
-		String hashStr = uri.getLastPathSegment();
-		Hash hash = new Hash(hashStr);
-		Content content = null;
-		// InputStream is = null;
-		AssetFileDescriptor afd = null;
 		try {
-			content = mContentManager.retrieve(hash);
-
-			if (content != null) {
-				afd = new AssetFileDescriptor(openPipeHelper(uri, imageType, null,
-						content.getData(),
-						this), 0,
-						AssetFileDescriptor.UNKNOWN_LENGTH);
-			}
-			else
-				throw new FileNotFoundException();
-
-		} catch (NotFoundException e) {
-			Log.i(TAG, "content retrieve failed.");
+			Content content = mContentManager.retrieve(new Hash(uri.getLastPathSegment()));
+			return openPipeHelper(content.getData());
 		} catch (IOException e) {
-			e.printStackTrace();
+			Log.e(TAG, "", e);
+			throw new FileNotFoundException("IOException while retrieving content");
+		} catch (NotFoundException e) {
+			throw new FileNotFoundException(e.getMessage());
 		}
-
-		return afd;
-
 	}
 
-	@Override
-	public void writeDataToPipe(ParcelFileDescriptor output, Uri uri, String mimeType, Bundle opts,
-			byte[] args) {
-		// transfer data from stream to pipe
-		FileOutputStream fout = new FileOutputStream(output.getFileDescriptor());
-
+	/**
+	 * Partial replacement for the openPipeHelper(...), which was not added
+	 * until API 11.
+	 * 
+	 * @param data the data to write to the pipe
+	 * @return the file descriptor pointing to the read of the pipe
+	 * @throws FileNotFoundException on IO exceptions, to match the API 11
+	 *             version of this method
+	 */
+	private ParcelFileDescriptor openPipeHelper(final byte[] data) throws FileNotFoundException {
 		try {
-			if (args == null)
-				return;
-			fout.write(args);
+			final ParcelFileDescriptor[] fds = ParcelFileDescriptor.createPipe();
 
+			Runnable task = new Runnable() {
+				@Override
+				public void run() {
+					writeDataToPipe(fds[1], data);
+					try {
+						fds[1].close();
+					} catch (IOException e) {
+						Log.w(TAG, "Failed to close pipe", e);
+					}
+				}
+			};
+			mExecutor.submit(task);
+
+			return fds[0];
 		} catch (IOException e) {
-			Log.i(TAG, "Failed to transfer data stream.");
+			throw new FileNotFoundException("Failed to create pipe");
+		}
+	}
+
+	/**
+	 * Partial replacement for the writeDataToPipe(...) method of the
+	 * ContentProvider.DataPipeWriter<T> interface, which was not added until
+	 * API 11.
+	 * 
+	 * @param output the file descriptor of the write end of the pipe
+	 * @param data the data to write to the pipe
+	 */
+	private void writeDataToPipe(ParcelFileDescriptor output, byte[] data) {
+		FileOutputStream fout = new FileOutputStream(output.getFileDescriptor());
+		try {
+			fout.write(data);
+		} catch (IOException e) {
+			Log.e(TAG, "Failed to transfer data stream.");
 		} finally {
 			try {
 				fout.close();
 			} catch (IOException e) {
-				Log.i(TAG, "Failed to close fileoutput stream");
+				Log.e(TAG, "Failed to close fileoutput stream");
 			}
 		}
 	}
