@@ -60,11 +60,6 @@ public class ImageProvider extends ContentProvider {
 	}
 
 	@Override
-	public int delete(Uri arg0, String arg1, String[] arg2) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public String getType(Uri uri) {
 		int match = sUriMatcher.match(uri);
 		switch (match) {
@@ -76,21 +71,6 @@ public class ImageProvider extends ContentProvider {
 				throw new IllegalArgumentException("Unknown or invalid URI " + uri);
 
 		}
-	}
-
-	@Override
-	public Uri insert(Uri uri, ContentValues values) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public Cursor query(Uri arg0, String[] arg1, String arg2, String[] arg3, String arg4) {
-		return null;
-	}
-
-	@Override
-	public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -164,4 +144,25 @@ public class ImageProvider extends ContentProvider {
 			}
 		}
 	}
+
+	@Override
+	public int delete(Uri arg0, String arg1, String[] arg2) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Uri insert(Uri uri, ContentValues values) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Cursor query(Uri arg0, String[] arg1, String arg2, String[] arg3, String arg4) {
+		return null;
+	}
+
+	@Override
+	public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+		throw new UnsupportedOperationException();
+	}
+
 }
