@@ -34,14 +34,10 @@ public class ImageProvider extends ContentProvider {
 	private static final UriMatcher sUriMatcher = new UriMatcher(
 			UriMatcher.NO_MATCH);
 
-	private static final int THUMBNAILS_ID = 1;
-	private static final int THUMBNAILS = 2;
-	private static final int IMAGES_ID = 3;
-	private static final int IMAGES = 4;
+	private static final int IMAGES_ID = 1;
+	private static final int IMAGES = 2;
 
 	static {
-		sUriMatcher.addURI(AUTHORITY, "thumbnails", THUMBNAILS);
-		sUriMatcher.addURI(AUTHORITY, "thumbnails/*", THUMBNAILS_ID);
 		sUriMatcher.addURI(AUTHORITY, "images", IMAGES);
 		sUriMatcher.addURI(AUTHORITY, "images/*", IMAGES_ID);
 	}
@@ -49,8 +45,6 @@ public class ImageProvider extends ContentProvider {
 	/**
 	 * Define the MIME types of image provider
 	 */
-	private static final String MIME_THUMBNAIL = "vnd.android.cursor.item/thumbnail";
-	private static final String MIME_THUMBNAILS = "vnd.android.cursor.dir/thumbnail";
 	private static final String MIME_IMAGE = "vnd.android.cursor.item/image";
 	private static final String MIME_IMAGES = "vnd.android.cursor.dir/images";
 
@@ -74,10 +68,6 @@ public class ImageProvider extends ContentProvider {
 	public String getType(Uri uri) {
 		int match = sUriMatcher.match(uri);
 		switch (match) {
-			case THUMBNAILS_ID:
-				return MIME_THUMBNAIL;
-			case THUMBNAILS:
-				return MIME_THUMBNAILS;
 			case IMAGES_ID:
 				return MIME_IMAGE;
 			case IMAGES:
@@ -106,7 +96,7 @@ public class ImageProvider extends ContentProvider {
 	@Override
 	public ParcelFileDescriptor openFile(Uri uri, String mode) throws FileNotFoundException {
 		int match = sUriMatcher.match(uri);
-		if (match != THUMBNAILS_ID && match != IMAGES_ID)
+		if (match != IMAGES_ID)
 			throw new IllegalArgumentException("Invalid URI: " + uri);
 
 		try {
