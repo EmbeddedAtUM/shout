@@ -12,6 +12,7 @@ import org.whispercomm.shout.content.Content;
 import org.whispercomm.shout.content.ContentManager;
 import org.whispercomm.shout.errors.NotFoundException;
 import org.whispercomm.shout.provider.ShoutProvider;
+import org.whispercomm.shout.util.Threads;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
@@ -55,7 +56,7 @@ public class ImageProvider extends ContentProvider {
 	@Override
 	public boolean onCreate() {
 		mContentManager = new ContentManager(this.getContext());
-		mExecutor = Executors.newCachedThreadPool();
+		mExecutor = Executors.newSingleThreadExecutor(new Threads.BackgroundThreadFactory());
 		return true;
 	}
 
