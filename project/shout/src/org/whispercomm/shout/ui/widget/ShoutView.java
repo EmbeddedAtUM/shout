@@ -1,14 +1,14 @@
 
 package org.whispercomm.shout.ui.widget;
 
-import org.whispercomm.shout.ShoutImage;
 import org.whispercomm.shout.Hash;
 import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.Location;
 import org.whispercomm.shout.R;
+import org.whispercomm.shout.ShoutImage;
 import org.whispercomm.shout.ShoutType;
-import org.whispercomm.shout.image.provider.ImageProviderContract.Avatars;
+import org.whispercomm.shout.provider.image.ImageProviderContract;
 import org.whispercomm.shout.text.ShoutLinkify;
 import org.whispercomm.shout.util.FormattedAge;
 import org.whispercomm.shout.util.FormattedAge.AgeListener;
@@ -127,7 +127,7 @@ public class ShoutView extends RelativeLayout {
 
 		// Loading avatars using Picasso library
 		Hash avatarHash = shout.getSender().getAvatar().getHash();
-		Uri mUri = Uri.withAppendedPath(Avatars.CONTENT_URI, avatarHash.toString());
+		Uri mUri = ImageProviderContract.imageUri(avatarHash);
 
 		Picasso.with(this.getContext()).load(mUri.toString())
 				.placeholder(R.drawable.defaultavatar)
