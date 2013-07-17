@@ -10,7 +10,6 @@
     <string name="settingsDesc">Settings</string>
     <string name="menu_settings">Settings</string>
     <string name="avatarDesc">Avatar</string>
-    <string name="shoutImageDesc">shoutImageDesc</string>
     <string name="menu_compose">Compose Message</string>
     <string name="shout">Shout!</string>
     <string name="attachLocation">Include Location</string>
