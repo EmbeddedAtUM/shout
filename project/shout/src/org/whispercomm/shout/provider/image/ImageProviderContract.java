@@ -12,9 +12,6 @@ import android.net.Uri;
  */
 public class ImageProviderContract {
 
-	private static final String TAG = ImageProviderContract.class
-			.getSimpleName();
-
 	/**
 	 * Define the authority for content provider
 	 */
