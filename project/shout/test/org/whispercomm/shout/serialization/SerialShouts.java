@@ -6,7 +6,7 @@ import java.security.spec.InvalidKeySpecException;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.spongycastle.util.encoders.Hex;
-import org.whispercomm.shout.Avatar;
+import org.whispercomm.shout.ShoutImage;
 import org.whispercomm.shout.Hash;
 import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.Shout;
@@ -26,7 +26,7 @@ public class SerialShouts {
 	@SuppressWarnings("unused")
 	// Keep to regenerate signature
 	private static String CHILD_PRIVATE_KEY = "308193020100301306072A8648CE3D020106082A8648CE3D030107047930770201010420DE48DD0A4DD3A3D9D9030F47CF069829055611F5D6FF06D03BAF8F7A72DDA969A00A06082A8648CE3D030107A1440342000474BC24849CF115A40665C465F8EE11D42C7F3ABBC61602DC5FB1FD8C05649A92B5D6987652AACA7FAA6D161CCDCC272C02F3520BFF753D5FDDD08C1C4D70B07B";
-	private static HashReference<Avatar> CHILD_AVATAR_HASH = new SimpleHashReference<Avatar>(
+	private static HashReference<ShoutImage> CHILD_AVATAR_HASH = new SimpleHashReference<ShoutImage>(
 			new Hash(new byte[] {
 					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 					0, 0, 0, 0, 0, 0,
@@ -36,7 +36,7 @@ public class SerialShouts {
 	@SuppressWarnings("unused")
 	// Keep to regenerate signature
 	private static String PARENT_PRIVATE_KEY = "308193020100301306072A8648CE3D020106082A8648CE3D0301070479307702010104203A84141D31C579FCFB730E0B0E54E9BBF5E86E8A3B9E7CAC82F2752168AF861DA00A06082A8648CE3D030107A1440342000434160B8041501DF3D5423D6F63C6C5E387290CFB0232EB5C988960C167A010EE5AD6D163F2BAF70733DAC9B46D07F01F72EF8C8AC9BDA4A206EBAE880A6338BA";
-	private static HashReference<Avatar> PARENT_AVATAR_HASH = new SimpleHashReference<Avatar>(
+	private static HashReference<ShoutImage> PARENT_AVATAR_HASH = new SimpleHashReference<ShoutImage>(
 			new Hash(new byte[] {
 					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 					0, 0, 0, 0, 0, 0,
@@ -46,7 +46,7 @@ public class SerialShouts {
 	@SuppressWarnings("unused")
 	// Keep to regenerate signature
 	private static String GRANDPARENT_PRIVATE_KEY = "308193020100301306072A8648CE3D020106082A8648CE3D030107047930770201010420CF1DF8F8BBFF54FA37D42E9BA2493434A060A3DD3E27DC3C89DFE230EFAF90BBA00A06082A8648CE3D030107A144034200045F36A31792965FC24B2BBC0EAD43F6228DE7B9BFA2B34AC6C47B143EBFB167E927B1A6427CFAF403D4275C709DE23F912576D1137E015A36A0C611558B378FCE";
-	private static HashReference<Avatar> GRANDPARENT_AVATAR_HASH = new SimpleHashReference<Avatar>(
+	private static HashReference<ShoutImage> GRANDPARENT_AVATAR_HASH = new SimpleHashReference<ShoutImage>(
 			new Hash(new byte[] {
 					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 					0, 0, 0, 0, 0, 0,

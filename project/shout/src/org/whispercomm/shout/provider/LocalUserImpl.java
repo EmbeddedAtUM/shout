@@ -1,36 +1,27 @@
 
 package org.whispercomm.shout.provider;
 
-import java.io.IOException;
 import java.security.spec.InvalidKeySpecException;
 
-import org.whispercomm.shout.Avatar;
 import org.whispercomm.shout.Hash;
 import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.LocalUser;
+import org.whispercomm.shout.ShoutImage;
 import org.whispercomm.shout.SimpleHashReference;
-import org.whispercomm.shout.content.AvatarStorage;
 import org.whispercomm.shout.crypto.ECPublicKey;
 import org.whispercomm.shout.crypto.KeyGenerator;
 import org.whispercomm.shout.errors.InvalidEncodingException;
 
-import android.content.Context;
 import android.util.Base64;
-import android.util.Log;
 
 public class LocalUserImpl implements LocalUser {
-	private static final String TAG = LocalUserImpl.class.getSimpleName();
-
-	private Context context;
 
 	private String username;
 	private ECPublicKey publicKey;
-	private HashReference<Avatar> avatar;
+	private HashReference<ShoutImage> avatar;
 
-	public LocalUserImpl(Context context, String username, String encodedKey,
+	public LocalUserImpl(String username, String encodedKey,
 			String encodedAvatarHash) {
-		this.context = context.getApplicationContext();
-
 		this.username = username;
 		try {
 			this.publicKey = KeyGenerator.generatePublic(Base64.decode(encodedKey, Base64.DEFAULT));
@@ -39,22 +30,12 @@ public class LocalUserImpl implements LocalUser {
 			throw new RuntimeException(e);
 		}
 		try {
-			this.avatar = new SimpleHashReference<Avatar>(new Hash(Base64.decode(encodedAvatarHash,
+			this.avatar = new SimpleHashReference<ShoutImage>(new Hash(Base64.decode(
+					encodedAvatarHash,
 					Base64.DEFAULT)));
 		} catch (InvalidEncodingException e) {
 			// TODO: Figure out what to do about this
 			throw e;
-		}
-	}
-
-	private void updateAvatar(Hash avatarHash) {
-		AvatarStorage storage = (AvatarStorage) context
-				.getSystemService(AvatarStorage.SHOUT_AVATAR_SERVICE);
-		try {
-			avatar = storage.retrieve(avatarHash);
-		} catch (IOException e) {
-			Log.w(TAG, "Unable to retrieve avatar.  Treating as missing.", e);
-			avatar = new SimpleHashReference<Avatar>(avatarHash);
 		}
 	}
 
@@ -69,10 +50,7 @@ public class LocalUserImpl implements LocalUser {
 	}
 
 	@Override
-	public HashReference<Avatar> getAvatar() {
-		if (!avatar.isAvailable()) {
-			updateAvatar(avatar.getHash());
-		}
+	public HashReference<ShoutImage> getAvatar() {
 		return avatar;
 	}
 

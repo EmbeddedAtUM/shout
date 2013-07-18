@@ -1,16 +1,17 @@
 
 package org.whispercomm.shout.ui.fragment;
 
-import org.whispercomm.shout.Avatar;
 import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.Location;
 import org.whispercomm.shout.R;
 import org.whispercomm.shout.Shout;
+import org.whispercomm.shout.ShoutImage;
 import org.whispercomm.shout.ShoutType;
 import org.whispercomm.shout.provider.CursorLoader;
 import org.whispercomm.shout.provider.ShoutCursorAdapter;
 import org.whispercomm.shout.provider.ShoutProviderContract;
+import org.whispercomm.shout.provider.image.ImageProviderContract;
 import org.whispercomm.shout.text.ShoutLinkify;
 import org.whispercomm.shout.ui.AbstractShoutViewActivity;
 import org.whispercomm.shout.ui.DetailsActivity;
@@ -26,6 +27,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.database.DataSetObserver;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -51,6 +53,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.squareup.picasso.Picasso;
 
 public class DetailsFragment extends SherlockFragment implements
 		LoaderManager.LoaderCallbacks<Cursor> {
@@ -446,12 +449,12 @@ public class DetailsFragment extends SherlockFragment implements
 		}
 
 		public void bindShout(LocalShout shout) {
-
-			HashReference<Avatar> avatarRef = shout.getSender().getAvatar();
-			if (avatarRef.isAvailable())
-				mAvatar.setImageBitmap(avatarRef.get().getBitmap());
-			else
-				mAvatar.setImageResource(R.drawable.defaultavatar);
+			HashReference<ShoutImage> avatarRef = shout.getSender().getAvatar();
+			Uri mUri = ImageProviderContract.imageUri(avatarRef.getHash());
+			Picasso.with(this.getContext()).load(mUri.toString())
+					.placeholder(R.drawable.defaultavatar)
+					.error(R.drawable.defaultavatar)
+					.into(mAvatar);
 
 			mSender.setText(shout.getSender().getUsername());
 
@@ -578,15 +581,17 @@ public class DetailsFragment extends SherlockFragment implements
 			String message = shout.getMessage();
 			String sender = shout.getSender().getUsername();
 			String timestamp = FormattedAge.formatAbsolute(shout.getTimestamp());
-			HashReference<Avatar> avatarRef = shout.getSender().getAvatar();
+			HashReference<ShoutImage> avatarRef = shout.getSender().getAvatar();
+
+			Uri mUri = ImageProviderContract.imageUri(avatarRef.getHash());
+			Picasso.with(this.getContext()).load(mUri.toString())
+					.placeholder(R.drawable.defaultavatar)
+					.error(R.drawable.defaultavatar)
+					.into(mAvatar);
 
 			mMessage.setText(message);
 			mSender.setText(sender);
 			mTimestamp.setText(timestamp);
-			if (avatarRef.isAvailable())
-				mAvatar.setImageBitmap(avatarRef.get().getBitmap());
-			else
-				mAvatar.setImageResource(R.drawable.defaultavatar);
 
 			ShoutLinkify.addLinks(mMessage);
 			Linkify.addLinks(mMessage, Linkify.ALL);
@@ -697,14 +702,16 @@ public class DetailsFragment extends SherlockFragment implements
 		public ReshoutItem bindShout(LocalShout shout) {
 			String sender = shout.getSender().getUsername();
 			String timestamp = FormattedAge.formatAbsolute(shout.getTimestamp());
-			HashReference<Avatar> avatarRef = shout.getSender().getAvatar();
+			HashReference<ShoutImage> avatarRef = shout.getSender().getAvatar();
+
+			Uri mUri = ImageProviderContract.imageUri(avatarRef.getHash());
+			Picasso.with(this.getContext()).load(mUri.toString())
+					.placeholder(R.drawable.defaultavatar)
+					.error(R.drawable.defaultavatar)
+					.into(mAvatar);
 
 			mSender.setText(sender);
 			mTimestamp.setText(timestamp);
-			if (avatarRef.isAvailable())
-				mAvatar.setImageBitmap(avatarRef.get().getBitmap());
-			else
-				mAvatar.setImageResource(R.drawable.defaultavatar);
 
 			return this;
 		}

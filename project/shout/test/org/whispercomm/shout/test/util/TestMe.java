@@ -1,7 +1,7 @@
 
 package org.whispercomm.shout.test.util;
 
-import org.whispercomm.shout.Avatar;
+import org.whispercomm.shout.ShoutImage;
 import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.Me;
 import org.whispercomm.shout.crypto.ECKeyPair;
@@ -13,17 +13,17 @@ public class TestMe implements Me {
 	public String username;
 	public ECPublicKey publicKey;
 	public ECPrivateKey privateKey;
-	public HashReference<Avatar> avatar;
+	public HashReference<ShoutImage> avatar;
 
 	public TestMe(String username, ECPublicKey publicKey, ECPrivateKey privateKey,
-			HashReference<Avatar> avatar) {
+			HashReference<ShoutImage> avatar) {
 		this.username = username;
 		this.publicKey = publicKey;
 		this.privateKey = privateKey;
 		this.avatar = avatar;
 	}
 
-	public TestMe(String username, ECKeyPair keyPair, HashReference<Avatar> avatar) {
+	public TestMe(String username, ECKeyPair keyPair, HashReference<ShoutImage> avatar) {
 		this(username, keyPair.getPublicKey(), keyPair.getPrivateKey(), avatar);
 	}
 
@@ -43,7 +43,7 @@ public class TestMe implements Me {
 	}
 
 	@Override
-	public HashReference<Avatar> getAvatar() {
+	public HashReference<ShoutImage> getAvatar() {
 		return avatar;
 	}
 
