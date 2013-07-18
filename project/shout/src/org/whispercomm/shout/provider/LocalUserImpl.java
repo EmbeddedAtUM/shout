@@ -18,17 +18,14 @@ public class LocalUserImpl implements LocalUser {
 
 	private String username;
 	private ECPublicKey publicKey;
+	private String encodedPublicKey;
 	private HashReference<ShoutImage> avatar;
 
-	public LocalUserImpl(String username, String encodedKey,
+	public LocalUserImpl(String username, String encodedPublicKey,
 			String encodedAvatarHash) {
 		this.username = username;
-		try {
-			this.publicKey = KeyGenerator.generatePublic(Base64.decode(encodedKey, Base64.DEFAULT));
-		} catch (InvalidKeySpecException e) {
-			// TODO: Figure out what to do about this
-			throw new RuntimeException(e);
-		}
+		this.encodedPublicKey = encodedPublicKey;
+		this.publicKey = null; // Delay expensive decoding until first use
 		try {
 			this.avatar = new SimpleHashReference<ShoutImage>(new Hash(Base64.decode(
 					encodedAvatarHash,
@@ -44,8 +41,26 @@ public class LocalUserImpl implements LocalUser {
 		return this.username;
 	}
 
+	/**
+	 * Ensures that public key has been decoded. Must be called before accessing
+	 * the {@link publicKey} field.
+	 */
+	private void preparePublicKey() {
+		if (null != publicKey)
+			return;
+
+		try {
+			publicKey = KeyGenerator.generatePublic(Base64.decode(encodedPublicKey,
+					Base64.DEFAULT));
+		} catch (InvalidKeySpecException e) {
+			// TODO: Figure out what to do about this
+			throw new RuntimeException(e);
+		}
+	}
+
 	@Override
 	public ECPublicKey getPublicKey() {
+		preparePublicKey();
 		return publicKey;
 	}
 
@@ -56,6 +71,7 @@ public class LocalUserImpl implements LocalUser {
 
 	@Override
 	public int hashCode() {
+		preparePublicKey();
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((publicKey == null) ? 0 : publicKey.hashCode());
@@ -65,6 +81,7 @@ public class LocalUserImpl implements LocalUser {
 
 	@Override
 	public boolean equals(Object obj) {
+		preparePublicKey();
 		if (this == obj)
 			return true;
 		if (obj == null)
