@@ -1,5 +1,5 @@
 
-package org.whispercomm.shout.image.provider;
+package org.whispercomm.shout.provider.image;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;

@@ -1,5 +1,5 @@
 
-package org.whispercomm.shout.image.provider;
+package org.whispercomm.shout.provider.image;
 
 import android.net.Uri;
 import android.provider.BaseColumns;
