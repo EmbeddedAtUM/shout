@@ -20,6 +20,11 @@ import org.whispercomm.shout.util.Encoders;
 public final class Hash {
 
 	/**
+	 * Hash with a value of zero (all bits zero).
+	 */
+	public static final Hash ZERO = new Hash(new byte[32]);
+
+	/**
 	 * Length of byte array representation of hash.
 	 */
 	public static final int LENGTH = 32;
