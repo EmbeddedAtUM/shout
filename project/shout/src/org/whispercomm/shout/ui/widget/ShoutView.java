@@ -54,11 +54,7 @@ public class ShoutView extends RelativeLayout {
 	}
 
 	public ShoutView(Context context) {
-		super(context);
-		LayoutInflater inflater = (LayoutInflater) context
-				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		inflater.inflate(R.layout.shoutview, this);
-		initializeViews();
+		this(context, null);
 	}
 
 	@SuppressLint("NewApi")
