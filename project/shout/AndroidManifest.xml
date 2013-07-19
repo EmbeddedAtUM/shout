@@ -94,7 +94,7 @@
 
         <provider
             android:name=".provider.image.ImageProvider"
-            android:authorities="org.whispercomm.shout.image.provider"
+            android:authorities="org.whispercomm.shout.provider.image"
             android:permission="org.whispercomm.shout.ACCESS_SHOUTS" />
 
         <service

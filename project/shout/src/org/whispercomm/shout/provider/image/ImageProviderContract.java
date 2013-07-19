@@ -15,7 +15,7 @@ public class ImageProviderContract {
 	/**
 	 * Define the authority for content provider
 	 */
-	static final String AUTHORITY = "org.whispercomm.shout.image.provider";
+	static final String AUTHORITY = "org.whispercomm.shout.provider.image";
 
 	/**
 	 * The content:// style URI for the Shout provider
