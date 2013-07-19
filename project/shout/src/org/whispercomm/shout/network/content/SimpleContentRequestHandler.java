@@ -21,6 +21,7 @@ import org.whispercomm.shout.errors.NotFoundException;
 import org.whispercomm.shout.network.PacketProtocol;
 import org.whispercomm.shout.network.shout.NetworkProtocol;
 import org.whispercomm.shout.network.shout.ShoutChainTooLongException;
+import org.whispercomm.shout.tracker.ShoutTracker;
 import org.whispercomm.shout.util.AlarmExecutorService;
 
 import android.util.Log;
@@ -135,6 +136,7 @@ public class SimpleContentRequestHandler implements ContentRequestHandler, Netwo
 	private void sendRequest(OutgoingRequestTask task) {
 		// Send the request
 		ByteBuffer buffer = PacketProtocol.createPacket();
+		ShoutTracker.trackSendContentRequest(task.getContentRequest());
 		ContentRequestSerializer.serialize(buffer, task.getContentRequest());
 		try {
 			Log.v(TAG, "Sending content request for " + task.getContentRequest().getObjectHash());

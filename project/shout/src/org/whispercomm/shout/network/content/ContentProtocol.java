@@ -26,6 +26,7 @@ import org.whispercomm.shout.network.ObjectProtocol;
 import org.whispercomm.shout.network.ObjectType;
 import org.whispercomm.shout.network.PacketProtocol;
 import org.whispercomm.shout.network.UnsupportedVersionException;
+import org.whispercomm.shout.tracker.ShoutTracker;
 
 import android.util.Log;
 
@@ -94,6 +95,7 @@ public class ContentProtocol implements ObjectProtocol {
 		ContentDescriptor descriptor = null;
 		try {
 			descriptor = ContentDescriptorSerializer.deserialize(data);
+			ShoutTracker.trackReceiveContentDescriptor(descriptor);
 		} catch (UnsupportedVersionException e) {
 			Log.v(TAG, "Dropping content descriptor with unsupported version", e);
 			return;
@@ -115,6 +117,7 @@ public class ContentProtocol implements ObjectProtocol {
 		MerkleNode node = null;
 		try {
 			node = MerkleSerializer.deserialize(data);
+			ShoutTracker.trackReceiveMerkleNode(node);
 		} catch (UnsupportedVersionException e) {
 			Log.v(TAG, "Dropping merkle node with unsupported version", e);
 			return;
@@ -136,6 +139,7 @@ public class ContentProtocol implements ObjectProtocol {
 		ContentRequest request = null;
 		try {
 			request = ContentRequestSerializer.deserialize(data);
+			ShoutTracker.trackReceiveContentRequest(request);
 		} catch (UnsupportedVersionException e) {
 			Log.v(TAG, "Dropping content request with unsupported version", e);
 			return;
@@ -149,6 +153,7 @@ public class ContentProtocol implements ObjectProtocol {
 	public void send(ContentDescriptor descriptor) throws IOException, ManesFrameTooLargeException,
 			ManesNotRegisteredException {
 		// Add the descriptor
+		ShoutTracker.trackSendContentDescriptor(descriptor);
 		ByteBuffer buffer = PacketProtocol.createPacket();
 		while (!ContentDescriptorSerializer.serialize(buffer, descriptor)) {
 			packetProtocol.send(buffer);
@@ -167,7 +172,6 @@ public class ContentProtocol implements ObjectProtocol {
 	public void send(MerkleNodeReference nodeRef, ByteBuffer buffer) throws IOException,
 			ManesFrameTooLargeException, ManesNotRegisteredException {
 		merkleStore.growTree(nodeRef);
-
 		// Serialize the merkle nodes into buffers
 		MerkleNodePacketBuilder builder = new MerkleNodePacketBuilder(buffer);
 		if (nodeRef.isAvailable())
@@ -196,6 +200,7 @@ public class ContentProtocol implements ObjectProtocol {
 				return;
 
 			MerkleNode node = ref.get();
+			ShoutTracker.trackSendMerkleNode(node);
 			if (!node.serialize(current)) {
 				createBuffer();
 				node.serialize(current);
