@@ -1,0 +1,49 @@
+SHOUT ANALYTICS OVERVIEW AND GUIDE
+
+In order to perform additional research on how users are using Shout
+we are going to start tracking anonymous statistics on how the app is
+being used using Google Analytics for Android.
+
+As of July 2013, we are tracking the following statistics (all are
+tracked based on date as well):
+
+* Activity Views (what activities users are looking at the most, and at
+what time, doesn't include any information beyond activity name)
+
+* Detail views (what shout is being looked at in the details fragment,
+  includes the shout hash)
+
+* Shout creation (Shout hash and type recorded)
+  * Any type of shout (Shout, Reshout, Comment, Recomment)
+  * Is only called if a shout has to be created, reshouts will not do
+    this the majority of the time
+
+* Shout sent (Shout hash and type recorded)
+  * Any type of shout
+  * Called whenever a shout packet is sent from the application (not
+  * including content like avatars)
+
+* Shout recieved (Shout hash and type recorded)
+  * Any type of shout
+  * Called whenever a shout packet is recieved by the application
+
+* Content packet recieved (Object hash and type recorded)
+  * Any type of content packet (Merkle node, content descriptor,
+    or content request)
+
+* Content packet sent (Object hash and type recorded)
+  * Any type of content packet
+
+
+TESTING AND PRODUCTION
+
+The manes-release repo's master branch is to be used for testing by
+default, so analytics using the master branch will go to a testing
+Google analytics database instead of the production one. We
+don't want developer testing to influence data gathering, as it may
+corrupt research later down the road.
+
+When deploying a production build, switch branches to the
+master-release branch, as that has the production Google Analytics key
+on it.
+
