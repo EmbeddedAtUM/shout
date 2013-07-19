@@ -75,21 +75,12 @@
         android:layout_marginTop="6dp"
         android:textColor="@android:color/black" />
 
-    <TableLayout
-        android:id="@+id/shoutDetails"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@id/toprow"
-        android:layout_below="@id/message"
-        android:layout_marginBottom="6dp"
-        android:shrinkColumns="1" />
-
     <TextView
         android:id="@+id/commentCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@id/toprow"
-        android:layout_below="@id/shoutDetails"
+        android:layout_below="@id/message"
         android:singleLine="true"
         android:textColor="@color/gray" />
 
@@ -98,7 +89,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_below="@id/shoutDetails"
+        android:layout_below="@id/message"
         android:textColor="@color/gray" />
 
 </merge>

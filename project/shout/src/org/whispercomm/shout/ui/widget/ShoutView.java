@@ -3,7 +3,6 @@ package org.whispercomm.shout.ui.widget;
 
 import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.LocalShout;
-import org.whispercomm.shout.Location;
 import org.whispercomm.shout.R;
 import org.whispercomm.shout.ShoutImage;
 import org.whispercomm.shout.ShoutType;
@@ -14,8 +13,6 @@ import org.whispercomm.shout.util.FormattedAge.AgeListener;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
@@ -25,7 +22,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -45,8 +41,6 @@ public class ShoutView extends RelativeLayout {
 	private TextView reshoutCount;
 	private TextView commentCount;
 	private TextView age;
-
-	private TableLayout detailsTable;
 
 	/**
 	 * The shout current bound to this view
@@ -97,7 +91,6 @@ public class ShoutView extends RelativeLayout {
 		message = (TextView) findViewById(R.id.message);
 		commentCount = (TextView) findViewById(R.id.commentCount);
 		reshoutCount = (TextView) this.findViewById(R.id.reshoutCount);
-		detailsTable = (TableLayout) findViewById(R.id.shoutDetails);
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 			message.setTextIsSelectable(true);
@@ -156,8 +149,6 @@ public class ShoutView extends RelativeLayout {
 		} else {
 			reshoutCount.setVisibility(View.GONE);
 		}
-
-		detailsTable.setVisibility(GONE);
 	}
 
 	private class AgeUpdater implements AgeListener, Runnable {
@@ -185,81 +176,6 @@ public class ShoutView extends RelativeLayout {
 	 */
 	public LocalShout getBoundShout() {
 		return this.shout;
-	}
-
-	public void showDetails() {
-		detailsTable.removeAllViews();
-		detailsTable.setVisibility(VISIBLE);
-		// Add the time sent
-		ShoutDetailRow timeSent = new ShoutDetailRow(getContext());
-		timeSent.setTitleText("Time Sent");
-		String sent = FormattedAge.formatAbsolute(shout.getTimestamp());
-		timeSent.setEntryText(sent);
-		detailsTable.addView(timeSent);
-		// Add the time received
-		ShoutDetailRow timeReceived = new ShoutDetailRow(getContext());
-		timeReceived.setTitleText("Time Received");
-		String received = FormattedAge.formatAbsolute(shout.getReceivedTime());
-		timeReceived.setEntryText(received);
-		detailsTable.addView(timeReceived);
-		// Add the location
-		Location location = shout.getLocation();
-		if (location != null) {
-			ShoutDetailRow longitude = new ShoutDetailRow(getContext());
-			ShoutDetailRow latitude = new ShoutDetailRow(getContext());
-			longitude.setTitleText("Longitude");
-			latitude.setTitleText("Latitude");
-			longitude.setEntryText(String.format("%f\u00b0", location.getLongitude()));
-			latitude.setEntryText(String.format("%f\u00b0", location.getLatitude()));
-			detailsTable.addView(longitude);
-			detailsTable.addView(latitude);
-
-			longitude.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					showInMap();
-				}
-			});
-
-			latitude.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					showInMap();
-				}
-			});
-
-			longitude.entry.setTextColor(Color.BLUE);
-			latitude.entry.setTextColor(Color.BLUE);
-
-		}
-
-		// // Add the signature
-		// ShoutDetailRow signature = new ShoutDetailRow(getContext());
-		// signature.setTitleText("Signature");
-		// signature.setEntryText(String.format("R<%s> S<%s>",
-		// Encoders.toHexString(shout.getSignature().getS().toByteArray()),
-		// Encoders.toHexString(shout.getSignature().getS().toByteArray())));
-		// detailsTable.addView(signature);
-		// // Add the hash
-		// ShoutDetailRow hash = new ShoutDetailRow(getContext());
-		// hash.setTitleText("Hash");
-		// hash.setEntryText(Encoders.toHexString(shout.getHash()));
-		// detailsTable.addView(hash);
-	}
-
-	private void showInMap() {
-		Location location = shout.getLocation();
-		if (location != null) {
-			Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(String.format(
-					"geo:%f,%f?q=%f,%f", location.getLatitude(), location.getLongitude(),
-					location.getLatitude(), location.getLongitude())));
-			this.getContext().startActivity(intent);
-		}
-	}
-
-	public void hideDetails() {
-		detailsTable.setVisibility(GONE);
-		detailsTable.removeAllViews();
 	}
 
 }
