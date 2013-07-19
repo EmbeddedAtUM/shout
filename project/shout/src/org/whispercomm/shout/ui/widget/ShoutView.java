@@ -9,13 +9,11 @@ import org.whispercomm.shout.ShoutType;
 import org.whispercomm.shout.provider.image.ImageProviderContract;
 import org.whispercomm.shout.text.ShoutLinkify;
 import org.whispercomm.shout.util.FormattedAge;
-import org.whispercomm.shout.util.FormattedAge.AgeListener;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Handler;
 import android.text.util.Linkify;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -47,19 +45,12 @@ public class ShoutView extends RelativeLayout {
 	 */
 	private LocalShout shout;
 
-	private Handler mHandler;
-
-	private FormattedAge formattedAge;
-
 	public ShoutView(Context context, AttributeSet attributeSet) {
 		super(context, attributeSet);
 		LayoutInflater inflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		inflater.inflate(R.layout.shoutview, this);
 		initializeViews();
-		mHandler = new Handler();
-		formattedAge = FormattedAge.create(new AgeUpdater());
-		formattedAge.setAbsoluteNoTime(true);
 	}
 
 	public ShoutView(Context context) {
@@ -68,19 +59,6 @@ public class ShoutView extends RelativeLayout {
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		inflater.inflate(R.layout.shoutview, this);
 		initializeViews();
-		mHandler = new Handler();
-		formattedAge = FormattedAge.create(new AgeUpdater());
-		formattedAge.setAbsoluteNoTime(true);
-	}
-
-	@Override
-	public void onAttachedToWindow() {
-		formattedAge.restart();
-	}
-
-	@Override
-	public void onDetachedFromWindow() {
-		formattedAge.stop();
 	}
 
 	@SuppressLint("NewApi")
@@ -129,10 +107,12 @@ public class ShoutView extends RelativeLayout {
 		 * If the sent time is after the received time, base the duration period
 		 * on the time received.
 		 */
+		String formattedAge;
 		if (shout.getTimestamp().isAfter(shout.getReceivedTime()))
-			formattedAge.setDateTime(shout.getReceivedTime());
+			formattedAge = FormattedAge.formatAge(shout.getReceivedTime(), true);
 		else
-			formattedAge.setDateTime(shout.getTimestamp());
+			formattedAge = FormattedAge.formatAge(shout.getTimestamp(), true);
+		age.setText(formattedAge);
 
 		if (shout.getType() == ShoutType.SHOUT) {
 			commentCount.setText(String.format("Comments (%d)",
@@ -149,24 +129,6 @@ public class ShoutView extends RelativeLayout {
 		} else {
 			reshoutCount.setVisibility(View.GONE);
 		}
-	}
-
-	private class AgeUpdater implements AgeListener, Runnable {
-
-		private String mAge;
-
-		@Override
-		public void run() {
-			if (age != null)
-				age.setText(mAge);
-		}
-
-		@Override
-		public void update(String age) {
-			this.mAge = age;
-			mHandler.post(this);
-		}
-
 	}
 
 	/**
