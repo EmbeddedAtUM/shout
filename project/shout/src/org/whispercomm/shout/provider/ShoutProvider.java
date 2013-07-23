@@ -448,6 +448,18 @@ public class ShoutProvider extends ContentProvider {
 					whereArgs = selectionArgs;
 				}
 				break;
+			case DELETED_SHOUT_ID:
+				table = ShoutDatabaseHelper.DELETED_SHOUTS_TABLE;
+				id = uri.getLastPathSegment();
+				if (TextUtils.isEmpty(selection)) {
+					whereClause = ShoutProviderContract.DeletedShouts._ID + "=" + id;
+					whereArgs = null;
+				} else {
+					whereClause = selection + " and "
+							+ ShoutProviderContract.DeletedShouts._ID + "=" + id;
+					whereArgs = selectionArgs;
+				}
+				break;
 			default:
 				throw new IllegalArgumentException("Invalid or unknown URI " + uri);
 		}
@@ -477,7 +489,6 @@ public class ShoutProvider extends ContentProvider {
 			case COMMENT_SHOUTS:
 			case RESHOUT_SHOUTS:
 				uris.add(ShoutProviderContract.Shouts.CONTENT_URI);
-
 
 		}
 
@@ -586,6 +597,17 @@ public class ShoutProvider extends ContentProvider {
 				+ ShoutProviderContract.Shouts.COMMENT_COUNT + " = "
 				+ ShoutProviderContract.Shouts.COMMENT_COUNT + " - 1 WHERE "
 				+ ShoutProviderContract.Shouts.HASH + " = new."
+				+ ShoutProviderContract.DeletedShouts.PARENT + ";\nEND;";
+
+		private static final String SQL_CREATE_TRIGGER_UNDO_DELETE_COMMENT = "CREATE TRIGGER "
+				+ "Undo_Comment_Count AFTER DELETE ON "
+				+ DELETED_SHOUTS_TABLE + " WHEN old."
+				+ ShoutProviderContract.DeletedShouts.PARENT + " IS NOT NULL "
+				+ "\n BEGIN\n" + "UPDATE "
+				+ SHOUTS_TABLE + " SET "
+				+ ShoutProviderContract.Shouts.COMMENT_COUNT + " = "
+				+ ShoutProviderContract.Shouts.COMMENT_COUNT + " + 1 WHERE "
+				+ ShoutProviderContract.Shouts.HASH + " = old."
 				+ ShoutProviderContract.DeletedShouts.PARENT + ";\nEND;";
 
 		// TODO: We Can't delete reshout can we?
@@ -703,6 +725,7 @@ public class ShoutProvider extends ContentProvider {
 			db.execSQL(SQL_CREATE_TRIGGER_COMMENT);
 			db.execSQL(SQL_CREATE_TRIGGER_RESHOUT);
 			db.execSQL(SQL_CREATE_TRIGGER_DELETE_COMMENT);
+			db.execSQL(SQL_CREATE_TRIGGER_UNDO_DELETE_COMMENT);
 			db.execSQL(SQL_CREATE_TRIGGER_MESSAGE);
 			db.execSQL(SQL_CREATE_VIEW_DENORMED_SHOUT);
 			db.execSQL(SQL_CREATE_VIEW_DELETION_FILTER);

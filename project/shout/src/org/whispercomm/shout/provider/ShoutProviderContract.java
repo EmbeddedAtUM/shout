@@ -1,6 +1,7 @@
 
 package org.whispercomm.shout.provider;
 
+import org.whispercomm.shout.DeletedShout;
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.LocalUser;
 import org.whispercomm.shout.Location;
@@ -357,7 +358,16 @@ public class ShoutProviderContract {
 		return result;
 	}
 
-	public static void deleteShout(Context context, Shout shout) {
+	static DeletedShout retrieveDeletedFromCursor(Cursor cursor) {
+		int idIndex = cursor.getColumnIndex(DeletedShouts._ID);
+		int hashIndex = cursor.getColumnIndex(DeletedShouts.HASH);
+		int id = cursor.getInt(idIndex);
+		String encodedHash = cursor.getString(hashIndex);
+		DeletedShout ds = new DeletedShoutImpl(encodedHash, id);
+		return ds;
+	}
+
+	public static DeletedShout deleteShout(Context context, Shout shout) {
 
 		ContentValues values = ContractHelper.buildContentValues(shout);
 		Uri location = context.getContentResolver().insert(DeletedShouts.CONTENT_URI, values);
@@ -365,10 +375,30 @@ public class ShoutProviderContract {
 
 		if (cursor == null) {
 			Log.e(TAG, "Null uri returned when insert into delete table.");
-			return;
+			return null;
 		}
+		cursor.moveToFirst();
+		DeletedShout result = retrieveDeletedFromCursor(cursor);
 		cursor.close();
-		return;
+		return result;
+	}
+
+	public static boolean undoDeleteShout(Context context, int id) {
+		if (id < 1) {
+			Log.e(TAG, "Fail to undo deletion of shout with id " + id);
+			return false;
+		}
+
+		Uri uri = ContentUris.withAppendedId(DeletedShouts.CONTENT_URI, id);
+
+		long error = context.getContentResolver().delete(uri, null, null);
+
+		if (error != 1) {
+			Log.e(TAG, "Undo deletion failed. ");
+			return false;
+		}
+		return true;
+
 	}
 
 	/**
