@@ -20,8 +20,11 @@ public class ShoutEraser {
 		mContext = context;
 	}
 
-	public void deleteShout(LocalShout target) {
-		ShoutProviderContract.deleteShout(mContext, target);
+	public DeletedShout deleteShout(LocalShout target) {
+		return ShoutProviderContract.deleteShout(mContext, target);
 	}
 
+	public boolean undoDeleteShout(int id) {
+		return ShoutProviderContract.undoDeleteShout(mContext, id);
+	}
 }

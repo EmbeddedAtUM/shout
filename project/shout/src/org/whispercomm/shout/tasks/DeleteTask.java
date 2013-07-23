@@ -1,6 +1,7 @@
 
 package org.whispercomm.shout.tasks;
 
+import org.whispercomm.shout.DeletedShout;
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.ShoutEraser;
 
@@ -12,12 +13,12 @@ import android.content.Context;
  * @author Bowen Xu
  */
 
-public class DeleteTask extends AsyncTaskCallback<Void, Void, Void> {
+public class DeleteTask extends AsyncTaskCallback<Void, Void, DeletedShout> {
 
 	private Context mContext;
 	private LocalShout mTarget;
 
-	public DeleteTask(Context context, AsyncTaskCompleteListener<Void> completeListener,
+	public DeleteTask(Context context, AsyncTaskCompleteListener<DeletedShout> completeListener,
 			LocalShout target) {
 		super(completeListener);
 		mContext = context;
@@ -26,15 +27,14 @@ public class DeleteTask extends AsyncTaskCallback<Void, Void, Void> {
 	}
 
 	@Override
-	protected Void doInBackground(Void... params) {
+	protected DeletedShout doInBackground(Void... params) {
 
 		ShoutEraser shoutEraser = new ShoutEraser(mContext);
 		/*
 		 * if (mTarget.getParent() == null) { return shoutEraser.deleteShout();
 		 * } else { return shoutEraser.deleteComment(); }
 		 */
-		shoutEraser.deleteShout(mTarget);
-		return null;
+		return shoutEraser.deleteShout(mTarget);
 	}
 
 }

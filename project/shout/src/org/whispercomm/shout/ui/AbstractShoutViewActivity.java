@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import org.whispercomm.manes.client.maclib.ManesNotInstalledException;
 import org.whispercomm.manes.client.maclib.ManesNotRegisteredException;
+import org.whispercomm.shout.DeletedShout;
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.R;
 import org.whispercomm.shout.id.IdManager;
@@ -16,6 +17,7 @@ import org.whispercomm.shout.tasks.DeleteTask;
 import org.whispercomm.shout.tasks.ReshoutTask;
 import org.whispercomm.shout.tasks.SendResult;
 import org.whispercomm.shout.tasks.SendShoutTask;
+import org.whispercomm.shout.ui.widget.UndoBarController;
 
 import android.util.Log;
 import android.widget.Toast;
@@ -47,7 +49,8 @@ public class AbstractShoutViewActivity extends AbstractShoutActivity {
 	}
 
 	public void onClickDelete(LocalShout shout) {
-		new DeleteTask(getApplicationContext(), new ShoutDeletionCompleteListener(), shout)
+		new DeleteTask(getApplicationContext(),
+				new ShoutDeletionCompleteListener(), shout)
 				.execute();
 	}
 
@@ -104,14 +107,13 @@ public class AbstractShoutViewActivity extends AbstractShoutActivity {
 	}
 
 	private class ShoutDeletionCompleteListener implements
-			AsyncTaskCompleteListener<Void> {
+			AsyncTaskCompleteListener<DeletedShout> {
 
 		@Override
-		public void onComplete(Void result) {
-			// TODO： Right now do nothing.
-			Toast.makeText(getApplicationContext(), "Deletion Succeeded. ", Toast.LENGTH_SHORT)
-					.show();
+		public void onComplete(DeletedShout result) {
+			UndoBarController.hideUndoBarView(UndoBarController.NOT_HIDE);
+			UndoBarController.saveDeleteResult(result);
 		}
-
 	}
+
 }
