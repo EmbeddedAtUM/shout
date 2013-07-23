@@ -49,6 +49,19 @@
             android:text="@string/no_shouts"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="@android:color/black" />
-    </FrameLayout>
+        
+        <LinearLayout 
+            android:id="@+id/undoBar"
+            style="@style/UndoBar">
+            
+            <TextView
+                android:id="@+id/undoBar_message"
+                style="@style/UndoBarMessage" />
+            <Button 
+                android:id="@+id/undoBar_button"
+                style="@style/UndoBarButton"  />
+        </LinearLayout>
+
+        </FrameLayout>
 
 </LinearLayout>
