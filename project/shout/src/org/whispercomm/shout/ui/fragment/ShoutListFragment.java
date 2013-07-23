@@ -5,13 +5,16 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.whispercomm.shout.DeletedShout;
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.R;
+import org.whispercomm.shout.ShoutEraser;
 import org.whispercomm.shout.provider.CursorLoader;
 import org.whispercomm.shout.provider.ParcelableShout;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.provider.ShoutProviderContract.SortOrder;
 import org.whispercomm.shout.ui.widget.TimelineAdapter;
+import org.whispercomm.shout.ui.widget.UndoBarController;
 
 import android.database.Cursor;
 import android.os.Bundle;
@@ -20,6 +23,9 @@ import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockFragment;
@@ -28,7 +34,8 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
 public class ShoutListFragment extends SherlockFragment implements
-		LoaderManager.LoaderCallbacks<Cursor> {
+		LoaderManager.LoaderCallbacks<Cursor>, UndoBarController.UndoListener,
+		UndoBarController.SaveDeletedShoutListener {
 
 	private static final String BUNDLE_KEY = "parceled_shouts";
 
@@ -37,6 +44,9 @@ public class ShoutListFragment extends SherlockFragment implements
 	private View mLoading;
 	private View mEmpty;
 	private ListView mListView;
+	private LinearLayout mUndoBar;
+
+	private LocalShout deletedShout;
 
 	private Set<LocalShout> expandedShouts;
 	private TimelineAdapter adapter;
@@ -46,6 +56,7 @@ public class ShoutListFragment extends SherlockFragment implements
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setHasOptionsMenu(true);
+
 	}
 
 	@Override
@@ -61,15 +72,36 @@ public class ShoutListFragment extends SherlockFragment implements
 
 		mLoading = view.findViewById(R.id.loading);
 		mEmpty = view.findViewById(android.R.id.empty);
+		mUndoBar = (LinearLayout) view.findViewById(R.id.undoBar);
 
 		mListView = (ListView) view.findViewById(android.R.id.list);
 		mListView.setEmptyView(view.findViewById(android.R.id.empty));
 		mListView.setAdapter(this.adapter);
 
+		mListView.setOnScrollListener(new OnScrollListener() {
+
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
+					int totalItemCount) {
+
+			}
+
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) {
+				UndoBarController.hideUndoBarView(UndoBarController.IMMEDIATE_HIDE);
+			}
+
+		}
+				);
+
 		if (savedInstanceState != null && savedInstanceState.containsKey(SORT_ORDER_KEY))
 			this.sortOrder = (SortOrder) savedInstanceState.getSerializable(SORT_ORDER_KEY);
 		else
 			this.sortOrder = SortOrder.ReceivedTimeDescending;
+
+		UndoBarController.with(mUndoBar);
+		UndoBarController.listenedBy(this, this);
+		UndoBarController.hideUndoBarView(UndoBarController.getUndoBarStatus());
 
 		// Do this after findViewById, so the view references are available
 		getLoaderManager().initLoader(0, null, this);
@@ -122,6 +154,7 @@ public class ShoutListFragment extends SherlockFragment implements
 		}
 
 		outState.putSerializable(SORT_ORDER_KEY, sortOrder);
+		UndoBarController.onSaveInstanceState(outState);
 	}
 
 	@Override
@@ -176,5 +209,18 @@ public class ShoutListFragment extends SherlockFragment implements
 		else
 			mLoading.setVisibility(View.INVISIBLE);
 	}
+
+	@Override
+	public void onUndo(int id) {
+
+		ShoutEraser shoutEraser = new ShoutEraser(getActivity());
+		boolean undo = shoutEraser.undoDeleteShout(id);
+		if (undo) {
+			UndoBarController.hideUndoBarView(UndoBarController.IMMEDIATE_HIDE);
+
+		}
+
+	}
+
 
 }
