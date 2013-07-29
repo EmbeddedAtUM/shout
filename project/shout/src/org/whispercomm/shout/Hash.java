@@ -8,6 +8,9 @@ import org.spongycastle.util.encoders.Hex;
 import org.whispercomm.shout.errors.InvalidEncodingException;
 import org.whispercomm.shout.util.Encoders;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Simple class that encapsulates a byte[] representation of a SHA-256 hash,
  * providing type safety and an {@code equals()} implementation.
@@ -17,7 +20,7 @@ import org.whispercomm.shout.util.Encoders;
  * 
  * @author David R. Bild
  */
-public final class Hash {
+public final class Hash implements Parcelable {
 
 	/**
 	 * Hash with a value of zero (all bits zero).
@@ -96,4 +99,28 @@ public final class Hash {
 		return true;
 	}
 
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeByteArray(hash);
+	}
+
+	public static final Parcelable.Creator<Hash> CREATOR = new Parcelable.Creator<Hash>() {
+
+		public Hash createFromParcel(Parcel in) {
+			return new Hash(in);
+		}
+
+		public Hash[] newArray(int size) {
+			return new Hash[size];
+		}
+	};
+
+	private Hash(Parcel in) {
+		this(in.createByteArray());
+	}
 }
