@@ -14,11 +14,11 @@
     </style>
 
     <style name="AppTheme" parent="AppThemeBase">
-        <item name="@attr/bitmapPreferenceStyle">@style/BitmapPreference</item>
-        <item name="@attr/delegatedPreferenceStyle">@style/DelegatedPreference</item>
-        <item name="@attr/expandableViewStyle">@style/ExpandableView</item>
-        <item name="@attr/detailsFragmentReshoutItemStyle">@style/DetailsFragmentReshoutItem</item>
-        <item name="@attr/detailsFragmentCommentItemStyle">@style/DetailsFragmentCommentItem</item>
+        <item name="bitmapPreferenceStyle">@style/BitmapPreference</item>
+        <item name="delegatedPreferenceStyle">@style/DelegatedPreference</item>
+        <item name="expandableViewStyle">@style/ExpandableView</item>
+        <item name="detailsFragmentReshoutItemStyle">@style/DetailsFragmentReshoutItem</item>
+        <item name="detailsFragmentCommentItemStyle">@style/DetailsFragmentCommentItem</item>
         <item name="detailsFragmentLocationViewStyle">@style/DetailsFragmentLocationView</item>
         <item name="detailsFragmentCommentViewStyle">@style/DetailsFragmentCommentView</item>
         <item name="detailsFragmentReshoutViewStyle">@style/DetailsFragmentReshoutView</item>
@@ -50,8 +50,8 @@
     </style>
 
     <style name="AppTheme.Settings">
-        <item name="@attr/bitmapPreferenceStyle">@style/BitmapPreference</item>
-        <item name="@attr/delegatedPreferenceStyle">@style/DelegatedPreference</item>
+        <item name="bitmapPreferenceStyle">@style/BitmapPreference</item>
+        <item name="delegatedPreferenceStyle">@style/DelegatedPreference</item>
 
         <!-- These color overrides should be removed when the main theme is fixed. -->
         <!-- Override bad text colors that propagate through to preferences title and summary fields -->
