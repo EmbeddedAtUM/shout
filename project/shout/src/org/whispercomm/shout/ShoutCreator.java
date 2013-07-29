@@ -4,6 +4,7 @@ package org.whispercomm.shout;
 import org.joda.time.DateTime;
 import org.whispercomm.shout.id.SignatureUtility;
 import org.whispercomm.shout.provider.ShoutProviderContract;
+import org.whispercomm.shout.tracker.ShoutTracker;
 
 import android.content.Context;
 
@@ -35,6 +36,7 @@ public class ShoutCreator {
 		UnsignedShout unsigned = new SimpleUnsignedShout(timestamp, sender,
 				message, location, null);
 		Shout shout = SignatureUtility.signShout(unsigned, sender);
+		ShoutTracker.trackCreateShout(shout);
 		return ShoutProviderContract.saveShout(context, shout);
 	}
 
@@ -52,6 +54,7 @@ public class ShoutCreator {
 		UnsignedShout unsigned = new SimpleUnsignedShout(timestamp, sender,
 				message, location, parent);
 		Shout shout = SignatureUtility.signShout(unsigned, sender);
+		ShoutTracker.trackCreateShout(shout);
 		return ShoutProviderContract.saveShout(context, shout);
 	}
 
@@ -67,6 +70,7 @@ public class ShoutCreator {
 		UnsignedShout unsigned = new SimpleUnsignedShout(timestamp, sender,
 				null, location, parent);
 		Shout shout = SignatureUtility.signShout(unsigned, sender);
+		ShoutTracker.trackCreateShout(shout);
 		return ShoutProviderContract.saveShout(context, shout);
 	}
 

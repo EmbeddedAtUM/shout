@@ -16,6 +16,7 @@ import org.whispercomm.shout.network.UnsupportedVersionException;
 import org.whispercomm.shout.serialization.SerializeUtility;
 import org.whispercomm.shout.serialization.SerializeUtility.BuildableShout;
 import org.whispercomm.shout.serialization.ShoutPacketException;
+import org.whispercomm.shout.tracker.ShoutTracker;
 
 import android.util.Log;
 
@@ -79,6 +80,7 @@ public class ShoutProtocol implements ObjectProtocol {
 		}
 
 		if (shout != null) {
+			ShoutTracker.trackReceiveShout(shout);
 			deliverShout(shout);
 		}
 	}
@@ -95,6 +97,7 @@ public class ShoutProtocol implements ObjectProtocol {
 	public void send(Shout shout) throws ManesFrameTooLargeException, ManesNotRegisteredException {
 		ByteBuffer buffer = PacketProtocol.createPacket();
 		while (shout != null) {
+			ShoutTracker.trackSendShout(shout);
 			SerializeUtility.serializeShout(buffer, shout);
 			shout = shout.getParent();
 		}

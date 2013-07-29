@@ -14,6 +14,7 @@ import org.whispercomm.shout.provider.ShoutCursorAdapter;
 import org.whispercomm.shout.provider.ShoutProviderContract;
 import org.whispercomm.shout.provider.image.ImageProviderContract;
 import org.whispercomm.shout.text.ShoutLinkify;
+import org.whispercomm.shout.tracker.ShoutTracker;
 import org.whispercomm.shout.ui.AbstractShoutViewActivity;
 import org.whispercomm.shout.ui.DetailsActivity;
 import org.whispercomm.shout.ui.MapActivity;
@@ -184,6 +185,14 @@ public class DetailsFragment extends SherlockFragment implements
 		mShoutView.bindShout(mShout);
 
 		return v;
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
+		if (mShout != null) {
+			ShoutTracker.trackViewDetails(mShout);
+		}
 	}
 
 	@Override
