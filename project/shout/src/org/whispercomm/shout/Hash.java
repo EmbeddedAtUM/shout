@@ -1,6 +1,7 @@
 
 package org.whispercomm.shout;
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 import org.spongycastle.crypto.digests.SHA256Digest;
@@ -44,6 +45,34 @@ public final class Hash implements Parcelable {
 		digest.doFinal(hash, 0);
 
 		return new Hash(hash);
+	}
+
+	/**
+	 * Generates the Hash of the specified {@code ByteBuffer}. The hash is
+	 * computed using {@code input.remaining()} bytes starting at
+	 * input.position(). Upon return, the buffer's position will be equal to its
+	 * limit; its limit will not have changed.
+	 * 
+	 * @param input the {@code ByteBuffer}
+	 * @returns the hash of the given data
+	 */
+	public static Hash hashData(ByteBuffer input) {
+		// Modified from java.security.MessageDigestSpi.java
+		Hash ret = null;
+		byte[] tmp;
+		if (input.hasArray()) {
+			tmp = input.array();
+			int offset = input.arrayOffset();
+			int position = input.position();
+			int limit = input.limit();
+			ret = hashData(tmp, offset + position, limit - position);
+			input.position(limit);
+		} else {
+			tmp = new byte[input.limit() - input.position()];
+			input.get(tmp);
+			ret = hashData(tmp, 0, tmp.length);
+		}
+		return ret;
 	}
 
 	private final byte[] hash;
