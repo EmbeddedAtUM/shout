@@ -5,12 +5,13 @@ import java.io.IOException;
 
 import org.whispercomm.manes.client.maclib.ManesNotInstalledException;
 import org.whispercomm.manes.client.maclib.ManesNotRegisteredException;
-import org.whispercomm.shout.ShoutImage;
+import org.whispercomm.shout.Hash;
 import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.Location;
 import org.whispercomm.shout.Me;
 import org.whispercomm.shout.R;
+import org.whispercomm.shout.ShoutImage;
 import org.whispercomm.shout.SimpleLocation;
 import org.whispercomm.shout.id.IdManager;
 import org.whispercomm.shout.id.UserNotInitiatedException;
@@ -229,7 +230,7 @@ public class MessageFragment extends SherlockFragment {
 			return null;
 		}
 
-		byte[] parentHash = extras.getByteArray(PARENT_ID);
+		Hash parentHash = extras.getParcelable(PARENT_ID);
 		if (parentHash == null) {
 			return null;
 		}

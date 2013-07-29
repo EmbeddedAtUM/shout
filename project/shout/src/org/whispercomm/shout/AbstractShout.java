@@ -6,14 +6,14 @@ import org.whispercomm.shout.util.ShoutMessageUtility;
 
 public abstract class AbstractShout implements Shout {
 
-	private byte[] hashCode;
+	private Hash hash;
 
 	@Override
-	public byte[] getHash() {
-		if (hashCode == null) {
-			this.hashCode = SerializeUtility.generateHash(this);
+	public Hash getHash() {
+		if (hash == null) {
+			this.hash = SerializeUtility.generateHash(this);
 		}
-		return hashCode;
+		return hash;
 	}
 
 	@Override

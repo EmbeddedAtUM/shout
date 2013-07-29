@@ -1,7 +1,6 @@
 
 package org.whispercomm.shout.test.util;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -43,7 +42,7 @@ public class TestUtility {
 		assertEquals(lhs.getSender().getPublicKey(), rhs.getSender().getPublicKey());
 		assertEquals(lhs.getSender().getAvatar(), rhs.getSender().getAvatar());
 		assertEquals(lhs.getSignature(), rhs.getSignature());
-		assertArrayEquals(lhs.getHash(), rhs.getHash());
+		assertEquals(lhs.getHash(), rhs.getHash());
 		testEqualShoutFields(lhs.getParent(), rhs.getParent());
 	}
 
@@ -61,7 +60,7 @@ public class TestUtility {
 		assertEquals(lhs.getSender().getUsername(), rhs.getSender().getUsername());
 		assertEquals(lhs.getSender().getPublicKey(), rhs.getSender().getPublicKey());
 		assertEquals(lhs.getSignature(), rhs.getSignature());
-		assertArrayEquals(lhs.getHash(), rhs.getHash());
+		assertEquals(lhs.getHash(), rhs.getHash());
 	}
 
 }

@@ -1,6 +1,7 @@
 
 package org.whispercomm.shout.ui.fragment;
 
+import org.whispercomm.shout.Hash;
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.Location;
 import org.whispercomm.shout.R;
@@ -166,7 +167,7 @@ public class MapFragment extends SherlockFragment implements
 		if (bundle == null) {
 			return null;
 		}
-		byte[] hash = bundle.getByteArray(MapActivity.SHOUT_ID);
+		Hash hash = bundle.getParcelable(MapActivity.SHOUT_ID);
 		if (hash == null) {
 			return null;
 		}

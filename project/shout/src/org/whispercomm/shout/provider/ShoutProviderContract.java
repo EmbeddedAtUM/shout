@@ -1,6 +1,7 @@
 
 package org.whispercomm.shout.provider;
 
+import org.whispercomm.shout.Hash;
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.LocalUser;
 import org.whispercomm.shout.Location;
@@ -226,8 +227,8 @@ public class ShoutProviderContract {
 	 * @param hash The hash of the Shout
 	 * @return The LocalShout with the given hash
 	 */
-	public static LocalShout retrieveShoutByHash(Context context, byte[] hash) {
-		String encodedHash = Base64.encodeToString(hash, Base64.DEFAULT);
+	public static LocalShout retrieveShoutByHash(Context context, Hash hash) {
+		String encodedHash = Base64.encodeToString(hash.toByteArray(), Base64.DEFAULT);
 		String selection = Shouts.HASH + " = ?";
 		String[] selectionArgs = {
 				encodedHash
@@ -411,11 +412,11 @@ public class ShoutProviderContract {
 	 * @param hash the hash of the parent whose comments to retrieve
 	 * @return a cursor over the comments
 	 */
-	public static Cursor getComments(Context context, byte[] hash) {
+	public static Cursor getComments(Context context, Hash hash) {
 		String sortOrder = Shouts.TIME_RECEIVED + " ASC";
 		String selection = Shouts.PARENT + " = ?";
 		String[] selectionArgs = {
-				Base64.encodeToString(hash, Base64.DEFAULT)
+				Base64.encodeToString(hash.toByteArray(), Base64.DEFAULT)
 		};
 		Cursor cursor = context.getContentResolver().query(Shouts.COMMENT_CONTENT_URI, null,
 				selection,
@@ -435,11 +436,11 @@ public class ShoutProviderContract {
 
 	}
 
-	public static Cursor getCursorOverReshouts(Context context, byte[] parentHash) {
+	public static Cursor getCursorOverReshouts(Context context, Hash parentHash) {
 		String sortOrder = Shouts.TIME_RECEIVED + " DESC";
 		String selection = Shouts.PARENT + " = ?";
 		String[] selectionArgs = {
-				Base64.encodeToString(parentHash, Base64.DEFAULT)
+				Base64.encodeToString(parentHash.toByteArray(), Base64.DEFAULT)
 		};
 
 		Cursor result = context.getContentResolver().query(Shouts.RESHOUT_CONTENT_URI,
@@ -553,7 +554,8 @@ public class ShoutProviderContract {
 		}
 
 		public static ContentValues buildContentValues(Shout shout, int authorId) {
-			String encodedHash = Base64.encodeToString(shout.getHash(), Base64.DEFAULT);
+			String encodedHash = Base64.encodeToString(shout.getHash().toByteArray(),
+					Base64.DEFAULT);
 			String encodedSig = Base64.encodeToString(DsaSignature.encode(shout.getSignature()),
 					Base64.DEFAULT);
 			String encodedSender = Base64.encodeToString(
@@ -571,7 +573,8 @@ public class ShoutProviderContract {
 			values.put(Shouts.TIME_SENT, shout.getTimestamp().getMillis());
 			values.put(Shouts.TIME_RECEIVED, System.currentTimeMillis());
 			if (shout.getParent() != null) {
-				String encodedParentHash = Base64.encodeToString(shout.getParent().getHash(),
+				String encodedParentHash = Base64.encodeToString(shout.getParent().getHash()
+						.toByteArray(),
 						Base64.DEFAULT);
 				values.put(Shouts.PARENT, encodedParentHash);
 			}

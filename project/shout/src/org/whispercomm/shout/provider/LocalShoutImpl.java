@@ -2,12 +2,12 @@
 package org.whispercomm.shout.provider;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.joda.time.DateTime;
+import org.whispercomm.shout.Hash;
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.LocalUser;
 import org.whispercomm.shout.Location;
@@ -26,11 +26,11 @@ public class LocalShoutImpl implements LocalShout {
 	private String message;
 	private Location location;
 	private DsaSignature signature;
-	private byte[] hashBytes;
+	private Hash hash;
 	private DateTime sentTime;
 	private DateTime receivedTime;
 
-	private byte[] parentHash = null;
+	private Hash parentHash = null;
 	private LocalShout parent = null;
 
 	private int commentCount;
@@ -49,14 +49,14 @@ public class LocalShoutImpl implements LocalShout {
 		this.message = message;
 		this.location = location;
 		this.signature = DsaSignature.decode(Base64.decode(encodedSig, Base64.DEFAULT));
-		this.hashBytes = Base64.decode(encodedHash, Base64.DEFAULT);
+		this.hash = new Hash(Base64.decode(encodedHash, Base64.DEFAULT));
 		this.sentTime = new DateTime(sentTime);
 		this.receivedTime = new DateTime(receivedTime);
 		this.commentCount = commentCount;
 		this.reshoutCount = reshoutCount;
 		this.reshouterCount = reshouterCount;
 		if (encodedParentHash != null) {
-			this.parentHash = Base64.decode(encodedParentHash, Base64.DEFAULT);
+			this.parentHash = new Hash(Base64.decode(encodedParentHash, Base64.DEFAULT));
 		}
 	}
 
@@ -66,8 +66,8 @@ public class LocalShoutImpl implements LocalShout {
 	}
 
 	@Override
-	public byte[] getHash() {
-		return this.hashBytes;
+	public Hash getHash() {
+		return this.hash;
 	}
 
 	@Override
@@ -134,7 +134,7 @@ public class LocalShoutImpl implements LocalShout {
 	@Override
 	public List<LocalUser> getReshouters() {
 		// TODO Collapse users with the same public key
-		Cursor cursor = ShoutProviderContract.getCursorOverReshouts(context, hashBytes);
+		Cursor cursor = ShoutProviderContract.getCursorOverReshouts(context, hash);
 		List<LocalUser> users = new ArrayList<LocalUser>(cursor.getCount());
 		Set<Integer> userIds = new HashSet<Integer>();
 		int userIdIndex = cursor.getColumnIndex(ShoutProviderContract.Shouts.USER_PK);
@@ -151,7 +151,7 @@ public class LocalShoutImpl implements LocalShout {
 
 	@Override
 	public List<LocalShout> getComments() {
-		Cursor cursor = ShoutProviderContract.getComments(context, hashBytes);
+		Cursor cursor = ShoutProviderContract.getComments(context, hash);
 		List<LocalShout> comments = new ArrayList<LocalShout>(cursor.getCount());
 		while (cursor.moveToNext()) {
 			comments.add(ShoutProviderContract.retrieveShoutFromCursor(context, cursor));
@@ -164,7 +164,7 @@ public class LocalShoutImpl implements LocalShout {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + Arrays.hashCode(hashBytes);
+		result = prime * result + ((hash == null) ? 0 : hash.hashCode());
 		return result;
 	}
 
@@ -177,7 +177,10 @@ public class LocalShoutImpl implements LocalShout {
 		if (getClass() != obj.getClass())
 			return false;
 		LocalShoutImpl other = (LocalShoutImpl) obj;
-		if (!Arrays.equals(hashBytes, other.hashBytes))
+		if (hash == null) {
+			if (other.hash != null)
+				return false;
+		} else if (!hash.equals(other.hash))
 			return false;
 		return true;
 	}

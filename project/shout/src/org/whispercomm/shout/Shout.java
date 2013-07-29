@@ -30,6 +30,6 @@ public interface Shout extends UnsignedShout {
 	 * 
 	 * @return The hash for the entire network packet this Shout arrived on.
 	 */
-	public byte[] getHash();
+	public Hash getHash();
 
 }

@@ -135,7 +135,7 @@ public class TestFactory {
 					"٩(-̮̮̃-̃)۶: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus congue rutrum quam quis sollicitudin.",
 					new DateTime(2010, 9, 8, 7, 6, 5, DateTimeZone.UTC),
 					null,
-					Hex.decode("9C019522796E25E742AEDFBA0844A1EF344F4897F88BFABD39365A553941F137"),
+					new Hash(Hex.decode("9C019522796E25E742AEDFBA0844A1EF344F4897F88BFABD39365A553941F137")),
 					ROOT_LOCATION),
 			TEST_ME_1);
 
@@ -146,7 +146,7 @@ public class TestFactory {
 					null,
 					new DateTime(2011, 10, 9, 8, 7, 6, 5, DateTimeZone.UTC),
 					null,
-					Hex.decode("1A604881053AE042E1A5DC02ED0D275B9206AF00EDE5399739510B91CDC348E8"),
+					new Hash(Hex.decode("1A604881053AE042E1A5DC02ED0D275B9206AF00EDE5399739510B91CDC348E8")),
 					RESHOUT_LOCATION),
 			TEST_ME_2);
 
@@ -157,7 +157,7 @@ public class TestFactory {
 					"٩(͡๏̯͡๏)۶: Sed vehicula placerat velit, sed pretium lacus luctus tincidunt. Vestibulum suscipit elit et turpis tristique lobortis.",
 					new DateTime(2011, 10, 9, 8, 7, 6, 5, DateTimeZone.UTC),
 					null,
-					Hex.decode("1A604881053AE042E1A5DC02ED0D275B9206AF00EDE5399739510B91CDC348E8"),
+					new Hash(Hex.decode("1A604881053AE042E1A5DC02ED0D275B9206AF00EDE5399739510B91CDC348E8")),
 					COMMENT_LOCATION),
 			TEST_ME_2);
 
@@ -168,7 +168,7 @@ public class TestFactory {
 					null,
 					new DateTime(2012, 11, 10, 9, 8, 7, DateTimeZone.UTC),
 					null,
-					Hex.decode("B2E74FC24E02A31CF8DF4F2826F2CD0E97B68F876E3AC85A30E51F9A26A144EB"),
+					new Hash(Hex.decode("B2E74FC24E02A31CF8DF4F2826F2CD0E97B68F876E3AC85A30E51F9A26A144EB")),
 					RECOMMENT_LOCATION),
 			TEST_ME_3);
 

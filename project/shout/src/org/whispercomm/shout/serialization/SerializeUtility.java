@@ -19,11 +19,11 @@ import java.nio.charset.CharacterCodingException;
 
 import org.joda.time.DateTime;
 import org.spongycastle.math.ec.ECPoint;
-import org.whispercomm.shout.ShoutImage;
 import org.whispercomm.shout.Hash;
 import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.Location;
 import org.whispercomm.shout.Shout;
+import org.whispercomm.shout.ShoutImage;
 import org.whispercomm.shout.ShoutType;
 import org.whispercomm.shout.SimpleHashReference;
 import org.whispercomm.shout.UnsignedShout;
@@ -38,7 +38,6 @@ import org.whispercomm.shout.network.shout.InvalidShoutSignatureException;
 import org.whispercomm.shout.util.Arrays;
 import org.whispercomm.shout.util.ByteBufferUtils.InvalidLengthException;
 import org.whispercomm.shout.util.ByteBufferUtils.LengthType;
-import org.whispercomm.shout.util.HashUtils;
 import org.whispercomm.shout.util.ShoutMessageUtility;
 
 /**
@@ -231,7 +230,7 @@ public class SerializeUtility {
 
 		// Add Parent Reference Fields
 		if (parent != null) {
-			buffer.put(parent.getHash());
+			buffer.put(parent.getHash().toByteArray());
 		}
 
 		// Set length field, including signature that has not yet been added to
@@ -393,7 +392,7 @@ public class SerializeUtility {
 
 			// Parent reference
 			if (HAS_PARENT(flags)) {
-				shout.parentHash = getArray(buffer, PARENT_HASH_SIZE);
+				shout.parentHash = new Hash(getArray(buffer, PARENT_HASH_SIZE));
 			}
 
 			/*
@@ -422,7 +421,7 @@ public class SerializeUtility {
 
 			// Compute hash
 			ByteBuffer clone = flipToMark(buffer.asReadOnlyBuffer());
-			shout.hash = HashUtils.sha256(clone);
+			shout.hash = Hash.hashData(clone);
 
 			return shout;
 		} catch (BufferUnderflowException e) {
@@ -490,11 +489,11 @@ public class SerializeUtility {
 	 * @param shout the shout to hash
 	 * @return the hash of the provied shout
 	 */
-	public static byte[] generateHash(Shout shout) {
+	public static Hash generateHash(Shout shout) {
 		ByteBuffer serialized = serializeShout(ByteBuffer.allocate(SHOUT_SIGNED_SIZE_MAX),
 				shout);
 		serialized.flip();
-		return HashUtils.sha256(serialized);
+		return Hash.hashData(serialized);
 	}
 
 	private static class BuildableLocation implements Location {
@@ -546,10 +545,10 @@ public class SerializeUtility {
 		public Location location = null;
 
 		public BuildableShout parent = null;
-		public byte[] parentHash = null;
+		public Hash parentHash = null;
 
 		public DsaSignature signature = null;
-		public byte[] hash = null;
+		public Hash hash = null;
 
 		@Override
 		public int getVersion() {
@@ -591,7 +590,7 @@ public class SerializeUtility {
 		}
 
 		@Override
-		public byte[] getHash() {
+		public Hash getHash() {
 			return hash;
 		}
 

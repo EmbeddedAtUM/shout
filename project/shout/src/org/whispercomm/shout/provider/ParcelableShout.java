@@ -1,6 +1,7 @@
 
 package org.whispercomm.shout.provider;
 
+import org.whispercomm.shout.Hash;
 import org.whispercomm.shout.LocalShout;
 
 import android.content.Context;
@@ -16,13 +17,13 @@ import android.os.Parcelable;
  */
 public class ParcelableShout implements Parcelable {
 
-	private byte[] hash;
+	private Hash hash;
 
 	public ParcelableShout(LocalShout shout) {
 		this.hash = shout.getHash();
 	}
 
-	private ParcelableShout(byte[] hash) {
+	private ParcelableShout(Hash hash) {
 		this.hash = hash;
 	}
 
@@ -43,12 +44,13 @@ public class ParcelableShout implements Parcelable {
 
 	@Override
 	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeByteArray(hash);
+		dest.writeParcelable(hash, flags);
 	}
 
 	public static final Parcelable.Creator<ParcelableShout> CREATOR = new Parcelable.Creator<ParcelableShout>() {
 		public ParcelableShout createFromParcel(Parcel in) {
-			return new ParcelableShout(in.createByteArray());
+			Hash hash = in.readParcelable(Hash.class.getClassLoader());
+			return new ParcelableShout(hash);
 		}
 
 		public ParcelableShout[] newArray(int size) {

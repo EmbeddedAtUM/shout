@@ -16,6 +16,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.whispercomm.shout.Hash;
 import org.whispercomm.shout.Shout;
 import org.whispercomm.shout.User;
 import org.whispercomm.shout.crypto.DsaSignature;
@@ -46,7 +47,7 @@ public class ShoutSearchContractTest {
 		this.context = new Activity();
 		shouts = new ArrayList<Shout>();
 		for (int i = 0; i < 5; i++) {
-			byte[] hash = TestFactory.genByteArray(32);
+			Hash hash = new Hash(TestFactory.genByteArray(32));
 			DsaSignature sig = new DsaSignature(BigInteger.valueOf(i * 10000),
 					BigInteger.valueOf(i * 10000000 + 123523554));
 			TestShout test = new TestShout(sender, null, MESSAGE, DateTime.now(), sig, hash, null);
@@ -55,7 +56,7 @@ public class ShoutSearchContractTest {
 		}
 		unique = new TestShout(sender, null, "Imma firin mah lazor!", DateTime.now(),
 				new DsaSignature(BigInteger.valueOf(1030239349), BigInteger.valueOf(234834934)),
-				TestFactory.genByteArray(8), null);
+				new Hash(TestFactory.genByteArray(32)), null);
 		ShoutProviderContract.saveShout(context, unique);
 	}
 
@@ -108,7 +109,7 @@ public class ShoutSearchContractTest {
 		TestShout similar = new TestShout(sender, null,
 				"I am firing my employees because they spend too much time on Reddit",
 				new DateTime(), new DsaSignature(BigInteger.valueOf(2389239),
-						BigInteger.valueOf(23923939)), TestFactory.genByteArray(9), null);
+						BigInteger.valueOf(23923939)), new Hash(TestFactory.genByteArray(32)), null);
 		ShoutProviderContract.saveShout(context, similar);
 		List<Shout> result = ShoutSearchContract.searchShoutMessage(context, "firin*");
 		assertNotNull(result);

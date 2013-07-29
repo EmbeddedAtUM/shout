@@ -1,6 +1,7 @@
 
 package org.whispercomm.shout.provider;
 
+import org.whispercomm.shout.Hash;
 import org.whispercomm.shout.crypto.DsaSignature;
 import org.whispercomm.shout.crypto.KeyGenerator;
 import org.whispercomm.shout.test.util.TestFactory;
@@ -128,7 +129,7 @@ public class ProviderTestFactory {
 	}
 
 	private static ContentValues buildShout(String message, long time, double latitude,
-			double longitude, byte[] authorKey, byte[] hash, byte[] signature, int version,
+			double longitude, byte[] authorKey, Hash hash, byte[] signature, int version,
 			int authorId) {
 		ContentValues values = new ContentValues();
 		values.put(ShoutProviderContract.Shouts.MESSAGE, message);
@@ -138,7 +139,7 @@ public class ProviderTestFactory {
 		values.put(ShoutProviderContract.Shouts.LONGITUDE, longitude);
 		values.put(ShoutProviderContract.Shouts.AUTHOR,
 				Base64.encodeToString(authorKey, Base64.DEFAULT));
-		values.put(ShoutProviderContract.Shouts.HASH, Base64.encodeToString(hash, Base64.DEFAULT));
+		values.put(ShoutProviderContract.Shouts.HASH, Base64.encodeToString(hash.toByteArray(), Base64.DEFAULT));
 		values.put(ShoutProviderContract.Shouts.SIGNATURE,
 				Base64.encodeToString(signature, Base64.DEFAULT));
 		values.put(ShoutProviderContract.Shouts.VERSION, version);

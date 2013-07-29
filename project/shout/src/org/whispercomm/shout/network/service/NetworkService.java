@@ -232,7 +232,7 @@ public class NetworkService extends Service implements ManesConnection, ManesIns
 	private final NetworkServiceBinder.Stub binder = new
 			NetworkServiceBinder.Stub() {
 				@Override
-				public ErrorCode send(byte[] hash) throws RemoteException {
+				public ErrorCode send(Hash hash) throws RemoteException {
 					if (manes == null) {
 						return ErrorCode.MANES_NOT_INSTALLED;
 					}

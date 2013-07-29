@@ -1,6 +1,7 @@
 
 package org.whispercomm.shout.ui.fragment;
 
+import org.whispercomm.shout.Hash;
 import org.whispercomm.shout.HashReference;
 import org.whispercomm.shout.LocalShout;
 import org.whispercomm.shout.Location;
@@ -271,7 +272,7 @@ public class DetailsFragment extends SherlockFragment implements
 			throw new IllegalArgumentException("must have a bundle");
 			// return null;
 		}
-		byte[] hash = bundle.getByteArray(DetailsActivity.SHOUT_ID);
+		Hash hash = bundle.getParcelable(DetailsActivity.SHOUT_ID);
 		if (hash == null) {
 			throw new IllegalArgumentException("must have a hash in bundle");
 			// return null;

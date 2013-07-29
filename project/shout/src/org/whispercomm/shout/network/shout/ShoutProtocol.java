@@ -2,7 +2,6 @@
 package org.whispercomm.shout.network.shout;
 
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -167,7 +166,7 @@ public class ShoutProtocol implements ObjectProtocol {
 		}
 
 		private BuildableShout processNeedParent(BuildableShout shout) {
-			if (Arrays.equals(root.parentHash, shout.hash)) {
+			if (shout.hash.equals(root.parentHash)) {
 				// This is parent we need.
 				root.parent = shout;
 				if (shout.parentHash != null) {
@@ -187,7 +186,7 @@ public class ShoutProtocol implements ObjectProtocol {
 
 		private BuildableShout processNeedGrandparent(BuildableShout shout)
 				throws ShoutChainTooLongException {
-			if (Arrays.equals(root.parent.parentHash, shout.hash)) {
+			if (shout.hash.equals(root.parent.parentHash)) {
 				// This is the grandparent we need.
 				root.parent.parent = shout;
 				if (shout.parentHash != null) {
