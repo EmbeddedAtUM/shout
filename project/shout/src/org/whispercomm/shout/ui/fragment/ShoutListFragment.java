@@ -1,6 +1,6 @@
 
 package org.whispercomm.shout.ui.fragment;
-
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -213,11 +213,33 @@ public class ShoutListFragment extends SherlockFragment implements
 	@Override
 	public void onUndo(int id) {
 
+		if (deletedShout != null) {
+			expandedShouts.add(deletedShout);
+			deletedShout = null;
+		}
 		ShoutEraser shoutEraser = new ShoutEraser(getActivity());
 		boolean undo = shoutEraser.undoDeleteShout(id);
 		if (undo) {
 			UndoBarController.hideUndoBarView(UndoBarController.IMMEDIATE_HIDE);
 
+		}
+
+	}
+	
+	@Override
+	public void saveDeleted(DeletedShout ds) {
+		// Remove the deletedshout from set of localshout.
+		if (ds == null)
+			return;
+		String encodedHash = Arrays.toString(ds.getHash());
+		if (expandedShouts != null) {
+			for (LocalShout shout : expandedShouts) {
+				if (Arrays.toString(shout.getHash()).equals(encodedHash)) {
+					deletedShout = shout;
+					expandedShouts.remove(shout);
+					break;
+				}
+			}
 		}
 
 	}
