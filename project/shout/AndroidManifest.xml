@@ -48,6 +48,9 @@
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="@string/maps_api_key" />
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
 
         <activity
             android:name=".ui.ShoutActivity"
@@ -91,7 +94,6 @@
             android:name=".provider.ShoutProvider"
             android:authorities="@string/providerAuthority"
             android:permission="org.whispercomm.shout.ACCESS_SHOUTS" />
-
         <provider
             android:name=".provider.image.ImageProvider"
             android:authorities="org.whispercomm.shout.provider.image"
