@@ -41,7 +41,7 @@ import android.util.Log;
 public class NetworkService extends Service implements ManesConnection, ManesInstallationListener {
 	public static final String TAG = NetworkService.class.getSimpleName();
 
-	public static final int APP_ID = 74688;// "shout" on a phone keyboard
+	public static final int APP_ID = 100;
 
 	public static final String ACTION_REQUEST_CONTENT = "org.whispercomm.shout.REQUEST_CONTENT";
 	public static final String EXTRA_HASH = "hash";
