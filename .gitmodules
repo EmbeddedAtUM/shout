@@ -1,6 +1,0 @@
-[submodule "project/contrib/ViewPagerIndicator"]
-	path = project/contrib/ViewPagerIndicator
-	url = git://github.com/JakeWharton/Android-ViewPagerIndicator.git
-[submodule "project/contrib/ActionBarSherlock"]
-	path = project/contrib/ActionBarSherlock
-	url = git://github.com/JakeWharton/ActionBarSherlock.git

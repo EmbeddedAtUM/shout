@@ -1,7 +1,7 @@
 #!/bin/sh
 
 FILENAME_BASE=ic_menu_compose_white
-RESOURCES_DIR=../../project/shout/res
+RESOURCES_DIR=../../project/shout/src/main/res
 
 install_bitmap() {
     # $1 is filename base
